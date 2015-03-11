@@ -2,7 +2,7 @@
 define_constants;
 
 alpha=2; %sets the limit for the capacity
-mpc = loadcase('case118.m');
+mpc = loadcase('case2383wp.m');
 results=runpf(mpc);
 
 n_bus = numel(mpc.bus(:,1));
@@ -63,6 +63,10 @@ end
 
 number_islands1=0;
 number_islands2=0;
+branch_status1=0;
+branch_status2=0;
+branch_stat2=[];
+
 
 while 1
     count2=count2+1
@@ -70,9 +74,11 @@ while 1
     %removes branches exceeding limit
     for island=1:length(all_case_ccr)
         branchstatus(all_case_ccr(island),reference)
+        branch_stat2=[branch_stat2;ans];
          
     end
-    
+    branch_stat2=branch_stat2';
+    branch_status2=sum(branch_stat2)
     
     %updates ccr with some branches exceeding limit, maybe some islands are
     %there----> next count all these islands
@@ -82,7 +88,7 @@ while 1
         update_ccr(all_case_ccr(island),reference)
         updated_ccr=[updated_ccr;ans] %problem is here, coz all ccr's stored in ans. Now solved?
         %also creates new updated ccr from old (new one in which some
-        %branches removed
+        %branches removed %HERE OUTPUT BRANCH_STATUS2
         
     end
     
@@ -134,16 +140,19 @@ while 1
     total_ccr(zero_power)=[];
     
     number_islands2=numel(total_ccr);
-    if number_islands2==number_islands1
+    if number_islands2==number_islands1 & branch_status2==branch_status1
         %count2=count2+1
         text='no cascading failure triggered %s\n';
         disp(text)
         break
     end
     number_islands1=number_islands2;
+    branch_status1=branch_status2;
+    branch_stat2=[]; %maybe do same for number_islands
     
     all_case_ccr =total_ccr; %DONE except for confused all_case and problem
     %mentioned above
+    total_ccr=[];
 end
 
 number_islands1
