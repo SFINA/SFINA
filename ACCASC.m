@@ -3,7 +3,7 @@ define_constants;
 
 alpha=2; %sets the limit for the capacity
 mpc = loadcase('case2383wp.m');
-results=runpf(mpc);
+results=rundcpf(mpc);
 
 n_bus = numel(mpc.bus(:,1));
 n_branches=numel(mpc.branch(:,1));
@@ -92,6 +92,25 @@ while 1
         
     end
     
+    num_iso=[];
+    for iso=1:length(updated_ccr)
+        [x,isolated_bus]=find_islands(updated_ccr(iso));
+        isolated_bus=isolated_bus;
+        num_iso=[num_iso;length(isolated_bus)];
+    end
+    
+    num_iso=num_iso';
+    
+    num_bus=[];
+    for n_b=1:length(updated_ccr)
+        num_bus=[num_bus;numel(updated_ccr(n_b).bus(:,1))];
+    end        
+    num_bus=num_bus';
+
+
+    same=find(num_bus==num_iso);
+    updated_ccr(same)=[];
+    
     %SO THE updated_ccr also contains isolated buses, maybe remove those
     %for iso=1:length(updated_ccr)
      %   [x,isolated_bus]=find_islands(updated_ccr(iso));
@@ -142,7 +161,7 @@ while 1
     number_islands2=numel(total_ccr);
     if number_islands2==number_islands1 & branch_status2==branch_status1
         %count2=count2+1
-        text='no cascading failure triggered %s\n';
+        text='cascading failure triggered';
         disp(text)
         break
     end
