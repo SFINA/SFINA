@@ -27,7 +27,7 @@ end
 
 %stores reference current
 powerflow(mpc)
-reference=ans
+reference=ans;
 
 %remove branche(s)
 
@@ -52,7 +52,7 @@ for res=1:length(result)
     mpc.branch(result(res),BR_STATUS)=0;
 end
 
-count2=0;
+
 
 init_island=numel(extract_islands(mpc));
 all_case_ccr=[];
@@ -60,15 +60,16 @@ for init=1:init_island
     all_case_ccr=[all_case_ccr;extract_islands(mpc,init)];
 end
 
-
+count2=0;
 number_islands1=0;
 number_islands2=0;
 branch_status1=0;
 branch_status2=0;
 branch_stat2=[];
-total_load=[];
-total_generation=[];
-
+total_load=[sum(mpc.bus(:,PD))];
+total_generation=[sum(mpc.gen(:,PG))];
+num_branches=[n_branches];
+num_islan=[0];
 while 1
     count2=count2+1
     
@@ -86,7 +87,7 @@ while 1
          
     end
     branch_stat2=branch_stat2';
-    branch_status2=sum(branch_stat2)
+    branch_status2=sum(branch_stat2);
     
     %updates ccr with some branches exceeding limit, maybe islands formed
     
@@ -166,8 +167,8 @@ while 1
     new_power_demand=sum(new_power_demand')
     new_power_generation=sum(new_power_generation')
     
-    total_load=[total_load;new_power_demand];
-    total_generation=[total_generation;new_power_generation];
+    
+    
     
     number_islands2=numel(total_ccr);
     if number_islands2==number_islands1 & branch_status2==branch_status1
@@ -176,6 +177,26 @@ while 1
         disp(text)
         break
     end
+    
+    total_load=[total_load;new_power_demand];
+    total_generation=[total_generation;new_power_generation];
+    num_branches=[num_branches;branch_status2];
+    num_islan=[num_islan;number_islands1]
+    
+    from_bus=[];
+    to_bus=[];
+    for topo=1:length(total_ccr)
+        from_bus=[from_bus;total_ccr(topo).branch(:,1)];
+        to_bus=[to_bus;total_ccr(topo).branch(:,2)];
+        %eval(sprintf('from_bus%d = from_bus', topo))
+        %eval(sprintf('to_bus%d = to_bus', topo))
+    end
+    FROM_BUS=from_bus;
+    TO_BUS=to_bus;
+    topology=table(FROM_BUS,TO_BUS);
+    writetable(topology,sprintf('topology_information%d.txt',count2));
+    
+    
     number_islands1=number_islands2;
     branch_status1=branch_status2;
     branch_stat2=[]; 
@@ -193,8 +214,9 @@ Iterations=num_it'
 
 Total_Load = total_load;
 Total_generation=total_generation;
-
+Number_Branches=num_branches;
+Number_Islands=num_islan;
 %Write table
-T = table(Iterations,Total_Load,Total_generation)
-writetable(T)
+T = table(Iterations,Total_Load,Total_generation,Number_Branches,Number_Islands)
+writetable(T,'mydata.txt')
 
