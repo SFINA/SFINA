@@ -2,8 +2,18 @@
 define_constants;
 
 alpha=2; %sets the limit for the capacity
-mpc = loadcase('case57.m');
-results=runpf(mpc);
+
+prompt = 'Input the case file: ';
+str = input(prompt,'s'); 
+mpc = loadcase(str); %here give str as case57 for example
+
+%prompt='AC or DC? If AC write runpf(mpc), if DC write rundcpf(mpc):';
+%results=input(prompt,'s');
+%results=runpf(mpc)
+
+prompt='if power say power, if current say current:';
+type=input(prompt,'s');
+
 
 n_bus = numel(mpc.bus(:,1)); %number of buses in the initial system
 n_branches=numel(mpc.branch(:,1)); %number of branches in the initial system
@@ -25,9 +35,18 @@ for j=1:length(k)
     ref_b=[ref_b;mpc.branch(k(j),2)]; 
 end
 
-%stores reference current
-powerflow(mpc)
-reference=ans;
+current='current';
+power='power';
+%voltage='voltage';
+%stores reference current and power
+if strcmp(type,current)==1
+    powerflow(mpc)
+    reference=ans;
+elseif strcmp(type,power)==1
+     powerflow_power(mpc)
+     reference=ans;
+end
+
 
 %remove branche(s)
 
@@ -73,17 +92,25 @@ num_islan=[0];
 while 1
     count2=count2+1
     
-    %for island=1:length(all_case_ccr)
-        
-     %   actual_pd=all_case_ccr(island).bus(:, PD);
-      %  all_case_ccr(island).bus(:, PD)=(sum(all_case_ccr(island).gen(:,PG))/sum(all_case_ccr(island).bus(:,PD)))*actual_pd;
+    %does load shedding
+    for island=1:length(all_case_ccr)
+        actual_pd=all_case_ccr(island).bus(:, PD);
+        if sum(all_case_ccr(island).bus(:, PD))>sum(all_case_ccr(island).gen(:,PG))
+            
+            all_case_ccr(island).bus(:, PD)=(sum(all_case_ccr(island).gen(:,PG))/sum(all_case_ccr(island).bus(:,PD)))*actual_pd;
+        end
          
          
-    %end
+    end
     
     for island=1:length(all_case_ccr)
-        branchstatus(all_case_ccr(island),reference)
-        branch_stat2=[branch_stat2;ans];
+        if strcmp(type,current)==1
+            branchstatus(mpc,all_case_ccr(island),reference)
+            branch_stat2=[branch_stat2;ans];
+        elseif strcmp(type,power)==1
+            branchstatus_power(mpc,all_case_ccr(island),reference)
+            branch_stat2=[branch_stat2;ans];
+        end
          
     end
     branch_stat2=branch_stat2';
@@ -94,8 +121,14 @@ while 1
     updated_ccr=[]
     
     for island=1:length(all_case_ccr)
-        update_ccr(all_case_ccr(island),reference)
-        updated_ccr=[updated_ccr;ans] 
+        if strcmp(type,current)==1
+            update_ccr(mpc,all_case_ccr(island),reference)
+            updated_ccr=[updated_ccr;ans] 
+        elseif strcmp(type,power)==1
+            update_ccr_power(mpc,all_case_ccr(island),reference)
+            updated_ccr=[updated_ccr;ans]
+        end
+        
         
     end
     
