@@ -59,7 +59,7 @@ end
 reference_ccr=reference_ccr';
     
     
-results=runpf(ccr);  
+results=rundcpf(ccr);  
     
     
 fake_bus_id=[];
