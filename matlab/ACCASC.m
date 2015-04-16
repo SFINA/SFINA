@@ -137,6 +137,37 @@ while 1
      
     %does load shedding and prompt how what fraction of generation to use:
     
+    
+    %BUS_TOPOLOGY and META:
+    
+    %prints bus information
+    
+    T_node=mpc.bus(:,BUS_I);
+    
+    NODE=T_node;
+    LENGTH_INITIAL=length(NODE)
+    all_1(1:length(NODE))=1;
+    all_1_gen(1:length(NODE))=0;
+    
+    T_GEN=mpc.gen(:,1);
+    %node_topology=table(NODE);
+    %writetable(node_topology,sprintf('bus_information%d.txt',count2));
+    
+    %prints bus + meta information
+    %a=length(NODE)-length(isolated_nodes);
+    %conc=zeros(1,a)
+    %isolated_nodes=[isolated_nodes;conc']
+    %ISOLATED_NODES=isolated_nodes;
+    
+    %busandmeta=table(NODE,ISOLATED_NODES);
+    %writetable(busandmeta,sprintf('bus_and_meta_information%d.txt',count2));
+    
+    
+    
+    
+    
+    
+    
     for island=1:length(all_case_ccr)
         actual_pd=all_case_ccr(island).bus(:, PD);
         if sum(all_case_ccr(island).bus(:, PD))>sum(all_case_ccr(island).gen(:,PG))
@@ -151,15 +182,16 @@ while 1
          
     end
     
+    
     for island=1:length(all_case_ccr)
         if strcmp(type,current)==1
-            branchstatus(mpc,all_case_ccr(island),reference)
+            branchstatus(mpc,all_case_ccr(island),reference);
             branch_stat2=[branch_stat2;ans];
         elseif strcmp(type,power)==1
-            branchstatus_power(mpc,all_case_ccr(island),reference)
+            branchstatus_power(mpc,all_case_ccr(island),reference);
             branch_stat2=[branch_stat2;ans];
         elseif strcmp(type,voltage)==1
-            branchstatus_voltage(mpc,all_case_ccr(island),volt_ref_max,volt_ref_min)
+            branchstatus_voltage(mpc,all_case_ccr(island),volt_ref_max,volt_ref_min);
             branch_stat2=[branch_stat2;ans];
         end
          
@@ -173,14 +205,14 @@ while 1
     
     for island=1:length(all_case_ccr)
         if strcmp(type,current)==1
-            update_ccr(mpc,all_case_ccr(island),reference)
+            update_ccr(mpc,all_case_ccr(island),reference);
             
             updated_ccr=[updated_ccr;ans] 
         elseif strcmp(type,power)==1
-            update_ccr_power(mpc,all_case_ccr(island),reference)
+            update_ccr_power(mpc,all_case_ccr(island),reference);
             updated_ccr=[updated_ccr;ans]
         elseif strcmp(type,voltage)==1
-            update_ccr_voltage(mpc,all_case_ccr(island),volt_ref_max,volt_ref_min)
+            update_ccr_voltage(mpc,all_case_ccr(island),volt_ref_max,volt_ref_min);
             updated_ccr=[updated_ccr;ans]
         end
         
@@ -199,6 +231,7 @@ while 1
     end
     
     num_iso=num_iso';
+    length_ISO=length(num_iso)
     
     num_bus=[];
     for n_b=1:length(updated_ccr)
@@ -228,6 +261,15 @@ while 1
     total_ccr=[total_ccr;all_case_ccr]
     TOTALISLANDS=numel(total_ccr)
     
+    rem_buses=0;
+    for con=1:TOTALISLANDS
+        rem_bus=length(total_ccr(con).bus(:,BUS_I));
+        rem_buses=rem_buses+rem_bus;
+    end
+    
+    REM_BUSES=rem_buses
+        
+    
     
     power_demand=[];
     power_generation=[];
@@ -242,9 +284,44 @@ while 1
     power_generation=power_generation'
 
     %find indices of PG=0 (finds which island has no generators and removes)
-    zero_power=find(power_generation==0);
+    zero_power=find(power_generation==0)
 
     total_ccr(zero_power)=[];
+    
+    rem_rem_buses=0;
+    for con=1:length(total_ccr)
+        rem_bus=length(total_ccr(con).bus(:,BUS_I));
+        rem_rem_buses=rem_rem_buses+rem_bus;
+    end
+    
+    %final number of remaining buses after PG=0 and branch removal/isolation
+    REM_REM_BUSES=rem_rem_buses
+    
+    remaining_bus=[];
+    for top=1:length(total_ccr)
+        remaining_bus=[remaining_bus;total_ccr(top).bus(:,BUS_I)]; 
+            
+    end
+    REMAINING_BUS=remaining_bus
+    length(REMAINING_BUS)
+    
+    %buses and meta information (generators + isolated)
+    
+    for ii=1:length(REMAINING_BUS)
+        all_1(REMAINING_BUS(ii))=0;
+    end
+    ISOLAT=all_1';
+    
+    for jj=1:length(T_GEN)
+        all_1_gen(T_GEN(jj))=1;
+    end
+    GENS=all_1_gen';
+    
+    
+    busandmeta=table(NODE,ISOLAT,GENS);
+    writetable(busandmeta,sprintf('bus_and_meta_information%d.txt',count2));
+    
+    
     
     %new power demand after PG=0 set
     new_power_demand=[];
@@ -295,27 +372,6 @@ while 1
     topology=table(FROM_BUS,TO_BUS,GENERATORS);
     writetable(topology,sprintf('branch_and_meta_information%d.txt',count2));
     
-    %prints bus information
-    
-    node=[];
-    
-    for topo=1:length(total_ccr)
-        node=[node;total_ccr(topo).bus(:,BUS_I)];
-        
-    end
-    NODE=node;
-    
-    %node_topology=table(NODE);
-    %writetable(node_topology,sprintf('bus_information%d.txt',count2));
-    
-    %prints bus + meta information
-    a=length(NODE)-length(isolated_nodes);
-    conc=zeros(1,a)
-    isolated_nodes=[isolated_nodes;conc']
-    ISOLATED_NODES=isolated_nodes;
-    
-    busandmeta=table(NODE,ISOLATED_NODES);
-    writetable(busandmeta,sprintf('bus_and_meta_information%d.txt',count2));
     
     number_islands1=number_islands2;
     branch_status1=branch_status2;
