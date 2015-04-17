@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package network;
+package core;
 
 /**
  *
  * @author evangelospournaras
  */
-public class Generator extends Node{
+public interface SimulationAgentInterface {
     
+    public void runFlowAnalysis();
 }
