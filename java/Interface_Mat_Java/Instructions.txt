@@ -1,0 +1,24 @@
+-------
+Follow these steps to call InterPSS loadflow analysis from Matlab
+-------
+1.  Copy 
+
+1. 	Start Matlab with JVM 1.8 to make it compatible with InterPSS
+	On Mac: 
+	- Install JVM 1.8
+	- Open terminal
+	- Find out path of JVM 1.8: /usr/libexec/java_home -V
+	- export MATLAB_JAVA=<full JVM path>/jre (if JDK is installed, for JRE omit the /jre)
+	  e.g. export MATLAB_JAVA=/Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk/Contents/Home/jre
+	- go to Applications folder in the same terminal window and open matlab with: open MATLAB_R2015a.app/
+	On Unix it might be different, on Windows it's definitely different
+	
+2.	To make Java simulation available in Matlab
+	- Copy ...
+	- ...
+
+3.	Run InterPSS powerflow analysis
+	- Type in Matlab: result = InterPSS_lf(inputpath,mode);
+	- inputpath = absolute path to case file
+	- mode = 'AC' or 'DC' as a string
+	- ...
