@@ -1,10 +1,16 @@
 % Matlab file to call InterMaJa for InterPSS loadflow calculation
-% Absolute path to input data file
-inputpath = './Data/ieee/009ieee.dat';
+% Comparison of InterPSS and Matpower for IEEE 14 Bus network
+disp('####################################');
+disp('InterPSS loadflow for 14 Bus network:')
+disp('####################################');
+inputpath = './Data/ieee/IEEE14Bus.dat';
 mode = 'AC';
 result = InterPSS_lf(inputpath,mode);
 disp(result);
 
-data = loadcase('case9');
+disp('####################################');
+disp('Corresponding Matpower loadflow for 14 Bus network:')
+disp('####################################');
+data = loadcase('case14');
 result2 = runpf(data);
 disp(result2);

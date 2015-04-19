@@ -5,9 +5,12 @@ import org.interpss.IpssCorePlugin;
 import org.interpss.display.AclfOutFunc;
 import org.interpss.display.AclfOutFunc.BusIdStyle;
 import org.interpss.display.impl.AclfOut_BusStyle;
+//import org.interpss.display.AclfOutFunc.BusIdStyle;
+//import org.interpss.display.impl.AclfOut_BusStyle;
 import org.interpss.fadapter.IpssFileAdapter;
-import org.interpss.pssl.simu.IpssDclf;
-import org.interpss.pssl.simu.IpssDclf.DclfAlgorithmDSL;
+//import org.interpss.pssl.simu.IpssDclf;
+//import org.interpss.pssl.simu.IpssDclf.DclfAlgorithmDSL;
+
 
 import com.interpss.CoreObjectFactory;
 import com.interpss.common.exp.InterpssException;
@@ -29,7 +32,11 @@ public class InterPSS_loadflow {
 		inputpath = new_inputpath;
 	}
 	
-	// Run InterPSS Power Flow analysis
+	private float[] getbus(LoadflowAlgorithm algo) {
+		float[] bus = new float[10];
+		return bus;
+	}
+	
 	public String runlf() {
 		
 		//Initialize logger and Spring config
@@ -48,7 +55,7 @@ public class InterPSS_loadflow {
 				LoadflowAlgorithm algo = CoreObjectFactory.createLoadflowAlgorithm(net);
 				//run load flow using default setting
 			  	algo.loadflow();
-			  	result = AclfOutFunc.loadFlowSummary(net).toString();
+			  	result = AclfOutFunc.loadFlowSummary(net).toString() + AclfOut_BusStyle.lfResultsBusStyle(net, BusIdStyle.BusId_No).toString();
 
 			} else if (mode.equals("DC")) {
 				//net = IpssAdapter.importAclfNet("testData/aclf/ieee14.ieee")

@@ -1,24 +1,30 @@
 -------
-Follow these steps to call InterPSS loadflow analysis from Matlab
+Follow these steps to call InterPSS loadflow analysis from Matlab. 
+I tried to make it as general (at least for Unix systems) as possible. No garantuee.
 -------
-1.  Copy 
+1.  Change Matlab startup folder:
+    - In any open matlab session, type in command window: userpath('/path_to_SFINA_at_git/java/Interface_Mat_Java').
+    - Quit Matlab.
+    (This ensures, that Matlab loads javaclasspath.txt at startup which adds neccessary java classes.
+    It just changes the startup folder of Matlab and can be easily resetted with userpath('reset') later if necessary.)
 
-1. 	Start Matlab with JVM 1.8 to make it compatible with InterPSS
+2. 	Start Matlab with JVM 1.8 to make it compatible with InterPSS
 	On Mac: 
-	- Install JVM 1.8
+	- Install JVM 1.8 (check your version in terminal with: java -version)
 	- Open terminal
 	- Find out path of JVM 1.8: /usr/libexec/java_home -V
 	- export MATLAB_JAVA=<full JVM path>/jre (if JDK is installed, for JRE omit the /jre)
 	  e.g. export MATLAB_JAVA=/Library/Java/JavaVirtualMachines/jdk1.8.0_31.jdk/Contents/Home/jre
-	- go to Applications folder in the same terminal window and open matlab with: open MATLAB_R2015a.app/
+	- navigate in the same terminal window to Applications folder and open matlab: open MATLAB_R2015a.app/
+    - to check if Matlab indeed now uses Java 1.8, type in Matlab command window: version -java
+    Note: Setting of the environment variable like this is limited to the current terminal window. 
+    So it's necessary to start Matlab from this same window. To set it for all future windows as well, add it to .bash_profile
 	On Unix it might be different, on Windows it's definitely different
 	
-2.	To make Java simulation available in Matlab
-	- Copy ...
-	- ...
-
-3.	Run InterPSS powerflow analysis
-	- Type in Matlab: result = InterPSS_lf(inputpath,mode);
-	- inputpath = absolute path to case file
+3.	Run InterPSS powerflow analysis for IEEE 14 Bus System
+	- open and run Example_call_interpss_from_matlab.m
+    - don't be scared about the red output, it's not an error, just some information output from loading InterPSS
+    General:
+    - Type in Matlab: result = InterPSS_lf(inputpath,mode);
+	- inputpath = path to case file
 	- mode = 'AC' or 'DC' as a string
-	- ...

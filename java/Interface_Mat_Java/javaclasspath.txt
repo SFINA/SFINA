@@ -1,6 +1,4 @@
 ### Entries added for InterMaJa by Ben 24th March 2015
-# Path to java class which calls InterPSS
-./bin/
 # Java Packages for InterPSS
 ./ipss-common-master/ipss.lib/lib/ipss/ipss_core.jar
 ./ipss-common-master/ipss.lib/lib/ipss/ipss_plugin.jar
