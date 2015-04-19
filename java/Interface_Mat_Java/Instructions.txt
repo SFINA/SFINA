@@ -1,12 +1,15 @@
 -------
 Follow these steps to call InterPSS loadflow analysis from Matlab. 
 I tried to make it as general (at least for Unix systems) as possible. No garantuee.
+The output is still a general load flow summary, you won’t be able to use it yet for the cascading failure simulation. I’m working on this.
 -------
+
 1.  Change Matlab startup folder:
     - In any open matlab session, type in command window: userpath('/path_to_SFINA_at_git/java/Interface_Mat_Java').
     - Quit Matlab.
     Note: This ensures, that Matlab loads javaclasspath.txt at startup which adds neccessary java classes.
     It just changes the startup folder of Matlab and can be easily resetted with userpath('reset') later if necessary.
+
 
 2.  Start Matlab with JVM 1.8 to make it compatible with InterPSS
     On Mac: 
@@ -20,6 +23,7 @@ I tried to make it as general (at least for Unix systems) as possible. No garant
     Note: Setting of the environment variable like this is limited to the current terminal window. 
     So it's necessary to start Matlab from this same window. To set it for all future windows as well, add it to .bash_profile
     On Unix it might be different, on Windows it's definitely different
+
 	
 3.  Run InterPSS powerflow analysis for IEEE 14 Bus System
     - open and run Example_call_interpss_from_matlab.m
