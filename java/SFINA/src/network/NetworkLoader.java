@@ -9,6 +9,10 @@ package network;
  *
  * @author evangelospournaras
  */
-public class Load extends Node{
+public class NetworkLoader {
+    
+    public NetworkLoader(){
+        
+    }
     
 }
