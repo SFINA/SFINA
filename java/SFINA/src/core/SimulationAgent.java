@@ -1,7 +1,13 @@
 package core;
 
 import dsutil.protopeer.FingerDescriptor;
+import flow_analysis.Backend;
+import static flow_analysis.Backend.INTERPSS;
+import static flow_analysis.Backend.MATPOWER;
+import flow_analysis.FlowAnalysisOutcome;
+import input.InputParameter;
 import java.util.List;
+import java.util.Map;
 import network.Link;
 import network.Node;
 import protopeer.BasePeerlet;
@@ -30,18 +36,21 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private String experimentID;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
-
-    public enum backend{
-        MATPOWER,
-        INTERPSS
-    }
     
-    public enum power_flow{
-        AC,
-        DC
-    }
+    private Map<InputParameter,Object> inputParameters;
     
-    final static String network="case2383wp.m";
+    public enum Domain{
+        POWER,
+        GAS,
+        WATER,
+        TRANSPORTATION
+    }
+    private Domain domain;
+    private Backend backend;
+    
+    
+    
+    final static String network="test.txt";
     final static double tolerance=2.0;
     
     private List<Node> nodes;
@@ -111,8 +120,30 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     
     @Override
-    public void runFlowAnalysis(){
-    
+    public FlowAnalysisOutcome runFlowAnalysis(){
+        switch(domain){
+            case POWER:
+              switch(backend){
+                  case MATPOWER:
+                      
+                      break;
+                  case INTERPSS:
+                      
+                      break;
+                  default:
+                      //something is wrong.
+              }
+              break;
+            case GAS:
+                break;
+            case WATER:
+                break;
+            case TRANSPORTATION:
+                break;
+            default:
+                //something is wrong.
+        }
+        return null;
     }
     
      /**

@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package core;
-
-import flow_analysis.FlowAnalysisOutcome;
+package flow_analysis;
 
 /**
  *
  * @author evangelospournaras
  */
-public interface SimulationAgentInterface {
+public enum Backend {
+    MATPOWER,
+    INTERPSS
     
-    public FlowAnalysisOutcome runFlowAnalysis();
 }
