@@ -1,4 +1,4 @@
-branch_id,isolated,current,power,r,x,b1,rateA,rateB,rateC,ratio,angle,status,angmin,angmax
+branch_id,isolated,current,power,resistance,reactance,susceptance,rateA,rateB,rateC,ratio,angle,status,angmin,angmax
 1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
 2,1,0,0,0,0,0,0,0,0,0,0,0,0,0
 3,0,0,0,0.0625,0.132,0.0258,0,0,0,0,0,1,-360,360
