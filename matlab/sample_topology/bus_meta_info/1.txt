@@ -1,4 +1,4 @@
-node_id,type,real_power,reactive_power,shunt_conduct,shunt_suscep,area,Volt_mag,Volt_ang,baseKV,Zone,Volt_max,Volt_min,real_gen,reactive_gen,react_power_max,reactive_power_min,Volt_setpoint,mBase,status,real_power_max,real_power_min,Pc1,Pc2,Qc1min,Qc1max,Qc2min,Qc2max,ramp_agc,ramp_10,ramp_30,ramp_q,apf
+node_id,type,real_power,reactive_power,shunt_conduct,shunt_suscep,area,volt_mag,volt_ang,baseKV,Zone,volt_max,volt_min,real_gen,reactive_gen,react_power_max,reactive_power_min,volt_setpoint,mBase,status,real_power_max,real_power_min,Pc1,Pc2,Qc1min,Qc1max,Qc2min,Qc2max,ramp_agc,ramp_10,ramp_30,ramp_q,apf
 1,SLACK_BUS,55,17,0,0,1,1.04,0,0,1,1.06,0.94,128.9,-16.1,200,-140,1.04,100,1,575.88,0,0,0,0,0,0,0,0,0,0,0,0
 2,GEN,0,0,0,0,0,0,0,0,0,0,0,0,-0.8,50,-17,1.01,100,1,100,0,0,0,0,0,0,0,0,0,0,0,0
 3,GEN,41,21,0,0,1,0.985,-5.97,0,1,1.06,0.94,40,-1,60,-10,0.985,100,1,140,0,0,0,0,0,0,0,0,0,0,0,0
