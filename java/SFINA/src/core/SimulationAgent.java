@@ -4,12 +4,17 @@ import dsutil.protopeer.FingerDescriptor;
 import flow_analysis.Backend;
 import static flow_analysis.Backend.INTERPSS;
 import static flow_analysis.Backend.MATPOWER;
+import flow_analysis.FlowAnalysisInterface;
 import flow_analysis.FlowAnalysisOutcome;
 import input.InputParameter;
 import java.util.List;
 import java.util.Map;
 import network.Link;
 import network.Node;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+import power_flow_analysis.InterPSSPowerFlowAnalysis;
+import power_flow_analysis.MATPOWERPowerFlowAnalysis;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -34,10 +39,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private String peersLogDirectory;
     
     private String experimentID;
+    private String inputParametersLocation;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
     
     private Map<InputParameter,Object> inputParameters;
+    
+    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
     
     public enum Domain{
         POWER,
@@ -51,13 +59,12 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     
     final static String network="test.txt";
-    final static double tolerance=2.0;
     
     private List<Node> nodes;
     private List<Link> links;
     
-    public SimulationAgent(){
-    
+    public SimulationAgent(String inputParametersLocation){
+        this.inputParametersLocation=inputParametersLocation;
     }
     
     /**
@@ -115,35 +122,35 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         loadAgentTimer.schedule(Time.inMilliseconds(1000));
     }
     
-    
-    
-    
-    
     @Override
     public FlowAnalysisOutcome runFlowAnalysis(){
+        FlowAnalysisInterface flowAnalysis;
         switch(domain){
             case POWER:
               switch(backend){
                   case MATPOWER:
-                      
-                      break;
+                      flowAnalysis=new MATPOWERPowerFlowAnalysis();
+                      return flowAnalysis.flowAnalysis();
                   case INTERPSS:
-                      
-                      break;
+                      flowAnalysis=new InterPSSPowerFlowAnalysis();
+                      return flowAnalysis.flowAnalysis();
                   default:
-                      //something is wrong.
+                      logger.debug("Wrong backend detected.");
+                      return null;
               }
-              break;
             case GAS:
-                break;
+                logger.debug("This domain is not supported at this moment");
+                return null;
             case WATER:
-                break;
+                logger.debug("This domain is not supported at this moment");
+                return null;
             case TRANSPORTATION:
-                break;
+                logger.debug("This domain is not supported at this moment");
+                return null;
             default:
-                //something is wrong.
+                logger.debug("Wrong backend detected.");
+                return null;
         }
-        return null;
     }
     
      /**

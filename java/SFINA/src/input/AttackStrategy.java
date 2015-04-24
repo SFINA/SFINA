@@ -9,11 +9,7 @@ package input;
  *
  * @author evangelospournaras
  */
-public enum InputParameter {
-    DOMAIN,
-    BACKEND,
-    FLOW_ANALYSIS_TYPE,
-    FLOW_TYPE,
-    TOLERANCE_PARAMETER,
-    ATTACK_STRATEGY
+public enum AttackStrategy {
+    SEQUENTIAL,
+    SIMULTANEOUS
 }

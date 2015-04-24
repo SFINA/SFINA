@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package input;
+package flow_analysis;
+
+import flow_analysis.FlowAnalysisOutcome;
 
 /**
  *
  * @author evangelospournaras
  */
-public enum InputParameter {
-    DOMAIN,
-    BACKEND,
-    FLOW_ANALYSIS_TYPE,
-    FLOW_TYPE,
-    TOLERANCE_PARAMETER,
-    ATTACK_STRATEGY
+public interface FlowAnalysisInterface {
+    
+    public FlowAnalysisOutcome flowAnalysis();
+    
 }
