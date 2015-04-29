@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package core;
+package flow_analysis;
 
 import flow_analysis.FlowAnalysisOutcome;
 
@@ -11,7 +11,8 @@ import flow_analysis.FlowAnalysisOutcome;
  *
  * @author evangelospournaras
  */
-public interface SimulationAgentInterface {
+public interface FlowAnalysisInterface {
     
-    public FlowAnalysisOutcome runFlowAnalysis();
+    public FlowAnalysisOutcome flowAnalysis();
+    
 }

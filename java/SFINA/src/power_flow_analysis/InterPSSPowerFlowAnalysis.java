@@ -3,15 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package core;
+package power_flow_analysis;
 
+import flow_analysis.FlowAnalysisInterface;
 import flow_analysis.FlowAnalysisOutcome;
 
 /**
  *
  * @author evangelospournaras
  */
-public interface SimulationAgentInterface {
+public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
     
-    public FlowAnalysisOutcome runFlowAnalysis();
+    @Override
+    public FlowAnalysisOutcome flowAnalysis(){
+        return null;
+        
+    }
+    
 }
