@@ -32,8 +32,8 @@ public class InterPSS_loadflow {
 		inputpath = new_inputpath;
 	}
 	
-	private float[] getbus(LoadflowAlgorithm algo) {
-		float[] bus = new float[10];
+	private float[] getbus(LoadflowAlgorithm algo, AclfNetwork net) {
+		float[] bus = new float[net.getNoBus()];
 		return bus;
 	}
 	
