@@ -1,16 +1,26 @@
 package ch.ethz.coss;
 
+import java.io.IOException;
+
 import matlabcontrol.*;
+
 import com.interpss.common.exp.InterpssException;
 
 public class Main {
-	public static void main(String[] args) throws MatlabConnectionException, MatlabInvocationException, InterpssException {
+	public static void main(String[] args) throws MatlabConnectionException, MatlabInvocationException, InterpssException, IOException {
 		
 		// Call InterPSS simulation on case IEEE009
-		String path = "./Data/ieee/IEEE14Bus.dat";
-		InterPSS_loadflow lf = new InterPSS_loadflow(path, "AC");
-		String result = lf.runlf();
-		System.out.println(result);	
+		//String path = "./Data/ieee/IEEE14Bus.dat";
+		//nterPSS_loadflow lf = new InterPSS_loadflow(path, "AC");
+		//String result = lf.runlf();
+		//System.out.println(result);	
+		
+		String branch = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/branch_info/1.txt";
+		String branch_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/branch_info/1.txt";
+		String bus_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/branch_info/1.txt";
+		String save_to = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/matpower_format/";
+		String case_name = "case5";
+		Convert.run(branch, branch_meta, bus_meta, save_to, case_name);
 		
 		/*
 		// Call Matlab from Java
