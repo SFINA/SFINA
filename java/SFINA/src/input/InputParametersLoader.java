@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import network.Link;
+import network.Node;
 import org.apache.log4j.Logger;
 
 /**
@@ -19,7 +21,7 @@ import org.apache.log4j.Logger;
  */
 public class InputParametersLoader {
     
-    private String parameterValueSeparator;
+    private final String parameterValueSeparator;
     private static final Logger logger = Logger.getLogger(InputParametersLoader.class);
     
     public InputParametersLoader(String parameterValueSeparator){
@@ -27,29 +29,24 @@ public class InputParametersLoader {
     }
     
     public HashMap<InputParameter,Object> loadInputParameters(String location){
+        HashMap<InputParameter,Object> inputParameters=new HashMap<InputParameter,Object>();
         File file = new File(location);
         Scanner scr = null;
         try {
             scr = new Scanner(file);
             while(scr.hasNext()){
-                System.out.println("line : "+scr.next());
                 StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
-                while (st.hasMoreElements()) {
-			System.out.println(st.nextElement());
+                while (st.hasMoreTokens()) {
+                    InputParameter inputParameter=lookupInputParameter(st.nextToken());
+                    Object value=this.getObjectFromString(inputParameter, st.nextToken());
+                    inputParameters.put(inputParameter, value);
 		}
-                
-                
-                
             }
         }
         catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        return null;
-    }
-    
-    public ArrayList<String> loadAttackedLines(String location){
-        return null;
+        return inputParameters;
     }
     
     private InputParameter lookupInputParameter(String inputParameter){
@@ -60,6 +57,78 @@ public class InputParametersLoader {
                 return InputParameter.BACKEND;
             case "flow_type":
                 return InputParameter.FLOW_TYPE;
+            case "flow_analysis_type":
+                return InputParameter.FLOW_ANALYSIS_TYPE;
+            case "tolerance":
+                return InputParameter.TOLERANCE_PARAMETER;
+            case "attack_strategy":
+                return InputParameter.ATTACK_STRATEGY;
+            default:
+                logger.debug("Input parameter is not recongised.");
+                return null;
+        }
+    }
+    
+    private Object getObjectFromString(InputParameter inputParameter, String stringValue){
+        switch(inputParameter){
+            case DOMAIN:
+                switch(stringValue){
+                    case "power":
+                        return Domain.POWER;
+                    case "gas":
+                        return Domain.GAS;
+                    case "water":
+                        return Domain.WATER;
+                    case "transportation":
+                        return Domain.TRANSPORTATION;
+                    default:
+                        logger.debug("Domain input parameter is not recongised.");
+                        return null;
+                }
+            case BACKEND:
+                switch(stringValue){
+                    case "matpower":
+                        return Backend.MATPOWER;
+                    case "interpss":
+                        return Backend.INTERPSS;
+                    default:
+                        logger.debug("Backend input parameter is not recongised.");
+                        return null;
+                }
+            case FLOW_TYPE:
+                switch(stringValue){
+                    case "dc":
+                        return FlowType.DC;
+                    case "ac":
+                        return FlowType.AC;
+                    default:
+                        logger.debug("Flow type input parameter is not recongised.");
+                        return null;
+                }
+            case FLOW_ANALYSIS_TYPE:
+                switch(stringValue){
+                    case "current":
+                        return FlowAnalysisType.CURRENT;
+                    case "power":
+                        return FlowAnalysisType.POWER;
+                    case "voltage":
+                        return FlowAnalysisType.VOLTAGE;
+                    default:
+                        logger.debug("Flow analysis type input parameter is not recongised.");
+                        return null;
+                }
+            case TOLERANCE_PARAMETER:
+                return Double.parseDouble(stringValue);
+            case ATTACK_STRATEGY:
+                switch(stringValue){
+                    case "sequential":
+                        return AttackStrategy.SEQUENTIAL;
+                    case "simultaneous":
+                        return AttackStrategy.SIMULTANEOUS;
+                    default:
+                        logger.debug("Attack strategy input parameter is not recongised.");
+                        return null;
+                }
             default:
                 logger.debug("Input parameter is not recongised.");
                 return null;

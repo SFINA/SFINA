@@ -6,34 +6,55 @@
 package network;
 
 import dsutil.generic.state.State;
-import dsutil.protopeer.FingerDescriptor;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  *
  * @author evangelospournaras
  */
-public class Node {
+public class Node extends State{
     
-    public static String id=UUID.randomUUID().toString();
     private String index;
-    private List<String> incomingLinks;
-    private List<String> outgoingLinks;
+    private List<Link> links;
     private boolean connected;
-    public State state;
     
     public Node(String index){
+        super();
         this.index=index;
         this.connected=false;
+        this.links=new ArrayList<Link>();
     }
     
     public void addLink(Link link){
-        
+        this.getLinks().add(link);
+        this.connected=true;
     }
     
     public void removeLink(Link link){
-        
+        this.getLinks().remove(link);
+        if(getLinks().size()==0)
+            this.connected=false;
+    }
+    
+    public ArrayList<Link> getIncomingLinks(){
+        ArrayList<Link> incomingLinks=new ArrayList<Link>();
+        for(Link link:getLinks()){
+            if(link.getEndNode().equals(this)){
+                incomingLinks.add(link);
+            }
+        }
+        return incomingLinks;
+    }
+    
+    public ArrayList<Link> getOutgoingLinks(){
+        ArrayList<Link> outgoingLinks=new ArrayList<Link>();
+        for(Link link:getLinks()){
+            if(link.getStartNode().equals(this)){
+                outgoingLinks.add(link);
+            }
+        }
+        return outgoingLinks;
     }
     
     public boolean isConnected(){
@@ -55,32 +76,18 @@ public class Node {
     }
 
     /**
-     * @return the incomingLinks
+     * @return the links
      */
-    public List<String> getIncomingLinks() {
-        return incomingLinks;
+    public List<Link> getLinks() {
+        return links;
     }
 
     /**
-     * @param incomingLinks the incomingLinks to set
+     * @param links the links to set
      */
-    public void setIncomingLinks(List<String> incomingLinks) {
-        this.incomingLinks = incomingLinks;
+    public void setLinks(List<Link> links) {
+        this.links = links;
+        if(links.size()!=0)
+            this.connected=true;
     }
-
-    /**
-     * @return the outgoingLinks
-     */
-    public List<String> getOutgoingLinks() {
-        return outgoingLinks;
-    }
-
-    /**
-     * @param outgoingLinks the outgoingLinks to set
-     */
-    public void setOutgoingLinks(List<String> outgoingLinks) {
-        this.outgoingLinks = outgoingLinks;
-    }
-    
-    
 }

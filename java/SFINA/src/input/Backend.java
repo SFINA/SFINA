@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flow_analysis;
+package input;
 
 /**
  *
@@ -12,5 +12,4 @@ package flow_analysis;
 public enum Backend {
     MATPOWER,
     INTERPSS
-    
 }

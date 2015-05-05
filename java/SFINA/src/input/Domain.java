@@ -9,7 +9,9 @@ package input;
  *
  * @author evangelospournaras
  */
-public enum FlowType {
-    AC,
-    DC
+public enum Domain {
+    POWER,
+    GAS,
+    WATER,
+    TRANSPORTATION
 }

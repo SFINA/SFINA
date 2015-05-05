@@ -1,20 +1,26 @@
 package core;
 
 import dsutil.protopeer.FingerDescriptor;
-import flow_analysis.Backend;
-import static flow_analysis.Backend.INTERPSS;
-import static flow_analysis.Backend.MATPOWER;
+import input.Backend;
+import static input.Backend.INTERPSS;
+import static input.Backend.MATPOWER;
 import flow_analysis.FlowAnalysisInterface;
 import flow_analysis.FlowAnalysisOutcome;
+import input.Domain;
+import static input.Domain.GAS;
+import static input.Domain.POWER;
+import static input.Domain.TRANSPORTATION;
+import static input.Domain.WATER;
 import input.InputParameter;
+import input.InputParametersLoader;
+import input.TopologyLoader;
 import java.util.List;
 import java.util.Map;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
-import power_flow_analysis.InterPSSPowerFlowAnalysis;
-import power_flow_analysis.MATPOWERPowerFlowAnalysis;
+import power.flow_analysis.InterPSSPowerFlowAnalysis;
+import power.flow_analysis.MATPOWERPowerFlowAnalysis;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -40,19 +46,19 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     private String experimentID;
     private String inputParametersLocation;
+    private String attackedLinesLocation;
+    private String parameterValueSeparator;
+    private String columnSeparator;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
+    private InputParametersLoader inputParametersLoader;
+    private TopologyLoader topologyLoader;
     
     private Map<InputParameter,Object> inputParameters;
+    private List<Link> attackedLinks;
     
     private static final Logger logger = Logger.getLogger(SimulationAgent.class);
     
-    public enum Domain{
-        POWER,
-        GAS,
-        WATER,
-        TRANSPORTATION
-    }
     private Domain domain;
     private Backend backend;
     
@@ -63,8 +69,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private List<Node> nodes;
     private List<Link> links;
     
-    public SimulationAgent(String inputParametersLocation){
+    public SimulationAgent(String inputParametersLocation, String attackedLinesLocation, String parameterValueSeparator, String columnSeparator){
         this.inputParametersLocation=inputParametersLocation;
+        this.attackedLinesLocation=attackedLinesLocation;
+        this.parameterValueSeparator=parameterValueSeparator;
+        this.columnSeparator=columnSeparator;
+        this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
+        this.topologyLoader=new TopologyLoader(this.columnSeparator);
     }
     
     /**
@@ -103,6 +114,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
+                inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
+                attackedLinks=topologyLoader.loadAttackedLinks(attackedLinesLocation, links);
                 runActiveState();
             }
         });
@@ -120,6 +133,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         }
         });
         loadAgentTimer.schedule(Time.inMilliseconds(1000));
+    }
+    
+    private void buildTopology(){
+        //adds the links in the nodes! 
     }
     
     @Override
