@@ -1,6 +1,7 @@
 package ch.ethz.coss;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import matlabcontrol.*;
 
@@ -16,36 +17,37 @@ public class Main {
 		System.out.println(result);*/	
 		
 		// Test conversion script with sample topology
-		String branch = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_info/1.txt";
+		/*String branch = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_info/1.txt";
 		String branch_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_meta_info/1.txt";
 		String bus_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/node_meta_info/1.txt";
 		String save_to = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/matpower_format/";
 		String case_name = "sample_topology";
 		Convert.toMatpower(branch, branch_meta, bus_meta, save_to, case_name);
-		
-		/*
-		// Call Matlab from Java
-		MatlabProxyFactory factory = new MatlabProxyFactory();
-		MatlabProxy proxy = factory.getProxy();
-	    
-		//Create log
-		LoggingMatlabProxy log = new LoggingMatlabProxy(proxy);
-	    LoggingMatlabProxy.showInConsoleHandler();
-		
-	    //Test with simple variable
-	    proxy.eval("a = 5 + 6");
-	    double result = ((double[]) proxy.getVariable("a"))[0];
-	    System.out.println("Result: " + result);
-	    
-	    //Call Powerflow analysis
-	    proxy.eval("grid_data = loadcase('case9')");
-	    proxy.eval("result = runpf(grid_data)");
-	    Object matpf_result = proxy.getVariable("result");
-	    //Double matpf_result = ((Double[]) proxy.getVariable("result"))[0];
-		System.out.println("Return of PowerFlow Analysis:" + matpf_result);
-		
-		//Close Matlab session
-		proxy.exit();;
 		*/
+		
+	    //Call Matpower flow analysis
+		CallMatpower matpwr = new CallMatpower("case14");
+		matpwr.run();
+		double[][] bus = matpwr.get("bus");
+		double[][] branch = matpwr.get("bra");
+		double[][] generator = matpwr.get("gen");
+		
+		System.out.println("Bus data:");
+		for(int i = 0; i < bus.length; i++)
+		{
+		    System.out.println(Arrays.toString(bus[i]));
+		}
+		
+		System.out.println("\nGenerator data:");
+		for(int i = 0; i < generator.length; i++)
+		{
+		    System.out.println(Arrays.toString(generator[i]));
+		}
+		
+		System.out.println("\nBranch data:");
+		for(int i = 0; i < branch.length; i++)
+		{
+		    System.out.println(Arrays.toString(branch[i]));
+		}
 	}
 }
