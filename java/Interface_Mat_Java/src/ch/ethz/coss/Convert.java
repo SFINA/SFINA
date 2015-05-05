@@ -21,6 +21,7 @@ public class Convert {
 	private static String bus_str = "";
 	private static String gen_str = "";
 	private static String bra_str = "";
+	private static String gencost_str = "";
 	
 	/**
 	 * Runs the conversion from SFINA custom .txt to Matpower .m format. 
@@ -87,11 +88,13 @@ public class Convert {
 				else bus_str += "	" + bus_data.get(i).get(j);
 			}
 			bus_str += ";\n";
-			// pick out generators and add their id and additional values in generator string
-			if (bus_data.get(i).get(1).equals("GEN")) {
+			// pick out generators and add their id and additional values in generator string and generator cost string
+			if (bus_data.get(i).get(1).equals("GEN") || bus_data.get(i).get(1).equals("SLACK_BUS") ) {
 				gen_str += "	" + bus_data.get(i).get(0);
-				for (int j = 13; j < bus_data.get(i).size(); j++) gen_str += "	" + bus_data.get(i).get(j);
+				for (int j = 13; j < 33; j++) gen_str += "	" + bus_data.get(i).get(j);
 				gen_str += ";\n";
+				for (int j = 33; j < bus_data.get(i).size(); j++) gencost_str += "	" + bus_data.get(i).get(j);
+				gencost_str += ";\n";
 			}
 		}
 
@@ -99,16 +102,11 @@ public class Convert {
 		for (int i = 1; i < bra_data.size(); i++){
 			for (int j = 1; j < 13; j++){
 				if (j == 1 || j == 2) bra_str += "	" + bra_data.get(i).get(j); // from_bus and to_bus
-				else if (j == 10) bra_str += "	" + bra_meta_data.get(i).get(j) + "	" + invertBranchStatus(bra_data.get(i).get(3)); // include status of line
+				else if (j == 10) bra_str += "	" + bra_meta_data.get(i).get(j) + "	" + bra_data.get(i).get(3); // include status of line
 				else bra_str += "	" + bra_meta_data.get(i).get(j); // all other branch info
 			}
 			bra_str += ";\n";
 		}		
-	}
-	
-	private static String invertBranchStatus(String branch_status) {
-		if (branch_status.equals("1")) return "0";
-		else return "1";
 	}
 	
 	private static void writeToMatFile(BufferedWriter writer, String case_name) throws IOException {
@@ -135,13 +133,18 @@ public class Convert {
 		writer.write("%% branch data\n%	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax\nmpc.branch = [\n");
 		writer.write(bra_str);
 		writer.write("];\n");
+		
+		// Write generator cost data
+		writer.write("%%-----  OPF Data  -----%%\n%% generator cost data\n%	1	startup	shutdown	n	x1	y1	...	xn	yn\n%	2	startup	shutdown	n	c(n-1)	...	c0\nmpc.gencost = [\n");
+		writer.write(gencost_str);
+		writer.write("];\n");
 	}
 	
 	private static boolean isIsolated(int bus_row) {
 		String bus = bus_data.get(bus_row).get(0);
 		boolean is_isolated = true;
 		for (int i = 1; i < bra_data.size(); i++){
-			if (bra_data.get(i).get(1).equals(bus) || bra_data.get(i).get(2).equals(bus) && bra_data.get(i).get(3).equals("0")) {
+			if (bra_data.get(i).get(1).equals(bus) || bra_data.get(i).get(2).equals(bus) && bra_data.get(i).get(3).equals("1")) {
 				is_isolated = false;
 			}
 		}
