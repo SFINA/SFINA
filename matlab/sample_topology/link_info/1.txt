@@ -1,4 +1,4 @@
-branch_id,from_bus,to_bus,status
+link_id,from_node,to_node,status
 1,1,2,0
 2,2,3,0
 3,3,4,1
