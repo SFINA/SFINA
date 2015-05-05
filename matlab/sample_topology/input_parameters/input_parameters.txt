@@ -1,0 +1,6 @@
+domain=power
+backend=matpower
+flow_analysis_type=power
+flow_type=DC
+attack_strategy=simultaneous
+alpha=2
