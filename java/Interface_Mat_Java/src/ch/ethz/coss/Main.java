@@ -24,9 +24,9 @@ public class Main {
 		String case_name = "sample_topology";
 		Convert.toMatpower(branch, branch_meta, bus_meta, save_to, case_name);
 		*/
-		
-	    //Call Matpower flow analysis
-		CallMatpower matpwr = new CallMatpower("case14");
+
+		//Call Matpower flow analysis. Specify argument true if you want to terminate matlab session (if no further simulations will be run).
+		CallMatpower matpwr = new CallMatpower("case14",true);
 		matpwr.run();
 		double[][] bus = matpwr.get("bus");
 		double[][] branch = matpwr.get("bra");
