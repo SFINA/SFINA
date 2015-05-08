@@ -26,10 +26,11 @@ public class Main {
 		*/
 
 		//Call Matpower flow analysis. Specify argument true if you want to terminate matlab session (if no further simulations will be run).
-		CallMatpower matpwr = new CallMatpower("case14",true);
-		matpwr.run();
+		CallMatpower matpwr = new CallMatpower("case14","AC");
+		int[] failed_bra = {5,6,12};
+		matpwr.run(failed_bra);
 		double[][] bus = matpwr.get("bus");
-		double[][] branch = matpwr.get("bra");
+		double[][] branch = matpwr.get("bra") ;
 		double[][] generator = matpwr.get("gen");
 		
 		System.out.println("Bus data:");
