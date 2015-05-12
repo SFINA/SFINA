@@ -10,6 +10,7 @@ package power.input;
  * @author evangelospournaras
  */
 public enum PowerNodeState {
+    ID,
     TYPE,
     REAL_POWER,
     REACTIVE_POWER,
