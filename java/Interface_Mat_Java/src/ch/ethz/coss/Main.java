@@ -12,9 +12,10 @@ public class Main {
 		
 		// Call InterPSS simulation on case IEEE009
 		/*String path = "./Data/ieee/IEEE14Bus.dat";
-		nterPSS_loadflow lf = new InterPSS_loadflow(path, "AC");
+		InterPSS_loadflow lf = new InterPSS_loadflow(path, "AC");
 		String result = lf.runlf();
-		System.out.println(result);*/	
+		System.out.println(result);	
+		*/
 		
 		// Test conversion script with sample topology
 		/*String branch = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_info/1.txt";
@@ -24,15 +25,26 @@ public class Main {
 		String case_name = "sample_topology";
 		Convert.toMatpower(branch, branch_meta, bus_meta, save_to, case_name);
 		*/
-
-		//Call Matpower flow analysis. Specify argument true if you want to terminate matlab session (if no further simulations will be run).
-		CallMatpower matpwr = new CallMatpower("case14","AC");
-		int[] failed_bra = {5,6,12};
-		matpwr.run(failed_bra);
-		double[][] bus = matpwr.get("bus");
-		double[][] branch = matpwr.get("bra") ;
-		double[][] generator = matpwr.get("gen");
 		
+		
+		// Use matpower flow analysis with network data in double[][] arrays
+		CallMatpower matpwr = new CallMatpower("createCase14", "AC");
+		
+		// Load case14 from Matpower into java object to use it for the simulation
+		matpwr.getCaseDataFromMatpower("case14");
+		double[][] bus = matpwr.getBus();
+		double[][] generator = matpwr.getGen();
+		double[][] branch = matpwr.getBranch() ;
+		double[][] gencost = matpwr.getGencost();
+		
+		// Run powerflow and get back the data
+		matpwr.run(bus,generator,branch,gencost);
+		bus = matpwr.getBus();
+		generator = matpwr.getGen();
+		branch = matpwr.getBranch();
+		gencost = matpwr.getGencost();
+		
+		// Print out results
 		System.out.println("Bus data:");
 		for(int i = 0; i < bus.length; i++)
 		{

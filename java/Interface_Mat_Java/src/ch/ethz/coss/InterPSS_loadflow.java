@@ -1,21 +1,26 @@
 package ch.ethz.coss;
 
+import org.eclipse.emf.common.util.EList;
 import org.interpss.CorePluginObjFactory;
 import org.interpss.IpssCorePlugin;
 import org.interpss.display.AclfOutFunc;
 import org.interpss.display.AclfOutFunc.BusIdStyle;
+import org.interpss.display.DclfOutFunc;
 import org.interpss.display.impl.AclfOut_BusStyle;
 //import org.interpss.display.AclfOutFunc.BusIdStyle;
 //import org.interpss.display.impl.AclfOut_BusStyle;
 import org.interpss.fadapter.IpssFileAdapter;
-//import org.interpss.pssl.simu.IpssDclf;
-//import org.interpss.pssl.simu.IpssDclf.DclfAlgorithmDSL;
-
+import org.interpss.pssl.simu.IpssDclf;
+import org.interpss.pssl.simu.IpssDclf.DclfAlgorithmDSL;
 
 import com.interpss.CoreObjectFactory;
 import com.interpss.common.exp.InterpssException;
+import com.interpss.core.aclf.AclfBranch;
 import com.interpss.core.aclf.AclfNetwork;
 import com.interpss.core.algo.LoadflowAlgorithm;
+import com.interpss.core.dclf.DclfAlgorithm;
+import com.interpss.core.dclf.DclfFactory;
+import com.interpss.core.net.Branch;
 
 public class InterPSS_loadflow {
 	private String mode;
@@ -32,11 +37,6 @@ public class InterPSS_loadflow {
 		inputpath = new_inputpath;
 	}
 	
-	private float[] getbus(LoadflowAlgorithm algo, AclfNetwork net) {
-		float[] bus = new float[net.getNoBus()];
-		return bus;
-	}
-	
 	public String runlf() {
 		
 		//Initialize logger and Spring config
@@ -51,6 +51,15 @@ public class InterPSS_loadflow {
 						.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF)
 						.load(inputpath)
 						.getAclfNet();
+				
+				EList<AclfBranch> branchlist = net.getBranchList();
+				net.getBranch("Bus4","Bus9").setStatus(false);
+				net.getBranch("Bus4","Bus7").setStatus(false);
+				net.getBranch("Bus5","Bus6").setStatus(false);
+				for (Branch br : branchlist) {
+					System.out.println(br);
+				}
+				
 				//create a load flow algorithm object
 				LoadflowAlgorithm algo = CoreObjectFactory.createLoadflowAlgorithm(net);
 				//run load flow using default setting
@@ -65,12 +74,13 @@ public class InterPSS_loadflow {
 				/*net = CorePluginObjFactory
 						.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF)
 						.load(inputpath)
-						.getAclfNet();
+						.getAclfNet();     
+        
+				DclfAlgorithmDSL algoDsl = IpssPTrading.createDclfAlgorithm(net);
+				algoDsl.runDclfAnalysis();
 
-				DclfAlgorithmDSL algoDsl = IpssDclf.createDclfAlgorithm(net)
-                        .runDclfAnalysis();
-
-				result = IpssUtil.outDclfResult(algoDsl).toString();
+				result = IpssUtil.outDclfResult(algoDsl, false)
+                        .toString();   
 				*/
 				result = "DC is not yet implemented";
 				
