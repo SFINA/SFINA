@@ -62,43 +62,6 @@ public class CallMatpower {
 	}
 	
 	/**
-	 * Method to close running Matlab session.
-	 * @throws MatlabConnectionException
-	 * @throws MatlabInvocationException
-	 */
-	public void closeMatlabSession() throws MatlabInvocationException {
-		try {
-			MatlabProxy proxy = factory.getProxy();
-			proxy.exit();
-			proxy.disconnect();
-			System.out.println("Matlab closed");
-		}
-		catch (MatlabConnectionException e) {
-			System.out.println("Matlab cannot be closed if no session is open.");
-		}
-	}
-	
-	/**
-	 * Method to load a Matpower case file data into java double[][] arrays, which then can be retrieved by getBus(), getGen(), getBranch() and getGencost().
-	 * @param which_case: Name of case file
-	 * @throws MatlabConnectionException
-	 * @throws MatlabInvocationException
-	 */
-	public void getCaseDataFromMatpower(String which_case) throws MatlabConnectionException, MatlabInvocationException{
-		MatlabProxy proxy = factory.getProxy();
-		proxy.eval("load_data = loadcase('" + which_case + "');");
-		
-		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);
-		matpf_bra = processor.getNumericArray("load_data.branch").getRealArray2D();
-		matpf_bus = processor.getNumericArray("load_data.bus").getRealArray2D();
-		matpf_gen = processor.getNumericArray("load_data.gen").getRealArray2D();
-		matpf_gencost = processor.getNumericArray("load_data.gencost").getRealArray2D();
-		proxy.eval("clear");
-		proxy.disconnect();
-		System.out.println("Loaded " + which_case);
-	}
-	
-	/**
 	 * starts Matlab session, runs Matpower simulation given network data (in Matpower format)
 	 * @param bus: Bus data as double[][]
 	 * @param gen: Generator data data as double[][]
@@ -116,11 +79,7 @@ public class CallMatpower {
 		
 		// Connect to Matlab
 		MatlabProxy proxy = factory.getProxy();
-		if (proxy.isExistingSession()) {
-			System.out.println("Connected to running Matlab session.");
-		}
-		else System.out.println("New Matlab session opened.");
-		
+
 		// Conversion object to send and retrieve arrays to and from matlab
 		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);
 		
@@ -144,9 +103,89 @@ public class CallMatpower {
 		
 		// Warn if there's problem with Powerflow Analysis
 		double success = ((double[]) proxy.getVariable("result.success"))[0];
-		if (success == 0.0) {System.out.println("ATTENTION: Problem with Powerflow. Probably didn't converge."); System.exit(0);};
+		if (success == 0.0) {System.out.println("ATTENTION: Problem with Powerflow. Probably didn't converge."); System.exit(0);}
+		else {System.out.println("Simulation successful.");};
 		
 		// Disconnect proxy from Matlab session
 		proxy.disconnect();
+	}
+	
+	/**
+	 * Method to close running Matlab session.
+	 * @throws MatlabConnectionException
+	 * @throws MatlabInvocationException
+	 */
+	public void closeMatlabSession() throws MatlabInvocationException {
+		try {
+			MatlabProxy proxy = factory.getProxy();
+			proxy.exit();
+			proxy.disconnect();
+			System.out.println("Matlab closed.");
+		}
+		catch (MatlabConnectionException e) {
+			System.out.println("Matlab cannot be closed if no session is open.");
+		}
+	}
+	
+	/**
+	 * Method to load a Matpower case file data into java double[][] arrays, which then can be retrieved by getBus(), getGen(), getBranch() and getGencost().
+	 * @param which_case: Name of case file
+	 * @throws MatlabConnectionException
+	 * @throws MatlabInvocationException
+	 */
+	public void getCaseDataFromMatpower(String which_case) throws MatlabConnectionException, MatlabInvocationException{
+		MatlabProxy proxy = factory.getProxy();
+		proxy.eval("load_data = loadcase('" + which_case + "');");
+		
+		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);
+		matpf_bra = processor.getNumericArray("load_data.branch").getRealArray2D();
+		matpf_bus = processor.getNumericArray("load_data.bus").getRealArray2D();
+		matpf_gen = processor.getNumericArray("load_data.gen").getRealArray2D();
+		matpf_gencost = processor.getNumericArray("load_data.gencost").getRealArray2D();
+		proxy.eval("clear");
+		proxy.disconnect();
+		System.out.println("Loaded " + which_case + ".");
+	}
+	
+	/**
+	 * Execute arbitrary (valid) Matlab command
+	 * @param command: String
+	 * @throws MatlabConnectionException
+	 * @throws MatlabInvocationException
+	 */
+	public void executeMatlabCommand(String command) throws MatlabConnectionException, MatlabInvocationException {
+		MatlabProxy proxy = factory.getProxy();
+		proxy.eval(command);
+		proxy.disconnect();
+	}
+	
+	/**
+	 * Finds out islands of current network. This is experimental, so far the indices of just one island are returned. 
+	 * @return double[]
+	 * @throws MatlabConnectionException
+	 * @throws MatlabInvocationException
+	 */
+	public double[] findIslands() throws MatlabConnectionException, MatlabInvocationException{
+		MatlabProxy proxy = factory.getProxy();
+		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);		
+		proxy.eval("[groups,isolated] = find_islands(" + case_name + ");");
+		double[] groups = processor.getNumericArray("groups{1,1}").getRealArray2D()[0];
+		proxy.disconnect();
+		return groups;
+	}
+	
+	/**
+	 * Returns double array of isolated buses.
+	 * @return double[]
+	 * @throws MatlabConnectionException
+	 * @throws MatlabInvocationException
+	 */
+	public double[] findIsolated() throws MatlabConnectionException, MatlabInvocationException {
+		MatlabProxy proxy = factory.getProxy();
+		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);		
+		proxy.eval("[groups,isolated] = find_islands(" + case_name + ");");
+		double[] isolated = processor.getNumericArray("isolated").getRealArray2D()[0];
+		proxy.disconnect();
+		return isolated;		
 	}
 }
