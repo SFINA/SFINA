@@ -9,7 +9,6 @@ public class CallMatpower {
 	private double[][] matpf_gen;
 	private double[][] matpf_bra;
 	private double[][] matpf_gencost;
-	private String case_name;
 	private String pf_type;
 	private MatlabProxyFactory factory;
 	
@@ -49,8 +48,7 @@ public class CallMatpower {
 	 * @throws MatlabConnectionException 
 	 * @throws MatlabInvocationException 
 	 */	
-	public CallMatpower(String new_case, String ac_dc) throws MatlabConnectionException, MatlabInvocationException {
-		case_name = new_case;
+	public CallMatpower(String ac_dc) throws MatlabConnectionException, MatlabInvocationException {
 		if (ac_dc.equals("AC") || ac_dc.equals("DC")) pf_type = ac_dc;
 		else {System.out.println("ATTENTION: Couldn't recognize AC or DC. Check your input parameters. Program exit.");System.exit(0);}
 		
@@ -84,16 +82,16 @@ public class CallMatpower {
 		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);
 		
 		// Send data to matlab to create matpower struct
-		proxy.eval(case_name + ".version = '2'");
-		proxy.eval(case_name + ".baseMVA = [100]");
-		processor.setNumericArray(case_name + ".bus", new MatlabNumericArray(matpf_bus, null));
-		processor.setNumericArray(case_name + ".gen", new MatlabNumericArray(matpf_gen, null));
-		processor.setNumericArray(case_name + ".branch", new MatlabNumericArray(matpf_bra, null));
-		processor.setNumericArray(case_name + ".gencost", new MatlabNumericArray(matpf_gencost, null));
+		proxy.eval("data.version = '2'");
+		proxy.eval("data.baseMVA = [100]");
+		processor.setNumericArray("data.bus", new MatlabNumericArray(matpf_bus, null));
+		processor.setNumericArray("data.gen", new MatlabNumericArray(matpf_gen, null));
+		processor.setNumericArray("data.branch", new MatlabNumericArray(matpf_bra, null));
+		processor.setNumericArray("data.gencost", new MatlabNumericArray(matpf_gencost, null));
 		
 		// Run AC or DC powerflow analysis
-		if (pf_type.equals("AC")) proxy.eval("result = runpf(" + case_name + ");");
-		else proxy.eval("result = rundcpf(" + case_name + ");");
+		if (pf_type.equals("AC")) proxy.eval("result = runpf(data);");
+		else proxy.eval("result = rundcpf(data);");
 		
 		// Get results
 		matpf_bra = processor.getNumericArray("result.branch").getRealArray2D();
@@ -160,6 +158,18 @@ public class CallMatpower {
 	}
 	
 	/**
+	 * Method disables branch with specific (Matpower) id 
+	 * @param branch_id
+	 * @throws MatlabInvocationException
+	 * @throws MatlabConnectionException
+	 */
+	public void disableBranch(int branch_id) throws MatlabInvocationException, MatlabConnectionException {
+		MatlabProxy proxy = factory.getProxy();
+		proxy.eval("data.branch(" + branch_id + ",11) = 0;");
+		proxy.disconnect();
+	}
+	
+	/**
 	 * Finds out islands of current network. This is experimental, so far the indices of just one island are returned. 
 	 * @return double[]
 	 * @throws MatlabConnectionException
@@ -168,7 +178,7 @@ public class CallMatpower {
 	public double[] findIslands() throws MatlabConnectionException, MatlabInvocationException{
 		MatlabProxy proxy = factory.getProxy();
 		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);		
-		proxy.eval("[groups,isolated] = find_islands(" + case_name + ");");
+		proxy.eval("[groups,isolated] = find_islands(data);");
 		double[] groups = processor.getNumericArray("groups{1,1}").getRealArray2D()[0];
 		proxy.disconnect();
 		return groups;
@@ -183,7 +193,7 @@ public class CallMatpower {
 	public double[] findIsolated() throws MatlabConnectionException, MatlabInvocationException {
 		MatlabProxy proxy = factory.getProxy();
 		MatlabTypeConverter processor = new MatlabTypeConverter(proxy);		
-		proxy.eval("[groups,isolated] = find_islands(" + case_name + ");");
+		proxy.eval("[groups,isolated] = find_islands(data);");
 		double[] isolated = processor.getNumericArray("isolated").getRealArray2D()[0];
 		proxy.disconnect();
 		return isolated;		

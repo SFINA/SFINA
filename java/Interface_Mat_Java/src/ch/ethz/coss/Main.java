@@ -14,7 +14,7 @@ public class Main {
 		/*String path = "./Data/ieee/IEEE14Bus.dat";
 		InterPSS_loadflow lf = new InterPSS_loadflow(path, "AC");
 		String result = lf.runlf();
-		System.out.println(result);	
+		//System.out.println(result);	
 		*/
 		
 		// Test conversion script with sample topology
@@ -28,8 +28,7 @@ public class Main {
 		
 		
 		// Use matpower flow analysis with network data in double[][] arrays
-		String case_name = "createCase14";
-		CallMatpower matpwr = new CallMatpower(case_name, "AC");
+		CallMatpower matpwr = new CallMatpower("AC");
 		
 		// Load case14 from Matpower into java object to use it for the simulation
 		matpwr.getCaseDataFromMatpower("case14");
@@ -45,26 +44,6 @@ public class Main {
 		branch = matpwr.getBranch();
 		gencost = matpwr.getGencost();
 		
-		// For trying island function: Remove some lines
-		matpwr.executeMatlabCommand(case_name + ".branch(8,11) = 0;");
-		matpwr.executeMatlabCommand(case_name + ".branch(9,11) = 0;");
-		matpwr.executeMatlabCommand(case_name + ".branch(10,11) = 0;");
-		matpwr.executeMatlabCommand(case_name + ".branch(14,11) = 0;");
-		matpwr.executeMatlabCommand(case_name + ".branch(15,11) = 0;");
-		double[] groups = matpwr.findIslands();
-		double[] iso = matpwr.findIsolated();
-		String group_str ="";
-		for(int i = 0; i < groups.length; i++)
-		{
-			group_str += groups[i] + "	";
-		}
-		System.out.println("Bus ids in one island: " + group_str);
-		for(int i = 0; i < iso.length; i++)
-		{
-		    System.out.println("Isolated bus: " + iso[i]);
-		}
-		
-		/*
 		// Print powerflow simulation results
 		System.out.println("Bus data:");
 		for(int i = 0; i < bus.length; i++)
@@ -82,6 +61,32 @@ public class Main {
 		for(int i = 0; i < branch.length; i++)
 		{
 		    System.out.println(Arrays.toString(branch[i]));
-		}*/
+		}
+		
+		
+		// For island function: Remove some lines
+		matpwr.disableBranch(8);
+		matpwr.disableBranch(9);
+		matpwr.disableBranch(10);
+		matpwr.disableBranch(14);
+		matpwr.disableBranch(15);
+
+		// Try island function and plot results
+		double[] islands = matpwr.findIslands();
+		double[] iso = matpwr.findIsolated();
+		String group_str ="";
+		System.out.println("\n");
+		for(int i = 0; i < islands.length; i++)
+		{
+			group_str += islands[i] + "	";
+		}
+		System.out.println("Bus ids in one island: " + group_str);
+		for(int i = 0; i < iso.length; i++)
+		{
+		    System.out.println("Isolated bus: " + iso[i]);
+		}
+		
+		// Close Matlab session
+		matpwr.closeMatlabSession();
 	}
 }
