@@ -5,7 +5,9 @@
  */
 package flow_analysis;
 
-import flow_analysis.FlowAnalysisOutcome;
+import java.util.List;
+import network.Link;
+import network.Node;
 
 /**
  *
@@ -13,6 +15,6 @@ import flow_analysis.FlowAnalysisOutcome;
  */
 public interface FlowAnalysisInterface {
     
-    public FlowAnalysisOutcome flowAnalysis();
+    public void flowAnalysis(List<Node> nodes, List<Link> links);
     
 }

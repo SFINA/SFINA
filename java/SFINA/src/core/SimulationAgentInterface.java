@@ -5,7 +5,6 @@
  */
 package core;
 
-import flow_analysis.FlowAnalysisOutcome;
 
 /**
  *
@@ -13,5 +12,5 @@ import flow_analysis.FlowAnalysisOutcome;
  */
 public interface SimulationAgentInterface {
     
-    public FlowAnalysisOutcome runFlowAnalysis();
+    public void runFlowAnalysis();
 }

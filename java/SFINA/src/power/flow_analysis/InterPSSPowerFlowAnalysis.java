@@ -6,7 +6,9 @@
 package power.flow_analysis;
 
 import flow_analysis.FlowAnalysisInterface;
-import flow_analysis.FlowAnalysisOutcome;
+import java.util.List;
+import network.Link;
+import network.Node;
 
 /**
  *
@@ -15,8 +17,8 @@ import flow_analysis.FlowAnalysisOutcome;
 public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
     
     @Override
-    public FlowAnalysisOutcome flowAnalysis(){
-        return null;
+    public void flowAnalysis(List<Node> nodes, List<Link> links){
+        
         
     }
     

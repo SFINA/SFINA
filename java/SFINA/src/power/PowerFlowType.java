@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package input;
+package power;
 
 /**
  *
  * @author evangelospournaras
  */
-public enum FlowType {
+public enum PowerFlowType {
     AC,
     DC
 }

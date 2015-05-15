@@ -5,7 +5,6 @@ import input.Backend;
 import static input.Backend.INTERPSS;
 import static input.Backend.MATPOWER;
 import flow_analysis.FlowAnalysisInterface;
-import flow_analysis.FlowAnalysisOutcome;
 import input.Domain;
 import static input.Domain.GAS;
 import static input.Domain.POWER;
@@ -19,6 +18,7 @@ import java.util.Map;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
+import power.PowerFlowType;
 import power.flow_analysis.InterPSSPowerFlowAnalysis;
 import power.flow_analysis.MATPOWERPowerFlowAnalysis;
 import protopeer.BasePeerlet;
@@ -140,33 +140,28 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
     
     @Override
-    public FlowAnalysisOutcome runFlowAnalysis(){
+    public void runFlowAnalysis(){
         FlowAnalysisInterface flowAnalysis;
         switch(domain){
             case POWER:
               switch(backend){
                   case MATPOWER:
-                      flowAnalysis=new MATPOWERPowerFlowAnalysis();
-                      return flowAnalysis.flowAnalysis();
+                      flowAnalysis=new MATPOWERPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
+                      flowAnalysis.flowAnalysis(this.nodes, this.links);
                   case INTERPSS:
                       flowAnalysis=new InterPSSPowerFlowAnalysis();
-                      return flowAnalysis.flowAnalysis();
+                      flowAnalysis.flowAnalysis(this.nodes, this.links);
                   default:
                       logger.debug("Wrong backend detected.");
-                      return null;
               }
             case GAS:
                 logger.debug("This domain is not supported at this moment");
-                return null;
             case WATER:
                 logger.debug("This domain is not supported at this moment");
-                return null;
             case TRANSPORTATION:
                 logger.debug("This domain is not supported at this moment");
-                return null;
             default:
                 logger.debug("Wrong backend detected.");
-                return null;
         }
     }
     

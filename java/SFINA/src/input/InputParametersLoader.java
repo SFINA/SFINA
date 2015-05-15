@@ -5,15 +5,14 @@
  */
 package input;
 
+import power.PowerFlowType;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import network.Link;
-import network.Node;
 import org.apache.log4j.Logger;
+import power.PowerFlowAnalysisType;
 
 /**
  *
@@ -98,9 +97,9 @@ public class InputParametersLoader {
             case FLOW_TYPE:
                 switch(stringValue){
                     case "dc":
-                        return FlowType.DC;
+                        return PowerFlowType.DC;
                     case "ac":
-                        return FlowType.AC;
+                        return PowerFlowType.AC;
                     default:
                         logger.debug("Flow type input parameter is not recongised.");
                         return null;
@@ -108,11 +107,11 @@ public class InputParametersLoader {
             case FLOW_ANALYSIS_TYPE:
                 switch(stringValue){
                     case "current":
-                        return FlowAnalysisType.CURRENT;
+                        return PowerFlowAnalysisType.CURRENT;
                     case "power":
-                        return FlowAnalysisType.POWER;
+                        return PowerFlowAnalysisType.POWER;
                     case "voltage":
-                        return FlowAnalysisType.VOLTAGE;
+                        return PowerFlowAnalysisType.VOLTAGE;
                     default:
                         logger.debug("Flow analysis type input parameter is not recongised.");
                         return null;
