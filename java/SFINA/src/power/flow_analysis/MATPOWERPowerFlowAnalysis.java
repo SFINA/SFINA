@@ -27,10 +27,10 @@ import power.input.PowerNodeState;
  */
 public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     
-    private double[][] matpf_bus;
-    private double[][] matpf_gen;
-    private double[][] matpf_bra;
-    private double[][] matpf_gencost;
+    private double[][] busesPowerFlowInfo;
+    private double[][] generatorsPowerFlowInfo;
+    private double[][] branchesPowerFlowInfo;
+    private double[][] costsPowerFlowInfo;
     private MatlabProxyFactory factory;
     private MatlabProxy proxy;
     private PowerFlowType powerFlowType;
@@ -46,42 +46,13 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
         this.converged=false;
     }
     
-    /**
-    * Returns bus 2-dim double array.
-    * @return double 2-dim array.
-    */
-    public double[][] getBus() {
-           return matpf_bus;
-    }
-    /**
-    * Returns Generator 2-dim double array.
-    * @return double 2-dim array.
-    */	
-    public double[][] getGen() {
-           return matpf_gen;
-    }
-    /**
-    * Returns Branch 2-dim double array.
-    * @return double 2-dim array.
-    */
-    public double[][] getBranch() {
-           return matpf_bra;
-    }
-    /**
-    * Returns Generator Cost 2-dim double array.
-    * @return double 2-dim array.
-    */
-    public double[][] getGencost() {
-           return matpf_gencost;
-    }
-    
     @Override
     public void flowAnalysis(List<Node> nodes, List<Link> links){
         // Initialize local variables
-        matpf_bus = this.getBuses(nodes);
-        matpf_gen = this.getGenerators(nodes);
-        matpf_bra = this.getBranches(links);
-        matpf_gencost = this.getGenerationCosts(nodes);
+        busesPowerFlowInfo = this.getBuses(nodes);
+        generatorsPowerFlowInfo = this.getGenerators(nodes);
+        branchesPowerFlowInfo = this.getBranches(links);
+        costsPowerFlowInfo = this.getGenerationCosts(nodes);
         
         try{
 
@@ -94,10 +65,10 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
             // Send data to matlab to create matpower struct
             proxy.eval(caseFile + ".version = '2'");
             proxy.eval(caseFile + ".baseMVA = [100]");
-            processor.setNumericArray(caseFile + ".bus", new MatlabNumericArray(matpf_bus, null));
-            processor.setNumericArray(caseFile + ".gen", new MatlabNumericArray(matpf_gen, null));
-            processor.setNumericArray(caseFile + ".branch", new MatlabNumericArray(matpf_bra, null));
-            processor.setNumericArray(caseFile + ".gencost", new MatlabNumericArray(matpf_gencost, null));
+            processor.setNumericArray(caseFile + ".bus", new MatlabNumericArray(getBusesPowerFlowInfo(), null));
+            processor.setNumericArray(caseFile + ".gen", new MatlabNumericArray(getGeneratorsPowerFlowInfo(), null));
+            processor.setNumericArray(caseFile + ".branch", new MatlabNumericArray(getBranchesPowerFlowInfo(), null));
+            processor.setNumericArray(caseFile + ".gencost", new MatlabNumericArray(getCostsPowerFlowInfo(), null));
 
             switch(powerFlowType){
                 case AC:
@@ -115,10 +86,12 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
             }
 
             // Get results
-            matpf_bra = processor.getNumericArray("result.branch").getRealArray2D();
-            matpf_bus = processor.getNumericArray("result.bus").getRealArray2D();
-            matpf_gen = processor.getNumericArray("result.gen").getRealArray2D();
-            matpf_gencost = processor.getNumericArray("result.gencost").getRealArray2D();
+            branchesPowerFlowInfo = processor.getNumericArray("result.branch").getRealArray2D();
+            busesPowerFlowInfo = processor.getNumericArray("result.bus").getRealArray2D();
+            generatorsPowerFlowInfo = processor.getNumericArray("result.gen").getRealArray2D();
+            costsPowerFlowInfo = processor.getNumericArray("result.gencost").getRealArray2D();
+            this.updateNodes(nodes);
+            this.updateLinks(links);
             // Disconnect proxy from Matlab session
             proxy.disconnect();
         }
@@ -150,6 +123,15 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     private double[][] getGenerationCosts(List<Node> nodes){
         return null;
     }
+    
+    private void updateNodes(List<Node> nodes){
+        //update with buses, generators and costs power flow info
+    }
+    
+    private void updateLinks(List<Link> links){
+        //update with branches power flow info
+    }
+    
 
     /**
      * @return the powerFlowType
@@ -170,6 +152,34 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
      */
     public boolean isConverged() {
         return converged;
+    }
+
+    /**
+     * @return the busesPowerFlowInfo
+     */
+    public double[][] getBusesPowerFlowInfo() {
+        return busesPowerFlowInfo;
+    }
+
+    /**
+     * @return the generatorsPowerFlowInfo
+     */
+    public double[][] getGeneratorsPowerFlowInfo() {
+        return generatorsPowerFlowInfo;
+    }
+
+    /**
+     * @return the branchesPowerFlowInfo
+     */
+    public double[][] getBranchesPowerFlowInfo() {
+        return branchesPowerFlowInfo;
+    }
+
+    /**
+     * @return the costsPowerFlowInfo
+     */
+    public double[][] getCostsPowerFlowInfo() {
+        return costsPowerFlowInfo;
     }
     
     

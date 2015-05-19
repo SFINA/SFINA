@@ -8,6 +8,7 @@ package network;
 import dsutil.generic.state.State;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -18,12 +19,33 @@ public class Node extends State{
     private String index;
     private List<Link> links;
     private boolean connected;
+    private Enum flowType;
+    private static final Logger logger = Logger.getLogger(Node.class);
     
     public Node(String index){
         super();
         this.index=index;
         this.connected=false;
         this.links=new ArrayList<Link>();
+    }
+    
+    public double getFlow(){
+        if(this.flowType.equals(null))
+            logger.debug("Flow type is not defined.");
+        return (double)this.getProperty(flowType);
+    }
+    
+    public void setFlow(double flow){
+        if(this.flowType.equals(null)){
+            logger.debug("Flow type is not defined.");
+        }
+        else{
+            this.addProperty(flowType, flow);
+        }
+    }
+    
+    public void setFlowType(Enum flowType){
+        this.flowType=flowType;
     }
     
     public void addLink(Link link){
