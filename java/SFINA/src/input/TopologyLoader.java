@@ -63,8 +63,24 @@ public class TopologyLoader {
         try {
             scr = new Scanner(file);
             while(scr.hasNext()){
-                Node node=new Node(scr.next());
-                nodes.add(node);
+                StringTokenizer st = new StringTokenizer(scr.next(), columnSeparator);
+                while (st.hasMoreTokens()) {
+                    String nodeIndex=st.nextToken();
+                    String status=st.nextToken();
+                    boolean connected=false;
+                    switch(status){
+                        case "1":
+                            connected=true;
+                            break;
+                        case "0":
+                            connected=false;
+                        default:
+                            logger.debug("Something is wrong with status of the nodes.");
+                    }
+                    Node node=new Node(nodeIndex, connected);
+                    nodes.add(node);
+                    
+		}
             }
         }
         catch (FileNotFoundException ex) {

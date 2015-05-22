@@ -8,6 +8,7 @@ package network;
 import dsutil.generic.state.State;
 import dsutil.protopeer.FingerDescriptor;
 import java.util.UUID;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -19,13 +20,43 @@ public class Link extends State{
     private Node startNode;
     private Node endNode;
     private boolean connected;
+    private boolean activated;
+    private Enum flowType;
+    private static final Logger logger = Logger.getLogger(Link.class);
     
-    public Link(String index, Node startNodeID, Node endNodeID, boolean isolated){
+    public Link(String index, boolean activated){
+        super();
+        this.index=index;
+        this.activated=activated;
+        this.evaluateConnectivity();
+    }
+    
+    public Link(String index, Node startNodeID, Node endNodeID, boolean activated){
         super();
         this.index=index;
         this.startNode=startNode;
         this.endNode=endNode;
-        this.connected=connected;
+        this.evaluateConnectivity();
+        this.activated=activated;
+    }
+    
+    public double getFlow(){
+        if(this.flowType==null)
+            logger.debug("Flow type is not defined.");
+        return (double)this.getProperty(flowType);
+    }
+    
+    public void setFlow(double flow){
+        if(this.flowType==null){
+            logger.debug("Flow type is not defined.");
+        }
+        else{
+            this.addProperty(flowType, flow);
+        }
+    }
+    
+    public void setFlowType(Enum flowType){
+        this.flowType=flowType;
     }
 
     /**
@@ -54,6 +85,7 @@ public class Link extends State{
      */
     public void setStartNode(Node startNode) {
         this.startNode = startNode;
+        this.evaluateConnectivity();
     }
 
     /**
@@ -68,6 +100,7 @@ public class Link extends State{
      */
     public void setEndNode(Node endNode) {
         this.endNode = endNode;
+        this.evaluateConnectivity();
     }
 
     /**
@@ -75,6 +108,29 @@ public class Link extends State{
      */
     public boolean isConnected() {
         return connected;
+    }
+    
+    private boolean hasStartNode(){
+        if(this.startNode!=null){
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean hasEndNode(){
+        if(this.endNode!=null){
+            return true;
+        }
+        return false;
+    }
+    
+    private void evaluateConnectivity(){
+        if(this.hasStartNode() && this.hasEndNode()){
+            this.connected=true;
+        }
+        else{
+            this.connected=false;
+        }
     }
     
 }

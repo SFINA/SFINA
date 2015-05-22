@@ -19,24 +19,35 @@ public class Node extends State{
     private String index;
     private List<Link> links;
     private boolean connected;
+    private boolean activated;
     private Enum flowType;
     private static final Logger logger = Logger.getLogger(Node.class);
     
-    public Node(String index){
+    public Node(String index, boolean activated){
         super();
         this.index=index;
         this.connected=false;
+        this.activated=activated;
         this.links=new ArrayList<Link>();
     }
     
+    public Node(String index, boolean activated, List<Link> links){
+        super();
+        this.index=index;
+        this.connected=false;
+        this.activated=activated;
+        this.links=new ArrayList<Link>();
+        this.links.addAll(links);
+    }
+    
     public double getFlow(){
-        if(this.flowType.equals(null))
+        if(this.flowType==null)
             logger.debug("Flow type is not defined.");
         return (double)this.getProperty(flowType);
     }
     
     public void setFlow(double flow){
-        if(this.flowType.equals(null)){
+        if(this.flowType==null){
             logger.debug("Flow type is not defined.");
         }
         else{
@@ -55,8 +66,7 @@ public class Node extends State{
     
     public void removeLink(Link link){
         this.getLinks().remove(link);
-        if(getLinks().size()==0)
-            this.connected=false;
+        this.evaluateConnectivity();
     }
     
     public ArrayList<Link> getIncomingLinks(){
@@ -109,7 +119,15 @@ public class Node extends State{
      */
     public void setLinks(List<Link> links) {
         this.links = links;
-        if(links.size()!=0)
+        this.evaluateConnectivity();
+    }
+    
+    private void evaluateConnectivity(){
+        if(links.size()!=0){
             this.connected=true;
+        }
+        else{
+            this.connected=false;
+        }
     }
 }
