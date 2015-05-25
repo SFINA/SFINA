@@ -3,32 +3,36 @@ package ch.ethz.coss;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.interpss.numeric.exp.IpssNumericException;
+
 import matlabcontrol.*;
 
 import com.interpss.common.exp.InterpssException;
+import com.interpss.core.dclf.common.ReferenceBusException;
 
 public class Main {
-	public static void main(String[] args) throws MatlabConnectionException, MatlabInvocationException, InterpssException, IOException {
+	public static void main(String[] args) throws MatlabConnectionException, MatlabInvocationException, InterpssException, IOException, ReferenceBusException, IpssNumericException {		
+		System.out.println("______InterPSS DC on Case14___________________________________________________________________");
+		testInterPSSloadflow();
 		
+		System.out.println("______Matpower DC on Case14___________________________________________________________________");
+		testMatpowerloadflow();
+		
+		//testConversion();
+	}
+	
+	private static void testInterPSSloadflow() throws ReferenceBusException, IpssNumericException{
 		// Call InterPSS simulation on case IEEE009
-		/*String path = "./Data/ieee/IEEE14Bus.dat";
-		InterPSS_loadflow lf = new InterPSS_loadflow(path, "AC");
+		String path = "./Data/ieee/IEEE14Bus.dat";
+		InterPSS_loadflow lf = new InterPSS_loadflow(path, "DC");
 		String result = lf.runlf();
-		//System.out.println(result);	
-		*/
-		
-		// Test conversion script with sample topology
-		/*String branch = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_info/1.txt";
-		String branch_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_meta_info/1.txt";
-		String bus_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/node_meta_info/1.txt";
-		String save_to = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/matpower_format/";
-		String case_name = "sample_topology";
-		Convert.toMatpower(branch, branch_meta, bus_meta, save_to, case_name);
-		*/
-		
-		
+		System.out.println(result);	
+		return;
+	}
+	
+	private static void testMatpowerloadflow() throws MatlabConnectionException, MatlabInvocationException{
 		// Use matpower flow analysis with network data in double[][] arrays
-		CallMatpower matpwr = new CallMatpower("AC");
+		CallMatpower matpwr = new CallMatpower("DC");
 		
 		// Load case14 from Matpower into java object to use it for the simulation
 		matpwr.getCaseDataFromMatpower("case14");
@@ -63,7 +67,7 @@ public class Main {
 		    System.out.println(Arrays.toString(branch[i]));
 		}
 		
-		
+		/*
 		// For island function: Remove some lines
 		matpwr.disableBranch(8);
 		matpwr.disableBranch(9);
@@ -85,8 +89,21 @@ public class Main {
 		{
 		    System.out.println("Isolated bus: " + iso[i]);
 		}
+		*/
 		
 		// Close Matlab session
 		matpwr.closeMatlabSession();
+		return;
+	}
+	
+	private static void testConversion() throws IOException{
+		// Test conversion script with sample topology
+		String branch = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_info/1.txt";
+		String branch_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/link_meta_info/1.txt";
+		String bus_meta = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/node_meta_info/1.txt";
+		String save_to = "/Users/Ben/Documents/Studium/COSS/SFINA/matlab/sample_topology/matpower_format/";
+		String case_name = "sample_topology";
+		Convert.toMatpower(branch, branch_meta, bus_meta, save_to, case_name);
+		return;
 	}
 }
