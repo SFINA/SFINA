@@ -72,12 +72,22 @@ public class PowerMetaInfoLoader {
     
     private PowerNodeState lookupPowerNodeState(String powerNodeState){
         switch(powerNodeState){
+            case "id": 
+                return PowerNodeState.ID;
             case "type":
                 return PowerNodeState.TYPE;
+            case "real_power":
+                return PowerNodeState.REAL_POWER_DEMAND;
+            case "reactive_power":
+                return PowerNodeState.REACTIVE_POWER_DEMAND;
             default:
-                logger.debug("Power node state is not recongised.");
+                logger.debug("Power node state is not recognized.");
                 return null;
         }
+    }
+    
+    private PowerLinkState lookupPowerLinkState(String powerLinkState){
+        return null;
     }
     
     private Object getActualValue(PowerNodeState powerNodeState, String rawValue){
@@ -96,8 +106,10 @@ public class PowerMetaInfoLoader {
                         logger.debug("Node type cannot be recognized.");
                         return null;
                 }
+            case REAL_POWER_DEMAND:
+                return rawValue;
             default:
-                logger.debug("Power node state is not recongised.");
+                logger.debug("Power node state is not recognized.");
                 return null;
         }
     }
