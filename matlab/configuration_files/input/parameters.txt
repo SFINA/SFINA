@@ -1,0 +1,7 @@
+domain=power
+backend=matpower
+flow_analysis_type=power
+flow_type=dc
+removal_strategy=simultaneous
+alpha=2
+time_steps=1
