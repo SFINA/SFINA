@@ -5,10 +5,26 @@
  */
 package testing;
 
+import java.util.ArrayList;
+import input.TopologyLoader;
+import input.InputParametersLoader;
+import power.input.PowerMetaInfoLoader;
+import network.Link;
+import network.Node;
+
 /**
  *
  * @author Ben
  */
 public class testLoader {
+    String col_seperator = ",";
+    String nodelocation = "/";
+    String linklocation = "/";
+    String nodemetalocation = "/";
+    TopologyLoader topologyLoader = new TopologyLoader(col_seperator);
+    PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator);
+    ArrayList<Node> nodes = topologyLoader.loadNodes(nodelocation);
+    ArrayList<Link> links = topologyLoader.loadLinks(linklocation, nodes);
+    metaloader.loadNodeMetaInfo(nodemetalocation,nodes);
     
 }

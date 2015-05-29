@@ -19,7 +19,7 @@ public enum PowerLinkState {
     RATE_A,         // MVA rating A (long term rating)
     RATE_B,         // MVA rating B (short term rating)
     RATE_C,         // MVA rating C (emergency rating)
-    RATIO,          // transformer off nominal turns ratio
+    TAP_RATIO,          // transformer off nominal turns ratio
     ANGLE_SHIFT,
     ANGLE_DIFFERENCE_MIN,
     ANGLE_DIFFERENCE_MAX,

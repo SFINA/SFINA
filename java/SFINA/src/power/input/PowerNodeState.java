@@ -46,7 +46,7 @@ public enum PowerNodeState {
     MODEL,      // 1 = cost model, 2 = piecewise linear, 3 = polynomial
     STARTUP,    // startup cost in USD
     SHUTDOWN,
-    N_COST,     // number of cost coefficients for polynomial cost function
+    N_COST,     // number of cost parameters/coefficients for polynomial cost function
     COST_PARAM, // first parameter/coefficient defining total cost function
     COST_PARAM_1, // second param
     COST_PARAM_2,
