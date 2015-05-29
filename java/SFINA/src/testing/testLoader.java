@@ -19,6 +19,7 @@ import network.Node;
 public class testLoader {
     public static void main(String[] args){
         String col_seperator = ",";
+        String missingValue="-";
         String nodelocation = "configuration_files/input/time_1/topology/nodes.txt";
         String linklocation = "configuration_files/input/time_1/topology/links.txt";
         String nodemetalocation = "configuration_files/input/time_1/flow/nodes.txt";
@@ -30,7 +31,7 @@ public class testLoader {
         ArrayList<Link> links = topologyloader.loadLinks(linklocation, nodes);
 
         // Load meta
-        PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator);
+        PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator, missingValue);
         metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
         //metaloader.loadLinkMetaInfo(linkmetalocation, links);
        

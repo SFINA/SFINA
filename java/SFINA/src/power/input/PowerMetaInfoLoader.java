@@ -24,9 +24,11 @@ public class PowerMetaInfoLoader {
     
     private final String parameterValueSeparator;
     private static final Logger logger = Logger.getLogger(PowerMetaInfoLoader.class);
+    private final String missingValue;
     
-    public PowerMetaInfoLoader(String parameterValueSeparator){
+    public PowerMetaInfoLoader(String parameterValueSeparator, String missingValue){
         this.parameterValueSeparator=parameterValueSeparator;
+        this.missingValue=missingValue;
     }
     
     public void loadNodeMetaInfo(String location, List<Node> nodes){
@@ -65,7 +67,9 @@ public class PowerMetaInfoLoader {
             ArrayList<String> rawValues=nodesStates.get(node.getIndex());
             for(int i=0;i<rawValues.size();i++){
                 PowerNodeState state=powerNodeStates.get(i);
-                node.addProperty(state, this.getActualValue(state, rawValues.get(i)));
+                String rawValue=rawValues.get(i);
+                if(!rawValue.equals(this.missingValue))
+                    node.addProperty(state, this.getActualValue(state, rawValues.get(i)));
             }
         }
     }

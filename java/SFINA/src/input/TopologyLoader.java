@@ -68,17 +68,17 @@ public class TopologyLoader {
                 while (st.hasMoreTokens()) {
                     String nodeIndex=st.nextToken();
                     String status=st.nextToken();
-                    boolean connected=false;
+                    boolean activated = false;
                     switch(status){
                         case "1":
-                            connected=true;
+                            activated=true;
                             break;
                         case "0":
-                            connected=false;
+                            activated=false;
                         default:
                             logger.debug("Something is wrong with status of the nodes.");
                     }
-                    Node node=new Node(nodeIndex, connected);
+                    Node node=new Node(nodeIndex, activated);
                     nodes.add(node);
                     
 		}
