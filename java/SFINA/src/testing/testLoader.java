@@ -41,7 +41,7 @@ public class testLoader {
         }
         System.out.println("---------- Links -----------");
         for(Link link : links){
-            System.out.println("Link " + link.getIndex() + "; Connected = " + link.isConnected());
+            System.out.println("Link " + link.getIndex() + "; Active = " + link.isConnected() + "; Coming from node " + link.getStartNode().getIndex() + "; Going to node " + link.getEndNode().getIndex());
         }
         System.out.println("Loading successful");
     }
