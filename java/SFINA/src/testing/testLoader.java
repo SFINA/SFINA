@@ -19,11 +19,18 @@ import network.Node;
 public class testLoader {
     public static void main(String[] args){
         String col_seperator = ",";
+<<<<<<< HEAD
         String missingValue="-";
         String nodelocation = "src/testing/configuration_files/input/time_1/topology/nodes.txt";
         String linklocation = "src/testing/configuration_files/input/time_1/topology/links.txt";
         String nodemetalocation = "src/testing/configuration_files/input/time_1/flow/nodes.txt";
         String linkmetalocation = "src/testing/configuration_files/input/time_1/flow/links.txt";
+=======
+        String nodelocation = "configuration_files/input/time_1/topology/nodes.txt";
+        String linklocation = "configuration_files/input/time_1/topology/links.txt";
+        String nodemetalocation = "configuration_files/input/time_1/flow/nodes.txt";
+        String linkmetalocation = "configuration_files/input/time_1/flow/links.txt";
+>>>>>>> 39d4bbaf58d7ce63d0a3d3a9814e92c72b6edfee
 
         // Load topology
         TopologyLoader topologyloader = new TopologyLoader(col_seperator);
