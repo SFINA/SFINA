@@ -73,8 +73,10 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
             switch(powerFlowType){
                 case AC:
                     proxy.eval("result = runpf(" + caseFile + ");");
+                    break;
                 case DC:
                     proxy.eval("result = rundcpf(" + caseFile + ");");
+                    break;
                 default:
                     logger.debug("Power flow type is not recognized.");
             }

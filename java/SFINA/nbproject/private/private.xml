@@ -5,10 +5,8 @@
         <group>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/network/Link.java</file>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/network/Node.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/power/input/PowerNodeState.java</file>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/power/input/PowerMetaInfoLoader.java</file>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/core/SimulationAgent.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/flow_analysis/FlowAnalysisInterface.java</file>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/InputParametersLoader.java</file>
         </group>
     </open-files>

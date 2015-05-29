@@ -6,8 +6,6 @@
 package network;
 
 import dsutil.generic.state.State;
-import dsutil.protopeer.FingerDescriptor;
-import java.util.UUID;
 import org.apache.log4j.Logger;
 
 /**
@@ -31,7 +29,7 @@ public class Link extends State{
         this.evaluateConnectivity();
     }
     
-    public Link(String index, Node startNodeID, Node endNodeID, boolean activated){
+    public Link(String index, boolean activated, Node startNode, Node endNode){
         super();
         this.index=index;
         this.startNode=startNode;
@@ -131,6 +129,20 @@ public class Link extends State{
         else{
             this.connected=false;
         }
+    }
+
+    /**
+     * @return the activated
+     */
+    public boolean isActivated() {
+        return activated;
+    }
+
+    /**
+     * @param activated the activated to set
+     */
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
     
 }

@@ -113,7 +113,7 @@ public class TopologyLoader {
                         }
                     }
                     if(startNode!=null && endNode!=null){
-                        Link link=new Link(linkIndex,startNode,endNode,connected);
+                        Link link=new Link(linkIndex,connected,startNode,endNode);
                         links.add(link);
                     }
                     else{

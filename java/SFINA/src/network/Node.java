@@ -61,7 +61,7 @@ public class Node extends State{
     
     public void addLink(Link link){
         this.getLinks().add(link);
-        this.connected=true;
+        this.evaluateConnectivity();
     }
     
     public void removeLink(Link link){
@@ -129,5 +129,19 @@ public class Node extends State{
         else{
             this.connected=false;
         }
+    }
+
+    /**
+     * @return the activated
+     */
+    public boolean isActivated() {
+        return activated;
+    }
+
+    /**
+     * @param activated the activated to set
+     */
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 }

@@ -144,22 +144,28 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         FlowAnalysisInterface flowAnalysis;
         switch(domain){
             case POWER:
-              switch(backend){
-                  case MATPOWER:
-                      flowAnalysis=new MATPOWERPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
-                      flowAnalysis.flowAnalysis(this.nodes, this.links);
-                  case INTERPSS:
-                      flowAnalysis=new InterPSSPowerFlowAnalysis();
-                      flowAnalysis.flowAnalysis(this.nodes, this.links);
-                  default:
-                      logger.debug("Wrong backend detected.");
-              }
+                switch(backend){
+                    case MATPOWER:
+                        flowAnalysis=new MATPOWERPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
+                        flowAnalysis.flowAnalysis(this.nodes, this.links);
+                        break;
+                    case INTERPSS:
+                        flowAnalysis=new InterPSSPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
+                        flowAnalysis.flowAnalysis(this.nodes, this.links);
+                        break;
+                    default:
+                        logger.debug("Wrong backend detected.");
+                }
+                break;
             case GAS:
                 logger.debug("This domain is not supported at this moment");
+                break;
             case WATER:
                 logger.debug("This domain is not supported at this moment");
+                break;
             case TRANSPORTATION:
                 logger.debug("This domain is not supported at this moment");
+                break;
             default:
                 logger.debug("Wrong backend detected.");
         }
