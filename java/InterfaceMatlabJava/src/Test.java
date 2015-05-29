@@ -8,7 +8,7 @@ import matlabcontrol.*;
 import com.interpss.common.exp.InterpssException;
 import com.interpss.core.dclf.common.ReferenceBusException;
 
-public class Main {
+public class Test {
 	public static void main(String[] args) throws MatlabConnectionException, MatlabInvocationException, InterpssException, IOException, ReferenceBusException, IpssNumericException {		
 		System.out.println("______InterPSS DC on Case14___________________________________________________________________");
 		testInterPSSloadflow();
