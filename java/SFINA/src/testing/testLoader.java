@@ -11,6 +11,7 @@ import input.InputParametersLoader;
 import power.input.PowerMetaInfoLoader;
 import network.Link;
 import network.Node;
+import power.input.PowerNodeState;
 
 /**
  *
@@ -33,12 +34,15 @@ public class testLoader {
         // Load meta
         PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator, missingValue);
         metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
-        //metaloader.loadLinkMetaInfo(linkmetalocation, links);
+        //metaloader.loadLinkMetaInfo(linkmetalocation, links); --> not yet fully implemented
        
         // Print information to see if it worked
         System.out.println("---------- Nodes -----------");
         for(Node node : nodes){
-            System.out.println("Node " + node.getIndex() + "; Connected = " + node.isConnected());
+            System.out.println("Node " + node.getIndex() + "; Activated = " + node.isActivated());
+            // Example how to get state variables of e.g. nodes. Have to cast object to respective values.
+            int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();
+            
         }
         System.out.println("---------- Links -----------");
         for(Link link : links){
