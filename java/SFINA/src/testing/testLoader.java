@@ -17,14 +17,27 @@ import network.Node;
  * @author Ben
  */
 public class testLoader {
-    String col_seperator = ",";
-    String nodelocation = "/";
-    String linklocation = "/";
-    String nodemetalocation = "/";
-    TopologyLoader topologyLoader = new TopologyLoader(col_seperator);
-    PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator);
-    ArrayList<Node> nodes = topologyLoader.loadNodes(nodelocation);
-    ArrayList<Link> links = topologyLoader.loadLinks(linklocation, nodes);
-    metaloader.loadNodeMetaInfo(nodemetalocation,nodes);
-    
+    public static void main(String[] args){
+        String col_seperator = ",";
+        String nodelocation = "src/testing/configuration_files/input/time_1/topology/nodes.txt";
+        String linklocation = "src/testing/configuration_files/input/time_1/topology/links.txt";
+        String nodemetalocation = "src/testing/configuration_files/input/time_1/flow/nodes.txt";
+        String linkmetalocation = "src/testing/configuration_files/input/time_1/flow/links.txt";
+
+        // Load topology
+        TopologyLoader topologyloader = new TopologyLoader(col_seperator);
+        ArrayList<Node> nodes = topologyloader.loadNodes(nodelocation);
+        ArrayList<Link> links = topologyloader.loadLinks(linklocation, nodes);
+
+        // Load meta
+        PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator);
+        //metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
+        //metaloader.loadLinkMetaInfo(linkmetalocation, links);
+       
+        // Print information to see if it worked
+        for(Node node : nodes){
+            System.out.println(node.getIndex());
+        }
+        System.out.println("Loading successful");
+    }
 }
