@@ -62,6 +62,7 @@ public class TopologyLoader {
         Scanner scr = null;
         try {
             scr = new Scanner(file);
+            scr.next();
             while(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), columnSeparator);
                 while (st.hasMoreTokens()) {
@@ -95,30 +96,29 @@ public class TopologyLoader {
         Scanner scr = null;
         try {
             scr = new Scanner(file);
+            scr.next();
             while(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), columnSeparator);
-                while (st.hasMoreTokens()) {
-                    String linkIndex=st.nextToken();
-                    String startIndex=st.nextToken();
-                    String endIndex=st.nextToken();
-                    boolean connected=Boolean.getBoolean(st.nextToken());
-                    Node startNode=null;
-                    Node endNode=null;
-                    for(Node node:nodes){
-                        if(startIndex.equals(node.getIndex())){
-                            startNode=node;
-                        }
-                        if(endIndex.equals(node.getIndex())){
-                            endNode=node;
-                        }
+                String linkIndex=st.nextToken();
+                String startIndex=st.nextToken();
+                String endIndex=st.nextToken();
+                boolean connected=Boolean.getBoolean(st.nextToken());
+                Node startNode=null;
+                Node endNode=null;
+                for(Node node:nodes){
+                    if(startIndex.equals(node.getIndex())){
+                        startNode=node;
                     }
-                    if(startNode!=null && endNode!=null){
-                        Link link=new Link(linkIndex,connected,startNode,endNode);
-                        links.add(link);
+                    if(endIndex.equals(node.getIndex())){
+                        endNode=node;
                     }
-                    else{
-                        logger.debug("Something went wrong with the indices of nodes and links.");
-                    }
+                }
+                if(startNode!=null && endNode!=null){
+                    Link link=new Link(linkIndex,connected,startNode,endNode);
+                    links.add(link);
+                }
+                else{
+                    logger.debug("Something went wrong with the indices of nodes and links.");
 		}
             }
         }
