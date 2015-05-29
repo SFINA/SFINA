@@ -31,12 +31,17 @@ public class testLoader {
 
         // Load meta
         PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator);
-        //metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
+        metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
         //metaloader.loadLinkMetaInfo(linkmetalocation, links);
        
         // Print information to see if it worked
+        System.out.println("---------- Nodes -----------");
         for(Node node : nodes){
-            System.out.println(node.getIndex());
+            System.out.println("Node " + node.getIndex() + "; Connected = " + node.isConnected());
+        }
+        System.out.println("---------- Links -----------");
+        for(Link link : links){
+            System.out.println("Link " + link.getIndex() + "; Connected = " + link.isConnected());
         }
         System.out.println("Loading successful");
     }
