@@ -1,4 +1,4 @@
-function [ref_current,ref_power,volt_ref_max,volt_ref_min] = powerflow(mpc)
+function [ref_current,ref_power,volt_ref_max,volt_ref_min] = powerflow(mpc,results)
 
 define_constants;
 
@@ -9,7 +9,11 @@ alpha=2; %sets the limit for the capacity
 
 %mpopt = mpoption('PF_ALG', 1,'PF_MAX_IT',20);
 %results = rundcpf(mpc, mpopt);
-results=runpf(mpc);
+%opt = mpoption('PF_ALG', 1);
+
+%opt = mpoption(opt, 'OUT_ALL', 0);
+%results=rundcpf(mpc,opt);
+%results=rundcpf(mpc);
 
 n_bus = numel(mpc.bus(:,1));
 n_branches=numel(mpc.branch(:,1));
