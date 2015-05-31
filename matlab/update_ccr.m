@@ -1,5 +1,4 @@
-
-function T = update_ccr(mpc,ccr,reference)
+function T = update_ccr(mpc,ccr,reference,results2)
 define_constants;
 %gives the indices of branches
 
@@ -60,10 +59,12 @@ reference_ccr=reference_ccr';
     
 
 %mpopt = mpoption('PF_ALG', 1,'PF_MAX_IT',20);
-%results = rundcpf(ccr, mpopt);
+%results2 = rundcpf(ccr, mpopt);
+opt = mpoption('PF_ALG', 1);
 
+opt = mpoption(opt, 'OUT_ALL', 0);
 
-results=runpf(ccr);  
+%results2=runpf(ccr,opt);  
     
     
 fake_bus_id=[];
@@ -85,14 +86,20 @@ end
    
     
 b=[];
+power=[];
+current=[];
 for t=1:n_branches_ccr %calculates the new current after removal of three lines
-    Sf_new = results.branch(k(:,t), PF) + 1j * results.branch(k(:,t), QF);
+    Sf_new = results2.branch(k(:,t), PF) + 1j * results2.branch(k(:,t), QF);
         
-    Vf_new = results.bus(f(:,t), VM) * exp(1j * results.bus(f(:,t), VA)*(pi/180));
+    Vf_new = results2.bus(f(:,t), VM) * exp(1j * results2.bus(f(:,t), VA)*(pi/180));
     If_new = abs(conj( Sf_new / Vf_new )); %% complex current injected into branch k at bus f
     b = [b; If_new];
+    power=[power;Sf_new];
+    current=[current;Sf_new]
 end
 b=b'
+power=power'
+current=current'
 
 for m=1:n_branches_ccr
     if(b(:,m)>reference_ccr(:,m))
@@ -103,3 +110,4 @@ end
 T=ccr
 
 end
+
