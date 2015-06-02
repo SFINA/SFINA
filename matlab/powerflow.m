@@ -1,4 +1,4 @@
-function [ref_current,ref_power,volt_ref_max,volt_ref_min] = powerflow(mpc)
+function [ref_current,ref_power,volt_ref_max,volt_ref_min] = powerflow(mpc,results2_pf)
 
 define_constants;
 
@@ -8,8 +8,12 @@ alpha=2; %sets the limit for the capacity
 
 
 %mpopt = mpoption('PF_ALG', 1,'PF_MAX_IT',20);
-%results = rundcpf(mpc, mpopt);
-results=runpf(mpc);
+%results2_pf = rundcpf(mpc, mpopt);
+opt = mpoption('PF_ALG', 1);
+
+opt = mpoption(opt, 'OUT_ALL', 0);
+
+%results2_pf=runpf(mpc,opt);
 
 n_bus = numel(mpc.bus(:,1));
 n_branches=numel(mpc.branch(:,1));
@@ -29,8 +33,8 @@ k=k';
 a=[]
 
 for t=1:n_branches
-    Sf = results.branch(k(:,t), PF) + 1j * results.branch(k(:,t), QF);
-    Vf = results.bus(f(:,t), VM) * exp(1j * results.bus(f(:,t), VA)*(pi/180));
+    Sf = results2_pf.branch(k(:,t), PF) + 1j * results2_pf.branch(k(:,t), QF);
+    Vf = results2_pf.bus(f(:,t), VM) * exp(1j * results2_pf.bus(f(:,t), VA)*(pi/180));
     If = abs(conj( Sf / Vf )); %% complex current injected into branch k at bus f
     ref_if = alpha*If;
     a = [a; ref_if];

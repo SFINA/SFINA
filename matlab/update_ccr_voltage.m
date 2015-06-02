@@ -1,11 +1,11 @@
-
-function T = update_ccr_voltage(mpc,ccr,voltage_ref_max,voltage_ref_min)
+function [island_ccr] = update_ccr_voltage(mpc,ccr,voltage_ref_max,voltage_ref_min,results2)
+%function [T,b] = branchstatus_voltage(mpc,ccr,voltage_ref_max,voltage_ref_min,results2)
 define_constants;
 %gives the indices of branches
 
 %mpc=loadcase('case57.m');
 k=[1:1:numel(mpc.branch(:,1))];
-n_bus = numel(mpc.bus(:,1));
+%n_bus = numel(mpc.bus(:,1));
 
 
 ref_idx=k;
@@ -62,11 +62,9 @@ reference_ccr_min=[];
 %reference_ccr_max=reference_ccr_max';
 %reference_ccr_min=reference_ccr_min';   
 
-%AT THIS POINT DOES REINDEXING OF BUS F_BUS
-
 %mpopt = mpoption('PF_ALG', 1,'PF_MAX_IT',20);
-%results = rundcpf(ccr, mpopt);
-results=runpf(ccr);  
+%results2 = rundcpf(ccr, mpopt);
+%results2=runpf(ccr);  
     
     
 fake_bus_id=[];
@@ -89,13 +87,14 @@ end
     
 b=[];
 for t=1:n_branches_ccr %calculates the new current after removal of three lines
-    Vf = abs(results.bus(f(:,t), VM) * exp(1j * results.bus(f(:,t), VA)*(pi/180)));
+    Vf = abs(results2.bus(f(:,t), VM) * exp(1j * results2.bus(f(:,t), VA)*(pi/180)));
         
     
     
     b = [b; Vf];
 end
 b=b'
+
 %write down all f here
 %convert to fake bus id (it is like inverse conversion)
 kau=ccr.branch(:,1)';
@@ -103,15 +102,15 @@ kau=ccr.branch(:,1)';
 %reference_ccr_max=voltage_ref_max(fake_bus_id(1:length(fake_bus_id)));
 %reference_ccr_min=voltage_ref_min(fake_bus_id(1:length(fake_bus_id)));
 %and then compare to the original stored bus id
-reference_ccr_max=voltage_ref_max(kau(1:length(kau)));
-reference_ccr_min=voltage_ref_min(kau(1:length(kau)));
-k=1:1:n_branches_ccr;
+reference_ccr_max=voltage_ref_max(kau(1:length(kau)))
+reference_ccr_min=voltage_ref_min(kau(1:length(kau)))
+k=1:1:n_branches_ccr
 for m=1:n_branches_ccr
-    if reference_ccr_min(:,m)<b(:,m)<reference_ccr_max(:,m)
+    if (reference_ccr_max(:,m)<b(:,m)) || (b(:,m)<reference_ccr_min(:,m))
         %|(b(:,m)==0);
         ccr.branch(k(:,m),BR_STATUS)=0;
     end
 end
-T=ccr
-
+island_ccr=ccr
 end
+

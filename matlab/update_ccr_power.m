@@ -1,5 +1,4 @@
-
-function T = update_ccr_power(mpc,ccr,reference)
+function T = update_ccr_power(mpc,ccr,reference,results2)
 define_constants;
 %gives the indices of branches
 
@@ -60,8 +59,8 @@ reference_ccr=reference_ccr';
     
 
 %mpopt = mpoption('PF_ALG', 1,'PF_MAX_IT',20);
-%results = runpf(ccr, mpopt);
-results=runpf(ccr);  
+%results2 = runpf(ccr, mpopt);
+%results2=runpf(ccr);  
     
     
 fake_bus_id=[];
@@ -84,7 +83,7 @@ end
     
 b=[];
 for t=1:n_branches_ccr %calculates the new current after removal of three lines
-    Sf_new = abs(results.branch(k(:,t), PF) + 1j * results.branch(k(:,t), QF));
+    Sf_new = abs(results2.branch(k(:,t), PF) + 1j * results2.branch(k(:,t), QF));
         
     
     
@@ -101,3 +100,4 @@ end
 T=ccr
 
 end
+

@@ -1,0 +1,18 @@
+sfina2gephi Instructions
+
+*Gephi Install.
+-Download and Install Gephi from the following link : http://gephi.github.io/users/download/
+-It don't support OpenJDK nether java 1.8.
+-Two make gephi point at the right java, modifie the file /{pathtogephi}/etc/gephi.conf where {pathtogephi} is the installation folder. Change the path of jdkhome to the correct java, e.g. jdkhome="/usr/local/jdk1.7.0_60" 
+
+*Gephi Graph Streaming Plug-in
+-Install the Graph Streaming plug-in : https://marketplace.gephi.org/plugin/graph-streaming/
+-
+
+*sfina2gephi
+-Start gephi
+-Create an empty workspace by choose menu "File/New Project" (the new workspace must be named "workspace0" (in lower cases and without spaces), if not we must change the workspace name in the example)
+-Go to the Streaming window and click on Server/Start
+-Start sfina2gephi
+-sfina2gephi will be monitoring the folder "branch/" waiting fir new files to be added. Each new file will be streamed to gephi.
+-The file should match the sfina format for branch topology.
