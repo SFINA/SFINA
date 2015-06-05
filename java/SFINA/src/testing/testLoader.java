@@ -8,7 +8,7 @@ package testing;
 import java.util.ArrayList;
 import input.TopologyLoader;
 import input.InputParametersLoader;
-import power.input.PowerMetaInfoLoader;
+import power.input.PowerFlowDataLoader;
 import network.Link;
 import network.Node;
 import power.input.PowerNodeState;
@@ -22,20 +22,20 @@ public class testLoader {
     public static void main(String[] args){
         String col_seperator = ",";
         String missingValue="-";
-        String nodelocation = "configuration_files/input/time_1/topology/nodes.txt";
-        String linklocation = "configuration_files/input/time_1/topology/links.txt";
-        String nodemetalocation = "configuration_files/input/time_1/flow/nodes.txt";
-        String linkmetalocation = "configuration_files/input/time_1/flow/links.txt";
+        String nodeLocation = "configuration_files/input/time_1/topology/nodes.txt";
+        String linkLocation = "configuration_files/input/time_1/topology/links.txt";
+        String nodeFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
+        String linkFlowLocation = "configuration_files/input/time_1/flow/links.txt";
 
         // Load topology
-        TopologyLoader topologyloader = new TopologyLoader(col_seperator);
-        ArrayList<Node> nodes = topologyloader.loadNodes(nodelocation);
-        ArrayList<Link> links = topologyloader.loadLinks(linklocation, nodes);
+        TopologyLoader topologyLoader = new TopologyLoader(col_seperator);
+        ArrayList<Node> nodes = topologyLoader.loadNodes(nodeLocation);
+        ArrayList<Link> links = topologyLoader.loadLinks(linkLocation, nodes);
 
         // Load meta
-        PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator, missingValue);
-        metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
-        metaloader.loadLinkMetaInfo(linkmetalocation, links); 
+        PowerFlowDataLoader flowDataLoader = new PowerFlowDataLoader(col_seperator, missingValue);
+        flowDataLoader.loadNodeFlowData(nodeFlowLocation, nodes);
+        flowDataLoader.loadLinkFlowData(linkFlowLocation, links); 
        
         // Print information to see if it worked
         String header = "-------------------------\n    NODES\n-------------------------\nID       ACTIVE";

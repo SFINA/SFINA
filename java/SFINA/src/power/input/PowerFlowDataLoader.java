@@ -21,18 +21,18 @@ import power.PowerNodeType;
  *
  * @author evangelospournaras
  */
-public class PowerMetaInfoLoader {
+public class PowerFlowDataLoader {
     
     private final String parameterValueSeparator;
-    private static final Logger logger = Logger.getLogger(PowerMetaInfoLoader.class);
+    private static final Logger logger = Logger.getLogger(PowerFlowDataLoader.class);
     private final String missingValue;
     
-    public PowerMetaInfoLoader(String parameterValueSeparator, String missingValue){
+    public PowerFlowDataLoader(String parameterValueSeparator, String missingValue){
         this.parameterValueSeparator=parameterValueSeparator;
         this.missingValue=missingValue;
     }
     
-    public void loadNodeMetaInfo(String location, List<Node> nodes){
+    public void loadNodeFlowData(String location, List<Node> nodes){
         ArrayList<PowerNodeState> powerNodeStates = new ArrayList<PowerNodeState>();
         HashMap<String,ArrayList<String>> nodesStateValues = new HashMap<String,ArrayList<String>>();
         File file = new File(location);
@@ -42,8 +42,8 @@ public class PowerMetaInfoLoader {
             if(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
                 while(st.hasMoreTokens()){
-                    String metaInfo = st.nextToken();
-                    PowerNodeState state = this.lookupPowerNodeState(metaInfo);
+                    String stateName = st.nextToken();
+                    PowerNodeState state = this.lookupPowerNodeState(stateName);
                     powerNodeStates.add(state);
                 }
             }
@@ -63,7 +63,7 @@ public class PowerMetaInfoLoader {
         
     }
 
-    public void loadLinkMetaInfo(String location, List<Link> links){
+    public void loadLinkFlowData(String location, List<Link> links){
         ArrayList<PowerLinkState> powerLinkStates = new ArrayList<PowerLinkState>();
         HashMap<String, ArrayList<String>> linksStateValues = new HashMap<String, ArrayList<String>>();
         File file = new File(location);
@@ -73,8 +73,8 @@ public class PowerMetaInfoLoader {
             if(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
                 while(st.hasMoreTokens()){
-                    String metaInfo = st.nextToken();
-                    PowerLinkState state = this.lookupPowerLinkState(metaInfo);
+                    String stateName = st.nextToken();
+                    PowerLinkState state = this.lookupPowerLinkState(stateName);
                     powerLinkStates.add(state);
                 }
             }
