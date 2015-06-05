@@ -37,7 +37,9 @@ public class InputParametersLoader {
                 StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
                 while (st.hasMoreTokens()) {
                     InputParameter inputParameter=lookupInputParameter(st.nextToken());
+                    System.out.println(inputParameter);
                     Object value=this.getObjectFromString(inputParameter, st.nextToken());
+                    System.out.println(value);
                     inputParameters.put(inputParameter, value);
 		}
             }
@@ -62,6 +64,8 @@ public class InputParametersLoader {
                 return InputParameter.TOLERANCE_PARAMETER;
             case "attack_strategy":
                 return InputParameter.ATTACK_STRATEGY;
+            case "time_steps":
+                return InputParameter.TIME_STEPS;
             default:
                 logger.debug("Input parameter is not recongised.");
                 return null;
@@ -128,6 +132,8 @@ public class InputParametersLoader {
                         logger.debug("Attack strategy input parameter is not recongised.");
                         return null;
                 }
+            case TIME_STEPS:
+                return Double.parseDouble(stringValue);
             default:
                 logger.debug("Input parameter is not recongised.");
                 return null;

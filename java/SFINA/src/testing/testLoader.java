@@ -5,8 +5,10 @@
  */
 package testing;
 
+import java.util.HashMap;
 import java.util.ArrayList;
 import input.TopologyLoader;
+import input.InputParameter;
 import input.InputParametersLoader;
 import power.input.PowerFlowDataLoader;
 import network.Link;
@@ -19,14 +21,17 @@ import power.input.PowerLinkState;
  * @author Ben
  */
 public class testLoader {
-    public static void main(String[] args){
-        String col_seperator = ",";
-        String missingValue="-";
-        String nodeLocation = "configuration_files/input/time_1/topology/nodes.txt";
-        String linkLocation = "configuration_files/input/time_1/topology/links.txt";
-        String nodeFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
-        String linkFlowLocation = "configuration_files/input/time_1/flow/links.txt";
+    private static String col_seperator = ",";
+    private static String param_seperator = "=";
+    private static String missingValue="-";
+    private static String nodeLocation = "configuration_files/input/time_1/topology/nodes.txt";
+    private static String linkLocation = "configuration_files/input/time_1/topology/links.txt";
+    private static String nodeFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
+    private static String linkFlowLocation = "configuration_files/input/time_1/flow/links.txt";
+    private static String paramLocation = "configuration_files/input/parameters.txt";
 
+    public static void main(String[] args){
+        
         // Load topology
         TopologyLoader topologyLoader = new TopologyLoader(col_seperator);
         ArrayList<Node> nodes = topologyLoader.loadNodes(nodeLocation);
@@ -36,9 +41,21 @@ public class testLoader {
         PowerFlowDataLoader flowDataLoader = new PowerFlowDataLoader(col_seperator, missingValue);
         flowDataLoader.loadNodeFlowData(nodeFlowLocation, nodes);
         flowDataLoader.loadLinkFlowData(linkFlowLocation, links); 
-       
+        
+        // Load Input Parameters
+        InputParametersLoader paramLoader = new InputParametersLoader(param_seperator);
+        HashMap<InputParameter,Object> parameters = paramLoader.loadInputParameters(paramLocation);
+        
+        // print out data to check
+        printNodes(nodes);
+        printLinks(links);
+        printParam(parameters);
+        System.out.println("\n-------------------------\n    LOADING SUCCESSFUL\n-------------------------\n");
+    }
+    
+    private static void printNodes(ArrayList<Node> nodes){
         // Print information to see if it worked
-        String header = "-------------------------\n    NODES\n-------------------------\nID       ACTIVE";
+        String header = "\n-------------------------\n    NODES\n-------------------------\nID       ACTIVE";
         for (PowerNodeState state : PowerNodeState.values()) header += "    " + state;
         System.out.println(header);
         
@@ -49,11 +66,12 @@ public class testLoader {
             }
             System.out.println(values);
             // Example how to get state variables of e.g. nodes. Have to cast object to respective values.
-            //int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();
-            
+            //int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();  
         }
-        
-        header = ("\n-------------------------\n    LINKS\n-------------------------\nID    StartNode   EndNote Active");
+    }
+    
+    private static void printLinks(ArrayList<Link> links){
+        String header = ("\n-------------------------\n    LINKS\n-------------------------\nID    StartNode   EndNote Active");
         for(PowerLinkState state : PowerLinkState.values()) header += " " + state;
         System.out.println(header);
         
@@ -64,6 +82,13 @@ public class testLoader {
             }
             System.out.println(values);
         }
-        System.out.println("--------------------\nLOADING SUCCESSFUL");
+    }
+    
+    private static void printParam(HashMap<InputParameter,Object> parameters){
+        System.out.println("\n-------------------------\n    INPUT PARAMETERS\n-------------------------");
+        
+        for (HashMap.Entry<InputParameter, Object> entry : parameters.entrySet()) {
+            System.out.println(entry.getKey() + "   " + entry.getValue());           
+        }
     }
 }
