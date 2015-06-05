@@ -15,7 +15,7 @@ public enum PowerNodeState {
     REAL_POWER_DEMAND,
     REACTIVE_POWER_DEMAND,
     SHUNT_CONDUCT,
-    SHUNT_SUSCEP,
+    SHUNT_SUSCEPT,
     AREA,
     VOLTAGE_MAGNITUDE,
     VOLTAGE_ANGLE,
@@ -29,7 +29,6 @@ public enum PowerNodeState {
     REACTIVE_POWER_MIN,
     VOLTAGE_SETPOINT,
     TOTAL_MVA_BASE,
-    STATUS,
     REAL_POWER_MAX,
     REAL_POWER_MIN,
     PC1,        // lower real power output of PQ capability curve (Matpower parameter)

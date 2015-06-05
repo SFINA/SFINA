@@ -102,7 +102,7 @@ public class TopologyLoader {
                 String linkIndex=st.nextToken();
                 String startIndex=st.nextToken();
                 String endIndex=st.nextToken();
-                boolean connected=Boolean.getBoolean(st.nextToken());
+                boolean activated=Boolean.getBoolean(st.nextToken());
                 Node startNode=null;
                 Node endNode=null;
                 for(Node node:nodes){
@@ -114,7 +114,7 @@ public class TopologyLoader {
                     }
                 }
                 if(startNode!=null && endNode!=null){
-                    Link link=new Link(linkIndex,connected,startNode,endNode);
+                    Link link=new Link(linkIndex,activated,startNode,endNode);
                     links.add(link);
                 }
                 else{

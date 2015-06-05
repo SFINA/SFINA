@@ -12,6 +12,7 @@ import power.input.PowerMetaInfoLoader;
 import network.Link;
 import network.Node;
 import power.input.PowerNodeState;
+import power.input.PowerLinkState;
 
 /**
  *
@@ -34,20 +35,35 @@ public class testLoader {
         // Load meta
         PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator, missingValue);
         metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
-        //metaloader.loadLinkMetaInfo(linkmetalocation, links); --> not yet fully implemented
+        metaloader.loadLinkMetaInfo(linkmetalocation, links); 
        
         // Print information to see if it worked
-        System.out.println("---------- Nodes -----------");
+        String header = "-------------------------\n    NODES\n-------------------------\nID       ACTIVE";
+        for (PowerNodeState state : PowerNodeState.values()) header += "    " + state;
+        System.out.println(header);
+        
         for(Node node : nodes){
-            System.out.println("Node " + node.getIndex() + "; Activated = " + node.isActivated());
+            String values = node.getIndex() + "    " + node.isActivated();
+            for(PowerNodeState state : PowerNodeState.values()){
+                values +=  "   " + node.getProperty(state);
+            }
+            System.out.println(values);
             // Example how to get state variables of e.g. nodes. Have to cast object to respective values.
-            int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();
+            //int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();
             
         }
-        System.out.println("---------- Links -----------");
+        
+        header = ("\n-------------------------\n    LINKS\n-------------------------\nID    StartNode   EndNote Active");
+        for(PowerLinkState state : PowerLinkState.values()) header += " " + state;
+        System.out.println(header);
+        
         for(Link link : links){
-            System.out.println("Link " + link.getIndex() + "; Active = " + link.isConnected() + "; Coming from node " + link.getStartNode().getIndex() + "; Going to node " + link.getEndNode().getIndex());
+            String values = link.getIndex() + " " + link.getStartNode().getIndex() + " " + link.getEndNode().getIndex() + "   " + link.isConnected();
+            for(PowerLinkState state : PowerLinkState.values()){
+                values +=  "   " + link.getProperty(state);
+            }
+            System.out.println(values);
         }
-        System.out.println("Loading successful");
+        System.out.println("--------------------\nLOADING SUCCESSFUL");
     }
 }
