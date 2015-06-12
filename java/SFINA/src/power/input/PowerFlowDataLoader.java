@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.Node;
+import network.Link;
 import org.apache.log4j.Logger;
 import power.PowerNodeType;
 
@@ -20,20 +21,20 @@ import power.PowerNodeType;
  *
  * @author evangelospournaras
  */
-public class PowerMetaInfoLoader {
+public class PowerFlowDataLoader {
     
     private final String parameterValueSeparator;
-    private static final Logger logger = Logger.getLogger(PowerMetaInfoLoader.class);
+    private static final Logger logger = Logger.getLogger(PowerFlowDataLoader.class);
     private final String missingValue;
     
-    public PowerMetaInfoLoader(String parameterValueSeparator, String missingValue){
+    public PowerFlowDataLoader(String parameterValueSeparator, String missingValue){
         this.parameterValueSeparator=parameterValueSeparator;
         this.missingValue=missingValue;
     }
     
-    public void loadNodeMetaInfo(String location, List<Node> nodes){
-        ArrayList<PowerNodeState> powerNodeStates=new ArrayList<PowerNodeState>();
-        HashMap<String,ArrayList<String>> nodesStates=new HashMap<String,ArrayList<String>>();
+    public void loadNodeFlowData(String location, List<Node> nodes){
+        ArrayList<PowerNodeState> powerNodeStates = new ArrayList<PowerNodeState>();
+        HashMap<String,ArrayList<String>> nodesStateValues = new HashMap<String,ArrayList<String>>();
         File file = new File(location);
         Scanner scr = null;
         try {
@@ -41,8 +42,8 @@ public class PowerMetaInfoLoader {
             if(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
                 while(st.hasMoreTokens()){
-                    String metaInfo=st.nextToken();
-                    PowerNodeState state=this.lookupPowerNodeState(metaInfo);
+                    String stateName = st.nextToken();
+                    PowerNodeState state = this.lookupPowerNodeState(stateName);
                     powerNodeStates.add(state);
                 }
             }
@@ -52,24 +53,66 @@ public class PowerMetaInfoLoader {
                 while (st.hasMoreTokens()) {
                     values.add(st.nextToken());
 		}
-                nodesStates.put(values.get(0), values);
+                nodesStateValues.put(values.get(0), values);
             }
         }
         catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        this.injectNodeStates(nodes, powerNodeStates, nodesStates);
+        this.injectNodeStates(nodes, powerNodeStates, nodesStateValues);
         
+    }
+
+    public void loadLinkFlowData(String location, List<Link> links){
+        ArrayList<PowerLinkState> powerLinkStates = new ArrayList<PowerLinkState>();
+        HashMap<String, ArrayList<String>> linksStateValues = new HashMap<String, ArrayList<String>>();
+        File file = new File(location);
+        Scanner scr = null;
+        try {
+            scr = new Scanner(file);
+            if(scr.hasNext()){
+                StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
+                while(st.hasMoreTokens()){
+                    String stateName = st.nextToken();
+                    PowerLinkState state = this.lookupPowerLinkState(stateName);
+                    powerLinkStates.add(state);
+                }
+            }
+            while(scr.hasNext()){
+                ArrayList<String> values = new ArrayList<String>();
+                StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
+                while (st.hasMoreTokens()) {
+                    values.add(st.nextToken());
+		}
+                linksStateValues.put(values.get(0), values);
+            }
+        }
+        catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        this.injectLinkStates(links, powerLinkStates, linksStateValues);
+                
     }
     
     private void injectNodeStates(List<Node> nodes, ArrayList<PowerNodeState> powerNodeStates, HashMap<String,ArrayList<String>> nodesStates){
-        for(Node node:nodes){
-            ArrayList<String> rawValues=nodesStates.get(node.getIndex());
+        for(Node node : nodes){
+            ArrayList<String> rawValues = nodesStates.get(node.getIndex());
             for(int i=0;i<rawValues.size();i++){
-                PowerNodeState state=powerNodeStates.get(i);
-                String rawValue=rawValues.get(i);
+                PowerNodeState state = powerNodeStates.get(i);
+                String rawValue = rawValues.get(i);
                 if(!rawValue.equals(this.missingValue))
-                    node.addProperty(state, this.getActualValue(state, rawValues.get(i)));
+                    node.addProperty(state, this.getActualNodeValue(state, rawValues.get(i)));
+            }
+        }
+    }
+    
+    private void injectLinkStates(List<Link> links, ArrayList<PowerLinkState> powerLinkStates, HashMap<String,ArrayList<String>> linksStates){
+        for(Link link : links){
+            ArrayList<String> rawValues = linksStates.get(link.getIndex());
+            for(int i=0;i<rawValues.size();i++){
+                PowerLinkState state = powerLinkStates.get(i);
+                String rawValue = rawValues.get(i);
+                link.addProperty(state, rawValue);
             }
         }
     }
@@ -87,7 +130,7 @@ public class PowerMetaInfoLoader {
             case "Gs":
                 return PowerNodeState.SHUNT_CONDUCT;
             case "Bs":
-                return PowerNodeState.SHUNT_SUSCEP;
+                return PowerNodeState.SHUNT_SUSCEPT;
             case "area":
                 return PowerNodeState.AREA;
             case "volt_mag":
@@ -161,10 +204,41 @@ public class PowerMetaInfoLoader {
     }
     
     private PowerLinkState lookupPowerLinkState(String powerLinkState){
-        return null;
+        switch(powerLinkState){
+            case "id":
+                return PowerLinkState.ID;
+            case "current":
+                return PowerLinkState.CURRENT;
+            case "power":
+                return PowerLinkState.POWER;
+            case "resistance":
+                return PowerLinkState.RESISTANCE;
+            case "reactance":
+                return PowerLinkState.REACTANCE;
+            case "susceptance":
+                return PowerLinkState.SUSCEPTANCE;
+            case "rateA":
+                return PowerLinkState.RATE_A;
+            case "rateB":
+                return PowerLinkState.RATE_B;
+            case "rateC":
+                return PowerLinkState.RATE_C;
+            case "ratio":
+                return PowerLinkState.TAP_RATIO;
+            case "angle":
+                return PowerLinkState.ANGLE_SHIFT;
+            case "angmin":
+                return PowerLinkState.ANGLE_DIFFERENCE_MIN;
+            case "angmax":
+                return PowerLinkState.ANGLE_DIFFERENCE_MAX;
+            default:
+                logger.debug("Link node state is not recognized.");
+                return null;
+        }
     }
+    //id,current,power,resistance,reactance,susceptance,rateA,rateB,rateC,ratio,angle,angmin,angmax
     
-    private Object getActualValue(PowerNodeState powerNodeState, String rawValue){
+    private Object getActualNodeValue(PowerNodeState powerNodeState, String rawValue){
         switch(powerNodeState){
             case ID:
                 return rawValue;

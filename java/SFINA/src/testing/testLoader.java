@@ -5,49 +5,106 @@
  */
 package testing;
 
+import java.util.HashMap;
 import java.util.ArrayList;
 import input.TopologyLoader;
+import input.InputParameter;
 import input.InputParametersLoader;
-import power.input.PowerMetaInfoLoader;
+import java.util.List;
+import power.input.PowerFlowDataLoader;
 import network.Link;
 import network.Node;
 import power.input.PowerNodeState;
+import power.input.PowerLinkState;
 
 /**
  *
  * @author Ben
  */
 public class testLoader {
-    public static void main(String[] args){
-        String col_seperator = ",";
-        String missingValue="-";
-        String nodelocation = "configuration_files/input/time_1/topology/nodes.txt";
-        String linklocation = "configuration_files/input/time_1/topology/links.txt";
-        String nodemetalocation = "configuration_files/input/time_1/flow/nodes.txt";
-        String linkmetalocation = "configuration_files/input/time_1/flow/links.txt";
-
+    private static String col_seperator = ",";
+    private static String param_seperator = "=";
+    private static String missingValue="-";
+    private static String nodeLocation = "configuration_files/input/time_1/topology/nodes.txt";
+    private static String linkLocation = "configuration_files/input/time_1/topology/links.txt";
+    private static String nodeFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
+    private static String linkFlowLocation = "configuration_files/input/time_1/flow/links.txt";
+    private static String paramLocation = "configuration_files/input/parameters.txt";
+    
+    // make imported nodes and links accessible for testing other stuff
+    private static ArrayList<Node> nodes;
+    private static ArrayList<Link> links;
+    
+    public testLoader(boolean printResults){
+                
         // Load topology
-        TopologyLoader topologyloader = new TopologyLoader(col_seperator);
-        ArrayList<Node> nodes = topologyloader.loadNodes(nodelocation);
-        ArrayList<Link> links = topologyloader.loadLinks(linklocation, nodes);
+        TopologyLoader topologyLoader = new TopologyLoader(col_seperator);
+        nodes = topologyLoader.loadNodes(nodeLocation);
+        links = topologyLoader.loadLinks(linkLocation, nodes);
 
         // Load meta
-        PowerMetaInfoLoader metaloader = new PowerMetaInfoLoader(col_seperator, missingValue);
-        metaloader.loadNodeMetaInfo(nodemetalocation, nodes);
-        //metaloader.loadLinkMetaInfo(linkmetalocation, links); --> not yet fully implemented
-       
+        PowerFlowDataLoader flowDataLoader = new PowerFlowDataLoader(col_seperator, missingValue);
+        flowDataLoader.loadNodeFlowData(nodeFlowLocation, nodes);
+        flowDataLoader.loadLinkFlowData(linkFlowLocation, links); 
+        
+        // Load Input Parameters
+        InputParametersLoader paramLoader = new InputParametersLoader(param_seperator);
+        HashMap<InputParameter,Object> parameters = paramLoader.loadInputParameters(paramLocation);
+               
+        // print out data to check
+        if (printResults) {
+            printNodes(nodes);
+            printLinks(links);
+            printParam(parameters);
+        }
+        System.out.println("\n--------------------------------------------------\n    LOADING DATA SUCCESSFUL\n--------------------------------------------------\n");
+
+    }
+    
+    private static void printNodes(ArrayList<Node> nodes){
         // Print information to see if it worked
-        System.out.println("---------- Nodes -----------");
+        String header = "\n-------------------------\n    NODES\n-------------------------\nID       ACTIVE     Connected";
+        for (PowerNodeState state : PowerNodeState.values()) header += "    " + state;
+        System.out.println(header);
+        
         for(Node node : nodes){
-            System.out.println("Node " + node.getIndex() + "; Activated = " + node.isActivated());
+            String values = node.getIndex() + "    " + node.isActivated() + "   " + node.isConnected();
+            for(PowerNodeState state : PowerNodeState.values()){
+                values +=  "   " + node.getProperty(state);
+            }
+            System.out.println(values);
             // Example how to get state variables of e.g. nodes. Have to cast object to respective values.
-            int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();
-            
+            //int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();  
         }
-        System.out.println("---------- Links -----------");
+    }
+    
+    private static void printLinks(ArrayList<Link> links){
+        String header = ("\n-------------------------\n    LINKS\n-------------------------\nID    StartNode   EndNote Active");
+        for(PowerLinkState state : PowerLinkState.values()) header += " " + state;
+        System.out.println(header);
+        
         for(Link link : links){
-            System.out.println("Link " + link.getIndex() + "; Active = " + link.isConnected() + "; Coming from node " + link.getStartNode().getIndex() + "; Going to node " + link.getEndNode().getIndex());
+            String values = link.getIndex() + " " + link.getStartNode().getIndex() + " " + link.getEndNode().getIndex() + "   " + link.isActivated();
+            for(PowerLinkState state : PowerLinkState.values()){
+                values +=  "   " + link.getProperty(state);
+            }
+            System.out.println(values);
         }
-        System.out.println("Loading successful");
+    }
+    
+    private static void printParam(HashMap<InputParameter,Object> parameters){
+        System.out.println("\n-------------------------\n    INPUT PARAMETERS\n-------------------------");
+        
+        for (HashMap.Entry<InputParameter, Object> entry : parameters.entrySet()) {
+            System.out.println(entry.getKey() + "   " + entry.getValue());           
+        }
+    }
+    
+    public ArrayList<Node> getNodes(){
+        return nodes;
+    }
+    
+    public ArrayList<Link> getLinks() {
+        return links;
     }
 }

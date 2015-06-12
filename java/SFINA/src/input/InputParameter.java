@@ -15,5 +15,6 @@ public enum InputParameter {
     FLOW_ANALYSIS_TYPE,
     FLOW_TYPE,
     TOLERANCE_PARAMETER,
-    ATTACK_STRATEGY
+    ATTACK_STRATEGY,
+    TIME_STEPS
 }

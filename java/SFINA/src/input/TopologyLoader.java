@@ -75,6 +75,7 @@ public class TopologyLoader {
                             break;
                         case "0":
                             activated=false;
+                            break;
                         default:
                             logger.debug("Something is wrong with status of the nodes.");
                     }
@@ -102,7 +103,18 @@ public class TopologyLoader {
                 String linkIndex=st.nextToken();
                 String startIndex=st.nextToken();
                 String endIndex=st.nextToken();
-                boolean connected=Boolean.getBoolean(st.nextToken());
+                String status=st.nextToken();
+                boolean activated = false;
+                switch(status){
+                    case "1":
+                        activated=true;
+                        break;
+                    case "0":
+                        activated=false;
+                        break;
+                    default:
+                        logger.debug("Something is wrong with status of the links.");
+                }
                 Node startNode=null;
                 Node endNode=null;
                 for(Node node:nodes){
@@ -114,7 +126,7 @@ public class TopologyLoader {
                     }
                 }
                 if(startNode!=null && endNode!=null){
-                    Link link=new Link(linkIndex,connected,startNode,endNode);
+                    Link link=new Link(linkIndex,activated,startNode,endNode);
                     links.add(link);
                 }
                 else{
