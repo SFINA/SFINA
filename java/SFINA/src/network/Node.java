@@ -29,6 +29,7 @@ public class Node extends State{
         this.connected=false;
         this.activated=activated;
         this.links=new ArrayList<Link>();
+        this.evaluateConnectivity();
     }
     
     public Node(String index, boolean activated, List<Link> links){
@@ -38,6 +39,7 @@ public class Node extends State{
         this.activated=activated;
         this.links=new ArrayList<Link>();
         this.links.addAll(links);
+        this.evaluateConnectivity();
     }
     
     public double getFlow(){
@@ -122,8 +124,14 @@ public class Node extends State{
         this.evaluateConnectivity();
     }
     
+    // if all connected links are deactivated, this will return connected = false
     private void evaluateConnectivity(){
-        if(links.size()!=0){
+        boolean allDeactivated = true;
+        for (Link link : links) {
+            if (link.isActivated()) allDeactivated = false;
+        }
+        
+        if(links.size()!=0 && !allDeactivated){
             this.connected=true;
         }
         else{

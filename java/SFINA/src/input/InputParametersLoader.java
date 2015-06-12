@@ -37,9 +37,7 @@ public class InputParametersLoader {
                 StringTokenizer st = new StringTokenizer(scr.next(), parameterValueSeparator);
                 while (st.hasMoreTokens()) {
                     InputParameter inputParameter=lookupInputParameter(st.nextToken());
-                    System.out.println(inputParameter);
                     Object value=this.getObjectFromString(inputParameter, st.nextToken());
-                    System.out.println(value);
                     inputParameters.put(inputParameter, value);
 		}
             }

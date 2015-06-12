@@ -45,7 +45,7 @@ public class testLoader {
         // Load Input Parameters
         InputParametersLoader paramLoader = new InputParametersLoader(param_seperator);
         HashMap<InputParameter,Object> parameters = paramLoader.loadInputParameters(paramLocation);
-        
+               
         // print out data to check
         printNodes(nodes);
         printLinks(links);
@@ -55,12 +55,12 @@ public class testLoader {
     
     private static void printNodes(ArrayList<Node> nodes){
         // Print information to see if it worked
-        String header = "\n-------------------------\n    NODES\n-------------------------\nID       ACTIVE";
+        String header = "\n-------------------------\n    NODES\n-------------------------\nID       ACTIVE     Connected";
         for (PowerNodeState state : PowerNodeState.values()) header += "    " + state;
         System.out.println(header);
         
         for(Node node : nodes){
-            String values = node.getIndex() + "    " + node.isActivated();
+            String values = node.getIndex() + "    " + node.isActivated() + "   " + node.isConnected();
             for(PowerNodeState state : PowerNodeState.values()){
                 values +=  "   " + node.getProperty(state);
             }
@@ -76,7 +76,7 @@ public class testLoader {
         System.out.println(header);
         
         for(Link link : links){
-            String values = link.getIndex() + " " + link.getStartNode().getIndex() + " " + link.getEndNode().getIndex() + "   " + link.isConnected();
+            String values = link.getIndex() + " " + link.getStartNode().getIndex() + " " + link.getEndNode().getIndex() + "   " + link.isActivated();
             for(PowerLinkState state : PowerLinkState.values()){
                 values +=  "   " + link.getProperty(state);
             }

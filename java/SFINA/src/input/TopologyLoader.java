@@ -115,7 +115,6 @@ public class TopologyLoader {
                     default:
                         logger.debug("Something is wrong with status of the links.");
                 }
-                System.out.println(activated);
                 Node startNode=null;
                 Node endNode=null;
                 for(Node node:nodes){

@@ -34,8 +34,10 @@ public class Link extends State{
         this.index=index;
         this.startNode=startNode;
         this.endNode=endNode;
-        this.evaluateConnectivity();
         this.activated=activated;
+        this.evaluateConnectivity();
+        startNode.addLink(this); // This ensures that connectivity on node is updated
+        endNode.addLink(this);
     }
     
     public double getFlow(){
@@ -83,6 +85,7 @@ public class Link extends State{
      */
     public void setStartNode(Node startNode) {
         this.startNode = startNode;
+        startNode.addLink(this);
         this.evaluateConnectivity();
     }
 
@@ -98,6 +101,7 @@ public class Link extends State{
      */
     public void setEndNode(Node endNode) {
         this.endNode = endNode;
+        endNode.addLink(this);
         this.evaluateConnectivity();
     }
 
