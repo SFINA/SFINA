@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import input.TopologyLoader;
 import input.InputParameter;
 import input.InputParametersLoader;
+import java.util.List;
 import power.input.PowerFlowDataLoader;
 import network.Link;
 import network.Node;
@@ -29,13 +30,17 @@ public class testLoader {
     private static String nodeFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
     private static String linkFlowLocation = "configuration_files/input/time_1/flow/links.txt";
     private static String paramLocation = "configuration_files/input/parameters.txt";
-
-    public static void main(String[] args){
-        
+    
+    // make imported nodes and links accessible for testing other stuff
+    private static ArrayList<Node> nodes;
+    private static ArrayList<Link> links;
+    
+    public testLoader(boolean printResults){
+                
         // Load topology
         TopologyLoader topologyLoader = new TopologyLoader(col_seperator);
-        ArrayList<Node> nodes = topologyLoader.loadNodes(nodeLocation);
-        ArrayList<Link> links = topologyLoader.loadLinks(linkLocation, nodes);
+        nodes = topologyLoader.loadNodes(nodeLocation);
+        links = topologyLoader.loadLinks(linkLocation, nodes);
 
         // Load meta
         PowerFlowDataLoader flowDataLoader = new PowerFlowDataLoader(col_seperator, missingValue);
@@ -47,10 +52,13 @@ public class testLoader {
         HashMap<InputParameter,Object> parameters = paramLoader.loadInputParameters(paramLocation);
                
         // print out data to check
-        printNodes(nodes);
-        printLinks(links);
-        printParam(parameters);
-        System.out.println("\n-------------------------\n    LOADING SUCCESSFUL\n-------------------------\n");
+        if (printResults) {
+            printNodes(nodes);
+            printLinks(links);
+            printParam(parameters);
+        }
+        System.out.println("\n--------------------------------------------------\n    LOADING DATA SUCCESSFUL\n--------------------------------------------------\n");
+
     }
     
     private static void printNodes(ArrayList<Node> nodes){
@@ -90,5 +98,13 @@ public class testLoader {
         for (HashMap.Entry<InputParameter, Object> entry : parameters.entrySet()) {
             System.out.println(entry.getKey() + "   " + entry.getValue());           
         }
+    }
+    
+    public ArrayList<Node> getNodes(){
+        return nodes;
+    }
+    
+    public ArrayList<Link> getLinks() {
+        return links;
     }
 }
