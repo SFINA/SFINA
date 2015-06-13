@@ -1,0 +1,6 @@
+domain=power
+backend=matpower
+flow_analysis_type=power
+flow_type=dc
+alpha=2
+time_steps=1
