@@ -3,18 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/testing/testLoader.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/power/flow_analysis/MATPOWERPowerFlowAnalysis.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/power/input/PowerMetaInfoLoader.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/core/SimulationAgent.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/TopologyLoader.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/InputParametersLoader.java</file>
-=======
-            <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/power/flow_analysis/MATPOWERPowerFlowAnalysis.java</file>
+            <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/testing/testInterpss.java</file>
             <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/power/flow_analysis/InterPSSPowerFlowAnalysis.java</file>
             <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/testing/testLoader.java</file>
->>>>>>> 90a045acf4283ac3b8edfb05cc00fd687cc814f1
+            <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/power/input/PowerNodeState.java</file>
         </group>
     </open-files>
 </project-private>

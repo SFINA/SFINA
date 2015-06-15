@@ -23,6 +23,7 @@ public enum PowerNodeState {
     ZONE,
     VOLTAGE_MAX,
     VOLTAGE_MIN,
+    // From here on generator specific data
     REAL_POWER_GENERATION,
     REACTIVE_POWER_GENERATION,
     REACTIVE_POWER_MAX,
