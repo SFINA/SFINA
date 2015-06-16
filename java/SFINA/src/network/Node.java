@@ -124,14 +124,8 @@ public class Node extends State{
         this.evaluateConnectivity();
     }
     
-    // if all connected links are deactivated, this will return connected = false
     private void evaluateConnectivity(){
-        boolean allDeactivated = true;
-        for (Link link : links) {
-            if (link.isActivated()) allDeactivated = false;
-        }
-        
-        if(links.size()!=0 && !allDeactivated){
+        if(links.size()!=0){
             this.connected=true;
         }
         else{
