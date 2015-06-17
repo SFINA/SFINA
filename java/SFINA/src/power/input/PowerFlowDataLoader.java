@@ -112,7 +112,7 @@ public class PowerFlowDataLoader {
             for(int i=0;i<rawValues.size();i++){
                 PowerLinkState state = powerLinkStates.get(i);
                 String rawValue = rawValues.get(i);
-                link.addProperty(state, rawValue);
+                link.addProperty(state, this.getActualLinkValue(state, rawValue));
             }
         }
     }
@@ -232,7 +232,7 @@ public class PowerFlowDataLoader {
             case "angmax":
                 return PowerLinkState.ANGLE_DIFFERENCE_MAX;
             default:
-                logger.debug("Link node state is not recognized.");
+                logger.debug("Power link state is not recognized.");
                 return null;
         }
     }
@@ -255,10 +255,118 @@ public class PowerFlowDataLoader {
                         return null;
                 }
             case REAL_POWER_DEMAND:
-                return rawValue;
+                return Double.parseDouble(rawValue);
+            case REACTIVE_POWER_DEMAND:
+                return Double.parseDouble(rawValue);
+            case SHUNT_CONDUCT:
+                return Double.parseDouble(rawValue);
+            case SHUNT_SUSCEPT:
+                return Double.parseDouble(rawValue);
+            case AREA:
+                return Double.parseDouble(rawValue);
+            case VOLTAGE_MAGNITUDE:
+                return Double.parseDouble(rawValue);
+            case VOLTAGE_ANGLE:
+                return Double.parseDouble(rawValue);
+            case BASE_VOLTAGE:
+                return Double.parseDouble(rawValue);
+            case ZONE:
+                return Double.parseDouble(rawValue);
+            case VOLTAGE_MAX:
+                return Double.parseDouble(rawValue);
+            case VOLTAGE_MIN:
+                return Double.parseDouble(rawValue);
+            // From here on generator specific data
+            case REAL_POWER_GENERATION:
+                return Double.parseDouble(rawValue);
+            case REACTIVE_POWER_GENERATION:
+                return Double.parseDouble(rawValue);
+            case REACTIVE_POWER_MAX:
+                return Double.parseDouble(rawValue);
+            case REACTIVE_POWER_MIN:
+                return Double.parseDouble(rawValue);
+            case VOLTAGE_SETPOINT:
+                return Double.parseDouble(rawValue);
+            case TOTAL_MVA_BASE:
+                return Double.parseDouble(rawValue);
+            case REAL_POWER_MAX:
+                return Double.parseDouble(rawValue);
+            case REAL_POWER_MIN:
+                return Double.parseDouble(rawValue);
+            case PC1:
+                return Double.parseDouble(rawValue);
+            case PC2:
+                return Double.parseDouble(rawValue);
+            case QC1_MIN:
+                return Double.parseDouble(rawValue);
+            case QC1_MAX:
+                return Double.parseDouble(rawValue);
+            case QC2_MIN:
+                return Double.parseDouble(rawValue);
+            case QC2_MAX:
+                return Double.parseDouble(rawValue);
+            case RAMP_AGC:
+                return Double.parseDouble(rawValue);
+            case RAMP_10:
+                return Double.parseDouble(rawValue);
+            case RAMP_30:
+                return Double.parseDouble(rawValue);
+            case RAMP_REACTIVE_POWER:
+                return Double.parseDouble(rawValue);
+            case AREA_PART_FACTOR:
+                return Double.parseDouble(rawValue);
+            case MODEL:
+                return Double.parseDouble(rawValue);
+            case STARTUP:
+                return Double.parseDouble(rawValue);
+            case SHUTDOWN:
+                return Double.parseDouble(rawValue);
+            case N_COST:
+                return Double.parseDouble(rawValue);
+            case COST_PARAM:
+                return Double.parseDouble(rawValue);
+            case COST_PARAM_1:
+                return Double.parseDouble(rawValue);
+            case COST_PARAM_2:
+                return Double.parseDouble(rawValue);
+            case COST_PARAM_3:
+                return Double.parseDouble(rawValue);
             default:
-                //logger.debug("Power node state is not recognized.");
-                return rawValue;
-        }
+                logger.debug("Power node state is not recognized.");
+                return null;
+        }    
     }  
+    private Object getActualLinkValue(PowerLinkState powerLinkState, String rawValue){
+        switch(powerLinkState){
+            case CURRENT:
+                return Double.parseDouble(rawValue);
+            case POWER:
+                return null;
+                //return Double.parseDouble(rawValue);
+            case RESISTANCE:
+                return Double.parseDouble(rawValue);
+            case REACTANCE:
+                return Double.parseDouble(rawValue);
+            case SUSCEPTANCE:
+                return Double.parseDouble(rawValue);
+            case RATE_A:
+                return Double.parseDouble(rawValue);
+            case RATE_B:
+                return Double.parseDouble(rawValue);
+            case RATE_C:
+                return Double.parseDouble(rawValue);
+            case TAP_RATIO:
+                return Double.parseDouble(rawValue);
+            case ANGLE_SHIFT:
+                return Double.parseDouble(rawValue);
+            case ANGLE_DIFFERENCE_MIN:
+                return Double.parseDouble(rawValue);
+            case ANGLE_DIFFERENCE_MAX:
+                return Double.parseDouble(rawValue);
+            default:
+                logger.debug("Power link state is not recognized.");
+                return null;
+                
+        }
+    }
 }

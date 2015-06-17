@@ -6,7 +6,8 @@
             <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/testing/testInterpss.java</file>
             <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/power/flow_analysis/InterPSSPowerFlowAnalysis.java</file>
             <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/testing/testLoader.java</file>
-            <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/power/input/PowerNodeState.java</file>
+            <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/power/input/PowerFlowDataLoader.java</file>
+            <file>file:/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/src/testing/MainTester.java</file>
         </group>
     </open-files>
 </project-private>
