@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2015 SFINA Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+package event;
+
+import dsutil.generic.state.State;
+
+/**
+ *
+ * @author evangelospournaras
+ */
+public class Event extends State{
+    
+    private int time;
+    private NetworkFeature networkFeature;
+    private NetworkComponent networkComponent;
+    private String componentID;
+    private Enum parameter;
+    private Object value;
+    
+    public Event(int time, NetworkFeature networkFeature, NetworkComponent networkComponent, String componentID, Enum parameter, Object value){
+        super();
+        this.time=time;
+        this.networkFeature=networkFeature;
+        this.networkComponent=networkComponent;
+        this.componentID=componentID;
+        this.parameter=parameter;
+        this.value=value;
+    }
+    
+}

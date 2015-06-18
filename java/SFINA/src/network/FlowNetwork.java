@@ -50,6 +50,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * Simple constructor that instantiates the hash maps. 
      */
     public FlowNetwork(){
+        super();
         this.nodes=new HashMap<String,Node>();
         this.links=new HashMap<String,Link>();
     }
