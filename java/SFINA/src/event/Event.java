@@ -41,5 +41,89 @@ public class Event extends State{
         this.parameter=parameter;
         this.value=value;
     }
+
+    /**
+     * @return the time
+     */
+    public int getTime() {
+        return time;
+    }
+
+    /**
+     * @param time the time to set
+     */
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    /**
+     * @return the networkFeature
+     */
+    public NetworkFeature getNetworkFeature() {
+        return networkFeature;
+    }
+
+    /**
+     * @param networkFeature the networkFeature to set
+     */
+    public void setNetworkFeature(NetworkFeature networkFeature) {
+        this.networkFeature = networkFeature;
+    }
+
+    /**
+     * @return the networkComponent
+     */
+    public NetworkComponent getNetworkComponent() {
+        return networkComponent;
+    }
+
+    /**
+     * @param networkComponent the networkComponent to set
+     */
+    public void setNetworkComponent(NetworkComponent networkComponent) {
+        this.networkComponent = networkComponent;
+    }
+
+    /**
+     * @return the componentID
+     */
+    public String getComponentID() {
+        return componentID;
+    }
+
+    /**
+     * @param componentID the componentID to set
+     */
+    public void setComponentID(String componentID) {
+        this.componentID = componentID;
+    }
+
+    /**
+     * @return the parameter
+     */
+    public Enum getParameter() {
+        return parameter;
+    }
+
+    /**
+     * @param parameter the parameter to set
+     */
+    public void setParameter(Enum parameter) {
+        this.parameter = parameter;
+    }
+
+    /**
+     * @return the value
+     */
+    public Object getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(Object value) {
+        this.value = value;
+    }
     
 }

@@ -3,13 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/testing/testLoader.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/network/Link.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/network/Node.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/power/flow_analysis/MATPOWERPowerFlowAnalysis.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/core/SimulationAgent.java</file>
-            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/TopologyLoader.java</file>
+            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/event/Event.java</file>
+            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/EventLoader.java</file>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/network/FlowNetwork.java</file>
+            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/TopologyLoader.java</file>
+            <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/power/input/PowerFlowDataLoader.java</file>
             <file>file:/Users/evangelospournaras/Documents/Repositories/Work/software/Github/SFINA/java/SFINA/src/input/InputParametersLoader.java</file>
         </group>
     </open-files>
