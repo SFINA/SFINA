@@ -11,7 +11,17 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- *
+ * A node has the following features:
+ * 
+ * - It extends the state that is a container of information.
+ * - It has a number of incoming and outgoing links.
+ * - It can be activated/deactivated and connected/disconnected.
+ * - It can vary the flow type: the flow can be any information contained in the
+ * state
+ * 
+ * Every persistent operation over the list of links imposes a re-evaluation of
+ * the node connectivity.
+ * 
  * @author evangelospournaras
  */
 public class Node extends State{
@@ -23,6 +33,13 @@ public class Node extends State{
     private Enum flowType;
     private static final Logger logger = Logger.getLogger(Node.class);
     
+    /**
+     * Instantiates a disconnected node. This is the recommended constructor as the addition
+     * of the links should be performed by a <code>FlowNetworkInterface</code>.
+     * 
+     * @param index the index of the node
+     * @param activated initialized as activated or deactivated
+     */
     public Node(String index, boolean activated){
         super();
         this.index=index;
@@ -32,6 +49,15 @@ public class Node extends State{
         this.evaluateConnectivity();
     }
     
+    /**
+     * Instantiates a connected node. This is not a recommended constructor as 
+     * the states of the nodes and links should be coordinated with a class 
+     * implementing the <code>FlowNetworkInterface</code>.
+     * 
+     * @param index
+     * @param activated
+     * @param links 
+     */
     public Node(String index, boolean activated, List<Link> links){
         super();
         this.index=index;
@@ -42,12 +68,22 @@ public class Node extends State{
         this.evaluateConnectivity();
     }
     
+    /**
+     * Returns the flow value if a flow type is defined.
+     * 
+     * @return the flow
+     */
     public double getFlow(){
         if(this.flowType==null)
             logger.debug("Flow type is not defined.");
         return (double)this.getProperty(flowType);
     }
     
+    /**
+     * Sets the flow if a flow type is defined
+     * 
+     * @param flow the flow set
+     */
     public void setFlow(double flow){
         if(this.flowType==null){
             logger.debug("Flow type is not defined.");
@@ -57,20 +93,40 @@ public class Node extends State{
         }
     }
     
+    /**
+     * Sets the flow type
+     * 
+     * @param flowType the set flow type
+     */
     public void setFlowType(Enum flowType){
         this.flowType=flowType;
     }
     
+    /**
+     * Adds a link and evaluates the connectivity of the node.
+     * 
+     * @param link the added link
+     */
     public void addLink(Link link){
         this.getLinks().add(link);
         this.evaluateConnectivity();
     }
     
+    /**
+     * Removes the link and evaluates the connectivity of the node
+     * 
+     * @param link the removed link
+     */
     public void removeLink(Link link){
         this.getLinks().remove(link);
         this.evaluateConnectivity();
     }
     
+    /**
+     * Returns a new list with all incoming links of the node
+     * 
+     * @return a new array list with the incoming links of the node
+     */
     public ArrayList<Link> getIncomingLinks(){
         ArrayList<Link> incomingLinks=new ArrayList<Link>();
         for(Link link:getLinks()){
@@ -81,6 +137,11 @@ public class Node extends State{
         return incomingLinks;
     }
     
+    /**
+     * Returns a new list with all outgoing links of the node
+     * 
+     * @return a new array list with the outgoing links of the node
+     */
     public ArrayList<Link> getOutgoingLinks(){
         ArrayList<Link> outgoingLinks=new ArrayList<Link>();
         for(Link link:getLinks()){
@@ -91,18 +152,27 @@ public class Node extends State{
         return outgoingLinks;
     }
     
+    /**
+     * Returns the status of the node connectivity
+     * 
+     * @return if the node is connected or disconnected
+     */
     public boolean isConnected(){
         return connected;
     }
 
     /**
-     * @return the index
+     * Returns the index of the node
+     * 
+     * @return the index of the node
      */
     public String getIndex() {
         return index;
     }
 
     /**
+     * Sets the index of the node
+     * 
      * @param index the index to set
      */
     public void setIndex(String index) {
@@ -110,13 +180,17 @@ public class Node extends State{
     }
 
     /**
-     * @return the links
+     * Returns the links of the node
+     * 
+     * @return the links of the node
      */
     public List<Link> getLinks() {
         return links;
     }
 
     /**
+     * Sets the links of the node
+     * 
      * @param links the links to set
      */
     public void setLinks(List<Link> links) {
@@ -124,6 +198,9 @@ public class Node extends State{
         this.evaluateConnectivity();
     }
     
+    /**
+     * Evaluates the connectivity of the node
+     */
     private void evaluateConnectivity(){
         if(links.size()!=0){
             this.connected=true;
@@ -134,13 +211,17 @@ public class Node extends State{
     }
 
     /**
-     * @return the activated
+     * Returned the activated/deactivated status of the node
+     * 
+     * @return the activated/deactivated status of the node
      */
     public boolean isActivated() {
         return activated;
     }
 
     /**
+     * Sets the activated/deactivated status of the node
+     * 
      * @param activated the activated to set
      */
     public void setActivated(boolean activated) {

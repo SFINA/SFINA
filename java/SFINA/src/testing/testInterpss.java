@@ -17,6 +17,7 @@
  */
 package testing;
 
+import com.interpss.common.exp.InterpssException;
 import java.util.ArrayList;
 import network.Link;
 import network.Node;
@@ -28,11 +29,18 @@ import power.flow_analysis.InterPSSPowerFlowAnalysis;
  * @author Ben
  */
 public class testInterpss {
-    public testInterpss(ArrayList<Node> nodes, ArrayList<Link> links){
+    public testInterpss(ArrayList<Node> nodes, ArrayList<Link> links) {
         
         // AC test
-        InterPSSPowerFlowAnalysis IpssObject = new InterPSSPowerFlowAnalysis(PowerFlowType.AC);
-        //IpssObject.flowAnalysis(nodes, links);
+        try{
+            InterPSSPowerFlowAnalysis IpssObject = new InterPSSPowerFlowAnalysis(PowerFlowType.AC);
+            IpssObject.flowAnalysis(nodes, links);
+            IpssObject.runCaseFromFile("ieee57.ieee");
+        }
+        catch(InterpssException ie){
+            ie.printStackTrace();
+        }
+        
         
         System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
     }

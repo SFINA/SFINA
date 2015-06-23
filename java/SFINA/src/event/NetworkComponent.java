@@ -15,27 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package testing;
-
-import java.util.ArrayList;
-import network.Link;
-import network.Node;
+package event;
 
 /**
  *
- * @author Ben
+ * @author evangelospournaras
  */
-public class MainTester {
-     
-    public static void main(String[] args){
-        // Test Loader. Argument true if loaded data should be printed to Output
-        testLoader testloader = new testLoader(false);
-        
-        // Get loaded data for other testers
-        ArrayList<Node> nodes = testloader.getNodes();
-        ArrayList<Link> links = testloader.getLinks();
-        
-        // Test InterPSS
-        testInterpss testinterpss = new testInterpss(nodes, links);
-    }
+public enum NetworkComponent {
+    Node,
+    Link
 }

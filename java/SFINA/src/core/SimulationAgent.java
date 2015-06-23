@@ -115,7 +115,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
-                attackedLinks=topologyLoader.loadAttackedLinks(attackedLinesLocation, links);
                 runActiveState();
             }
         });
