@@ -156,6 +156,7 @@ public class EventLoader {
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
+                        break;
                     case FLOW:
                         switch(networkComponent){
                             case Node:
@@ -175,6 +176,7 @@ public class EventLoader {
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
+                                break;
                             case Link:
                                 switch(domain){
                                     case POWER:
@@ -192,9 +194,11 @@ public class EventLoader {
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
+                                break;
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
+                        break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
                 }
@@ -212,6 +216,7 @@ public class EventLoader {
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
+                        break;
                     case FLOW:
                         switch(networkComponent){
                             case Node:
@@ -231,6 +236,7 @@ public class EventLoader {
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
+                                break;
                             case Link:
                                 switch(domain){
                                     case POWER:
@@ -248,10 +254,11 @@ public class EventLoader {
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
-                                
+                                break;
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
+                        break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
                 }
