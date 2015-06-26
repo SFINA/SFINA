@@ -1,3 +1,4 @@
-time_1,topology,links,5,4,0
-time_1,topology,links,6,4,0
-time_1,topology,links,7,4,0
+time,feature,component,id,parameter,value
+1,topology,link,5,status,0
+1,topology,link,6,status,0
+1,topology,link,7,status,0
