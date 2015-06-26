@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import network.FlowNetwork;
 import network.Link;
 import network.LinkState;
 import network.Node;
@@ -26,10 +27,12 @@ import power.input.PowerLinkState;
  */
 public class TopologyLoader {
     
+    private FlowNetwork net;
     private String columnSeparator;
     private static final Logger logger = Logger.getLogger(TopologyLoader.class);
     
-    public TopologyLoader(String columnSeparator){
+    public TopologyLoader(FlowNetwork net, String columnSeparator){
+        this.net=net;
         this.columnSeparator=columnSeparator;
     }
     
@@ -61,7 +64,7 @@ public class TopologyLoader {
 //        return attackedLinks;
 //    }
     
-    public ArrayList<Node> loadNodes(String location){
+    public void loadNodes(String location){
         ArrayList<NodeState> nodeStates=new ArrayList<NodeState>();
         ArrayList<Node> nodes=new ArrayList<Node>();
         File file = new File(location);
@@ -84,16 +87,16 @@ public class TopologyLoader {
                 String nodeIndex=(String)this.getActualNodeValue(nodeStates.get(0), values.get(0));
                 boolean status=(Boolean)this.getActualNodeValue(nodeStates.get(1), values.get(1));
                 Node node=new Node(nodeIndex, status);
-                nodes.add(node);
+                net.addNode(node);
             }
         }
         catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        return nodes;
     }
     
-    public ArrayList<Link> loadLinks(String location, ArrayList<Node> nodes){
+    public void loadLinks(String location){
+        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
         ArrayList<LinkState> linkStates=new ArrayList<LinkState>();
         ArrayList<Link> links=new ArrayList<Link>();
         File file = new File(location);
@@ -129,7 +132,7 @@ public class TopologyLoader {
                 }
                 if(startNode!=null && endNode!=null){
                     Link link=new Link(linkIndex,status,startNode,endNode);
-                    links.add(link);
+                    net.addLink(link);
                 }
                 else{
                     logger.debug("Something went wrong with the indices of nodes and links.");
@@ -139,7 +142,6 @@ public class TopologyLoader {
         catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        return links;
     }
     
     private Object getActualNodeValue(NodeState nodeState, String rawValue){

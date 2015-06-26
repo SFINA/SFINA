@@ -51,4 +51,14 @@ public interface FlowNetworkInterface {
     
     public double getAvgNodeDegree();
     
+    /*public double getClustCoeff();
+    
+    public double getBtwnCentrality(Node node);
+    
+    public double getBtwnCentrality(Link link);
+    
+    public double getDegCentrality(Node node);
+    
+    public double getDegCentrality(Link link);*/
+    
 }

@@ -15,11 +15,12 @@ import input.InputParametersLoader;
 import input.TopologyLoader;
 import java.util.List;
 import java.util.Map;
+import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
-import power.flow_analysis.InterPSSPowerFlowAnalysis;
+import power.flow_analysis.InterpssPowerFlowAnalysis;
 import power.flow_analysis.MATPOWERPowerFlowAnalysis;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
@@ -66,8 +67,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     final static String network="test.txt";
     
-    private List<Node> nodes;
-    private List<Link> links;
+    private FlowNetwork net;
     
     public SimulationAgent(String inputParametersLocation, String attackedLinesLocation, String parameterValueSeparator, String columnSeparator){
         this.inputParametersLocation=inputParametersLocation;
@@ -75,7 +75,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.parameterValueSeparator=parameterValueSeparator;
         this.columnSeparator=columnSeparator;
         this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
-        this.topologyLoader=new TopologyLoader(this.columnSeparator);
+        this.topologyLoader=new TopologyLoader(net, this.columnSeparator);
     }
     
     /**
@@ -146,11 +146,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 switch(backend){
                     case MATPOWER:
                         flowAnalysis=new MATPOWERPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
-                        flowAnalysis.flowAnalysis(this.nodes, this.links);
+                        flowAnalysis.flowAnalysis(net);
                         break;
                     case INTERPSS:
-                        flowAnalysis=new InterPSSPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
-                        flowAnalysis.flowAnalysis(this.nodes, this.links);
+                        flowAnalysis=new InterpssPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
+                        flowAnalysis.flowAnalysis(net);
                         break;
                     default:
                         logger.debug("Wrong backend detected.");
@@ -170,32 +170,16 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         }
     }
     
-     /**
-     * @return the nodes
-     */
-    public List<Node> getNodes() {
-        return nodes;
-    }
-
     /**
-     * @param nodes the nodes to set
+     * 
+     * @return the network
      */
-    public void setNodes(List<Node> nodes) {
-        this.nodes = nodes;
+    public FlowNetwork getFlowNetwork() {
+        return net;
     }
-
-    /**
-     * @return the links
-     */
-    public List<Link> getLinks() {
-        return links;
-    }
-
-    /**
-     * @param links the links to set
-     */
-    public void setLinks(List<Link> links) {
-        this.links = links;
+    
+    public void setFlowNetwork(FlowNetwork net) {
+        this.net = net;
     }
     
     //****************** MEASUREMENTS ******************

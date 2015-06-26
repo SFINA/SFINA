@@ -58,7 +58,7 @@ public class InputParametersLoader {
                 return InputParameter.FLOW_TYPE;
             case "flow_analysis_type":
                 return InputParameter.FLOW_ANALYSIS_TYPE;
-            case "tolerance":
+            case "tolerance_parameter":
                 return InputParameter.TOLERANCE_PARAMETER;
             case "attack_strategy":
                 return InputParameter.ATTACK_STRATEGY;

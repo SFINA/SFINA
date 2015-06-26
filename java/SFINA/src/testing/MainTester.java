@@ -17,25 +17,31 @@
  */
 package testing;
 
+import input.EventLoader;
 import java.util.ArrayList;
+import network.FlowNetwork;
 import network.Link;
 import network.Node;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Ben
  */
 public class MainTester {
-     
+    
+    private static boolean output = false;
+    
     public static void main(String[] args){
-        // Test Loader. Argument true if loaded data should be printed to Output
-        testLoader testloader = new testLoader(false);
         
-        // Get loaded data for other testers
-        ArrayList<Node> nodes = testloader.getNodes();
-        ArrayList<Link> links = testloader.getLinks();
+        // Create network object
+        FlowNetwork net = new FlowNetwork();
+        
+        // Test Loader. Argument true if loaded data should be printed to Output
+        testLoader testloader = new testLoader(net, output);
         
         // Test InterPSS
-        testInterpss testinterpss = new testInterpss(nodes, links);
+        testInterpss testinterpss = new testInterpss(net);
+        
     }
 }

@@ -21,11 +21,14 @@ import com.interpss.core.net.Area;
 import com.interpss.core.net.Zone;
 import flow_analysis.FlowAnalysisInterface;
 import static java.lang.Math.PI;
+import java.util.ArrayList;
 import java.util.List;
+import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.EList;
 import org.interpss.CorePluginObjFactory;
 import org.interpss.IpssCorePlugin;
 import org.interpss.display.AclfOutFunc.BusIdStyle;
@@ -44,25 +47,23 @@ import power.input.PowerNodeState;
  *
  * @author evangelospournaras
  */
-public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
+public class InterpssPowerFlowAnalysis implements FlowAnalysisInterface{
     
-    private List<Node> nodesSfina;
-    private List<Link> linksSfina;
     private PowerFlowType powerFlowType;
-    private AclfNetwork net;
+    private FlowNetwork SfinaNet;
+    private AclfNetwork IpssNet;
     private String resultAsString;
-    private static final Logger logger = Logger.getLogger(InterPSSPowerFlowAnalysis.class);
+    private static final Logger logger = Logger.getLogger(InterpssPowerFlowAnalysis.class);
     
-    public InterPSSPowerFlowAnalysis(PowerFlowType powerFlowType){
+    public InterpssPowerFlowAnalysis(PowerFlowType powerFlowType){
         this.powerFlowType=powerFlowType;
     }
     
     
     @Override
-    public void flowAnalysis(List<Node> nodes, List<Link> links){
+    public void flowAnalysis(FlowNetwork net){
         
-        this.nodesSfina = nodes;
-        this.linksSfina = links;
+        this.SfinaNet = net;
         
         IpssCorePlugin.init();
         
@@ -71,16 +72,16 @@ public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
                 case AC:
                     buildIpssNet();
                     //net = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load(inputpath).getAclfNet();
-                    LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(net);
+                    LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
                     acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
-                    //acAlgo.loadflow();
-                    //resultAsString = AclfOut_BusStyle.lfResultsBusStyle(net, BusIdStyle.BusId_No).toString();
+                    acAlgo.loadflow();
+                    resultAsString = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
                     getIpssResults();
                     break;
                 case DC:
                     buildIpssNet();
                     //net = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load(inputpath).getAclfNet();  
-                    DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(net);
+                    DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(IpssNet);
                     dcAlgo.calculateDclf();
                     resultAsString = DclfOutFunc.dclfResults(dcAlgo, false).toString();
                     getIpssResults();
@@ -106,23 +107,25 @@ public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
      * Transfrom SFINA to IPSS network
      */
     private void buildIpssNet(){
-        net = CoreObjectFactory.createAclfNetwork();
+        IpssNet = CoreObjectFactory.createAclfNetwork();
         
         // Set baseKVA. Not sure if we have this in our data, or if we need it. Or we just set it here to a default value.
-        net.setBaseKva(10000.0);
+        IpssNet.setBaseKva(100000.0);
+        
+        ArrayList<Node> nodesSfina = new ArrayList<Node>(SfinaNet.getNodes());
+        ArrayList<Link> linksSfina = new ArrayList<Link>(SfinaNet.getLinks());
         
         try {
             for (Node node : nodesSfina) {
-                //System.out.println(node.toString());
-                AclfBus IpssBus = CoreObjectFactory.createAclfBus(node.getIndex(), net); // name of bus in InterPSS is index of node in SFINA. Buses are referenced by this name.
+                AclfBus IpssBus = CoreObjectFactory.createAclfBus(node.getIndex(), IpssNet); // name of bus in InterPSS is index of node in SFINA. Buses are referenced by this name.
                 IpssBus.setNumber(Long.parseLong(node.getIndex()));
                 IpssBus.setStatus(node.isActivated());
                 switch((PowerNodeType)node.getProperty(PowerNodeState.TYPE)){
                     case GENERATOR:
                         IpssBus.setGenCode(AclfGenCode.GEN_PV);
                         IpssBus.toPVBus(); // don't know if necessary
-                        IpssBus.setGenP((Double)node.getProperty(PowerNodeState.REAL_POWER_GENERATION)); // in MW
-                        IpssBus.setGenQ((Double)node.getProperty(PowerNodeState.REACTIVE_POWER_GENERATION)); // in MVAr
+                        IpssBus.setGenP((Double)node.getProperty(PowerNodeState.REAL_POWER_GENERATION)/IpssNet.getBaseMva()); // in MW
+                        IpssBus.setGenQ((Double)node.getProperty(PowerNodeState.REACTIVE_POWER_GENERATION)/IpssNet.getBaseMva()); // in MVAr
                         // Missing reactive_power_max, reactive_power_min, real_power_max, real_power_min
                         // In InterPSS methods existing: .setExpLoadP(), .setExpLoadQ()
                         IpssBus.setDesiredVoltMag((Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE)); // derived from comparison with IEEE loaded data
@@ -133,8 +136,8 @@ public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
                     case SLACK_BUS:
                         IpssBus.setGenCode(AclfGenCode.SWING);
                         IpssBus.toSwingBus();
-                        IpssBus.setGenP((Double)node.getProperty(PowerNodeState.REAL_POWER_GENERATION)); // in MW
-                        IpssBus.setGenQ((Double)node.getProperty(PowerNodeState.REACTIVE_POWER_GENERATION)); // in MVAr
+                        IpssBus.setGenP((Double)node.getProperty(PowerNodeState.REAL_POWER_GENERATION)/IpssNet.getBaseMva()); // in MW
+                        IpssBus.setGenQ((Double)node.getProperty(PowerNodeState.REACTIVE_POWER_GENERATION)/IpssNet.getBaseMva()); // in MVAr
                         IpssBus.setDesiredVoltMag((Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE)); // derived from comparison with IEEE loaded data
                         break;
                     case BUS:
@@ -146,20 +149,15 @@ public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
                 }
                 
                 // Properties for all buses (Gen and non-Gen)
-                
-                IpssBus.setLoadP((Double)node.getProperty(PowerNodeState.REAL_POWER_DEMAND)); // in MW
-                IpssBus.setLoadQ((Double)node.getProperty(PowerNodeState.REACTIVE_POWER_DEMAND)); // in MVAr
-                
+
                 if (IpssBus.getLoadP() != 0.0) 
                     IpssBus.setLoadCode(AclfLoadCode.CONST_P);
                 else
                     IpssBus.setLoadCode(AclfLoadCode.NON_LOAD);
                 
-                /*if(node.getIndex().equals("1")) {
-                    System.out.println((Double)node.getProperty(PowerNodeState.REAL_POWER_DEMAND));
-                    System.out.println(IpssBus.getLoadP());
-                }*/
-
+                IpssBus.setLoadP((Double)node.getProperty(PowerNodeState.REAL_POWER_DEMAND)/IpssNet.getBaseMva()); // in MW
+                IpssBus.setLoadQ((Double)node.getProperty(PowerNodeState.REACTIVE_POWER_DEMAND)/IpssNet.getBaseMva()); // in MVAr
+                
                 Complex y = new Complex((Double)node.getProperty(PowerNodeState.SHUNT_CONDUCT),(Double)node.getProperty(PowerNodeState.SHUNT_SUSCEPT));
                 IpssBus.setShuntY(y);
 
@@ -174,22 +172,21 @@ public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
                 
                 /*** Area and Zone are optional for Power Flow calculation ***/
                 
-                //Area area = new Area();
+                //Area area = new Area(); // Doesn't work
                 //IpssBus.setArea((Area)node.getProperty(PowerNodeState.AREA)); 
                 
-                //Zone zone = new Zone();
+                //Zone zone = new Zone(); // Doesn't work
                 //IpssBus.setZone((Zone)node.getProperty(PowerNodeState.ZONE));
                 
                 // Missing voltage_max, voltage_min
                 // In InterPSS methods existing: .setDesiredVoltAng(), .setDesiredVoltMag()
-                
-                // Properties for all buses (Gen and non-Gen)
+
                 
             }
             for (Link link : linksSfina){
-                //System.out.println(link.toString());
+
                 AclfBranch IpssBranch = CoreObjectFactory.createAclfBranch();
-                net.addBranch(IpssBranch, link.getStartNode().getIndex(), link.getEndNode().getIndex()); // names of buses in InterPSS are index of SFINA nodes
+                IpssNet.addBranch(IpssBranch, link.getStartNode().getIndex(), link.getEndNode().getIndex()); // names of buses in InterPSS are index of SFINA nodes
                 IpssBranch.setId(link.getIndex()); // set branch id to SFINA branch id to make better accessible
                 
                 // Set Impedance z = r + j*x
@@ -223,43 +220,59 @@ public class InterPSSPowerFlowAnalysis implements FlowAnalysisInterface{
      */
     private void getIpssResults(){
         System.out.println(resultAsString);
+        
+        // Get Voltage
+        for(AclfBus bus : IpssNet.getBusList()) {
+            Node SfinaNode = SfinaNet.getNode(bus.getId());
+            SfinaNode.addProperty(PowerNodeState.VOLTAGE_MAGNITUDE, bus.getVoltageMag(UnitType.PU));
+            SfinaNode.addProperty(PowerNodeState.VOLTAGE_ANGLE, bus.getVoltageAng(UnitType.Deg));
+        }
+        
     };
     
-    public void runCaseFromFile(String CaseName) throws InterpssException{
+    public void compareToCaseLoaded(String CaseName) throws InterpssException{
         AclfNetwork caseNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/" + CaseName).getAclfNet();
         
         // print and compare values we want to input
-        //System.out.println("Bus  |   LoadP loaded  |  LoadP direct  |  LoadQ loaded  |  LoadQ direct  |  BaseVoltage loaded  |  BaseVoltage direct\n--------------------------------------------------------------\n");
+        
         String BusData = "";
         String BranchData = "";
         for (int i=1; i < 58; i++){
             AclfBus busLoaded = caseNet.getBus("Bus" + i);
-            AclfBus busDirect = net.getBus("" + i);
+            AclfBus busDirect = IpssNet.getBus("" + i);
             if (i == 1 || i == 2){
             //    System.out.println(busLoaded);
             //    System.out.println(busDirect);
             }
-            BusData += i + "   " + busLoaded.getLoadP() + "        " + busDirect.getLoadP() + "  |   " + busLoaded.getLoadQ() + "       " + busDirect.getLoadQ() + "   |   "   + caseNet.getBaseMva()+ "       " + net.getBaseMva()  + "\n";
-            BusData += i + "   " + busLoaded.getGenP() + "        " + busDirect.getGenP() + "   |  " + busLoaded.getGenQ() + "       " + busDirect.getGenQ() + "   |   "   + busLoaded.getGenCode() + "     " + busDirect.getGenCode() + "   |   " + busLoaded.getGenPartFactor() + "        " + busDirect.getGenPartFactor() + "\n";
+            BusData += i + "   " + (busLoaded.getLoadP() - busDirect.getLoadP()) + "  |   " + (busLoaded.getLoadQ() - busDirect.getLoadQ()) + "   |   "   + caseNet.getBaseMva()+ "       " + IpssNet.getBaseMva() + "   |   "   + caseNet.getBaseKva()+ "       " + IpssNet.getBaseKva()  + "\n";
+            BusData += i + "   " + (busLoaded.getGenP() - busDirect.getGenP()) + "   |  " + (busLoaded.getGenQ() - busDirect.getGenQ()) + "   |   "   + busLoaded.getGenCode() + "     " + busDirect.getGenCode() + "   |   " + busLoaded.getGenPartFactor() + "        " + busDirect.getGenPartFactor() + "\n";
         }
-        for (int i=1; i < caseNet.getNoBranch()+1; i++){
-            AclfBranch branchLoaded = caseNet.getBranch("" + i);
-            AclfBranch branchDirect = net.getBranch("" + i);
-            System.out.println(i);
-            System.out.println(branchLoaded);
-            System.out.println(branchDirect);
+        EList<AclfBranch> netBranches = IpssNet.getBranchList();
+        EList<AclfBranch> caseNetBranches = caseNet.getBranchList();
             
-            //BusData += i + "   " + branchLoaded.getLoadP() + "        " + busDirect.getLoadP() + "  |   " + branchLoaded.getLoadQ() + "       " + busDirect.getLoadQ() + "   |   "   + caseNet.getBaseMva()+ "       " + net.getBaseMva()  + "\n";
-            //BusData += i + "   " + branchLoaded.getGenP() + "        " + busDirect.getGenP() + "   |  " + branchLoaded.getGenQ() + "       " + busDirect.getGenQ() + "   |   "   + branchLoaded.getGenCode() + "     " + busDirect.getGenCode() + "   |   " + branchLoaded.getGenPartFactor() + "        " + busDirect.getGenPartFactor() + "\n";
+        for (int i=1; i < caseNet.getNoBranch()+1; i++){
+            AclfBranch branchLoaded = caseNetBranches.get(i-1);
+            AclfBranch branchDirect = netBranches.get(i-1);
+            
+            if(i==1){
+                //System.out.println(branchLoaded);
+                //System.out.println(branchDirect);
+            }
+
+            
+            BranchData += i + "   " + branchLoaded.getZ() + "        " + branchDirect.getZ() + "  |   " + branchLoaded.getHShuntY()+ "       " + branchDirect.getHShuntY() +  "   |   "   + branchLoaded.getY()+ "       " + branchDirect.getY() + "  |   " + branchLoaded.getFromTurnRatio() + "       " + branchDirect.getFromTurnRatio()+ "  |   " + branchLoaded.getToTurnRatio()+ "       " + branchDirect.getToTurnRatio()+ "   |   "   + branchLoaded.getFromPSXfrAngle()+ "       " + branchDirect.getFromPSXfrAngle()+ "   |   "   + branchLoaded.getToPSXfrAngle()+ "       " + branchDirect.getToPSXfrAngle() + "\n";
+            
         }
+        //System.out.println("Bus  |   LoadP loaded    LoadP direct  |  LoadQ loaded    LoadQ direct  |  BaseVoltage loaded    BaseVoltage direct \n GenP loaded    GenP direct   |   GenQ l    GenQ dir    |   GenCode l   GenCode dir |   GenPartFactor l     GenPartFactor dir\n--------------------------------------------------------------\n");
         //System.out.println(BusData + "\n--------------------------------------------------------------");
-        System.out.println(BranchData + "\n--------------------------------------------------------------");
+        //System.out.println("Branch  |   Z loaded    Z direct  |  HShuntY loaded    HShuntY direct  |  Y Susceptance l     Y Susceptance dir   |  FromTurnRatio l     FromTurnRatio dir    | ToTurnRatio l      ToTurnRatio dir  |  FromPSXfrAngle l      FromPSXfrAngle dir  |       FromPSXfrAngle l      FromPSXfrAngle dir   |       ToPSXfrAngle l      ToPSXfrAngle dir     \n--------------------------------------------------------------\n");
+        //System.out.println(BranchData + "\n--------------------------------------------------------------");
         
         
         LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(caseNet);
-        //acAlgo.loadflow();
+        acAlgo.loadflow();
         String result = AclfOut_BusStyle.lfResultsBusStyle(caseNet, BusIdStyle.BusId_No).toString();
-        //System.out.println(result);
+        System.out.println(result);
         
         // print values we want to inject
     }

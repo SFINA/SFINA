@@ -9,9 +9,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import network.FlowNetwork;
 import network.Node;
 import network.Link;
 import org.apache.log4j.Logger;
@@ -23,16 +23,19 @@ import power.PowerNodeType;
  */
 public class PowerFlowDataLoader {
     
+    private final FlowNetwork net;
     private final String parameterValueSeparator;
     private static final Logger logger = Logger.getLogger(PowerFlowDataLoader.class);
     private final String missingValue;
     
-    public PowerFlowDataLoader(String parameterValueSeparator, String missingValue){
+    public PowerFlowDataLoader(FlowNetwork net, String parameterValueSeparator, String missingValue){
+        this.net=net;
         this.parameterValueSeparator=parameterValueSeparator;
         this.missingValue=missingValue;
     }
     
-    public void loadNodeFlowData(String location, List<Node> nodes){
+    public void loadNodeFlowData(String location){
+        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
         ArrayList<PowerNodeState> powerNodeStates = new ArrayList<PowerNodeState>();
         HashMap<String,ArrayList<String>> nodesStateValues = new HashMap<String,ArrayList<String>>();
         File file = new File(location);
@@ -63,7 +66,8 @@ public class PowerFlowDataLoader {
         
     }
 
-    public void loadLinkFlowData(String location, List<Link> links){
+    public void loadLinkFlowData(String location){
+        ArrayList<Link> links = new ArrayList(net.getLinks());
         ArrayList<PowerLinkState> powerLinkStates = new ArrayList<PowerLinkState>();
         HashMap<String, ArrayList<String>> linksStateValues = new HashMap<String, ArrayList<String>>();
         File file = new File(location);
@@ -94,7 +98,7 @@ public class PowerFlowDataLoader {
                 
     }
     
-    private void injectNodeStates(List<Node> nodes, ArrayList<PowerNodeState> powerNodeStates, HashMap<String,ArrayList<String>> nodesStates){
+    private void injectNodeStates(ArrayList<Node> nodes, ArrayList<PowerNodeState> powerNodeStates, HashMap<String,ArrayList<String>> nodesStates){
         for(Node node : nodes){
             ArrayList<String> rawValues = nodesStates.get(node.getIndex());
             for(int i=0;i<rawValues.size();i++){
@@ -106,7 +110,7 @@ public class PowerFlowDataLoader {
         }
     }
     
-    private void injectLinkStates(List<Link> links, ArrayList<PowerLinkState> powerLinkStates, HashMap<String,ArrayList<String>> linksStates){
+    private void injectLinkStates(ArrayList<Link> links, ArrayList<PowerLinkState> powerLinkStates, HashMap<String,ArrayList<String>> linksStates){
         for(Link link : links){
             ArrayList<String> rawValues = linksStates.get(link.getIndex());
             for(int i=0;i<rawValues.size();i++){

@@ -6,6 +6,7 @@
 package power.flow_analysis;
 
 import flow_analysis.FlowAnalysisInterface;
+import java.util.ArrayList;
 import java.util.List;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
@@ -14,6 +15,7 @@ import matlabcontrol.MatlabProxyFactory;
 import matlabcontrol.MatlabProxyFactoryOptions;
 import matlabcontrol.extensions.MatlabNumericArray;
 import matlabcontrol.extensions.MatlabTypeConverter;
+import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
@@ -47,8 +49,10 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     }
     
     @Override
-    public void flowAnalysis(List<Node> nodes, List<Link> links){
+    public void flowAnalysis(FlowNetwork net){
         // Initialize local variables
+        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
+        ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
         busesPowerFlowInfo = this.getBuses(nodes);
         generatorsPowerFlowInfo = this.getGenerators(nodes);
         branchesPowerFlowInfo = this.getBranches(links);
