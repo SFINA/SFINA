@@ -12,7 +12,8 @@ package power.input;
 public enum PowerLinkState {
     ID,
     CURRENT,
-    POWER,
+    REAL_POWER_FLOW,
+    REACTIVE_POWER_FLOW,
     RESISTANCE,
     REACTANCE,
     SUSCEPTANCE,

@@ -74,6 +74,7 @@ public class TopologyLoader {
             if(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), columnSeparator);
                 while(st.hasMoreTokens()){
+                    // Here properties from NodeState like ID are added, but later no values are assigned (id==null), because the internal variables are used.
                     NodeState nodeState=this.lookupNodeState(st.nextToken());
                     nodeStates.add(nodeState);
                 }
@@ -106,6 +107,7 @@ public class TopologyLoader {
             if(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), columnSeparator);
                 while(st.hasMoreTokens()){
+                    // Same as for nodes, here properties like ID, from_node, to_node, etc are added but never used.
                     LinkState linkState=this.lookupLinkState(st.nextToken());
                     linkStates.add(linkState);
                 }

@@ -213,8 +213,10 @@ public class PowerFlowDataLoader {
                 return PowerLinkState.ID;
             case "current":
                 return PowerLinkState.CURRENT;
-            case "power":
-                return PowerLinkState.POWER;
+            case "real_power":
+                return PowerLinkState.REAL_POWER_FLOW;
+            case "reactive_power":
+                return PowerLinkState.REACTIVE_POWER_FLOW;
             case "resistance":
                 return PowerLinkState.RESISTANCE;
             case "reactance":
@@ -344,9 +346,10 @@ public class PowerFlowDataLoader {
         switch(powerLinkState){
             case CURRENT:
                 return Double.parseDouble(rawValue);
-            case POWER:
-                return null;
-                //return Double.parseDouble(rawValue);
+            case REAL_POWER_FLOW:
+                return Double.parseDouble(rawValue);
+            case REACTIVE_POWER_FLOW:
+                return Double.parseDouble(rawValue);
             case RESISTANCE:
                 return Double.parseDouble(rawValue);
             case REACTANCE:
