@@ -1,4 +1,4 @@
-id,current,active_power,reactive_power,resistance,reactance,susceptance,rateA,rateB,rateC,ratio,angle,angmin,angmax
+id,current,real_power,reactive_power,resistance,reactance,susceptance,rateA,rateB,rateC,ratio,angle,angmin,angmax
 1,138.15959445553,126.337400519039,-68.4435648624618,0.0083,0.028,0.129,0,0,0,0,0,-360,360
 2,120.923085651544,121.676073117399,10.5468462752671,0.0298,0.085,0.0818,0,0,0,0,0,-360,360
 3,132.804869902367,128.454628023196,24.7264303963238,0.0112,0.0366,0.038,0,0,0,0,0,,-360,360
