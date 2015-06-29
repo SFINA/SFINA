@@ -20,6 +20,7 @@ package network;
 import dsutil.generic.state.State;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -42,8 +43,8 @@ import org.apache.log4j.Logger;
  */
 public class FlowNetwork extends State implements FlowNetworkInterface{
     
-    private HashMap<String,Node> nodes;
-    private HashMap<String,Link> links;
+    private LinkedHashMap<String,Node> nodes;
+    private LinkedHashMap<String,Link> links;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**
@@ -51,8 +52,8 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public FlowNetwork(){
         super();
-        this.nodes=new HashMap<String,Node>();
-        this.links=new HashMap<String,Link>();
+        this.nodes=new LinkedHashMap<String,Node>();
+        this.links=new LinkedHashMap<String,Link>();
     }
     
     @Override
@@ -93,8 +94,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public void addLink(Link link){
         this.links.put(link.getIndex(), link);
-        link.getStartNode().addLink(link);
-        link.getEndNode().addLink(link);
+        if(link.isActivated()){
+            link.getStartNode().addLink(link);
+            link.getEndNode().addLink(link);
+        }
     }
     
     @Override
