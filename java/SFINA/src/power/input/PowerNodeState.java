@@ -47,9 +47,8 @@ public enum PowerNodeState {
     STARTUP,    // startup cost in USD
     SHUTDOWN,
     N_COST,     // number of cost parameters/coefficients for polynomial cost function
-    COST_PARAM, // first parameter/coefficient defining total cost function
-    COST_PARAM_1, // second param
-    COST_PARAM_2,
+    COST_PARAM_1, // first parameter/coefficient defining total cost function
+    COST_PARAM_2, //second param
     COST_PARAM_3,
     //reactive_power_min,volt_setpoint,mBase,status,real_power_max,real_power_min,Pc1,Pc2,Qc1min,Qc1max,Qc2min,Qc2max,ramp_agc,ramp_10,ramp_30,ramp_q,apf
 }

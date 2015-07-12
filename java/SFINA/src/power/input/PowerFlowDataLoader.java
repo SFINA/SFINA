@@ -329,8 +329,6 @@ public class PowerFlowDataLoader {
                 return Double.parseDouble(rawValue);
             case N_COST:
                 return Double.parseDouble(rawValue);
-            case COST_PARAM:
-                return Double.parseDouble(rawValue);
             case COST_PARAM_1:
                 return Double.parseDouble(rawValue);
             case COST_PARAM_2:
