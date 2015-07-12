@@ -21,6 +21,7 @@ import network.Node;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.PowerNodeType;
+import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 
 /**
@@ -37,7 +38,7 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     private MatlabProxy proxy;
     private PowerFlowType powerFlowType;
     private boolean converged;
-    private final String caseFile="dump-case";
+    private final String caseFile="DumpCase";
     private static final Logger logger = Logger.getLogger(MATPOWERPowerFlowAnalysis.class);
     
     
@@ -59,7 +60,6 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
         costsPowerFlowInfo = this.getGenerationCosts(nodes);
         
         try{
-
             // Connect to Matlab
             MatlabProxy proxy = factory.getProxy();
 
@@ -110,32 +110,191 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     }
         
     private double[][] getBuses(List<Node> nodes){
-        for(Node node:nodes){
-            if(node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.BUS)){
-                
+        ArrayList MatpowerBusData = new ArrayList();
+        for (Node node : nodes){
+            ArrayList<Double> row = new ArrayList<>();
+            for (NeededBusData BusState : NeededBusData.values()){
+                switch (BusState){
+                    case ID: 
+                        row.add(Double.parseDouble(node.getIndex()));
+                        break;
+                    case TYPE:
+                        if (!node.isConnected())
+                            row.add(4.0);
+                        else if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.BUS))
+                            row.add(1.0);
+                        else if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR))
+                            row.add(2.0);
+                        else if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS))
+                            row.add(3.0);
+                        else 
+                            System.out.println("Problem converting to Matpower Bus Type! May not work properly.");
+                        break;
+                    default:
+                        row.add((Double)node.getProperty(PowerNodeState.valueOf(BusState.toString())));
+                }
+            }
+            MatpowerBusData.add(row);
+        }
+        return convertToDoubleArray(MatpowerBusData);
+    }
+    
+    private enum NeededBusData {
+        ID,
+        TYPE,
+        REAL_POWER_DEMAND,
+        REACTIVE_POWER_DEMAND,
+        SHUNT_CONDUCT,
+        SHUNT_SUSCEPT,
+        AREA,
+        VOLTAGE_MAGNITUDE,
+        VOLTAGE_ANGLE,
+        BASE_VOLTAGE,
+        ZONE,
+        VOLTAGE_MAX,
+        VOLTAGE_MIN,
+    }
+    
+    private double[][] getGenerators(ArrayList<Node> nodes){
+        ArrayList MatpowerGenData = new ArrayList();
+        for (Node node : nodes){
+            if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR) || node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS)){
+                ArrayList<Double> row = new ArrayList<>();
+                for (NeededGenData GenState : NeededGenData.values()){
+                    switch (GenState){
+                        case ID: 
+                            row.add(Double.parseDouble(node.getIndex()));
+                            break;
+                        case STATUS:
+                            if (node.isActivated() == true)
+                                row.add(1.0);
+                            else
+                                row.add(0.0);
+                            break;
+                        default:
+                            row.add((Double)node.getProperty(PowerNodeState.valueOf(GenState.toString())));       
+                    }
+                }
+                MatpowerGenData.add(row);
             }
         }
-        return null;
+        return convertToDoubleArray(MatpowerGenData);
     }
     
-    private double[][] getGenerators(List<Node> nodes){
-        return null;
+    private enum NeededGenData{
+        ID,
+        REAL_POWER_GENERATION,
+        REACTIVE_POWER_GENERATION,
+        REACTIVE_POWER_MAX,
+        REACTIVE_POWER_MIN,
+        VOLTAGE_SETPOINT,
+        TOTAL_MVA_BASE,
+        STATUS,             
+        REAL_POWER_MAX,
+        REAL_POWER_MIN,
+        PC1,        
+        PC2,
+        QC1_MIN,    
+        QC1_MAX,
+        QC2_MIN,
+        QC2_MAX,
+        RAMP_AGC,   
+        RAMP_10,    
+        RAMP_30,
+        RAMP_REACTIVE_POWER,
+        AREA_PART_FACTOR,
+}
+    
+    private double[][] getBranches(ArrayList<Link> links){
+        ArrayList MatpowerBranchData = new ArrayList();
+        for(Link link : links){
+            ArrayList<Double> row = new ArrayList<>();
+            for(NeededBranchData BranchState : NeededBranchData.values()){
+                switch (BranchState){
+                    case FROM_BUS: 
+                        row.add(Double.parseDouble(link.getStartNode().getIndex()));
+                        break;
+                    case TO_BUS:
+                        row.add(Double.parseDouble(link.getEndNode().getIndex()));
+                        break;
+                    case STATUS:
+                        if (link.isActivated() == true)
+                            row.add(1.0);
+                        else
+                            row.add(0.0);
+                        break;
+                    default:
+                        row.add((Double)link.getProperty(PowerLinkState.valueOf(BranchState.toString())));
+                }
+            }
+            MatpowerBranchData.add(row);
+        }
+        return convertToDoubleArray(MatpowerBranchData);
     }
     
-    private double[][] getBranches(List<Link> links){
-        return null;
+    private enum NeededBranchData {
+        FROM_BUS,   // !
+        TO_BUS,     // !
+        RESISTANCE,
+        REACTANCE,
+        SUSCEPTANCE,
+        RATE_A, 
+        RATE_B, 
+        RATE_C, 
+        TAP_RATIO,
+        ANGLE_SHIFT,
+        STATUS,     // !
+        ANGLE_DIFFERENCE_MIN,
+        ANGLE_DIFFERENCE_MAX,
     }
     
-    private double[][] getGenerationCosts(List<Node> nodes){
-        return null;
+    private double[][] getGenerationCosts(ArrayList<Node> nodes){
+        ArrayList MatpowerGenCostData = new ArrayList();
+        for (Node node : nodes){
+            if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR) || node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS)){
+                ArrayList<Double> row = new ArrayList<>();
+                for (NeededGenCostData GenCostState : NeededGenCostData.values()){
+                    row.add((Double)node.getProperty(PowerNodeState.valueOf(GenCostState.toString())));       
+                }
+                MatpowerGenCostData.add(row);
+            }
+        }
+        return convertToDoubleArray(MatpowerGenCostData);
     }
     
-    private void updateNodes(List<Node> nodes){
+    private enum NeededGenCostData {
+        MODEL,      
+        STARTUP,    
+        SHUTDOWN,
+        N_COST,     
+        COST_PARAM_1,
+        COST_PARAM_2,
+        COST_PARAM_3,
+    }
+    
+    private double[][] convertToDoubleArray(ArrayList<ArrayList<Double>> list){
+        int rows = list.size();
+        int cols = list.get(1).size();
+        double[][] doubleArray = new double[rows][cols];
+        for (int i=0; i < rows; i++){
+            for (int j=0; j < cols; j++){
+                if (list.get(i).size() != cols){
+                    System.out.println("Problem with array dimension! Not quadratic! May not work properly.");
+                }
+                doubleArray[i][j] = list.get(i).get(j);
+            }
+        }
+        return doubleArray;
+    }    
+    
+    private void updateNodes(ArrayList<Node> nodes){
         //update with buses, generators and costs power flow info
+        System.out.println("WARNING: Updating Nodes is not yet implemented.");
     }
     
-    private void updateLinks(List<Link> links){
+    private void updateLinks(ArrayList<Link> links){
         //update with branches power flow info
+        System.out.println("WARNING: Updating Links is not yet implemented.");
     }
     
 
@@ -188,5 +347,15 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
         return costsPowerFlowInfo;
     }
     
+    public void tester(FlowNetwork net) {
+        // Initialize local variables
+        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
+        ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
+        busesPowerFlowInfo = this.getBuses(nodes);
+        generatorsPowerFlowInfo = this.getGenerators(nodes);
+        branchesPowerFlowInfo = this.getBranches(links);
+        costsPowerFlowInfo = this.getGenerationCosts(nodes);
+        
+    }
     
 }

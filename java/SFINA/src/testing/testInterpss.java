@@ -19,6 +19,8 @@ package testing;
 
 import com.interpss.common.exp.InterpssException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
@@ -30,18 +32,30 @@ import power.flow_analysis.InterpssPowerFlowAnalysis;
  * @author Ben
  */
 public class testInterpss {
-    public testInterpss(FlowNetwork net) {
+    public testInterpss(FlowNetwork net, boolean CompareData, boolean CompareResults) {
         
-        // AC test
-        try{
+        if(CompareData){
             InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
-            IpssObject.flowAnalysis(net);
-            IpssObject.compareToCaseLoaded("ieee57.ieee");
+            try{
+                IpssObject.compareDataToCaseLoaded(net, "ieee57.ieee");
+            }
+            catch(InterpssException ie){
+                ie.printStackTrace();
+            }
+            System.out.println(">>>>> Compared data from IEEE file from SFINA loaders.");
         }
-        catch(InterpssException ie){
-            ie.printStackTrace();
-        }
+        else System.out.println(">>>>> Didn't compare data from IEEE file from SFINA loaders.");
         
+        if (CompareResults){
+            InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
+            try {
+                IpssObject.compareLFResultsToCaseLoaded(net, "ieee57.ieee");
+            } catch (InterpssException ie) {
+                ie.printStackTrace();
+            }
+            System.out.println(">>>>> Compared LF results for IEEE data loaded and SFINA data directly.");
+        }
+        else System.out.println(">>>>> Didn't compare LF results for IEEE data loaded and SFINA data directly.");
         
         System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
     }

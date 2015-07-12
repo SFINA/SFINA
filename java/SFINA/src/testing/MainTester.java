@@ -30,7 +30,9 @@ import org.apache.log4j.Logger;
  */
 public class MainTester {
     
-    private static boolean output = false;
+    private static boolean PrintLoadedData = false;
+    private static boolean CompareLoadflowData = false;
+    private static boolean CompareLoadflowResults = true;
     
     public static void main(String[] args){
         
@@ -38,10 +40,13 @@ public class MainTester {
         FlowNetwork net = new FlowNetwork();
         
         // Test Loader. Argument true if loaded data should be printed to Output
-        testLoader testloader = new testLoader(net, output);
+        testLoader testloader = new testLoader(net, PrintLoadedData);
         
         // Test InterPSS
-        testInterpss testinterpss = new testInterpss(net);
+        //testInterpss testinterpss = new testInterpss(net, CompareLoadflowData, CompareLoadflowResults);
+        
+        // Test Matpower
+        testMatpower testmatpwr = new testMatpower(net);
         
     }
 }
