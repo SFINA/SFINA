@@ -44,9 +44,13 @@ public class MainTester {
         
         // Test InterPSS
         //testInterpss testinterpss = new testInterpss(net, CompareLoadflowData, CompareLoadflowResults);
-        
         // Test Matpower
-        testMatpower testmatpwr = new testMatpower(net);
+        //testMatpower testmatpwr = new testMatpower(net);
         
+        // Test Island Extraction
+        testNetworkMethods testnetmethods = new testNetworkMethods(net);
+        String[] removeLinks = {"8","15","16","17","18","19","20","21","22","41","80"};
+        testnetmethods.testIslandFinder(removeLinks);
+        testnetmethods.testMetrics();
     }
 }

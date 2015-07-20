@@ -18,7 +18,10 @@
 package network;
 
 import dsutil.generic.state.State;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -213,6 +216,65 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         deactivatedLink.setActivated(false);
         deactivatedLink.getStartNode().removeLink(deactivatedLink);
         deactivatedLink.getEndNode().removeLink(deactivatedLink);
+    }
+    
+    @Override
+    /**
+     * Extract islands
+     * 
+     * @return ArrayList where each entry is an sorted ArrayList of nodes belonging to one island. islands.size() gives number of islands.
+     */
+    public ArrayList<ArrayList<Node>> getIslands(){
+        ArrayList islands = new ArrayList();
+        ArrayList leftNodes = new ArrayList();
+        for (Node node : this.nodes.values())
+            leftNodes.add(node);
+        while (leftNodes.size() > 0){
+            ArrayList<Node> newIsland = new ArrayList();
+            Node currentNode = (Node)leftNodes.get(0);
+            iterateIsland(currentNode, newIsland, leftNodes);
+            
+            Collections.sort(newIsland, new Comparator<Node>(){
+                public int compare(Node node1, Node node2) {
+                return Integer.compare(Integer.parseInt(node1.getIndex()), Integer.parseInt(node2.getIndex()));
+                }
+            });
+            
+            islands.add(newIsland);
+        }
+        return islands;
+    }
+    
+    private void iterateIsland(Node currentNode, ArrayList<Node> currentIsland, ArrayList leftNodes){
+        if (currentIsland.contains(currentNode)){
+            System.out.println("Island iterator was called even though node is already in Island, which should not happen! Check algorithm!");
+            return;
+        }
+        currentIsland.add(currentNode);
+        
+        if (!leftNodes.contains(currentNode)){
+            System.out.println("Attention: Node " + currentNode.getIndex() + " not in array of Nodes not assigned to island, which should not happen! Check algorithm!");
+            return;            
+        }    
+        leftNodes.remove(currentNode);
+        
+        // Check all links connected to current node.
+        ArrayList<Link> currentLinks = (ArrayList)currentNode.getLinks();
+        if (currentLinks.size() > 0){
+            for (Link link : currentLinks){
+                // Restart Iteration with EndNode of current Link
+                currentNode = link.getEndNode();
+                if (!currentIsland.contains(currentNode)){
+                    iterateIsland(currentNode, currentIsland, leftNodes);
+                }
+                // Restart Iteration with StartNode of current Link
+                currentNode = link.getStartNode();
+                if (!currentIsland.contains(currentNode)){
+                    iterateIsland(currentNode, currentIsland, leftNodes);
+                }
+                
+            }
+        }
     }
     
     @Override

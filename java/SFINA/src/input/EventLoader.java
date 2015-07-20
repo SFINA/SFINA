@@ -35,7 +35,6 @@ import power.input.PowerNodeState;
 import static power.input.PowerNodeState.AREA;
 import static power.input.PowerNodeState.AREA_PART_FACTOR;
 import static power.input.PowerNodeState.BASE_VOLTAGE;
-import static power.input.PowerNodeState.COST_PARAM;
 import static power.input.PowerNodeState.COST_PARAM_1;
 import static power.input.PowerNodeState.COST_PARAM_2;
 import static power.input.PowerNodeState.COST_PARAM_3;
@@ -568,8 +567,6 @@ public class EventLoader {
             case SHUTDOWN:
                 return Double.parseDouble(rawValue);
             case N_COST:
-                return Double.parseDouble(rawValue);
-            case COST_PARAM:
                 return Double.parseDouble(rawValue);
             case COST_PARAM_1:
                 return Double.parseDouble(rawValue);

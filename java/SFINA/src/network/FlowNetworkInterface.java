@@ -17,6 +17,7 @@
  */
 package network;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -48,6 +49,8 @@ public interface FlowNetworkInterface {
     public void deactivateNode(String index);
     
     public void deactivateLink(String index);
+    
+    public ArrayList<ArrayList<Node>> getIslands();
     
     public double getAvgNodeDegree();
     
