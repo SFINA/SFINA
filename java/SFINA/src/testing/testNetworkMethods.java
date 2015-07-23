@@ -49,6 +49,8 @@ public class testNetworkMethods {
     }
     
     public void testMetrics(){
-        System.out.println("\n--------------------------------------------------\n    METRIC TESTING NOT YET IMPLEMENTED\n--------------------------------------------------\n");
+        System.out.println("\n--------------------------------------------------\n    METRIC TESTING\n--------------------------------------------------\n");
+        System.out.format("%-25s%10s\n", "Average Node Degree:", net.getAvgNodeDegree());
+        System.out.format("%-25s%10s\n", "Clustering Coefficient:", net.getClustCoeff());
     }
 }

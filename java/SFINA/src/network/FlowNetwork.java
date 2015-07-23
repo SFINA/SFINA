@@ -290,4 +290,49 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         }
         return totalNodeDegree/this.nodes.size();
     }
+    
+    public double getClustCoeff(){
+        // Compute local clustering coefficient for each node
+        ArrayList<Double> localClustCoeff = new ArrayList();
+        for(Node node:this.nodes.values()){
+            // Get neighbors of current node
+            ArrayList<Node> neighborNodes = new ArrayList();
+            for(Link link : node.getLinks()){
+                if(!link.getStartNode().getIndex().equals(node.getIndex()))
+                    neighborNodes.add(link.getStartNode());
+                else if(!link.getEndNode().getIndex().equals(node.getIndex()))
+                    neighborNodes.add(link.getEndNode());
+            }
+            
+            // Get number of neighbors of current node that are connected
+            Double connectedNeighbors = 0.0;
+            for(Node neighbor : neighborNodes){
+                for(Link neighborLink : neighbor.getLinks()){
+                    if(neighborNodes.contains(neighborLink.getEndNode()) && neighborLink.getEndNode() != neighbor){
+                        connectedNeighbors += 1.0;
+                    }
+                    if(neighborNodes.contains(neighborLink.getStartNode()) && neighborLink.getStartNode() != neighbor){
+                        connectedNeighbors += 1.0;
+                    }
+                }
+            }
+            connectedNeighbors /= 2; // Every neighbor connection is counted twice
+            
+            // Compute local clustering coefficient of current node = number of connected neighbors / (d*(d-1))
+            if(node.getLinks().size() > 1) // prevent division by 0
+                localClustCoeff.add(2*connectedNeighbors/node.getLinks().size()/(node.getLinks().size()-1));
+            
+            /*System.out.println("---------------");
+            System.out.println(node.getIndex() + " has " + connectedNeighbors + " connected neighbors");
+            System.out.println(node.getIndex() + " has " + node.getLinks().size() + " neighbors");
+            System.out.println("Local ClustCoeff of node " + node.getIndex() + "is:  " + 2*connectedNeighbors/node.getLinks().size()/(node.getLinks().size()-1));*/
+        }        
+        
+        // Compute global clustering coefficient = sum(localClustCoeff)/n
+        Double globalClustCoeff = 0.0;
+        for (Double el : localClustCoeff)
+            globalClustCoeff += el;
+        
+        return globalClustCoeff/nodes.size();
+    };
 }
