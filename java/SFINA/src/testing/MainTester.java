@@ -17,12 +17,18 @@
  */
 package testing;
 
+import event.Event;
 import input.EventLoader;
+import input.InputParameter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
+import power.PowerNodeType;
+import power.input.PowerLinkState;
+import power.input.PowerNodeState;
 
 /**
  *
@@ -38,19 +44,30 @@ public class MainTester {
         
         // Create network object
         FlowNetwork net = new FlowNetwork();
+        Output printer = new Output(net);
         
         // Test Loader. Argument true if loaded data should be printed to Output
-        testLoader testloader = new testLoader(net, PrintLoadedData);
+        testLoader testloader = new testLoader(net);
+        //testloader.printLoadedData();
+        //printer.printNodesAll();
+        //printer.printNodesAll();
         
         // Test InterPSS
-        //testInterpss testinterpss = new testInterpss(net, CompareLoadflowData, CompareLoadflowResults);
+        testInterpss testinterpss = new testInterpss(net);
+        //testinterpss.compareData();
+        //testinterpss.compareResults();
+        testinterpss.runRealInterss();
+        printer.printLfResults();
+        
         // Test Matpower
         //testMatpower testmatpwr = new testMatpower(net);
+        //printer.printLfResults(); 
         
         // Test Island Extraction
         testNetworkMethods testnetmethods = new testNetworkMethods(net);
-        String[] removeLinks = {"8","15","16","17","18","19","20","21","22","41","80"};
-        testnetmethods.testIslandFinder(removeLinks);
-        testnetmethods.testMetrics();
+        //String[] removeLinks = {"8","15","16","17","18","19","20","21","22","41","80"};
+        //testnetmethods.testIslandFinder(removeLinks);
+        //testnetmethods.testMetrics();
     }
+    
 }

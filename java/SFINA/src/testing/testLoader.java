@@ -41,8 +41,10 @@ public class testLoader {
     private FlowNetwork net;
     private static ArrayList<Node> nodes;
     private static ArrayList<Link> links;
+    private static HashMap<InputParameter,Object> parameters;
+    private static ArrayList<Event> events;
     
-    public testLoader(FlowNetwork net, boolean printResults){
+    public testLoader(FlowNetwork net){
         this.net = net;
         
         // Load topology
@@ -61,55 +63,63 @@ public class testLoader {
         
         // Load Input Parameters
         InputParametersLoader paramLoader = new InputParametersLoader(param_seperator);
-        HashMap<InputParameter,Object> parameters = paramLoader.loadInputParameters(paramLocation);
+        parameters = paramLoader.loadInputParameters(paramLocation);
         
         // Load Event Parameters
         EventLoader eventLoader = new EventLoader(Domain.POWER, col_seperator);
-        ArrayList<Event> events = eventLoader.loadEvents(eventLocation);
-               
-        // print out data to check
-        if (printResults) {
-            printNodes(nodes);
-            printLinks(links);
-            printParam(parameters);
-            printEvents(events);
-        }
+        events = eventLoader.loadEvents(eventLocation);
+         
         System.out.println("\n--------------------------------------------------\n    LOADING DATA SUCCESSFUL\n--------------------------------------------------\n");
 
     }
     
-    private static void printNodes(ArrayList<Node> nodes){
-        // Print information to see if it worked
-        String header = "\n-------------------------\n    NODES\n-------------------------\nIndex       ACTIVE     Connected";
-        for (PowerNodeState state : PowerNodeState.values()) header += "    " + state;
-        System.out.println(header);
+    public void printLoadedData(){
+            printNodes();
+            printLinks();
+            printParam();
+            printEvents();
+    }
+    
+    private static void printNodes(){
+        System.out.println("\n-------------------------\n    NODES\n-------------------------\n");
+        System.out.format("%15s%15s%15s", "Index", "isActivated", "isConnected");
+        for (PowerNodeState state : PowerNodeState.values()) {
+            String printStateName = state.toString();
+            if (printStateName.length() > 13)
+                printStateName = printStateName.substring(0,13);
+            System.out.format("%15s", printStateName);
+        }
+        System.out.print("\n");
         
         for(Node node : nodes){
-            String values = node.getIndex() + "    " + node.isActivated() + "   " + node.isConnected();
-            for(PowerNodeState state : PowerNodeState.values()){
-                values +=  "   " + node.getProperty(state);
-            }
-            System.out.println(values);
-            // Example how to get state variables of e.g. nodes. Have to cast object to respective values.
-            //int id = ((Integer)node.getProperty(PowerNodeState.ID)).intValue();  
+            System.out.format("%15s%15s%15s", node.getIndex(), node.isActivated(), node.isConnected());
+            for(PowerNodeState state : PowerNodeState.values())
+                System.out.format("%15s", node.getProperty(state));
+            System.out.print("\n");
         }
     }
     
-    private static void printLinks(ArrayList<Link> links){
-        String header = ("\n-------------------------\n    LINKS\n-------------------------\nIndex    StartNode   EndNote Active");
-        for(PowerLinkState state : PowerLinkState.values()) header += " " + state;
-        System.out.println(header);
-        
+    private static void printLinks(){
+        System.out.println("\n-------------------------\n    LINKS\n-------------------------\n");
+        System.out.format("%15s%15s%15s%15s%15s", "Index", "StartNode", "EndNode", "isActivated", "isConnected");
+
+        for(PowerLinkState state : PowerLinkState.values()) {
+            String printStateName = state.toString();
+            if (printStateName.length() > 13)
+                printStateName = printStateName.substring(0,13);
+            System.out.format("%15s", printStateName);
+        }
+        System.out.print("\n");
+
         for(Link link : links){
-            String values = link.getIndex() + " " + link.getStartNode().getIndex() + " " + link.getEndNode().getIndex() + "   " + link.isActivated();
-            for(PowerLinkState state : PowerLinkState.values()){
-                values +=  "   " + link.getProperty(state);
-            }
-            System.out.println(values);
+            System.out.format("%15s%15s%15s%15s%15s", link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), link.isActivated(), link.isConnected());
+            for(PowerLinkState state : PowerLinkState.values())
+                System.out.format("%15s", link.getProperty(state));
+            System.out.print("\n");
         }
     }
     
-    private static void printParam(HashMap<InputParameter,Object> parameters){
+    private static void printParam(){
         System.out.println("\n-------------------------\n    INPUT PARAMETERS\n-------------------------");
         
         for (HashMap.Entry<InputParameter, Object> entry : parameters.entrySet()) {
@@ -117,7 +127,7 @@ public class testLoader {
         }
     }
     
-    private static void printEvents(ArrayList<Event> events){
+    private static void printEvents(){
         System.out.println("\n-------------------------\n    Event PARAMETERS\n-------------------------");
         
         for (Event event : events) {
@@ -128,13 +138,5 @@ public class testLoader {
             System.out.println("Component ID: " + event.getComponentID());
             System.out.println("Parameter and value: " + event.getParameter() + " = " + event.getValue());
         }
-    }
-    
-    public ArrayList<Node> getNodes(){
-        return nodes;
-    }
-    
-    public ArrayList<Link> getLinks() {
-        return links;
     }
 }

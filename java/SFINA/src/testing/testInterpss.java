@@ -32,9 +32,14 @@ import power.flow_analysis.InterpssPowerFlowAnalysis;
  * @author Ben
  */
 public class testInterpss {
-    public testInterpss(FlowNetwork net, boolean CompareData, boolean CompareResults) {
+    FlowNetwork net;
+    
+    public testInterpss(FlowNetwork net) {
+        this.net = net;
         
-        if(CompareData){
+    }
+    
+    public void compareData(){
             InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
             try{
                 IpssObject.compareDataToCaseLoaded(net, "ieee57.ieee");
@@ -43,10 +48,10 @@ public class testInterpss {
                 ie.printStackTrace();
             }
             System.out.println(">>>>> Compared data from IEEE file from SFINA loaders.");
+            System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
         }
-        else System.out.println(">>>>> Didn't compare data from IEEE file from SFINA loaders.");
-        
-        if (CompareResults){
+
+    public void compareResults(){
             InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
             try {
                 IpssObject.compareLFResultsToCaseLoaded(net, "ieee57.ieee");
@@ -54,9 +59,13 @@ public class testInterpss {
                 ie.printStackTrace();
             }
             System.out.println(">>>>> Compared LF results for IEEE data loaded and SFINA data directly.");
+            System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
         }
-        else System.out.println(">>>>> Didn't compare LF results for IEEE data loaded and SFINA data directly.");
-        
-        System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
+
+    
+    public void runRealInterss(){
+            InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
+            IpssObject.flowAnalysis(net);
+            System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
     }
 }

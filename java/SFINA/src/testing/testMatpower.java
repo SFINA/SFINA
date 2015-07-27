@@ -29,22 +29,28 @@ import power.flow_analysis.MATPOWERPowerFlowAnalysis;
  */
 public class testMatpower {
     public testMatpower(FlowNetwork net){
+        boolean printDoubles = false;
         MATPOWERPowerFlowAnalysis algo = new MATPOWERPowerFlowAnalysis(PowerFlowType.AC);
-        algo.tester(net);
-        double[][] buses = algo.getBusesPowerFlowInfo();
-        print(buses, "Bus");
-        double[][] gens = algo.getGeneratorsPowerFlowInfo();
-        print(gens, "Generators");
-        double[][] bras = algo.getBranchesPowerFlowInfo();
-        print(bras, "Branches");
-        double[][] cost = algo.getCostsPowerFlowInfo();
-        print(cost, "Cost");
-        
+//        algo.tester(net);
         algo.flowAnalysis(net);
+        double[][] buses = algo.getBusesPowerFlowInfo();
+        double[][] gens = algo.getGeneratorsPowerFlowInfo();
+        double[][] bras = algo.getBranchesPowerFlowInfo();
+        double[][] cost = algo.getCostsPowerFlowInfo();
+        
+        if (printDoubles){
+            print(buses, "Bus");
+            print(gens, "Generators");
+            print(bras, "Branches");
+            print(cost, "Cost");
+        }
+        
+       
     }
     
     private void print(double[][] stuff, String title){
         System.out.println("---------------- " + title + " ------------------");
+        System.out.println("Number of columns: " + stuff[0].length);
         for(int i = 0; i<stuff.length; i++){
             for(int j = 0; j<stuff[i].length; j++){
                 System.out.format("%10s", stuff[i][j]);
