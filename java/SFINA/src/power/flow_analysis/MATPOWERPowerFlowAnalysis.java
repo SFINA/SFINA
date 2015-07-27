@@ -30,6 +30,7 @@ import power.input.PowerNodeState;
  */
 public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     
+    private FlowNetwork net;
     private double[][] busesPowerFlowInfo;
     private double[][] generatorsPowerFlowInfo;
     private double[][] branchesPowerFlowInfo;
@@ -52,8 +53,9 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     @Override
     public void flowAnalysis(FlowNetwork net){
         // Initialize local variables
-        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
-        ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
+        this.net = net;
+        ArrayList<Node> nodes = new ArrayList<Node>(this.net.getNodes());
+        ArrayList<Link> links = new ArrayList<Link>(this.net.getLinks());
         busesPowerFlowInfo = this.getBuses(nodes);
         generatorsPowerFlowInfo = this.getGenerators(nodes);
         branchesPowerFlowInfo = this.getBranches(links);
@@ -289,12 +291,24 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     
     private void updateNodes(ArrayList<Node> nodes){
         //update with buses, generators and costs power flow info
-        System.out.println("WARNING: Updating Nodes is not yet implemented.");
+        for (int i=0; i<this.busesPowerFlowInfo.length; i++){
+            nodes.get(i).replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, busesPowerFlowInfo[i][7]);
+            nodes.get(i).replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, busesPowerFlowInfo[i][8]);
+        }
+        for (int i=0; i<this.generatorsPowerFlowInfo.length; i++){
+            String busIndex = String.valueOf((int)generatorsPowerFlowInfo[i][0]);
+            net.getNode(busIndex).replacePropertyElement(PowerNodeState.REAL_POWER_GENERATION, generatorsPowerFlowInfo[i][1]);
+            net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, generatorsPowerFlowInfo[i][2]);
+        }
     }
     
     private void updateLinks(ArrayList<Link> links){
         //update with branches power flow info
-        System.out.println("WARNING: Updating Links is not yet implemented.");
+        for (int i=0; i<this.branchesPowerFlowInfo.length; i++){
+            // To be checked: How to translate from and to injection into net power flow. what about loss?
+            links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW, branchesPowerFlowInfo[i][13]);
+            links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW, branchesPowerFlowInfo[i][14]);
+        }
     }
     
 
@@ -346,16 +360,4 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     public double[][] getCostsPowerFlowInfo() {
         return costsPowerFlowInfo;
     }
-    
-    public void tester(FlowNetwork net) {
-        // Initialize local variables
-        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
-        ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
-        busesPowerFlowInfo = this.getBuses(nodes);
-        generatorsPowerFlowInfo = this.getGenerators(nodes);
-        branchesPowerFlowInfo = this.getBranches(links);
-        costsPowerFlowInfo = this.getGenerationCosts(nodes);
-        
-    }
-    
 }
