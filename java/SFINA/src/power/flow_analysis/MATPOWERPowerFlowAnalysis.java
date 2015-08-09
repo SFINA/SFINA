@@ -306,8 +306,11 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
         //update with branches power flow info
         for (int i=0; i<this.branchesPowerFlowInfo.length; i++){
             // To be checked: How to translate from and to injection into net power flow. what about loss?
-            links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW, branchesPowerFlowInfo[i][13]);
-            links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW, branchesPowerFlowInfo[i][14]);
+            links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, branchesPowerFlowInfo[i][13]);
+            links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, branchesPowerFlowInfo[i][14]);
+            links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branchesPowerFlowInfo[i][15]);
+            links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, branchesPowerFlowInfo[i][16]);
+            links.get(i).replacePropertyElement(PowerLinkState.CURRENT, 0.0); // To be calculated
         }
     }
     

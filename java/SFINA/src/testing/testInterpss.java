@@ -63,7 +63,7 @@ public class testInterpss {
         }
 
     
-    public void runRealInterss(){
+    public void runRealInterpss(){
             InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
             IpssObject.flowAnalysis(net);
             System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");

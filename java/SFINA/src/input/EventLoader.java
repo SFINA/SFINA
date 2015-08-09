@@ -383,10 +383,14 @@ public class EventLoader {
                 return PowerLinkState.ID;
             case "current":
                 return PowerLinkState.CURRENT;
-            case "real_power":
-                return PowerLinkState.REAL_POWER_FLOW;
-            case "reactive_power":
-                return PowerLinkState.REACTIVE_POWER_FLOW;
+            case "real_power_from":
+                return PowerLinkState.REAL_POWER_FLOW_FROM;
+            case "reactive_power_from":
+                return PowerLinkState.REACTIVE_POWER_FLOW_FROM;
+            case "real_power_to":
+                return PowerLinkState.REAL_POWER_FLOW_TO;
+            case "reactive_power_to":
+                return PowerLinkState.REACTIVE_POWER_FLOW_TO;
             case "resistance":
                 return PowerLinkState.RESISTANCE;
             case "reactance":
@@ -583,9 +587,13 @@ public class EventLoader {
         switch(powerLinkState){
             case CURRENT:
                 return Double.parseDouble(rawValue);
-            case REAL_POWER_FLOW:
+            case REAL_POWER_FLOW_FROM:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_FLOW:
+            case REACTIVE_POWER_FLOW_FROM:
+                return Double.parseDouble(rawValue);
+            case REAL_POWER_FLOW_TO:
+                return Double.parseDouble(rawValue);
+            case REACTIVE_POWER_FLOW_TO:
                 return Double.parseDouble(rawValue);
             case RESISTANCE:
                 return Double.parseDouble(rawValue);

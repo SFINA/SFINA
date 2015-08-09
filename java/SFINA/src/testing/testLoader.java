@@ -74,49 +74,11 @@ public class testLoader {
     }
     
     public void printLoadedData(){
-            printNodes();
-            printLinks();
+            Output printer = new Output(net);
+            printer.printNodesAll();
+            printer.printLinksAll();
             printParam();
             printEvents();
-    }
-    
-    private static void printNodes(){
-        System.out.println("\n-------------------------\n    NODES\n-------------------------\n");
-        System.out.format("%15s%15s%15s", "Index", "isActivated", "isConnected");
-        for (PowerNodeState state : PowerNodeState.values()) {
-            String printStateName = state.toString();
-            if (printStateName.length() > 13)
-                printStateName = printStateName.substring(0,13);
-            System.out.format("%15s", printStateName);
-        }
-        System.out.print("\n");
-        
-        for(Node node : nodes){
-            System.out.format("%15s%15s%15s", node.getIndex(), node.isActivated(), node.isConnected());
-            for(PowerNodeState state : PowerNodeState.values())
-                System.out.format("%15s", node.getProperty(state));
-            System.out.print("\n");
-        }
-    }
-    
-    private static void printLinks(){
-        System.out.println("\n-------------------------\n    LINKS\n-------------------------\n");
-        System.out.format("%15s%15s%15s%15s%15s", "Index", "StartNode", "EndNode", "isActivated", "isConnected");
-
-        for(PowerLinkState state : PowerLinkState.values()) {
-            String printStateName = state.toString();
-            if (printStateName.length() > 13)
-                printStateName = printStateName.substring(0,13);
-            System.out.format("%15s", printStateName);
-        }
-        System.out.print("\n");
-
-        for(Link link : links){
-            System.out.format("%15s%15s%15s%15s%15s", link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), link.isActivated(), link.isConnected());
-            for(PowerLinkState state : PowerLinkState.values())
-                System.out.format("%15s", link.getProperty(state));
-            System.out.print("\n");
-        }
     }
     
     private static void printParam(){

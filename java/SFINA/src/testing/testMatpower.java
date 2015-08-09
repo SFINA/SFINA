@@ -29,7 +29,6 @@ import power.flow_analysis.MATPOWERPowerFlowAnalysis;
  */
 public class testMatpower {
     public testMatpower(FlowNetwork net){
-        boolean printDoubles = false;
         MATPOWERPowerFlowAnalysis algo = new MATPOWERPowerFlowAnalysis(PowerFlowType.AC);
 //        algo.tester(net);
         algo.flowAnalysis(net);
@@ -38,14 +37,15 @@ public class testMatpower {
         double[][] bras = algo.getBranchesPowerFlowInfo();
         double[][] cost = algo.getCostsPowerFlowInfo();
         
-        if (printDoubles){
-            print(buses, "Bus");
-            print(gens, "Generators");
-            print(bras, "Branches");
-            print(cost, "Cost");
-        }
-        
+        //printDoubleArrays(buses, gens, bras, cost);
        
+    }
+    
+    public void printDoubleArrays(double[][] buses, double[][] gens, double[][] bras, double[][] cost){
+        print(buses, "Bus");
+        print(gens, "Generators");
+        print(bras, "Branches");
+        print(cost, "Cost");
     }
     
     private void print(double[][] stuff, String title){
