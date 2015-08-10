@@ -69,7 +69,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     private FlowNetwork net;
     
-    public SimulationAgent(String inputParametersLocation, String attackedLinesLocation, String parameterValueSeparator, String columnSeparator){
+    public SimulationAgent(String peersLogDirectory, String inputParametersLocation, String attackedLinesLocation, String parameterValueSeparator, String columnSeparator){
         this.inputParametersLocation=inputParametersLocation;
         this.attackedLinesLocation=attackedLinesLocation;
         this.parameterValueSeparator=parameterValueSeparator;
