@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import com.interpss.core.aclf.adj.impl.i;
+import core.SimulationAgent;
 import java.io.File;
 import protopeer.Experiment;
 import protopeer.Peer;
@@ -32,18 +32,26 @@ import protopeer.util.quantities.Time;
 public class TestExperiment extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
+    private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="Experiment "+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int runDuration=100;
     private final static int N=100;
     
+    // SFINA parameters
+    private final static String inputParametersLocation="configuration_files/input/parameters.txt";
+    private final static String eventsLocation="configuration_files/input/events.txt";
+    private final static String parameterValueSeparator="=";
+    private final static String columnSeparator=",";
+    
+    
     public static void main(String[] args) {
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
         final TestExperiment test = new TestExperiment();
         test.init();
-        final File folder = new File("peersLog/"+experimentID);
+        final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
         folder.mkdir();
         PeerFactory peerFactory=new PeerFactory() {
@@ -52,7 +60,7 @@ public class TestExperiment extends SimulatedExperiment{
                 if (peerIndex == 0) {
                    newPeer.addPeerlet(null);
                 }
-                newPeer.addPeerlet(null);
+                newPeer.addPeerlet(new SimulationAgent(experimentID, peersLogDirectory, inputParametersLocation, eventsLocation, parameterValueSeparator, columnSeparator));
                 return newPeer;
             }
         };

@@ -10,6 +10,7 @@ import static input.Domain.GAS;
 import static input.Domain.POWER;
 import static input.Domain.TRANSPORTATION;
 import static input.Domain.WATER;
+import input.EventLoader;
 import input.InputParameter;
 import input.InputParametersLoader;
 import input.TopologyLoader;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import network.FlowNetwork;
 import network.Link;
-import network.Node;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.flow_analysis.InterpssPowerFlowAnalysis;
@@ -43,39 +43,43 @@ import protopeer.util.quantities.Time;
  */
 public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface{
     
-    private String peersLogDirectory;
+    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
     
     private String experimentID;
+    private String peersLogDirectory;
     private String inputParametersLocation;
-    private String attackedLinesLocation;
+    private String eventsLocation;
     private String parameterValueSeparator;
     private String columnSeparator;
+    
+    private InputParametersLoader inputParametersLoader;
+    private FlowNetwork flowNetwork;
+    private TopologyLoader topologyLoader;
+    private EventLoader eventLoader;
+    
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
-    private InputParametersLoader inputParametersLoader;
-    private TopologyLoader topologyLoader;
+    
     
     private Map<InputParameter,Object> inputParameters;
-    private List<Link> attackedLinks;
     
-    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
+    
     
     private Domain domain;
     private Backend backend;
     
     
-    
-    final static String network="test.txt";
-    
-    private FlowNetwork net;
-    
-    public SimulationAgent(String peersLogDirectory, String inputParametersLocation, String attackedLinesLocation, String parameterValueSeparator, String columnSeparator){
+    public SimulationAgent(String experimentID, String peersLogDirectory, String inputParametersLocation, String eventsLocation, String parameterValueSeparator, String columnSeparator){
+        this.experimentID=experimentID;
+        this.peersLogDirectory=peersLogDirectory;
         this.inputParametersLocation=inputParametersLocation;
-        this.attackedLinesLocation=attackedLinesLocation;
+        this.eventsLocation=eventsLocation;
         this.parameterValueSeparator=parameterValueSeparator;
         this.columnSeparator=columnSeparator;
+        
         this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
-        this.topologyLoader=new TopologyLoader(net, this.columnSeparator);
+        this.flowNetwork=new FlowNetwork();
+        this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
     }
     
     /**
@@ -115,6 +119,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
+                eventLoader=new EventLoader((Domain)inputParameters.get(InputParameter.DOMAIN), columnSeparator);
                 runActiveState();
             }
         });
@@ -146,11 +151,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 switch(backend){
                     case MATPOWER:
                         flowAnalysis=new MATPOWERPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
-                        flowAnalysis.flowAnalysis(net);
+                        flowAnalysis.flowAnalysis(flowNetwork);
                         break;
                     case INTERPSS:
                         flowAnalysis=new InterpssPowerFlowAnalysis((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
-                        flowAnalysis.flowAnalysis(net);
+                        flowAnalysis.flowAnalysis(flowNetwork);
                         break;
                     default:
                         logger.debug("Wrong backend detected.");
@@ -175,11 +180,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * @return the network
      */
     public FlowNetwork getFlowNetwork() {
-        return net;
+        return flowNetwork;
     }
     
     public void setFlowNetwork(FlowNetwork net) {
-        this.net = net;
+        this.flowNetwork = net;
     }
     
     //****************** MEASUREMENTS ******************
