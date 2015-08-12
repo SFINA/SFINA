@@ -131,10 +131,10 @@ public class EventLoader {
                 NetworkComponent networkComponent=null;
                 switch(values.get(2)){
                     case "node":
-                        networkComponent=NetworkComponent.Node;
+                        networkComponent=NetworkComponent.NODE;
                         break;
                     case "link":
-                        networkComponent=NetworkComponent.Link;
+                        networkComponent=NetworkComponent.LINK;
                         break;
                     default:
                         logger.debug("Network component cannot be recognized.");
@@ -146,10 +146,10 @@ public class EventLoader {
                 switch(networkFeature){
                     case TOPOLOGY:
                         switch(networkComponent){
-                            case Node:
+                            case NODE:
                                 parameter=this.lookupNodeState(values.get(4));
                                 break;
-                            case Link:
+                            case LINK:
                                 parameter=this.lookupLinkState(values.get(4));
                                 break;
                             default:
@@ -158,7 +158,7 @@ public class EventLoader {
                         break;
                     case FLOW:
                         switch(networkComponent){
-                            case Node:
+                            case NODE:
                                 switch(domain){
                                     case POWER:
                                         parameter=this.lookupPowerNodeState(values.get(4));
@@ -176,7 +176,7 @@ public class EventLoader {
                                         logger.debug("Wrong backend detected.");
                                 }
                                 break;
-                            case Link:
+                            case LINK:
                                 switch(domain){
                                     case POWER:
                                         parameter=this.lookupPowerLinkState(values.get(4));
@@ -206,10 +206,10 @@ public class EventLoader {
                 switch(networkFeature){
                     case TOPOLOGY:
                         switch(networkComponent){
-                            case Node:
+                            case NODE:
                                 value=this.getActualNodeValue((NodeState)parameter,values.get(5));
                                 break;
-                            case Link:
+                            case LINK:
                                 value=this.getActualLinkValue((LinkState)parameter,values.get(5));
                                 break;
                             default:
@@ -218,7 +218,7 @@ public class EventLoader {
                         break;
                     case FLOW:
                         switch(networkComponent){
-                            case Node:
+                            case NODE:
                                 switch(domain){
                                     case POWER:
                                         value=this.getActualPowerNodeValue((PowerNodeState)parameter,values.get(5));
@@ -236,7 +236,7 @@ public class EventLoader {
                                         logger.debug("Wrong backend detected.");
                                 }
                                 break;
-                            case Link:
+                            case LINK:
                                 switch(domain){
                                     case POWER:
                                         value=this.getActualPowerLinkValue((PowerLinkState)parameter,values.get(5));

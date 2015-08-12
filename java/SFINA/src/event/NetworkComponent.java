@@ -22,6 +22,6 @@ package event;
  * @author evangelospournaras
  */
 public enum NetworkComponent {
-    Node,
-    Link
+    NODE,
+    LINK
 }

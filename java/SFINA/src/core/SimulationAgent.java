@@ -1,6 +1,7 @@
 package core;
 
 import dsutil.protopeer.FingerDescriptor;
+import event.Event;
 import input.Backend;
 import static input.Backend.INTERPSS;
 import static input.Backend.MATPOWER;
@@ -14,10 +15,11 @@ import input.EventLoader;
 import input.InputParameter;
 import input.InputParametersLoader;
 import input.TopologyLoader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import network.FlowNetwork;
-import network.Link;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.flow_analysis.InterpssPowerFlowAnalysis;
@@ -62,6 +64,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     
     private Map<InputParameter,Object> inputParameters;
+    private Map<Integer,List<Event>> eventSchedule;
     
     
     
@@ -80,6 +83,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
+        this.eventSchedule=new HashMap<Integer,List<Event>>();
     }
     
     /**
@@ -120,6 +124,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             public void timerExpired(Timer timer){
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
                 eventLoader=new EventLoader((Domain)inputParameters.get(InputParameter.DOMAIN), columnSeparator);
+                List<Event> events=eventLoader.loadEvents(eventsLocation);
+                scheduleEvents(events);
                 runActiveState();
             }
         });
@@ -137,6 +143,20 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         }
         });
         loadAgentTimer.schedule(Time.inMilliseconds(1000));
+    }
+    
+    private void scheduleEvents(List<Event> events){
+        for(Event event:events){
+            int eventTime=event.getTime();
+            if(this.eventSchedule.containsKey(eventTime)){
+                this.eventSchedule.get(eventTime).add(event);
+            }
+            else{
+                List<Event> timeEvents=new ArrayList<Event>();
+                timeEvents.add(event);
+                this.eventSchedule.put(eventTime, timeEvents);
+            }
+        }
     }
     
     private void buildTopology(){
