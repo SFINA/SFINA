@@ -18,8 +18,13 @@
 package event;
 
 import network.FlowNetwork;
+import network.Link;
+import network.LinkState;
+import static network.LinkState.FROM_NODE;
 import network.Node;
 import network.NodeState;
+import static network.NodeState.STATUS;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -27,14 +32,16 @@ import network.NodeState;
  */
 public class EventExecutor {
     
+    private static final Logger logger = Logger.getLogger(EventExecutor.class);
+    
     private FlowNetwork flowNetwork;
     
     public EventExecutor(FlowNetwork flowNetwork){
-        
+        this.flowNetwork=flowNetwork;
     }
     
     public void executeEvent(FlowNetwork flowNetwork, Event event){
-        switch(event.getNetworkFeature()){
+        switch(event.getEventType()){
             case TOPOLOGY:
                 switch(event.getNetworkComponent()){
                     case NODE:
@@ -45,26 +52,51 @@ public class EventExecutor {
                                 break;
                             case STATUS:
                                 node.setActivated((Boolean)event.getValue());
-                                //do sth
                                 break;
                             default:
-                                //do sth
+                                logger.debug("Node state cannot be recognised");
                         }
-                        // DO STH
                         break;
                     case LINK:
-                        // DO STH
+                        Link link=flowNetwork.getLink(event.getComponentID());
+                        link.replacePropertyElement(event.getParameter(), event.getValue());
+                        switch((LinkState)event.getParameter()){
+                            case ID:
+                                link.setIndex((String)event.getValue());
+                                break;
+                            case FROM_NODE:
+                                link.setStartNode(flowNetwork.getNode((String)event.getValue()));
+                                break;
+                            case TO_NODE:
+                                link.setEndNode(flowNetwork.getNode((String)event.getValue()));
+                                break;
+                            case STATUS:
+                                link.setActivated((Boolean)event.getValue());
+                                break;
+                            default:
+                                logger.debug("Link state cannot be recognised");
+                        }
                         break;
                     default:
-                        //do sth
+                        logger.debug("Network component cannot be recognised");
                 }
-                //DO STH
                 break;
             case FLOW:
-                //DO STH
+                switch(event.getNetworkComponent()){
+                    case NODE:
+                        Node node=flowNetwork.getNode(event.getComponentID());
+                        node.replacePropertyElement(event.getParameter(), event.getValue());
+                        break;
+                    case LINK:
+                        Link link=flowNetwork.getLink(event.getComponentID());
+                        link.replacePropertyElement(event.getParameter(), event.getValue());
+                        break;
+                    default:
+                        logger.debug("Network component cannot be recognised");
+                }
                 break;
             default:
-                //do sth
+                logger.debug("Event type cannot be recognised");
         }
     }
     

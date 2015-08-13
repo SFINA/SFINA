@@ -95,7 +95,7 @@ public class testLoader {
         for (Event event : events) {
             System.out.println("--- New Event ---");
             System.out.println("Event time: " + event.getTime());
-            System.out.println("Network Feature: " + event.getNetworkFeature());
+            System.out.println("Network Feature: " + event.getEventType());
             System.out.println("Network Component: " + event.getNetworkComponent());
             System.out.println("Component ID: " + event.getComponentID());
             System.out.println("Parameter and value: " + event.getParameter() + " = " + event.getValue());

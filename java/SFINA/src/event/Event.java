@@ -26,16 +26,16 @@ import dsutil.generic.state.State;
 public class Event extends State{
     
     private int time;
-    private NetworkFeature networkFeature;
+    private EventType eventType;
     private NetworkComponent networkComponent;
     private String componentID;
     private Enum parameter;
     private Object value;
     
-    public Event(int time, NetworkFeature networkFeature, NetworkComponent networkComponent, String componentID, Enum parameter, Object value){
+    public Event(int time, EventType eventType, NetworkComponent networkComponent, String componentID, Enum parameter, Object value){
         super();
         this.time=time;
-        this.networkFeature=networkFeature;
+        this.eventType=eventType;
         this.networkComponent=networkComponent;
         this.componentID=componentID;
         this.parameter=parameter;
@@ -59,15 +59,15 @@ public class Event extends State{
     /**
      * @return the networkFeature
      */
-    public NetworkFeature getNetworkFeature() {
-        return networkFeature;
+    public EventType getEventType() {
+        return eventType;
     }
 
     /**
      * @param networkFeature the networkFeature to set
      */
-    public void setNetworkFeature(NetworkFeature networkFeature) {
-        this.networkFeature = networkFeature;
+    public void setNetworkFeature(EventType networkFeature) {
+        this.eventType = networkFeature;
     }
 
     /**

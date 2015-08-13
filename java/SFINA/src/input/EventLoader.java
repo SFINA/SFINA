@@ -20,7 +20,7 @@ package input;
 import event.Event;
 import event.EventState;
 import event.NetworkComponent;
-import event.NetworkFeature;
+import event.EventType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -116,13 +116,13 @@ public class EventLoader {
                 // 1. Time
                 int time=Integer.parseInt(values.get(0));
                 // 2. Network feature
-                NetworkFeature networkFeature=null;
+                EventType networkFeature=null;
                 switch(values.get(1)){
                     case "topology":
-                        networkFeature=NetworkFeature.TOPOLOGY;
+                        networkFeature=EventType.TOPOLOGY;
                         break;
                     case "flow":
-                        networkFeature=NetworkFeature.FLOW;
+                        networkFeature=EventType.FLOW;
                         break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
@@ -276,7 +276,7 @@ public class EventLoader {
             case "time": 
                 return EventState.ID;
             case "feature":
-                return EventState.NETWORK_FEATURE;
+                return EventState.EVENT_TYPE;
             case "component":
                 return EventState.NETWORK_COMPONENT;
             case "id":

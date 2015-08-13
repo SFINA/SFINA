@@ -21,7 +21,7 @@ package event;
  *
  * @author evangelospournaras
  */
-public enum NetworkFeature {
+public enum EventType {
     TOPOLOGY,
     FLOW
 }

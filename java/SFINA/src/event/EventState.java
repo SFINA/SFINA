@@ -23,7 +23,7 @@ package event;
  */
 public enum EventState {
     TIME,
-    NETWORK_FEATURE,
+    EVENT_TYPE,
     NETWORK_COMPONENT,
     ID,
     PARAMETER,
