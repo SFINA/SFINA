@@ -16,10 +16,13 @@ import input.InputParameter;
 import input.InputParametersLoader;
 import input.TopologyLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import network.FlowNetwork;
+import network.Link;
+import network.LinkState;
+import network.Node;
+import network.NodeState;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.flow_analysis.InterpssPowerFlowAnalysis;
@@ -49,6 +52,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     private String experimentID;
     private String peersLogDirectory;
+    private Time bootstrapTime;
+    private Time runTime;
     private String inputParametersLocation;
     private String eventsLocation;
     private String parameterValueSeparator;
@@ -64,7 +69,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     
     private Map<InputParameter,Object> inputParameters;
-    private Map<Integer,List<Event>> eventSchedule;
     
     
     
@@ -72,9 +76,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private Backend backend;
     
     
-    public SimulationAgent(String experimentID, String peersLogDirectory, String inputParametersLocation, String eventsLocation, String parameterValueSeparator, String columnSeparator){
+    public SimulationAgent(String experimentID, String peersLogDirectory, Time bootstrapTime, Time runTime, String inputParametersLocation, String eventsLocation, String parameterValueSeparator, String columnSeparator){
         this.experimentID=experimentID;
         this.peersLogDirectory=peersLogDirectory;
+        this.bootstrapTime=bootstrapTime;
+        this.runTime=runTime;
         this.inputParametersLocation=inputParametersLocation;
         this.eventsLocation=eventsLocation;
         this.parameterValueSeparator=parameterValueSeparator;
@@ -83,7 +89,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
-        this.eventSchedule=new HashMap<Integer,List<Event>>();
     }
     
     /**
@@ -124,12 +129,15 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             public void timerExpired(Timer timer){
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
                 eventLoader=new EventLoader((Domain)inputParameters.get(InputParameter.DOMAIN), columnSeparator);
-                List<Event> events=eventLoader.loadEvents(eventsLocation);
-                scheduleEvents(events);
+                ArrayList<Event> events=eventLoader.loadEvents(eventsLocation);
+                for(Event event:events){
+                    //we may need to adjust time here because the clock is already at time 2!
+                    runEventExecution(event.getTime(),event);
+                }
                 runActiveState();
             }
         });
-        loadAgentTimer.schedule(Time.inMilliseconds(2000));
+        loadAgentTimer.schedule(bootstrapTime);
     }
     
     /**
@@ -139,28 +147,85 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                //runActiveState();
+                runFlowAnalysis();
+                runActiveState();
         }
         });
-        loadAgentTimer.schedule(Time.inMilliseconds(1000));
+        loadAgentTimer.schedule(runTime);
     }
     
-    private void scheduleEvents(List<Event> events){
-        for(Event event:events){
-            int eventTime=event.getTime();
-            if(this.eventSchedule.containsKey(eventTime)){
-                this.eventSchedule.get(eventTime).add(event);
-            }
-            else{
-                List<Event> timeEvents=new ArrayList<Event>();
-                timeEvents.add(event);
-                this.eventSchedule.put(eventTime, timeEvents);
-            }
+    /**
+     * The scheduling of the active state.  It is executed periodically. 
+     */
+    private void runEventExecution(int time, Event event){
+        Timer loadAgentTimer= getPeer().getClock().createNewTimer();
+        loadAgentTimer.addTimerListener(new TimerListener(){
+            public void timerExpired(Timer timer){
+                executeEvent(flowNetwork,event);
         }
+        });
+        loadAgentTimer.schedule(Time.inMilliseconds(time*1000));
     }
     
-    private void buildTopology(){
-        //adds the links in the nodes! 
+    @Override
+    public void executeEvent(FlowNetwork flowNetwork, Event event){
+        switch(event.getEventType()){
+            case TOPOLOGY:
+                switch(event.getNetworkComponent()){
+                    case NODE:
+                        Node node=flowNetwork.getNode(event.getComponentID());
+                        switch((NodeState)event.getParameter()){
+                            case ID:
+                                node.setIndex((String)event.getValue());
+                                break;
+                            case STATUS:
+                                node.setActivated((Boolean)event.getValue());
+                                break;
+                            default:
+                                logger.debug("Node state cannot be recognised");
+                        }
+                        break;
+                    case LINK:
+                        Link link=flowNetwork.getLink(event.getComponentID());
+                        link.replacePropertyElement(event.getParameter(), event.getValue());
+                        switch((LinkState)event.getParameter()){
+                            case ID:
+                                link.setIndex((String)event.getValue());
+                                break;
+                            case FROM_NODE:
+                                link.setStartNode(flowNetwork.getNode((String)event.getValue()));
+                                break;
+                            case TO_NODE:
+                                link.setEndNode(flowNetwork.getNode((String)event.getValue()));
+                                break;
+                            case STATUS:
+                                link.setActivated((Boolean)event.getValue());
+                                break;
+                            default:
+                                logger.debug("Link state cannot be recognised");
+                        }
+                        break;
+                    default:
+                        logger.debug("Network component cannot be recognised");
+                }
+                break;
+            case FLOW:
+                switch(event.getNetworkComponent()){
+                    case NODE:
+                        Node node=flowNetwork.getNode(event.getComponentID());
+                        node.replacePropertyElement(event.getParameter(), event.getValue());
+                        break;
+                    case LINK:
+                        Link link=flowNetwork.getLink(event.getComponentID());
+                        link.replacePropertyElement(event.getParameter(), event.getValue());
+                        break;
+                    default:
+                        logger.debug("Network component cannot be recognised");
+                }
+                break;
+            default:
+                logger.debug("Event type cannot be recognised");
+        }
     }
     
     @Override
@@ -222,8 +287,4 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             }
         });
     }
-    
-    
 }
-    
-    

@@ -24,6 +24,7 @@ import event.EventType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.LinkState;
@@ -81,15 +82,17 @@ public class EventLoader {
     private Domain domain;
     private String columnSeparator;
     private static final Logger logger = Logger.getLogger(EventLoader.class);
+    private ArrayList<Event> events;
+    
     
     public EventLoader(Domain domain, String columnSeparator){
         this.domain=domain;
         this.columnSeparator=columnSeparator;
+        this.events=new ArrayList<Event>();
     }
     
     public ArrayList<Event> loadEvents(String location){
         ArrayList<EventState> eventStates=new ArrayList<EventState>(); // not used at this moment
-        ArrayList<Event> events=new ArrayList<Event>();
         File file = new File(location);
         Scanner scr = null;
         try {
@@ -262,13 +265,13 @@ public class EventLoader {
                         logger.debug("Network feature cannot be recognized.");
                 }
                 Event event=new Event(time,networkFeature,networkComponent,id,parameter,value);
-                events.add(event);
+                getEvents().add(event);
             }
         }
         catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        return events;
+        return getEvents();
     }
     
     private EventState lookupEventState(String eventState){
@@ -619,5 +622,12 @@ public class EventLoader {
                 logger.debug("Power link state is not recognized.");
                 return null;
         }
+    }
+
+    /**
+     * @return the events
+     */
+    public ArrayList<Event> getEvents() {
+        return events;
     }
 }

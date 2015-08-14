@@ -5,6 +5,9 @@
  */
 package core;
 
+import event.Event;
+import network.FlowNetwork;
+
 
 /**
  *
@@ -12,5 +15,7 @@ package core;
  */
 public interface SimulationAgentInterface {
     
+    public void executeEvent(FlowNetwork flowNetwork, Event event);
     public void runFlowAnalysis();
+    
 }

@@ -36,6 +36,8 @@ public class TestExperiment extends SimulatedExperiment{
     private static String experimentID="Experiment "+expSeqNum+"/";
     
     //Simulation Parameters
+    private final static Time bootstrapTime=Time.inMilliseconds(2000);
+    private final static Time runTime=Time.inMilliseconds(1000);
     private final static int runDuration=100;
     private final static int N=100;
     
@@ -60,7 +62,7 @@ public class TestExperiment extends SimulatedExperiment{
                 if (peerIndex == 0) {
                    newPeer.addPeerlet(null);
                 }
-                newPeer.addPeerlet(new SimulationAgent(experimentID, peersLogDirectory, inputParametersLocation, eventsLocation, parameterValueSeparator, columnSeparator));
+                newPeer.addPeerlet(new SimulationAgent(experimentID, peersLogDirectory, bootstrapTime, runTime, inputParametersLocation, eventsLocation, parameterValueSeparator, columnSeparator));
                 return newPeer;
             }
         };
