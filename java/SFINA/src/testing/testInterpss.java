@@ -25,7 +25,7 @@ import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import power.PowerFlowType;
-import power.flow_analysis.InterpssPowerFlowAnalysis;
+import power.flow_analysis.InterpssFlowBackend;
 
 /**
  *
@@ -40,7 +40,7 @@ public class testInterpss {
     }
     
     public void compareData(){
-            InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
+            InterpssFlowBackend IpssObject = new InterpssFlowBackend(PowerFlowType.AC);
             try{
                 IpssObject.compareDataToCaseLoaded(net, "ieee57.ieee");
             }
@@ -52,7 +52,7 @@ public class testInterpss {
         }
 
     public void compareResults(){
-            InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
+            InterpssFlowBackend IpssObject = new InterpssFlowBackend(PowerFlowType.AC);
             try {
                 IpssObject.compareLFResultsToCaseLoaded(net, "ieee57.ieee");
             } catch (InterpssException ie) {
@@ -64,7 +64,7 @@ public class testInterpss {
 
     
     public void runRealInterpss(){
-            InterpssPowerFlowAnalysis IpssObject = new InterpssPowerFlowAnalysis(PowerFlowType.AC);
+            InterpssFlowBackend IpssObject = new InterpssFlowBackend(PowerFlowType.AC);
             IpssObject.flowAnalysis(net);
             System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
     }

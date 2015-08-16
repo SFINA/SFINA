@@ -21,14 +21,14 @@ import power.PowerNodeType;
  *
  * @author evangelospournaras
  */
-public class PowerFlowDataLoader {
+public class PowerFlowLoader {
     
     private final FlowNetwork net;
     private final String parameterValueSeparator;
-    private static final Logger logger = Logger.getLogger(PowerFlowDataLoader.class);
+    private static final Logger logger = Logger.getLogger(PowerFlowLoader.class);
     private final String missingValue;
     
-    public PowerFlowDataLoader(FlowNetwork net, String parameterValueSeparator, String missingValue){
+    public PowerFlowLoader(FlowNetwork net, String parameterValueSeparator, String missingValue){
         this.net=net;
         this.parameterValueSeparator=parameterValueSeparator;
         this.missingValue=missingValue;

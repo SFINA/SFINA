@@ -14,7 +14,7 @@ import network.Node;
  *
  * @author evangelospournaras
  */
-public interface FlowAnalysisInterface {
+public interface FlowBackendInterface {
     
     public void flowAnalysis(FlowNetwork net);
     

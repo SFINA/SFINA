@@ -38,14 +38,24 @@ public class TestExperiment extends SimulatedExperiment{
     //Simulation Parameters
     private final static Time bootstrapTime=Time.inMilliseconds(2000);
     private final static Time runTime=Time.inMilliseconds(1000);
-    private final static int runDuration=100;
-    private final static int N=100;
+    private final static int runDuration=5;
+    private final static int N=57;
     
     // SFINA parameters
-    private final static String inputParametersLocation="configuration_files/input/parameters.txt";
-    private final static String eventsLocation="configuration_files/input/events.txt";
     private final static String parameterValueSeparator="=";
     private final static String columnSeparator=",";
+    private final static String missingValue="-";
+    private final static String nodesLocation = "configuration_files/input/time_1/topology/nodes.txt";
+    private final static String linksLocation = "configuration_files/input/time_1/topology/links.txt";
+    private final static String nodesFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
+    private final static String linksFlowLocation = "configuration_files/input/time_1/flow/links.txt";
+    private final static String inputParametersLocation="configuration_files/input/parameters.txt";
+    private final static String eventsLocation="configuration_files/input/events.txt";
+    
+    
+    
+    
+    
     
     
     public static void main(String[] args) {
@@ -59,10 +69,10 @@ public class TestExperiment extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                if (peerIndex == 0) {
-                   newPeer.addPeerlet(null);
-                }
-                newPeer.addPeerlet(new SimulationAgent(experimentID, peersLogDirectory, bootstrapTime, runTime, inputParametersLocation, eventsLocation, parameterValueSeparator, columnSeparator));
+//                if (peerIndex == 0) {
+//                   newPeer.addPeerlet(null);
+//                }
+                newPeer.addPeerlet(new SimulationAgent(experimentID, peersLogDirectory, bootstrapTime, runTime, inputParametersLocation, nodesLocation, linksLocation, nodesFlowLocation, linksFlowLocation, eventsLocation, parameterValueSeparator, columnSeparator, missingValue));
                 return newPeer;
             }
         };

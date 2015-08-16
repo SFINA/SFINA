@@ -5,7 +5,7 @@
  */
 package power.flow_analysis;
 
-import flow_analysis.FlowAnalysisInterface;
+import flow_analysis.FlowBackendInterface;
 import java.util.ArrayList;
 import java.util.List;
 import matlabcontrol.MatlabConnectionException;
@@ -28,7 +28,7 @@ import power.input.PowerNodeState;
  *
  * @author evangelospournaras
  */
-public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
+public class MATPOWERFlowBackend implements FlowBackendInterface{
     
     private FlowNetwork net;
     private double[][] busesPowerFlowInfo;
@@ -40,10 +40,10 @@ public class MATPOWERPowerFlowAnalysis implements FlowAnalysisInterface{
     private PowerFlowType powerFlowType;
     private boolean converged;
     private final String caseFile="DumpCase";
-    private static final Logger logger = Logger.getLogger(MATPOWERPowerFlowAnalysis.class);
+    private static final Logger logger = Logger.getLogger(MATPOWERFlowBackend.class);
     
     
-    public MATPOWERPowerFlowAnalysis(PowerFlowType powerFlowType){
+    public MATPOWERFlowBackend(PowerFlowType powerFlowType){
         MatlabProxyFactoryOptions options = new MatlabProxyFactoryOptions.Builder().setUsePreviouslyControlledSession(true).build();
         factory = new MatlabProxyFactory(options);
         this.powerFlowType=powerFlowType;

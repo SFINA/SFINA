@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import network.FlowNetwork;
 import power.PowerFlowType;
-import power.flow_analysis.MATPOWERPowerFlowAnalysis;
+import power.flow_analysis.MATPOWERFlowBackend;
 
 /**
  *
@@ -29,7 +29,7 @@ import power.flow_analysis.MATPOWERPowerFlowAnalysis;
  */
 public class testMatpower {
     public testMatpower(FlowNetwork net){
-        MATPOWERPowerFlowAnalysis algo = new MATPOWERPowerFlowAnalysis(PowerFlowType.AC);
+        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(PowerFlowType.AC);
 //        algo.tester(net);
         algo.flowAnalysis(net);
         double[][] buses = algo.getBusesPowerFlowInfo();

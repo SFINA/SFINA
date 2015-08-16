@@ -7,6 +7,8 @@ package core;
 
 import event.Event;
 import network.FlowNetwork;
+import protopeer.network.Message;
+import protopeer.util.quantities.Time;
 
 
 /**
@@ -15,7 +17,18 @@ import network.FlowNetwork;
  */
 public interface SimulationAgentInterface {
     
+    public void runBootstraping(Time bootstrapTime);
+    
+    public void runActiveState(Time runTime);
+    
+    public void runEventExecution(int time, Event event);
+    
+    public void runPassiveState(Message message);
+    
     public void executeEvent(FlowNetwork flowNetwork, Event event);
+    
     public void runFlowAnalysis();
+    
+    public void scheduleMeasurements();
     
 }

@@ -15,7 +15,7 @@ import input.InputParameter;
 import input.InputParametersLoader;
 import java.util.List;
 import network.FlowNetwork;
-import power.input.PowerFlowDataLoader;
+import power.input.PowerFlowLoader;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
@@ -53,7 +53,7 @@ public class testLoader {
         topologyLoader.loadLinks(linkLocation);
 
         // Load meta
-        PowerFlowDataLoader flowDataLoader = new PowerFlowDataLoader(net, col_seperator, missingValue);
+        PowerFlowLoader flowDataLoader = new PowerFlowLoader(net, col_seperator, missingValue);
         flowDataLoader.loadNodeFlowData(nodeFlowLocation);
         flowDataLoader.loadLinkFlowData(linkFlowLocation); 
         

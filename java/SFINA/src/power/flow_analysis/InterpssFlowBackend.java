@@ -19,7 +19,7 @@ import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
 import com.interpss.core.net.Area;
 import com.interpss.core.net.Zone;
-import flow_analysis.FlowAnalysisInterface;
+import flow_analysis.FlowBackendInterface;
 import static java.lang.Math.PI;
 import java.util.ArrayList;
 import network.FlowNetwork;
@@ -45,15 +45,15 @@ import power.input.PowerNodeState;
  *
  * @author evangelospournaras
  */
-public class InterpssPowerFlowAnalysis implements FlowAnalysisInterface{
+public class InterpssFlowBackend implements FlowBackendInterface{
     
     private PowerFlowType powerFlowType;
     private FlowNetwork SfinaNet;
     private AclfNetwork IpssNet;
     private String resultAsString;
-    private static final Logger logger = Logger.getLogger(InterpssPowerFlowAnalysis.class);
+    private static final Logger logger = Logger.getLogger(InterpssFlowBackend.class);
     
-    public InterpssPowerFlowAnalysis(PowerFlowType powerFlowType){
+    public InterpssFlowBackend(PowerFlowType powerFlowType){
         this.powerFlowType=powerFlowType;
     }
     
