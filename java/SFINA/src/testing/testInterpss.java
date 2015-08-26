@@ -33,39 +33,39 @@ import power.flow_analysis.InterpssFlowBackend;
  */
 public class testInterpss {
     FlowNetwork net;
+    PowerFlowType FlowType;
     
-    public testInterpss(FlowNetwork net) {
+    public testInterpss(FlowNetwork net, PowerFlowType FlowType) {
         this.net = net;
-        
+        this.FlowType = FlowType;
     }
+    
+    public void runInterpssOurData(){
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
+        IpssObject.flowAnalysis(net);
+        System.out.println(">>>>> InterPSS flow analysis with SFINA data conversion.");
+    }
+
+    public void runInterpssTheirLoader(){
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
+        try {
+            IpssObject.flowAnalysisIpssDataLoader(net, "ieee57.ieee");
+        } catch (InterpssException ie) {
+            ie.printStackTrace();
+        }
+        System.out.println(">>>>> InterPSS flow analysis with data loaded by InterPSS directly.");
+    }    
     
     public void compareData(){
-            InterpssFlowBackend IpssObject = new InterpssFlowBackend(PowerFlowType.AC);
-            try{
-                IpssObject.compareDataToCaseLoaded(net, "ieee57.ieee");
-            }
-            catch(InterpssException ie){
-                ie.printStackTrace();
-            }
-            System.out.println(">>>>> Compared data from IEEE file from SFINA loaders.");
-            System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
+        try{
+            IpssObject.compareDataToCaseLoaded(net, "ieee57.ieee");
         }
-
-    public void compareResults(){
-            InterpssFlowBackend IpssObject = new InterpssFlowBackend(PowerFlowType.AC);
-            try {
-                IpssObject.compareLFResultsToCaseLoaded(net, "ieee57.ieee");
-            } catch (InterpssException ie) {
-                ie.printStackTrace();
-            }
-            System.out.println(">>>>> Compared LF results for IEEE data loaded and SFINA data directly.");
-            System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
+        catch(InterpssException ie){
+            ie.printStackTrace();
         }
-
-    
-    public void runRealInterpss(){
-            InterpssFlowBackend IpssObject = new InterpssFlowBackend(PowerFlowType.AC);
-            IpssObject.flowAnalysis(net);
-            System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
+        System.out.println(">>>>> Compared data from IEEE file from SFINA loaders.");
+        System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
     }
+
 }

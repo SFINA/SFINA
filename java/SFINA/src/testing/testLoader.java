@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import input.TopologyLoader;
 import input.InputParameter;
 import input.InputParametersLoader;
+import java.io.File;
 import java.util.List;
 import network.FlowNetwork;
 import power.input.PowerFlowLoader;
@@ -30,10 +31,10 @@ public class testLoader {
     private static String col_seperator = ",";
     private static String param_seperator = "=";
     private static String missingValue="-";
-    private static String nodeLocation = "configuration_files/input/time_1/topology/nodes.txt";
-    private static String linkLocation = "configuration_files/input/time_1/topology/links.txt";
-    private static String nodeFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
-    private static String linkFlowLocation = "configuration_files/input/time_1/flow/links.txt";
+    private String nodeLocation;
+    private String linkLocation;
+    private String nodeFlowLocation;
+    private String linkFlowLocation;
     private static String paramLocation = "configuration_files/input/parameters.txt";
     private static String eventLocation = "configuration_files/input/events.txt";
     
@@ -44,8 +45,24 @@ public class testLoader {
     private static HashMap<InputParameter,Object> parameters;
     private static ArrayList<Event> events;
     
-    public testLoader(FlowNetwork net){
+    public testLoader(){
+    }
+    
+    public void load(String caseName, FlowNetwork net){
         this.net = net;
+        
+        // Construct paths to case files
+        this.nodeLocation = "configuration_files/input/" + caseName + "/topology/nodes.txt";
+        this.linkLocation = "configuration_files/input/" + caseName + "/topology/links.txt";
+        this.nodeFlowLocation = "configuration_files/input/" + caseName + "/flow/nodes.txt";
+        this.linkFlowLocation = "configuration_files/input/" + caseName + "/flow/links.txt";
+        
+        // Check if caseName does exist as a directory
+        File file=new File(nodeLocation);
+        if (!file.exists()){
+            System.out.println("WARNING: The specified case file folder seems to not exist! Cant't load data. Exit.");
+            System.exit(0);
+        }
         
         // Load topology
         TopologyLoader topologyLoader = new TopologyLoader(net, col_seperator);
@@ -74,9 +91,9 @@ public class testLoader {
     }
     
     public void printLoadedData(){
-            Output printer = new Output(net);
-            printer.printNodesAll();
-            printer.printLinksAll();
+            Output printer = new Output();
+            printer.printNodesAll(net);
+            printer.printLinksAll(net);
             printParam();
             printEvents();
     }

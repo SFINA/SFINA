@@ -291,6 +291,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return totalNodeDegree/this.nodes.size();
     }
     
+    @Override
     public double getClustCoeff(){
         // Compute local clustering coefficient for each node
         ArrayList<Double> localClustCoeff = new ArrayList();

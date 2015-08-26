@@ -32,11 +32,11 @@ import power.input.PowerNodeState;
 public class Output {
     FlowNetwork net;
     
-    public Output(FlowNetwork net){
-        this.net = net;
+    public Output(){
     }
     
-    public void printNodesAll(){
+    public void printNodesAll(FlowNetwork net){
+        this.net = net;
         ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
         
         System.out.println("\n-------------------------\n    NODES\n-------------------------\n");
@@ -65,7 +65,8 @@ public class Output {
         }
     }
     
-    public void printLinksAll(){
+    public void printLinksAll(FlowNetwork net){
+        this.net = net;
         ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
 
         System.out.println("\n-------------------------\n    LINKS\n-------------------------\n");
@@ -95,7 +96,8 @@ public class Output {
         }
     }
     
-    public void printLfResults(){
+    public void printLfResults(FlowNetwork net){
+        this.net = net;
         // Nodes
         int col = 10;
         String dashes = "";

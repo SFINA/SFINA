@@ -50,7 +50,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     private PowerFlowType powerFlowType;
     private FlowNetwork SfinaNet;
     private AclfNetwork IpssNet;
-    private String resultAsString;
     private static final Logger logger = Logger.getLogger(InterpssFlowBackend.class);
     
     public InterpssFlowBackend(PowerFlowType powerFlowType){
@@ -69,19 +68,15 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             switch(powerFlowType){
                 case AC:
                     buildIpssNet();
-                    //net = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load(inputpath).getAclfNet();
                     LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
                     acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
                     acAlgo.loadflow();
-                    resultAsString = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
                     getIpssResults();
                     break;
                 case DC:
                     buildIpssNet();
-                    //net = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load(inputpath).getAclfNet();  
                     DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(IpssNet);
                     dcAlgo.calculateDclf();
-                    resultAsString = DclfOutFunc.dclfResults(dcAlgo, false).toString();
                     getIpssResults();
                     dcAlgo.destroy();	
                     break;
@@ -219,10 +214,15 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             SfinaNode.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, bus.getVoltageMag(UnitType.PU));
             SfinaNode.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, bus.getVoltageAng(UnitType.Deg));
             
-            if (bus.isGenPV() || bus.isSwing()){
+            if(bus.isSwing()){
+                SfinaNode.replacePropertyElement(PowerNodeState.REAL_POWER_GENERATION, bus.getNetGenResults().getReal()*IpssNet.getBaseMva());
+                SfinaNode.replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, bus.getNetGenResults().getImaginary()*IpssNet.getBaseMva());
+            }
+            if (bus.isGenPV()){
                 SfinaNode.replacePropertyElement(PowerNodeState.REAL_POWER_GENERATION, bus.getGenP()*IpssNet.getBaseMva());
                 SfinaNode.replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, bus.getGenQ()*IpssNet.getBaseMva());
             }
+            
         }
         
         for(AclfBranch branch : IpssNet.getBranchList()){
@@ -230,13 +230,50 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             
             SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, branch.powerFrom2To(UnitType.mW).getReal());
             SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, branch.powerFrom2To(UnitType.mVar).getImaginary());
-            SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branch.powerTo2From().getReal());
-            SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branch.powerTo2From().getImaginary());
+            SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branch.powerTo2From(UnitType.mW).getReal());
+            SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, branch.powerTo2From(UnitType.mVar).getImaginary());
             
             SfinaLink.replacePropertyElement(PowerLinkState.CURRENT, branch.current(UnitType.Amp));
         }
         
     };
+    
+    
+    public void flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName) throws InterpssException{
+        this.SfinaNet = net;
+        IpssCorePlugin.init();
+        this.IpssNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/" + CaseName).getAclfNet();
+        LoadflowAlgorithm directAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
+        directAlgo.loadflow();
+        
+        // Make bus and branch index compatible with SFINA
+        int i = 0;
+        for (AclfBus bus : IpssNet.getBusList()){
+            bus.setId(String.valueOf(++i));
+        }
+        i = 0;
+        for (AclfBranch branch : IpssNet.getBranchList()){
+            branch.setId(String.valueOf(++i));
+        }
+        
+        getIpssResults();
+
+        String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
+        //System.out.println(resultLoaded);
+        
+        /*
+        System.out.format("%10s%20s%20s%20s%20s","Bus", "GenP load", "GenQ load", "GenP dir", "GenQ dir\n");
+        for (int i=1; i < 58; i++){
+            AclfBus busLoaded = caseNet.getBus("Bus" + i);
+            AclfBus busDirect = IpssNet.getBus("" + i);
+            if(busLoaded.getGenCode().equals(AclfGenCode.GEN_PV) || busLoaded.getGenCode().equals(AclfGenCode.SWING))
+                System.out.format("%10s%20s%20s%20s%20s\n", i, busLoaded.getGenP(),busLoaded.getGenQ(),busDirect.getGenP(),busDirect.getGenQ());
+        }
+                */
+
+    }    
+    
+    
     
     public void compareDataToCaseLoaded(FlowNetwork net, String CaseName) throws InterpssException{
         this.SfinaNet = net;
@@ -279,55 +316,5 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         System.out.println(BranchData + "\n--------------------------------------------------------------");
 
     }
-    
-        public void compareLFResultsToCaseLoaded(FlowNetwork net, String CaseName) throws InterpssException{
-            this.SfinaNet = net;
-            IpssCorePlugin.init();
-//            buildIpssNet();
-//            LoadflowAlgorithm SfinaAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
-//            SfinaAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
-//            SfinaAlgo.loadflow();
-//            String resultDirect = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
-            //System.out.println(resultDirect);
-            
-            AclfNetwork caseNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/" + CaseName).getAclfNet();
-            LoadflowAlgorithm directAlgo = CoreObjectFactory.createLoadflowAlgorithm(caseNet);
-            directAlgo.loadflow();
-            
-            String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(caseNet, BusIdStyle.BusId_No).toString();
-            System.out.println(resultLoaded);
-            /*
-            System.out.format("%10s%20s%20s%20s%20s","Bus", "GenP load", "GenQ load", "GenP dir", "GenQ dir\n");
-            for (int i=1; i < 58; i++){
-                AclfBus busLoaded = caseNet.getBus("Bus" + i);
-                AclfBus busDirect = IpssNet.getBus("" + i);
-                if(busLoaded.getGenCode().equals(AclfGenCode.GEN_PV) || busLoaded.getGenCode().equals(AclfGenCode.SWING))
-                    System.out.format("%10s%20s%20s%20s%20s\n", i, busLoaded.getGenP(),busLoaded.getGenQ(),busDirect.getGenP(),busDirect.getGenQ());
-            }
-                    */
-            
-            for(int i=1; i < caseNet.getNoBus()+1; i++) {
-                AclfBus bus = caseNet.getBusList().get(i-1);
-                Node SfinaNode = SfinaNet.getNode(""+i);
-
-                SfinaNode.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, bus.getVoltageMag(UnitType.PU));
-                SfinaNode.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, bus.getVoltageAng(UnitType.Deg));
-
-                if (bus.isGenPV() || bus.isSwing()){
-                    SfinaNode.replacePropertyElement(PowerNodeState.REAL_POWER_GENERATION, bus.getGenP()*caseNet.getBaseMva());
-                    SfinaNode.replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, bus.getGenQ()*caseNet.getBaseMva());
-                }
-            }
-
-            for(int i=1; i < caseNet.getNoBranch()+1; i++) {
-                AclfBranch bra = caseNet.getBranchList().get(i-1);
-                Link SfinaLink = SfinaNet.getLink(""+i);
-
-                SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, bra.powerFrom2To(UnitType.mW).getReal());
-                SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, bra.powerFrom2To(UnitType.mVar).getImaginary());
-                SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, bra.powerTo2From().getReal());
-                SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, bra.powerTo2From().getImaginary());
-            }
-        }
     
 }

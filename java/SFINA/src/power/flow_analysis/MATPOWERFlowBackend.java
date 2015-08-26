@@ -281,7 +281,7 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
         for (int i=0; i < rows; i++){
             for (int j=0; j < cols; j++){
                 if (list.get(i).size() != cols){
-                    System.out.println("Problem with array dimension! Not quadratic! May not work properly.");
+                    System.out.println("Problem with array dimension! Rows don't have same length! May not work properly.");
                 }
                 doubleArray[i][j] = list.get(i).get(j);
             }
@@ -305,11 +305,11 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     private void updateLinks(ArrayList<Link> links){
         //update with branches power flow info
         for (int i=0; i<this.branchesPowerFlowInfo.length; i++){
-            // To be checked: How to translate from and to injection into net power flow. what about loss?
             links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, branchesPowerFlowInfo[i][13]);
             links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, branchesPowerFlowInfo[i][14]);
             links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branchesPowerFlowInfo[i][15]);
             links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, branchesPowerFlowInfo[i][16]);
+            // Current to be calculated
             links.get(i).replacePropertyElement(PowerLinkState.CURRENT, 0.0); // To be calculated
         }
     }

@@ -54,6 +54,8 @@ public interface FlowNetworkInterface {
     
     public double getAvgNodeDegree();
     
+    //public ArrayList getDegreeDist();
+    
     public double getClustCoeff();
     
     /*public double getEffGraphRes();

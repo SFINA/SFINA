@@ -26,6 +26,7 @@ import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
+import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
@@ -37,35 +38,27 @@ import power.input.PowerNodeState;
 public class MainTester {
     
     public static void main(String[] args){
+        testLoader loader = new testLoader();
+        Output printer = new Output();
         
-        // Create network object
-        FlowNetwork net = new FlowNetwork();
-        Output printer1 = new Output(net);
-        
-        // Test Loader. Argument true if loaded data should be printed to Output
-        testLoader testloader = new testLoader(net);
-        //testloader.printLoadedData();
-
         // Test Matpower
-        testMatpower testmatpwr = new testMatpower(net);
-        printer1.printLfResults(); 
+        //FlowNetwork net1 = new FlowNetwork();
+        //loader.load("case30", net1);
+        //testloader.printLoadedData(net1);
+        //testMatpower testmatpwr = new testMatpower(net1, PowerFlowType.AC);
+        //printer.printLfResults(net1); 
         
         // Test InterPSS
-        testInterpss testinterpss = new testInterpss(net);
-//        //testinterpss.compareData();
-//        testinterpss.compareResults();
-//        System.out.println("========= LF results when directly loaded from InterPSS case file =========");
-//        printer.printLfResults();
-//        
-        System.out.println("========= LF results when our data passed =========");
         FlowNetwork net2 = new FlowNetwork(); // Load data again to avoid powerflow simu from before to affect it
-        Output printer2 = new Output(net);
-        testLoader testloader2 = new testLoader(net2); 
-        testinterpss.runRealInterpss();
-        printer2.printLfResults();
+        loader.load("case57", net2);
+        testInterpss testinterpss = new testInterpss(net2, PowerFlowType.DC);
+        testinterpss.runInterpssOurData();
+        //testinterpss.runInterpssTheirLoader();
+        //testinterpss.compareData();
+        printer.printLfResults(net2);
       
         // Test Island Extraction
-        testNetworkMethods testnetmethods = new testNetworkMethods(net);
+        //testNetworkMethods testnetmethods = new testNetworkMethods(net);
         //String[] removeLinks = {"8","15","16","17","18","19","20","21","22","41","80"};
         //testnetmethods.testIslandFinder(removeLinks);
         //testnetmethods.testMetrics();

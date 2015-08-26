@@ -28,10 +28,11 @@ import power.flow_analysis.MATPOWERFlowBackend;
  * @author Ben
  */
 public class testMatpower {
-    public testMatpower(FlowNetwork net){
-        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(PowerFlowType.AC);
-//        algo.tester(net);
+    public testMatpower(FlowNetwork net, PowerFlowType FlowType){
+        
+        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
         algo.flowAnalysis(net);
+
         double[][] buses = algo.getBusesPowerFlowInfo();
         double[][] gens = algo.getGeneratorsPowerFlowInfo();
         double[][] bras = algo.getBranchesPowerFlowInfo();
