@@ -45,10 +45,10 @@ public class TestExperiment extends SimulatedExperiment{
     private final static String parameterValueSeparator="=";
     private final static String columnSeparator=",";
     private final static String missingValue="-";
-    private final static String nodesLocation = "configuration_files/input/time_1/topology/nodes.txt";
-    private final static String linksLocation = "configuration_files/input/time_1/topology/links.txt";
-    private final static String nodesFlowLocation = "configuration_files/input/time_1/flow/nodes.txt";
-    private final static String linksFlowLocation = "configuration_files/input/time_1/flow/links.txt";
+    private final static String nodesLocation = "configuration_files/input/case57/topology/nodes.txt";
+    private final static String linksLocation = "configuration_files/input/case57/topology/links.txt";
+    private final static String nodesFlowLocation = "configuration_files/input/case57/flow/nodes.txt";
+    private final static String linksFlowLocation = "configuration_files/input/case57/flow/links.txt";
     private final static String inputParametersLocation="configuration_files/input/parameters.txt";
     private final static String eventsLocation="configuration_files/input/events.txt";
     
