@@ -34,6 +34,16 @@ public class TopologyLoader {
     public TopologyLoader(FlowNetwork net, String columnSeparator){
         this.net=net;
         this.columnSeparator=columnSeparator;
+        
+        // empty network if it has nodes and links
+        if (net.getLinks().size() != 0){
+            for (Link link : net.getLinks())
+                net.removeLink(link);
+        }
+        if (net.getNodes().size() != 0){
+            for (Node node : net.getNodes())
+                net.removeNode(node);
+        }
     }
     
 //    public ArrayList<Link> loadAttackedLinks(String location, List<Link> links){
