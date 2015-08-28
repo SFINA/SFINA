@@ -19,6 +19,7 @@ package network;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -42,6 +43,8 @@ public interface FlowNetworkInterface {
     
     public Link getLink(String index);
     
+    public Link getLink(Node startNode, Node endNode);
+    
     public void activateNode(String index);
     
     public void activateLink(String index);
@@ -54,20 +57,22 @@ public interface FlowNetworkInterface {
     
     public double getAvgNodeDegree();
     
-    //public ArrayList getDegreeDist();
+    public LinkedHashMap getDegreeDist();
     
     public double getClustCoeff();
     
-    /*public double getEffGraphRes();
-    
     public double getAvgShortestPath();
+
+    public double getDegCentrality(Node node);
+    
+    public double getClosenessCentrality(Node node);
+    
+    /*public double getEffGraphRes();
     
     public double getBtwnCentrality(Node node);
     
     public double getBtwnCentrality(Link link);
-    
-    public double getDegCentrality(Node node);
-    
+
     public double getDegCentrality(Link link);*/
     
 }

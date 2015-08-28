@@ -26,6 +26,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.jgrapht.Graph;
+import org.jgrapht.UndirectedGraph;
+import static org.jgrapht.alg.DijkstraShortestPath.findPathBetween;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 
 /**
  * A flow network facilitates and mandates the topology of a flow network. This
@@ -156,6 +161,22 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     @Override
     /**
+     * Returns the link given the start node and end node
+     * 
+     * @param startNode the start node of the link
+     * @param endNode the end node of the link
+     * @return the link or null if no link between the nodes exists
+     */
+    public Link getLink(Node startNode, Node endNode){
+        for (Link link : links.values()){
+            if (link.getStartNode() == startNode && link.getEndNode() == endNode)
+                return link;
+        }
+        return null;
+    }
+    
+    @Override
+    /**
      * Activates a node and updates the topology.
      * 
      * @param index the index of the activated node.
@@ -272,7 +293,6 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
                 if (!currentIsland.contains(currentNode)){
                     iterateIsland(currentNode, currentIsland, leftNodes);
                 }
-                
             }
         }
     }
@@ -289,6 +309,43 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
             totalNodeDegree+=node.getLinks().size();
         }
         return totalNodeDegree/this.nodes.size();
+    }
+    
+    @Override
+    /**
+     * Calculates closeness centrality for given node
+     * @param node
+     * @return centrality
+     */
+    public double getClosenessCentrality(Node node){
+        double distance = 0.0;
+        for (Node otherNode : nodes.values()){
+            if (otherNode != node){
+                ArrayList<Link> asp = getShortestPath(otherNode, node);
+                if (asp == null)
+                    return 0.0;
+                else
+                    distance += asp.size();
+            }
+        }
+        return (nodes.size()-1)/distance;
+    }
+    
+    @Override
+    public double getDegCentrality(Node node){
+        return node.getLinks().size();
+    }
+    
+    @Override
+    public LinkedHashMap getDegreeDist(){
+        LinkedHashMap<Integer,Integer> dist = new LinkedHashMap<>();
+        ArrayList<Integer> allDegrees = new ArrayList<>();
+        for (Node node : this.nodes.values()){
+            allDegrees.add(node.getLinks().size());
+        }
+        for (int i=0; i < Collections.max(allDegrees)+1; i++)
+            dist.put(i, Collections.frequency(allDegrees, i));
+        return dist;
     }
     
     @Override
@@ -336,4 +393,50 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         
         return globalClustCoeff/nodes.size();
     };
+
+    /**
+     * Computes the average shortest path length of the network
+     * @return average shortest path length
+     */
+    public double getAvgShortestPath(){
+        double asp = 0.0;
+        for (Node v : nodes.values()){
+            for (Node w : nodes.values()){
+                ArrayList<Link> path = getShortestPath(v,w);
+                if (path != null)
+                    asp += path.size();
+            }
+        }
+        return asp/nodes.size()/nodes.size();
+    }
+    
+    /**
+     * Uses package JGraphT (http://jgrapht.org/) to find the shortest path between two nodes
+     * @param v start node
+     * @param w end node
+     * @return Link sequence of shortest path or null if no path exists
+     */
+    public ArrayList<Link> getShortestPath(Node v, Node w){
+        ArrayList<Link> path = new ArrayList();
+        Graph<String, DefaultEdge> jgraphtGraph = buildJGraphT();
+        List<DefaultEdge> jgraphtPath = findPathBetween(jgraphtGraph,v.getIndex(),w.getIndex());
+        if (jgraphtPath == null)
+            return null;
+        for (DefaultEdge edge : jgraphtPath){
+            path.add(this.getLink(this.getNode(jgraphtGraph.getEdgeSource(edge)), this.getNode(jgraphtGraph.getEdgeTarget(edge))));
+        }
+        return path;
+    }
+    
+    private Graph<String, DefaultEdge> buildJGraphT(){
+        Graph<String, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
+        for (Node node : nodes.values())
+            if(node.isActivated())
+                g.addVertex(node.getIndex());
+        for (Link link : links.values())
+            if(link.isActivated())
+                g.addEdge(link.getStartNode().getIndex(), link.getEndNode().getIndex());
+        return g;
+    }
+    
 }

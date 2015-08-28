@@ -19,6 +19,7 @@ package testing;
 
 import java.util.ArrayList;
 import network.FlowNetwork;
+import network.Link;
 import network.Node;
 
 /**
@@ -42,7 +43,7 @@ public class testNetworkMethods {
         for (int i=0; i < islands.size(); i++){
             System.out.println("Island " + i);
             for (Node node : islands.get(i)){
-                System.out.format("%5s", node.getIndex());
+                System.out.format("%3s", node.getIndex());
             }
             System.out.println("\n");
         }
@@ -50,7 +51,21 @@ public class testNetworkMethods {
     
     public void testMetrics(){
         System.out.println("\n--------------------------------------------------\n    METRIC TESTING\n--------------------------------------------------\n");
-        System.out.format("%-25s%10s\n", "Average Node Degree:", net.getAvgNodeDegree());
-        System.out.format("%-25s%10s\n", "Clustering Coefficient:", net.getClustCoeff());
+        System.out.format("%-30s%-10.4f\n", "Average Node Degree:", net.getAvgNodeDegree());
+        System.out.format("%-30s%-30s\n", "Degree Distribution:", net.getDegreeDist().toString());
+        System.out.format("%-30s%-10.4f\n", "Clustering Coefficient:", net.getClustCoeff());
+        System.out.format("%-30s%-10.4f\n", "Average shortest path length:", net.getAvgShortestPath());
+        System.out.format("%-30s%-10.4f\n", "Closeness centrality node 5:", net.getClosenessCentrality(net.getNode("5")));
+        Node startNode = net.getNode("9");
+        Node endNode = net.getNode("57");
+        ArrayList<Link> path = net.getShortestPath(startNode, endNode);
+        String pathString = "";
+        if(path != null){
+            for (Link link : path)
+                pathString += "(" + link.getStartNode().getIndex() + ":" + link.getEndNode().getIndex() + "), ";
+        }
+        else
+            pathString = "No path found.";
+        System.out.format("%-30s%-30s\n", "Shortest path (Nodes " + startNode.getIndex() + "->" + endNode.getIndex() + "):", pathString);
     }
 }
