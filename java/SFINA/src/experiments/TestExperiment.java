@@ -52,12 +52,6 @@ public class TestExperiment extends SimulatedExperiment{
     private final static String inputParametersLocation="configuration_files/input/parameters.txt";
     private final static String eventsLocation="configuration_files/input/events.txt";
     
-    
-    
-    
-    
-    
-    
     public static void main(String[] args) {
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();

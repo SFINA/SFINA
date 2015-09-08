@@ -134,7 +134,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 Domain domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
                 switch(domain){
                     case POWER:
-                        PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, parameterValueSeparator, missingValue);
+                        PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
                         flowLoader.loadNodeFlowData(nodesFlowLocation);
                         flowLoader.loadLinkFlowData(linksFlowLocation);
                         break;
