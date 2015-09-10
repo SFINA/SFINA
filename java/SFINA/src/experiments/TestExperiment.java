@@ -38,7 +38,7 @@ public class TestExperiment extends SimulatedExperiment{
     //Simulation Parameters
     private final static Time bootstrapTime=Time.inMilliseconds(2000);
     private final static Time runTime=Time.inMilliseconds(1000);
-    private final static int runDuration=5;
+    private final static int runDuration=3;
     private final static int N=57;
     
     // SFINA parameters

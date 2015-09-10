@@ -1,4 +1,4 @@
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -9,8 +9,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -21,8 +21,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -33,8 +33,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -45,8 +45,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -57,8 +57,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -69,8 +69,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -81,8 +81,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -93,8 +93,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -105,8 +105,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -117,8 +117,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -129,8 +129,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -141,8 +141,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -153,8 +153,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -165,8 +165,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -177,8 +177,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -189,8 +189,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -201,8 +201,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -213,8 +213,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -225,8 +225,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -237,8 +237,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -249,8 +249,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -261,8 +261,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -273,8 +273,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -285,8 +285,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -297,8 +297,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -309,8 +309,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -321,8 +321,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -333,8 +333,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -345,8 +345,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -357,8 +357,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -369,8 +369,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -381,8 +381,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -393,8 +393,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -405,8 +405,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -417,8 +417,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -429,8 +429,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -441,8 +441,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -453,8 +453,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -465,8 +465,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -477,8 +477,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -489,8 +489,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -501,8 +501,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -513,8 +513,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -525,8 +525,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -537,8 +537,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -549,8 +549,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -561,8 +561,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -573,8 +573,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -585,8 +585,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -597,8 +597,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -609,8 +609,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -621,8 +621,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -633,8 +633,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -645,8 +645,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -657,8 +657,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -669,8 +669,8 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
-[Sep 08 17:48:49] ERROR (NetworkInterface.java:141) - 
+	at experiments.TestExperiment.main(TestExperiment.java:74)
+[Sep 10 17:22:20] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
 	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:313)
 	at core.SimulationAgent.start(SimulationAgent.java:112)
@@ -681,4 +681,4 @@ java.lang.NullPointerException
 	at protopeer.network.NetworkInterface.bringUp(NetworkInterface.java:161)
 	at protopeer.Peer.start(Peer.java:186)
 	at protopeer.Experiment.startPeers(Experiment.java:205)
-	at experiments.TestExperiment.main(TestExperiment.java:80)
+	at experiments.TestExperiment.main(TestExperiment.java:74)

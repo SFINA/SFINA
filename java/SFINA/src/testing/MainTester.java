@@ -42,20 +42,20 @@ public class MainTester {
         Output printer = new Output();
         
         // Test Matpower
-        //FlowNetwork net1 = new FlowNetwork();
-        //loader.load("case30", net1);
+        FlowNetwork net1 = new FlowNetwork();
+        loader.load("case57", net1);
         //testloader.printLoadedData(net1);
-        //testMatpower testmatpwr = new testMatpower(net1, PowerFlowType.AC);
-        //printer.printLfResults(net1); 
+        testMatpower testmatpwr = new testMatpower(net1, PowerFlowType.AC);
+        printer.printLfResults(net1); 
         
         // Test InterPSS
-        FlowNetwork net2 = new FlowNetwork(); // Load data again to avoid powerflow simu from before to affect it
-        loader.load("case57", net2);
-        testInterpss testinterpss = new testInterpss(net2, PowerFlowType.DC);
-        testinterpss.runInterpssOurData();
-        //testinterpss.runInterpssTheirLoader();
-        //testinterpss.compareData();
-        printer.printLfResults(net2);
+//        FlowNetwork net2 = new FlowNetwork(); // Load data again to avoid powerflow simu from before to affect it
+//        loader.load("case57", net2);
+//        testInterpss testinterpss = new testInterpss(net2, PowerFlowType.DC);
+//        testinterpss.runInterpssOurData();
+//        //testinterpss.runInterpssTheirLoader();
+//        //testinterpss.compareData();
+//        printer.printLfResults(net2);
       
         // Test Island Extraction
         //testNetworkMethods testnetmethods = new testNetworkMethods(net);
