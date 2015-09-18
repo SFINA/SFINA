@@ -43,7 +43,7 @@ public class MainTester {
         
         // Test Matpower
         FlowNetwork net1 = new FlowNetwork();
-        loader.load("case57", net1);
+        loader.load("case30", net1);
         //testloader.printLoadedData(net1);
         testMatpower testmatpwr = new testMatpower(net1, PowerFlowType.AC);
         printer.printLfResults(net1); 

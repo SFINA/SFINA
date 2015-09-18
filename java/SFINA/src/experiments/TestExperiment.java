@@ -39,16 +39,16 @@ public class TestExperiment extends SimulatedExperiment{
     private final static Time bootstrapTime=Time.inMilliseconds(2000);
     private final static Time runTime=Time.inMilliseconds(1000);
     private final static int runDuration=3;
-    private final static int N=57;
+    private final static int N=1;
     
     // SFINA parameters
     private final static String parameterValueSeparator="=";
     private final static String columnSeparator=",";
     private final static String missingValue="-";
-    private final static String nodesLocation = "configuration_files/input/case57/topology/nodes.txt";
-    private final static String linksLocation = "configuration_files/input/case57/topology/links.txt";
-    private final static String nodesFlowLocation = "configuration_files/input/case57/flow/nodes.txt";
-    private final static String linksFlowLocation = "configuration_files/input/case57/flow/links.txt";
+    private final static String nodesLocation = "configuration_files/input/case30/topology/nodes.txt";
+    private final static String linksLocation = "configuration_files/input/case30/topology/links.txt";
+    private final static String nodesFlowLocation = "configuration_files/input/case30/flow/nodes.txt";
+    private final static String linksFlowLocation = "configuration_files/input/case30/flow/links.txt";
     private final static String inputParametersLocation="configuration_files/input/parameters.txt";
     private final static String eventsLocation="configuration_files/input/events.txt";
     
