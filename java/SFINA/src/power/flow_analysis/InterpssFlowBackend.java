@@ -232,8 +232,17 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, branch.powerFrom2To(UnitType.mVar).getImaginary());
             SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branch.powerTo2From(UnitType.mW).getReal());
             SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, branch.powerTo2From(UnitType.mVar).getImaginary());
+            // Current
+            SfinaLink.replacePropertyElement(PowerLinkState.CURRENT, branch.current(UnitType.Amp));            
+            // Loss 
+            double lossReal = Math.abs(Math.abs((Double)SfinaLink.getProperty(PowerLinkState.REAL_POWER_FLOW_TO)) - Math.abs((Double)SfinaLink.getProperty(PowerLinkState.REAL_POWER_FLOW_FROM)));
+            double lossReactive = (Double)SfinaLink.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO) + (Double)SfinaLink.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM);
+            lossReactive = 0.0;
+            //double lossReal = (Double)SfinaLink.getProperty(PowerLinkState.CURRENT)*(Double)SfinaLink.getProperty(PowerLinkState.CURRENT)*(Double)SfinaLink.getProperty(PowerLinkState.RESISTANCE);
+            //double lossReactive = (Double)SfinaLink.getProperty(PowerLinkState.CURRENT)*(Double)SfinaLink.getProperty(PowerLinkState.CURRENT)*(Double)SfinaLink.getProperty(PowerLinkState.REACTANCE);
+            SfinaLink.addProperty(PowerLinkState.LOSS_REAL, lossReal);
+            SfinaLink.addProperty(PowerLinkState.LOSS_REACTIVE, lossReactive);
             
-            SfinaLink.replacePropertyElement(PowerLinkState.CURRENT, branch.current(UnitType.Amp));
         }
         
     };

@@ -20,26 +20,55 @@ package testing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import network.FlowNetwork;
+import network.Link;
+import network.Node;
 import power.PowerFlowType;
+import power.PowerNodeType;
 import power.flow_analysis.MATPOWERFlowBackend;
+import power.input.PowerLinkState;
+import power.input.PowerNodeState;
 
 /**
  *
  * @author Ben
  */
 public class testMatpower {
-    public testMatpower(FlowNetwork net, PowerFlowType FlowType){
+    
+    static FlowNetwork net;
+    static PowerFlowType FlowType;
+    
+    public static void main(String[] args){
+        net = new FlowNetwork();
+        testLoader loader = new testLoader();
+        Output printer = new Output();
+        
+        loader.load("case57", net);
+        FlowType = PowerFlowType.AC;
         
         MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
+        resetLfData(net);
         algo.flowAnalysis(net);
-
+        printer.printLfResults(net);
+     
         double[][] buses = algo.getBusesPowerFlowInfo();
         double[][] gens = algo.getGeneratorsPowerFlowInfo();
         double[][] bras = algo.getBranchesPowerFlowInfo();
         double[][] cost = algo.getCostsPowerFlowInfo();
-        
         //printDoubleArrays(buses, gens, bras, cost);
        
+    }
+    
+    private static void resetLfData(FlowNetwork net){
+        for(Link link : net.getLinks()){
+            link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, 0.0);
+            link.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, 0.0);
+            link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, 0.0);
+            link.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, 0.0);
+            link.replacePropertyElement(PowerLinkState.CURRENT, 0.0);            
+            link.addProperty(PowerLinkState.LOSS_REAL, 0.0);
+            link.addProperty(PowerLinkState.LOSS_REACTIVE, 0.0);
+            
+        }
     }
     
     public void printDoubleArrays(double[][] buses, double[][] gens, double[][] bras, double[][] cost){

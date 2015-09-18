@@ -309,6 +309,12 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
             links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, branchesPowerFlowInfo[i][14]);
             links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branchesPowerFlowInfo[i][15]);
             links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, branchesPowerFlowInfo[i][16]);
+            // Loss
+            double lossReal = Math.abs(Math.abs((Double)links.get(i).getProperty(PowerLinkState.REAL_POWER_FLOW_TO)) - Math.abs((Double)links.get(i).getProperty(PowerLinkState.REAL_POWER_FLOW_FROM)));
+            double lossReactive = (Double)links.get(i).getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO) + (Double)links.get(i).getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM);
+            lossReactive = 0.0;
+            links.get(i).addProperty(PowerLinkState.LOSS_REAL, lossReal);
+            links.get(i).addProperty(PowerLinkState.LOSS_REACTIVE, lossReactive);
             // Current to be calculated
             links.get(i).replacePropertyElement(PowerLinkState.CURRENT, 0.0); // To be calculated
         }

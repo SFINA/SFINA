@@ -27,13 +27,18 @@ import network.Node;
  * @author Ben
  */
 public class testNetworkMethods {
-    FlowNetwork net;
+    static FlowNetwork net;
     
-    public testNetworkMethods(FlowNetwork net){
-        this.net = net;
+    public static void main(String[] args){
+        testLoader loader = new testLoader();
+        net = new FlowNetwork();
+        loader.load("case57", net);
+        String[] removeLinks = {"8","15","16","17","18","19","20","21","22","41","80"};
+        testIslandFinder(removeLinks);
+        testMetrics();
     }
     
-    public void testIslandFinder(String[] removedLinks){
+    public static void testIslandFinder(String[] removedLinks){
         // Remove some branches to create islands
         for (String el : removedLinks)
             net.deactivateLink(el);
@@ -49,7 +54,7 @@ public class testNetworkMethods {
         }
     }
     
-    public void testMetrics(){
+    public static void testMetrics(){
         System.out.println("\n--------------------------------------------------\n    METRIC TESTING\n--------------------------------------------------\n");
         System.out.format("%-30s%-10.4f\n", "Average Node Degree:", net.getAvgNodeDegree());
         System.out.format("%-30s%-30s\n", "Degree Distribution:", net.getDegreeDist().toString());
@@ -57,7 +62,7 @@ public class testNetworkMethods {
         System.out.format("%-30s%-10.4f\n", "Average shortest path length:", net.getAvgShortestPath());
         System.out.format("%-30s%-10.4f\n", "Closeness centrality node 5:", net.getClosenessCentrality(net.getNode("5")));
         Node startNode = net.getNode("9");
-        Node endNode = net.getNode("57");
+        Node endNode = net.getNode("30");
         ArrayList<Link> path = net.getShortestPath(startNode, endNode);
         String pathString = "";
         if(path != null){

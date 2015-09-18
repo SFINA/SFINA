@@ -26,37 +26,50 @@ import network.Link;
 import network.Node;
 import power.PowerFlowType;
 import power.flow_analysis.InterpssFlowBackend;
+import power.input.PowerLinkState;
+import power.input.PowerNodeState;
 
 /**
  *
  * @author Ben
  */
 public class testInterpss {
-    FlowNetwork net;
-    PowerFlowType FlowType;
+    static FlowNetwork net;
+    static PowerFlowType FlowType;
     
-    public testInterpss(FlowNetwork net, PowerFlowType FlowType) {
-        this.net = net;
-        this.FlowType = FlowType;
-    }
-    
-    public void runInterpssOurData(){
-        InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
-        IpssObject.flowAnalysis(net);
-        System.out.println(">>>>> InterPSS flow analysis with SFINA data conversion.");
+    public static void main(String[] args){
+        net = new FlowNetwork();
+        testLoader loader = new testLoader();
+        Output printer = new Output();
+        
+        loader.load("case57", net);
+        FlowType = PowerFlowType.DC;
+              
+        runInterpssOurData();
+        //runInterpssTheirLoader();
+        //compareData();
+        System.out.println("\n--------------------------------------------------\n    " + FlowType + ", " +net.getNodes().size()+ " BUS\n--------------------------------------------------\n");
+        printer.printLfResults(net);
     }
 
-    public void runInterpssTheirLoader(){
+    
+    private static void runInterpssOurData(){
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
+        IpssObject.flowAnalysis(net);
+        System.out.println("\n--------------------------------------------------\n    INTERPSS WITH SFINA DATA CONVERSION\n--------------------------------------------------");
+    }
+
+    private static void runInterpssTheirLoader(){
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
         try {
             IpssObject.flowAnalysisIpssDataLoader(net, "ieee57.ieee");
         } catch (InterpssException ie) {
             ie.printStackTrace();
         }
-        System.out.println(">>>>> InterPSS flow analysis with data loaded by InterPSS directly.");
+        System.out.println("\n--------------------------------------------------\n    INTERPSS WITH DATA LOADED BY INTERPSS' LOADERS\n--------------------------------------------------");        
     }    
     
-    public void compareData(){
+    private static void compareData(){
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
         try{
             IpssObject.compareDataToCaseLoaded(net, "ieee57.ieee");
@@ -64,8 +77,23 @@ public class testInterpss {
         catch(InterpssException ie){
             ie.printStackTrace();
         }
-        System.out.println(">>>>> Compared data from IEEE file from SFINA loaders.");
-        System.out.println("\n--------------------------------------------------\n    INTERPSS TESTING SUCCESSFUL\n--------------------------------------------------\n");
+        System.out.println("\n--------------------------------------------------\n    COMPARED DATA FROM IEEE FILE <-> SFINA LOADERS\n--------------------------------------------------");
+    }
+    
+    private static void resetLfData(FlowNetwork net){
+        for(Node bus : net.getNodes()) {
+            bus.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, 0.0);
+            bus.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, 0.0);
+        }
+        for(Link link : net.getLinks()){
+            link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, 0.0);
+            link.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, 0.0);
+            link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, 0.0);
+            link.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, 0.0);
+            link.replacePropertyElement(PowerLinkState.CURRENT, 0.0);            
+            link.addProperty(PowerLinkState.LOSS_REAL, 0.0);
+            link.addProperty(PowerLinkState.LOSS_REACTIVE, 0.0);   
+        }
     }
 
 }
