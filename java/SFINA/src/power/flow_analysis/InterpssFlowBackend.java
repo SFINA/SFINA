@@ -63,7 +63,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         this.SfinaNet = net;
         
         IpssCorePlugin.init();
-        
         try{
             switch(powerFlowType){
                 case AC:
@@ -71,13 +70,17 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
                     acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
                     acAlgo.loadflow();
-                    getIpssResults();
+                    String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();        
+                    System.out.println(resultLoaded);
+                    getIpssACResults();
                     break;
                 case DC:
                     buildIpssNet();
                     DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(IpssNet);
                     dcAlgo.calculateDclf();
-                    getIpssResults();
+                    getIpssDCResults(dcAlgo);
+                    //String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
+                    //System.out.println(resultDC);
                     dcAlgo.destroy();	
                     break;
                 default:
@@ -203,10 +206,32 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         }
     };
     
+    private void getIpssDCResults(DclfAlgorithm dcAlgo){
+        for(AclfBus bus : IpssNet.getBusList()) {
+            Node SfinaNode = SfinaNet.getNode(bus.getId());
+            SfinaNode.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, 1.0);
+            SfinaNode.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, dcAlgo.getBusAngle(bus.getId())*180/PI);
+            if (!bus.isGenPQ()){
+                SfinaNode.replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, 0.0);
+            }
+            SfinaNode.replacePropertyElement(PowerNodeState.REACTIVE_POWER_DEMAND, 0.0);
+                
+        }
+        for(AclfBranch branch : IpssNet.getBranchList()){
+            Link SfinaLink = SfinaNet.getLink(branch.getId());
+            SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, branch.getDclfFlow()*IpssNet.getBaseMva());
+            SfinaLink.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, -branch.getDclfFlow()*IpssNet.getBaseMva());
+            SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, 0.0);
+            SfinaLink.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, 0.0);
+            SfinaLink.addProperty(PowerLinkState.LOSS_REAL, 0.0);
+            SfinaLink.addProperty(PowerLinkState.LOSS_REACTIVE, 0.0);
+        }
+    }
+    
     /**
      * Transform IPSS results back to SFINA
      */
-    private void getIpssResults(){
+    private void getIpssACResults(){
 
         for(AclfBus bus : IpssNet.getBusList()) {
             Node SfinaNode = SfinaNet.getNode(bus.getId());
@@ -248,27 +273,67 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     };
     
     
-    public void flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName) throws InterpssException{
+    public void flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
         this.SfinaNet = net;
         IpssCorePlugin.init();
-        this.IpssNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/" + CaseName).getAclfNet();
-        LoadflowAlgorithm directAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
-        directAlgo.loadflow();
         
-        // Make bus and branch index compatible with SFINA
-        int i = 0;
-        for (AclfBus bus : IpssNet.getBusList()){
-            bus.setId(String.valueOf(++i));
-        }
-        i = 0;
-        for (AclfBranch branch : IpssNet.getBranchList()){
-            branch.setId(String.valueOf(++i));
-        }
-        
-        getIpssResults();
+        try{
+            switch(powerFlowType){
+                case AC:
+                    this.IpssNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/" + CaseName).getAclfNet();
+                    LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
+                    acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
+                    acAlgo.loadflow();
+                    
+                    // Make bus and branch index compatible with SFINA
+                    int i = 0;
+                    for (AclfBus bus : IpssNet.getBusList()){
+                        bus.setId(String.valueOf(++i));
+                    }
+                    i = 0;
+                    for (AclfBranch branch : IpssNet.getBranchList()){
+                        branch.setId(String.valueOf(++i));
+                    }
 
-        String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
-        //System.out.println(resultLoaded);
+                    getIpssACResults();
+                    String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
+                    System.out.println(resultLoaded);
+                    break;
+                case DC:
+                    this.IpssNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/" + CaseName).getAclfNet();
+                    DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(IpssNet);
+                    dcAlgo.calculateDclf();	
+                    
+                    // Make bus and branch index compatible with SFINA
+                    int j = 0;
+                    for (AclfBus bus : IpssNet.getBusList()){
+                        bus.setId(String.valueOf(++j));
+                    }
+                    j = 0;
+                    for (AclfBranch branch : IpssNet.getBranchList()){
+                        branch.setId(String.valueOf(++j));
+                    }
+
+                    getIpssDCResults(dcAlgo);
+                    String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
+                    System.out.println(resultDC);
+                    break;
+                default:
+                    logger.debug("Power flow type is not recognized.");
+            }
+        }
+        catch(ReferenceBusException rbe){
+            rbe.printStackTrace();
+        }
+        catch(IpssNumericException ine){
+            ine.printStackTrace();
+        }
+        catch(InterpssException ie){
+            ie.printStackTrace();
+        }
+        
+        
+
         
         /*
         System.out.format("%10s%20s%20s%20s%20s","Bus", "GenP load", "GenQ load", "GenP dir", "GenQ dir\n");

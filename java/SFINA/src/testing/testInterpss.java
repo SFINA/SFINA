@@ -26,46 +26,48 @@ import network.Link;
 import network.Node;
 import power.PowerFlowType;
 import power.flow_analysis.InterpssFlowBackend;
+import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
+import static testing.testMatpower.FlowType;
 
 /**
  *
  * @author Ben
  */
 public class testInterpss {
-    static FlowNetwork net;
-    static PowerFlowType FlowType;
+    static FlowNetwork net = new FlowNetwork();
+    static PowerFlowType FlowType = PowerFlowType.AC;
     
     public static void main(String[] args){
-        net = new FlowNetwork();
         testLoader loader = new testLoader();
         Output printer = new Output();
         
         loader.load("case57", net);
-        FlowType = PowerFlowType.DC;
+        FlowNetwork net2 = new FlowNetwork();
+        loader.load("case57", net2);
+        //resetLfData(net);
               
-        runInterpssOurData();
-        //runInterpssTheirLoader();
+        //runInterpssOurData(net);
+        runInterpssTheirLoader(net);
         //compareData();
+        runMatlabSimu(net2);
         System.out.println("\n--------------------------------------------------\n    " + FlowType + ", " +net.getNodes().size()+ " BUS\n--------------------------------------------------\n");
         printer.printLfResults(net);
+        printer.printLfResults(net2);
+        printer.compareLFResults(net, net2);
     }
 
     
-    private static void runInterpssOurData(){
+    private static void runInterpssOurData(FlowNetwork net){
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
         IpssObject.flowAnalysis(net);
         System.out.println("\n--------------------------------------------------\n    INTERPSS WITH SFINA DATA CONVERSION\n--------------------------------------------------");
     }
 
-    private static void runInterpssTheirLoader(){
+    private static void runInterpssTheirLoader(FlowNetwork net){
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
-        try {
-            IpssObject.flowAnalysisIpssDataLoader(net, "ieee57.ieee");
-        } catch (InterpssException ie) {
-            ie.printStackTrace();
-        }
+        IpssObject.flowAnalysisIpssDataLoader(net, "ieee57.ieee");
         System.out.println("\n--------------------------------------------------\n    INTERPSS WITH DATA LOADED BY INTERPSS' LOADERS\n--------------------------------------------------");        
     }    
     
@@ -80,10 +82,15 @@ public class testInterpss {
         System.out.println("\n--------------------------------------------------\n    COMPARED DATA FROM IEEE FILE <-> SFINA LOADERS\n--------------------------------------------------");
     }
     
+    private static void runMatlabSimu(FlowNetwork net){
+        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
+        algo.flowAnalysis(net);
+    }
+    
     private static void resetLfData(FlowNetwork net){
         for(Node bus : net.getNodes()) {
-            bus.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, 0.0);
-            bus.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, 0.0);
+            //bus.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, 0.0);
+            //bus.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, 0.0);
         }
         for(Link link : net.getLinks()){
             link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, 0.0);
