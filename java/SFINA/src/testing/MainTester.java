@@ -45,7 +45,7 @@ public class MainTester {
         FlowNetwork net1 = new FlowNetwork();
         loader.load("case30", net1);
         //testloader.printLoadedData(net1);
-        testMatpower testmatpwr = new testMatpower(net1, PowerFlowType.AC);
+        //testMatpower testmatpwr = new testMatpower(net1, PowerFlowType.AC);
         printer.printLfResults(net1); 
         
         // Test InterPSS
