@@ -294,11 +294,19 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
         for (int i=0; i<this.busesPowerFlowInfo.length; i++){
             nodes.get(i).replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, busesPowerFlowInfo[i][7]);
             nodes.get(i).replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, busesPowerFlowInfo[i][8]);
+            if(powerFlowType.equals(PowerFlowType.DC))
+                nodes.get(i).replacePropertyElement(PowerNodeState.REACTIVE_POWER_DEMAND, 0.0);
+
         }
         for (int i=0; i<this.generatorsPowerFlowInfo.length; i++){
             String busIndex = String.valueOf((int)generatorsPowerFlowInfo[i][0]);
             net.getNode(busIndex).replacePropertyElement(PowerNodeState.REAL_POWER_GENERATION, generatorsPowerFlowInfo[i][1]);
-            net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, generatorsPowerFlowInfo[i][2]);
+            if(powerFlowType.equals(PowerFlowType.AC))
+                net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, generatorsPowerFlowInfo[i][2]);
+            else {
+                net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, 0.0);
+                net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_DEMAND, 0.0);
+            }
         }
     }
     
