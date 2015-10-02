@@ -33,7 +33,7 @@ public class TestExperiment extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
-    private static String experimentID="Experiment "+expSeqNum+"/";
+    private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static Time bootstrapTime=Time.inMilliseconds(2000);
@@ -45,12 +45,21 @@ public class TestExperiment extends SimulatedExperiment{
     private final static String parameterValueSeparator="=";
     private final static String columnSeparator=",";
     private final static String missingValue="-";
-    private final static String nodesLocation = "configuration_files/input/case30/topology/nodes.txt";
-    private final static String linksLocation = "configuration_files/input/case30/topology/links.txt";
-    private final static String nodesFlowLocation = "configuration_files/input/case30/flow/nodes.txt";
-    private final static String linksFlowLocation = "configuration_files/input/case30/flow/links.txt";
-    private final static String inputParametersLocation="configuration_files/input/parameters.txt";
-    private final static String eventsLocation="configuration_files/input/events.txt";
+    
+    private final static String configurationFilesLocation = "configuration_files/";
+    private final static String timeTokenName="time_";
+    private final static String inputDirectoryName="input";
+    private final static String outputDirectoryName="output";
+    private final static String topologyDirectoryName="topology";
+    private final static String flowDirectoryName="flow";
+    
+    private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
+    private final static String inputParametersLocation=experimentConfigurationFilesLocation+"/parameters.txt";
+    private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
+    private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
+    private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
+    private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
+    private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
         System.out.println("Experiment "+expSeqNum+"\n");
@@ -66,7 +75,22 @@ public class TestExperiment extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new SimulationAgent(experimentID, peersLogDirectory, bootstrapTime, runTime, inputParametersLocation, nodesLocation, linksLocation, nodesFlowLocation, linksFlowLocation, eventsLocation, parameterValueSeparator, columnSeparator, missingValue));
+                newPeer.addPeerlet(new SimulationAgent(
+                        experimentID, 
+                        peersLogDirectory, 
+                        bootstrapTime,
+                        runTime,                        
+                        timeTokenName,
+                        experimentConfigurationFilesLocation,
+                        inputParametersLocation,
+                        nodesLocation,
+                        linksLocation,
+                        nodesFlowLocation,
+                        linksFlowLocation,
+                        eventsLocation,
+                        parameterValueSeparator,
+                        columnSeparator,
+                        missingValue));
                 return newPeer;
             }
         };

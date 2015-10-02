@@ -55,6 +55,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private String peersLogDirectory;
     private Time bootstrapTime;
     private Time runTime;
+    private String timeToken;
+    private String timeTokenName;
+    private String experimentConfigurationFilesLocation;
     private String inputParametersLocation;
     private String nodesLocation;
     private String linksLocation;
@@ -72,11 +75,28 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
     
-    public SimulationAgent(String experimentID, String peersLogDirectory, Time bootstrapTime, Time runTime, String inputParametersLocation, String nodesLocation, String linksLocation, String nodesFlowLocation, String linksFlowLocation, String eventsLocation, String parameterValueSeparator, String columnSeparator, String missingValue){
+    public SimulationAgent(
+            String experimentID, 
+            String peersLogDirectory, 
+            Time bootstrapTime, 
+            Time runTime, 
+            String timeTokenName, 
+            String experimentConfigurationFilesLocation, 
+            String inputParametersLocation, 
+            String nodesLocation, 
+            String linksLocation, 
+            String nodesFlowLocation, 
+            String linksFlowLocation, 
+            String eventsLocation, 
+            String parameterValueSeparator, 
+            String columnSeparator, 
+            String missingValue){
         this.experimentID=experimentID;
         this.peersLogDirectory=peersLogDirectory;
         this.bootstrapTime=bootstrapTime;
         this.runTime=runTime;
+        this.timeTokenName=timeTokenName;
+        this.experimentConfigurationFilesLocation=experimentConfigurationFilesLocation;
         this.inputParametersLocation=inputParametersLocation;
         this.nodesLocation=nodesLocation;
         this.linksLocation=linksLocation;
@@ -89,6 +109,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
+        this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
     }
     
     /**
@@ -128,15 +149,16 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
+                timeToken=timeTokenName+(getSimulationTime()+1);
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
-                topologyLoader.loadNodes(nodesLocation);
-                topologyLoader.loadLinks(linksLocation);
+                topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
+                topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
                 Domain domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
                 switch(domain){
                     case POWER:
                         PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
-                        flowLoader.loadNodeFlowData(nodesFlowLocation);
-                        flowLoader.loadLinkFlowData(linksFlowLocation);
+                        flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
+                        flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
                         break;
                     case GAS:
                         logger.debug("This domain is not supported at this moment");
@@ -175,6 +197,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         }
         });
         loadAgentTimer.schedule(runTime);
+    }
+    
+    public int getSimulationTime(){
+        return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
     
     @Override
