@@ -15,6 +15,7 @@ import input.EventLoader;
 import input.InputParameter;
 import input.InputParametersLoader;
 import input.TopologyLoader;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 import network.FlowNetwork;
@@ -74,6 +75,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
+    private Domain domain;
     
     public SimulationAgent(
             String experimentID, 
@@ -151,28 +153,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime()+1);
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
-                topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
-                topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
-                Domain domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
-                switch(domain){
-                    case POWER:
-                        PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
-                        flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
-                        flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
-                        break;
-                    case GAS:
-                        logger.debug("This domain is not supported at this moment");
-                        break;
-                    case WATER:
-                        logger.debug("This domain is not supported at this moment");
-                        break;
-                    case TRANSPORTATION:
-                        logger.debug("This domain is not supported at this moment");
-                        break;
-                    default:
-                        logger.debug("This domain is not supported at this moment");
-                }
-                eventLoader=new EventLoader((Domain)inputParameters.get(InputParameter.DOMAIN), columnSeparator);
+                domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
+                loadNetworkData();
+                eventLoader=new EventLoader(domain,columnSeparator);
                 ArrayList<Event> events=eventLoader.loadEvents(eventsLocation);
                 for(Event event:events){
                     //we may need to adjust time here because the clock is already at time 2!
@@ -192,6 +175,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
+                timeToken=timeTokenName+(getSimulationTime()+1);
+                loadNetworkData();
                 runFlowAnalysis();
                 runActiveState(runtime);
         }
@@ -202,6 +187,33 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     public int getSimulationTime(){
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
+    
+    private void loadNetworkData(){
+        File file = new File(experimentConfigurationFilesLocation+timeToken);
+        if (file.exists() && file.isDirectory()) {
+            topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
+            topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
+            switch(domain){
+                case POWER:
+                    PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
+                    flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
+                    flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
+                    break;
+                case GAS:
+                    logger.debug("This domain is not supported at this moment");
+                    break;
+                case WATER:
+                    logger.debug("This domain is not supported at this moment");
+                    break;
+                case TRANSPORTATION:
+                    logger.debug("This domain is not supported at this moment");
+                    break;
+                default:
+                    logger.debug("This domain is not supported at this moment");
+            }
+        }
+    }
+    
     
     @Override
     public void runPassiveState(Message message){

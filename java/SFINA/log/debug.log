@@ -1,7 +1,7 @@
-[Oct 02 18:45:27] ERROR (NetworkInterface.java:141) - 
+[Oct 05 18:15:24] ERROR (NetworkInterface.java:141) - 
 java.lang.NullPointerException
-	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:339)
-	at core.SimulationAgent.start(SimulationAgent.java:133)
+	at core.SimulationAgent.scheduleMeasurements(SimulationAgent.java:351)
+	at core.SimulationAgent.start(SimulationAgent.java:135)
 	at protopeer.Peer.startPeerlets(Peer.java:378)
 	at protopeer.Peer.access$500(Peer.java:24)
 	at protopeer.Peer$PeerNetworkListener.interfaceUp(Peer.java:70)
