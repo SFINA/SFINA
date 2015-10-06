@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.SimulationAgent;
+import core.MeasurementSimulationAgent;
 import java.io.File;
 import protopeer.Experiment;
 import protopeer.Peer;
@@ -29,7 +29,7 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class TestExperiment extends SimulatedExperiment{
+public class TestMeasurementSimulationAgent extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -64,7 +64,7 @@ public class TestExperiment extends SimulatedExperiment{
     public static void main(String[] args) {
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
-        final TestExperiment test = new TestExperiment();
+        final TestMeasurementSimulationAgent test = new TestMeasurementSimulationAgent();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -75,7 +75,7 @@ public class TestExperiment extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new SimulationAgent(
+                newPeer.addPeerlet(new MeasurementSimulationAgent(
                         experimentID, 
                         peersLogDirectory, 
                         bootstrapTime,

@@ -21,11 +21,13 @@ public interface SimulationAgentInterface {
     
     public void runActiveState(Time runTime);
     
-    public void runEventExecution(int time, Event event);
-    
     public void runPassiveState(Message message);
     
     public void executeEvent(FlowNetwork flowNetwork, Event event);
+    
+    public void performMeasurements();
+    
+    public void initMeasurements();
     
     public void runFlowAnalysis();
     

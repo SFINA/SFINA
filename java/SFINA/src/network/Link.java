@@ -30,6 +30,7 @@ public class Link extends State{
     private boolean connected;
     private boolean activated;
     private Enum flowType;
+    private Enum capacityType;
     private static final Logger logger = Logger.getLogger(Link.class);
     
     /**
@@ -89,12 +90,46 @@ public class Link extends State{
     }
     
     /**
+     * Returns the capacity of the link if a capacity type is defined
+     * 
+     * @return the capacity of the link
+     */
+    public double getCapacity(){
+        if(this.capacityType==null)
+            logger.debug("Capacity type is not defined.");
+        return (double)this.getProperty(capacityType);
+    }
+    
+    /**
+     * Sets the capacity of the link if a capacity type is defined
+     * 
+     * @param capacity the capacity of the link
+     */
+    public void setCapacity(double capacity){
+        if(this.capacityType==null){
+            logger.debug("Capacity type is not defined.");
+        }
+        else{
+            this.addProperty(capacityType, capacity);
+        }
+    }
+    
+    /**
      * Sets the flow type of the link
      * 
      * @param flowType the flow type of the link
      */
     public void setFlowType(Enum flowType){
         this.flowType=flowType;
+    }
+    
+    /**
+     * Sets the capacity type of the link
+     * 
+     * @param capacityType the capacity type of the link
+     */
+    public void setCapacityType(Enum capacityType){
+        this.capacityType=capacityType;
     }
 
     /**

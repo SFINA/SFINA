@@ -31,6 +31,7 @@ public class Node extends State{
     private boolean connected;
     private boolean activated;
     private Enum flowType;
+    private Enum capacityType;
     private static final Logger logger = Logger.getLogger(Node.class);
     
     /**
@@ -94,12 +95,46 @@ public class Node extends State{
     }
     
     /**
+     * Returns the capacity of the node if a capacity type is defined
+     * 
+     * @return the capacity of the node
+     */
+    public double getCapacity(){
+        if(this.capacityType==null)
+            logger.debug("Capacity type is not defined.");
+        return (double)this.getProperty(capacityType);
+    }
+    
+    /**
+     * Sets the capacity of the node if a capacity type is defined
+     * 
+     * @param capacity the capacity of the node
+     */
+    public void setCapacity(double capacity){
+        if(this.capacityType==null){
+            logger.debug("Capacity type is not defined.");
+        }
+        else{
+            this.addProperty(capacityType, capacity);
+        }
+    }
+    
+    /**
      * Sets the flow type
      * 
      * @param flowType the set flow type
      */
     public void setFlowType(Enum flowType){
         this.flowType=flowType;
+    }
+    
+    /**
+     * Sets the capacity type of the node
+     * 
+     * @param capacityType the capacity type of the node
+     */
+    public void setCapacityType(Enum capacityType){
+        this.capacityType=capacityType;
     }
     
     /**

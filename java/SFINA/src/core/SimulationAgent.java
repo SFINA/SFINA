@@ -17,6 +17,7 @@ import input.InputParametersLoader;
 import input.TopologyLoader;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import network.FlowNetwork;
 import network.Link;
@@ -28,6 +29,8 @@ import power.PowerFlowType;
 import power.flow_analysis.InterpssFlowBackend;
 import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerFlowLoader;
+import power.input.PowerLinkState;
+import power.input.PowerNodeState;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -52,8 +55,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     private static final Logger logger = Logger.getLogger(SimulationAgent.class);
     
-    private String experimentID;
-    private String peersLogDirectory;
+    public String experimentID;
+    public String peersLogDirectory;
     private Time bootstrapTime;
     private Time runTime;
     private String timeToken;
@@ -74,8 +77,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private TopologyLoader topologyLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
-    private MeasurementFileDumper measurementDumper;
+    public MeasurementFileDumper measurementDumper;
     private Domain domain;
+    private ArrayList<Event> events;
     
     public SimulationAgent(
             String experimentID, 
@@ -156,11 +160,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
                 loadNetworkData();
                 eventLoader=new EventLoader(domain,columnSeparator);
-                ArrayList<Event> events=eventLoader.loadEvents(eventsLocation);
-                for(Event event:events){
-                    //we may need to adjust time here because the clock is already at time 2!
-                    //runEventExecution(event.getTime()-(int)Time.inSeconds(runTime),event);
-                }
+                events=eventLoader.loadEvents(eventsLocation);
                 runActiveState(runTime);
             }
         });
@@ -177,7 +177,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime()+1);
                 loadNetworkData();
+                executeAllEvents(getSimulationTime());
                 runFlowAnalysis();
+                initMeasurements();
+                performMeasurements();
                 runActiveState(runtime);
         }
         });
@@ -198,6 +201,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                     PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
                     flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
                     flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
+                    flowNetwork.setLinkFlowType(PowerLinkState.REAL_POWER_FLOW_FROM);
+                    flowNetwork.setNodeFlowType(PowerNodeState.REAL_POWER_DEMAND);
+                    flowNetwork.setLinkCapacityType(PowerLinkState.REACTANCE);
+                    flowNetwork.setNodeCapacityType(PowerNodeState.BASE_VOLTAGE);
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");
@@ -220,18 +227,23 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         
     }
     
-    /**
-     * The scheduling of the active state.  It is executed periodically. 
-     */
     @Override
-    public void runEventExecution(int time, Event event){
-        Timer loadAgentTimer= getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
-                executeEvent(flowNetwork,event);
+    public void performMeasurements(){
+        
+    }
+    
+    @Override
+    public void initMeasurements(){
+        
+    }
+    
+    
+    public void executeAllEvents(int time){
+        for(Event event:events){
+            if(event.getTime()==time){
+                this.executeEvent(flowNetwork, event);
+            }
         }
-        });
-        loadAgentTimer.schedule(Time.inMilliseconds(time*1000));
     }
     
     @Override

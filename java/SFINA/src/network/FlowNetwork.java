@@ -175,6 +175,50 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return null;
     }
     
+    /**
+     * Sets the flow type of the links
+     * 
+     * @param flowType the flow type of the links
+     */
+    public void setLinkFlowType(Enum flowType){
+        for(Link link:this.getLinks()){
+            link.setFlowType(flowType);
+        }
+    }
+    
+    /**
+     * Sets the flow type of the nodes
+     * 
+     * @param flowType the flow type of the nodes
+     */
+    public void setNodeFlowType(Enum flowType){
+        for(Node node:this.getNodes()){
+            node.setFlowType(flowType);
+        }
+    }
+    
+    /**
+     * Sets the capacity type of the links
+     * 
+     * @param capacityType the capacity type of the links
+     */
+    public void setLinkCapacityType(Enum capacityType){
+        for(Link link:this.getLinks()){
+            link.setCapacityType(capacityType);
+        }
+    }
+    
+    /**
+     * Sets the capacity type of the nodes
+     * 
+     * @param capacityType the capacity time of nodes
+     */
+    public void setNodeCapacityType(Enum capacityType){
+        for(Node node:this.getNodes()){
+            node.setCapacityType(capacityType);
+        }
+    }
+    
     @Override
     /**
      * Activates a node and updates the topology.
