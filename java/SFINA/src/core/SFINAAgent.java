@@ -207,8 +207,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
                     flowNetwork.setLinkFlowType(PowerLinkState.REAL_POWER_FLOW_FROM);
                     flowNetwork.setNodeFlowType(PowerNodeState.REAL_POWER_DEMAND);
-                    flowNetwork.setLinkCapacityType(PowerLinkState.REACTANCE);
-                    flowNetwork.setNodeCapacityType(PowerNodeState.BASE_VOLTAGE);
+                    flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
+                    flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");
