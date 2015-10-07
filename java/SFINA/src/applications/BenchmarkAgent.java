@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package core;
+package applications;
 
+import core.SFINAAgent;
 import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import network.Link;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
@@ -30,11 +29,9 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class MeasurementSimulationAgent extends SimulationAgent{
+public class BenchmarkAgent extends SFINAAgent{
     
-    private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
-    
-    public MeasurementSimulationAgent(String experimentID, 
+    public BenchmarkAgent(String experimentID, 
             String peersLogDirectory, 
             Time bootstrapTime, 
             Time runTime, 
@@ -64,16 +61,22 @@ public class MeasurementSimulationAgent extends SimulationAgent{
                 parameterValueSeparator,
                 columnSeparator,
                 missingValue);
-        this.temporalLinkMetrics=new HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>>();
     }
-    @Override
-    public void initMeasurements(){
-        HashMap<String,HashMap<Metrics,Object>> linkMetrics=new HashMap<String,HashMap<Metrics,Object>>();
+    
+    private void calculateActivationStatus(){
         for(Link link:this.getFlowNetwork().getLinks()){
-            HashMap<Metrics,Object> metrics=new HashMap<Metrics,Object>();
-            linkMetrics.put(link.getIndex(), metrics);
+            boolean activationStatus=link.isActivated();
+            HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
+            metrics.put(Metrics.ACTIVATION_STATUS, (activationStatus==true) ? 1.0 : 0.0);
         }
-        this.temporalLinkMetrics.put(this.getSimulationTime(), linkMetrics);
+    }
+    
+    private void calculateFlow(){
+        for(Link link:this.getFlowNetwork().getLinks()){
+            double flow=link.getFlow();
+            HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
+            metrics.put(Metrics.FLOW, flow);
+        }
     }
     
     private void calculateUtilization(){
@@ -81,13 +84,16 @@ public class MeasurementSimulationAgent extends SimulationAgent{
             double flow=link.getFlow();
             double capacity=link.getCapacity();
             double utilization=flow/capacity;
-            HashMap<Metrics,Object> metrics=temporalLinkMetrics.get(this.getSimulationTime()).get(link.getIndex());
+            HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
             metrics.put(Metrics.UTILIZATION, utilization);
         }
     }
     
+    
     @Override
     public void performMeasurements(){
+        this.calculateActivationStatus();
+        this.calculateFlow();
         this.calculateUtilization();
     }
     
@@ -98,12 +104,22 @@ public class MeasurementSimulationAgent extends SimulationAgent{
      */
     @Override
     public void scheduleMeasurements(){
-        this.measurementDumper=new MeasurementFileDumper(peersLogDirectory+this.experimentID+getPeer().getIdentifier().toString());
+        setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-                log.log(epochNumber, Metrics.UTILIZATION, 0.0);
-                measurementDumper.measurementEpochEnded(log, epochNumber);
-                log.shrink(epochNumber, epochNumber+1);
+//                System.out.println("Simulation time:"+getSimulationTime());
+                int simulationTime=getSimulationTime();
+                if(simulationTime>=1){
+                    for(Link link:getFlowNetwork().getLinks()){
+                        HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
+                        log.log(simulationTime, link.getIndex(), Metrics.UTILIZATION, ((Double)linkMetrics.get(Metrics.UTILIZATION)).doubleValue());
+                        log.log(simulationTime, link.getIndex(), Metrics.FLOW, ((Double)linkMetrics.get(Metrics.FLOW)).doubleValue());
+                        log.log(simulationTime, link.getIndex(), Metrics.ACTIVATION_STATUS, ((Double)linkMetrics.get(Metrics.ACTIVATION_STATUS)).doubleValue());
+                    }
+                }
+                
+                getMeasurementDumper().measurementEpochEnded(log, simulationTime);
+                log.shrink(simulationTime, simulationTime+1);
             }
         });
     }

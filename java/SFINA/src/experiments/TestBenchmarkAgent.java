@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.MeasurementSimulationAgent;
+import applications.BenchmarkAgent;
 import java.io.File;
 import protopeer.Experiment;
 import protopeer.Peer;
@@ -29,7 +29,7 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class TestMeasurementSimulationAgent extends SimulatedExperiment{
+public class TestBenchmarkAgent extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -38,7 +38,7 @@ public class TestMeasurementSimulationAgent extends SimulatedExperiment{
     //Simulation Parameters
     private final static Time bootstrapTime=Time.inMilliseconds(2000);
     private final static Time runTime=Time.inMilliseconds(1000);
-    private final static int runDuration=3;
+    private final static int runDuration=4;
     private final static int N=1;
     
     // SFINA parameters
@@ -64,7 +64,7 @@ public class TestMeasurementSimulationAgent extends SimulatedExperiment{
     public static void main(String[] args) {
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
-        final TestMeasurementSimulationAgent test = new TestMeasurementSimulationAgent();
+        final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -75,7 +75,7 @@ public class TestMeasurementSimulationAgent extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new MeasurementSimulationAgent(
+                newPeer.addPeerlet(new BenchmarkAgent(
                         experimentID, 
                         peersLogDirectory, 
                         bootstrapTime,

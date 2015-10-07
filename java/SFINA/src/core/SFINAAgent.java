@@ -1,5 +1,6 @@
 package core;
 
+import applications.Metrics;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
 import input.Backend;
@@ -51,12 +52,12 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface{
+public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
-    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
+    private static final Logger logger = Logger.getLogger(SFINAAgent.class);
     
-    public String experimentID;
-    public String peersLogDirectory;
+    private String experimentID;
+    private String peersLogDirectory;
     private Time bootstrapTime;
     private Time runTime;
     private String timeToken;
@@ -77,11 +78,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private TopologyLoader topologyLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
-    public MeasurementFileDumper measurementDumper;
+    private MeasurementFileDumper measurementDumper;
     private Domain domain;
     private ArrayList<Event> events;
     
-    public SimulationAgent(
+    private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
+    
+    public SFINAAgent(
             String experimentID, 
             String peersLogDirectory, 
             Time bootstrapTime, 
@@ -113,6 +116,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.columnSeparator=columnSeparator;
         this.missingValue=missingValue;
         this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
+        this.temporalLinkMetrics=new HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>>();
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
@@ -136,7 +140,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     @Override
     public void start(){
         this.runBootstraping(this.bootstrapTime);
-        scheduleMeasurements();
     }
 
     /**
@@ -161,6 +164,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 loadNetworkData();
                 eventLoader=new EventLoader(domain,columnSeparator);
                 events=eventLoader.loadEvents(eventsLocation);
+                scheduleMeasurements();
                 runActiveState(runTime);
             }
         });
@@ -234,7 +238,12 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     @Override
     public void initMeasurements(){
-        
+        HashMap<String,HashMap<Metrics,Object>> linkMetrics=new HashMap<String,HashMap<Metrics,Object>>();
+        for(Link link:this.getFlowNetwork().getLinks()){
+            HashMap<Metrics,Object> metrics=new HashMap<Metrics,Object>();
+            linkMetrics.put(link.getIndex(), metrics);
+        }
+        this.getTemporalLinkMetrics().put(this.getSimulationTime(), linkMetrics);
     }
     
     
@@ -360,13 +369,48 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      */
     @Override
     public void scheduleMeasurements(){
-        this.measurementDumper=new MeasurementFileDumper(peersLogDirectory+this.experimentID+getPeer().getIdentifier().toString());
+        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
                 
-                measurementDumper.measurementEpochEnded(log, epochNumber);
+                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
                 log.shrink(epochNumber, epochNumber+1);
             }
         });
+    }
+
+    /**
+     * @return the experimentID
+     */
+    public String getExperimentID() {
+        return experimentID;
+    }
+
+    /**
+     * @return the peersLogDirectory
+     */
+    public String getPeersLogDirectory() {
+        return peersLogDirectory;
+    }
+
+    /**
+     * @return the measurementDumper
+     */
+    public MeasurementFileDumper getMeasurementDumper() {
+        return measurementDumper;
+    }
+
+    /**
+     * @return the temporalLinkMetrics
+     */
+    public HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> getTemporalLinkMetrics() {
+        return temporalLinkMetrics;
+    }
+
+    /**
+     * @param measurementDumper the measurementDumper to set
+     */
+    public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
+        this.measurementDumper = measurementDumper;
     }
 }

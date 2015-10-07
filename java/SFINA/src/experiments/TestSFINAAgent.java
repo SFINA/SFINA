@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.SimulationAgent;
+import core.SFINAAgent;
 import java.io.File;
 import protopeer.Experiment;
 import protopeer.Peer;
@@ -29,7 +29,7 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class TestSimulationAgent extends SimulatedExperiment{
+public class TestSFINAAgent extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -64,7 +64,7 @@ public class TestSimulationAgent extends SimulatedExperiment{
     public static void main(String[] args) {
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
-        final TestSimulationAgent test = new TestSimulationAgent();
+        final TestSFINAAgent test = new TestSFINAAgent();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -75,7 +75,7 @@ public class TestSimulationAgent extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new SimulationAgent(
+                newPeer.addPeerlet(new SFINAAgent(
                         experimentID, 
                         peersLogDirectory, 
                         bootstrapTime,
