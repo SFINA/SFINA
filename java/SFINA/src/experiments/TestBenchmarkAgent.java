@@ -36,9 +36,9 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
-    private final static Time bootstrapTime=Time.inMilliseconds(2000);
-    private final static Time runTime=Time.inMilliseconds(1000);
-    private final static int runDuration=4;
+    private final static int bootstrapTime=2000;
+    private final static int runTime=1000;
+    private final static int runDuration=10;
     private final static int N=1;
     
     // SFINA parameters
@@ -78,8 +78,8 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
                 newPeer.addPeerlet(new BenchmarkAgent(
                         experimentID, 
                         peersLogDirectory, 
-                        bootstrapTime,
-                        runTime,                        
+                        Time.inMilliseconds(bootstrapTime),
+                        Time.inMilliseconds(runTime),                        
                         timeTokenName,
                         experimentConfigurationFilesLocation,
                         inputParametersLocation,

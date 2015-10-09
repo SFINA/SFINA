@@ -43,7 +43,6 @@ public class BenchmarkLogReplayer {
             for (int i = 0; i < listOfFiles.length; i++) {
                 if (listOfFiles[i].isFile()&&!listOfFiles[i].isHidden()) {
                     MeasurementLog loadedLog=replayer.loadLogFromFile(directory+listOfFiles[i].getName());
-                    System.err.println(loadedLog.toString());
                     MeasurementLog replayedLog=this.getMemorySupportedLog(loadedLog, minLoad, maxLoad);
                     replayer.mergeLog(replayedLog);
                 }

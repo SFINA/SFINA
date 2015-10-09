@@ -17,9 +17,9 @@ import protopeer.util.quantities.Time;
  */
 public interface SimulationAgentInterface {
     
-    public void runBootstraping(Time bootstrapTime);
+    public void runBootstraping();
     
-    public void runActiveState(Time runTime);
+    public void runActiveState();
     
     public void runPassiveState(Message message);
     

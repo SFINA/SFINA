@@ -19,6 +19,7 @@ package applications;
 
 import core.SFINAAgent;
 import java.util.HashMap;
+import java.util.HashSet;
 import network.Link;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
@@ -107,19 +108,19 @@ public class BenchmarkAgent extends SFINAAgent{
         setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-//                System.out.println("Simulation time:"+getSimulationTime());
+                log.log(epochNumber, "link", "metric", epochNumber);
                 int simulationTime=getSimulationTime();
                 if(simulationTime>=1){
+                    log.logTagSet(epochNumber, new HashSet(getFlowNetwork().getLinks()), epochNumber);
                     for(Link link:getFlowNetwork().getLinks()){
                         HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
-                        log.log(simulationTime, link.getIndex(), Metrics.UTILIZATION, ((Double)linkMetrics.get(Metrics.UTILIZATION)).doubleValue());
-                        log.log(simulationTime, link.getIndex(), Metrics.FLOW, ((Double)linkMetrics.get(Metrics.FLOW)).doubleValue());
-                        log.log(simulationTime, link.getIndex(), Metrics.ACTIVATION_STATUS, ((Double)linkMetrics.get(Metrics.ACTIVATION_STATUS)).doubleValue());
+                        log.log(epochNumber, Metrics.UTILIZATION, ((Double)linkMetrics.get(Metrics.UTILIZATION)).doubleValue());
+                        log.log(epochNumber, Metrics.FLOW, ((Double)linkMetrics.get(Metrics.FLOW)).doubleValue());
+                        log.log(epochNumber, Metrics.ACTIVATION_STATUS, ((Double)linkMetrics.get(Metrics.ACTIVATION_STATUS)).doubleValue());
                     }
                 }
-                
-                getMeasurementDumper().measurementEpochEnded(log, simulationTime);
-                log.shrink(simulationTime, simulationTime+1);
+                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
+                log.shrink(epochNumber, epochNumber+1);
             }
         });
     }

@@ -139,7 +139,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     */
     @Override
     public void start(){
-        this.runBootstraping(this.bootstrapTime);
+        this.runBootstraping();
     }
 
     /**
@@ -154,7 +154,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * The scheduling of the active state. It is executed periodically. 
      */
     @Override
-    public void runBootstraping(Time bootstratTime){
+    public void runBootstraping(){
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
@@ -165,17 +165,17 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 eventLoader=new EventLoader(domain,columnSeparator);
                 events=eventLoader.loadEvents(eventsLocation);
                 scheduleMeasurements();
-                runActiveState(runTime);
+                runActiveState();
             }
         });
-        loadAgentTimer.schedule(bootstrapTime);
+        loadAgentTimer.schedule(this.bootstrapTime);
     }
     
     /**
      * The scheduling of the active state.  It is executed periodically. 
      */
     @Override
-    public void runActiveState(Time runtime){
+    public void runActiveState(){
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
@@ -185,11 +185,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 runFlowAnalysis();
                 initMeasurements();
                 performMeasurements();
-                runActiveState(runtime);
-        }
+                runActiveState(); 
+       }
         });
-        loadAgentTimer.schedule(runTime);
+        loadAgentTimer.schedule(this.runTime);
     }
+    
     
     public int getSimulationTime(){
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
@@ -363,7 +364,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     //****************** MEASUREMENTS ******************
-        
+    
     /**
      * Scheduling the measurements for the simulation agent
      */
