@@ -52,19 +52,19 @@ import static power.input.PowerNodeState.RAMP_10;
 import static power.input.PowerNodeState.RAMP_30;
 import static power.input.PowerNodeState.RAMP_AGC;
 import static power.input.PowerNodeState.RAMP_REACTIVE_POWER;
-import static power.input.PowerNodeState.REACTIVE_POWER_DEMAND;
-import static power.input.PowerNodeState.REACTIVE_POWER_GENERATION;
-import static power.input.PowerNodeState.REACTIVE_POWER_MAX;
-import static power.input.PowerNodeState.REACTIVE_POWER_MIN;
-import static power.input.PowerNodeState.REAL_POWER_DEMAND;
-import static power.input.PowerNodeState.REAL_POWER_GENERATION;
-import static power.input.PowerNodeState.REAL_POWER_MAX;
-import static power.input.PowerNodeState.REAL_POWER_MIN;
+import static power.input.PowerNodeState.POWER_DEMAND_REACTIVE;
+import static power.input.PowerNodeState.POWER_GENERATION_REACTIVE;
+import static power.input.PowerNodeState.POWER_MAX_REACTIVE;
+import static power.input.PowerNodeState.POWER_MIN_REACTIVE;
+import static power.input.PowerNodeState.POWER_DEMAND_REAL;
+import static power.input.PowerNodeState.POWER_GENERATION_REAL;
+import static power.input.PowerNodeState.POWER_MAX_REAL;
+import static power.input.PowerNodeState.POWER_MIN_REAL;
 import static power.input.PowerNodeState.SHUNT_CONDUCT;
 import static power.input.PowerNodeState.SHUNT_SUSCEPT;
 import static power.input.PowerNodeState.SHUTDOWN;
 import static power.input.PowerNodeState.STARTUP;
-import static power.input.PowerNodeState.TOTAL_MVA_BASE;
+import static power.input.PowerNodeState.MVA_BASE_TOTAL;
 import static power.input.PowerNodeState.TYPE;
 import static power.input.PowerNodeState.VOLTAGE_ANGLE;
 import static power.input.PowerNodeState.VOLTAGE_MAGNITUDE;
@@ -301,9 +301,9 @@ public class EventLoader {
             case "type":
                 return PowerNodeState.TYPE;
             case "real_power":
-                return PowerNodeState.REAL_POWER_DEMAND;
+                return PowerNodeState.POWER_DEMAND_REAL;
             case "reactive_power":
-                return PowerNodeState.REACTIVE_POWER_DEMAND;
+                return PowerNodeState.POWER_DEMAND_REACTIVE;
             case "Gs":
                 return PowerNodeState.SHUNT_CONDUCT;
             case "Bs":
@@ -323,21 +323,21 @@ public class EventLoader {
             case "volt_min":
                 return PowerNodeState.VOLTAGE_MIN;
             case "real_gen":
-                return PowerNodeState.REAL_POWER_GENERATION;
+                return PowerNodeState.POWER_GENERATION_REAL;
             case "reactive_gen":
-                return PowerNodeState.REACTIVE_POWER_GENERATION;
+                return PowerNodeState.POWER_GENERATION_REACTIVE;
             case "Qmax":
-                return PowerNodeState.REACTIVE_POWER_MAX;
+                return PowerNodeState.POWER_MAX_REACTIVE;
             case "Qmin":
-                return PowerNodeState.REACTIVE_POWER_MIN;
+                return PowerNodeState.POWER_MIN_REACTIVE;
             case "Vg":
                 return PowerNodeState.VOLTAGE_SETPOINT;
             case "mBase":
-                return PowerNodeState.TOTAL_MVA_BASE;
+                return PowerNodeState.MVA_BASE_TOTAL;
             case "power_max":
-                return PowerNodeState.REAL_POWER_MAX;
+                return PowerNodeState.POWER_MAX_REAL;
             case "power_min":
-                return PowerNodeState.REAL_POWER_MIN;
+                return PowerNodeState.POWER_MIN_REAL;
             case "Pc1":
                 return PowerNodeState.PC1;
             case "Pc2":
@@ -387,13 +387,13 @@ public class EventLoader {
             case "current":
                 return PowerLinkState.CURRENT;
             case "real_power_from":
-                return PowerLinkState.REAL_POWER_FLOW_FROM;
+                return PowerLinkState.POWER_FLOW_FROM_REAL;
             case "reactive_power_from":
-                return PowerLinkState.REACTIVE_POWER_FLOW_FROM;
+                return PowerLinkState.POWER_FLOW_FROM_REACTIVE;
             case "real_power_to":
-                return PowerLinkState.REAL_POWER_FLOW_TO;
+                return PowerLinkState.POWER_FLOW_TO_REAL;
             case "reactive_power_to":
-                return PowerLinkState.REACTIVE_POWER_FLOW_TO;
+                return PowerLinkState.POWER_FLOW_TO_REACTIVE;
             case "resistance":
                 return PowerLinkState.RESISTANCE;
             case "reactance":
@@ -506,9 +506,9 @@ public class EventLoader {
                         logger.debug("Node type cannot be recognized.");
                         return null;
                 }
-            case REAL_POWER_DEMAND:
+            case POWER_DEMAND_REAL:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_DEMAND:
+            case POWER_DEMAND_REACTIVE:
                 return Double.parseDouble(rawValue);
             case SHUNT_CONDUCT:
                 return Double.parseDouble(rawValue);
@@ -529,21 +529,21 @@ public class EventLoader {
             case VOLTAGE_MIN:
                 return Double.parseDouble(rawValue);
             // From here on generator specific data
-            case REAL_POWER_GENERATION:
+            case POWER_GENERATION_REAL:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_GENERATION:
+            case POWER_GENERATION_REACTIVE:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_MAX:
+            case POWER_MAX_REACTIVE:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_MIN:
+            case POWER_MIN_REACTIVE:
                 return Double.parseDouble(rawValue);
             case VOLTAGE_SETPOINT:
                 return Double.parseDouble(rawValue);
-            case TOTAL_MVA_BASE:
+            case MVA_BASE_TOTAL:
                 return Double.parseDouble(rawValue);
-            case REAL_POWER_MAX:
+            case POWER_MAX_REAL:
                 return Double.parseDouble(rawValue);
-            case REAL_POWER_MIN:
+            case POWER_MIN_REAL:
                 return Double.parseDouble(rawValue);
             case PC1:
                 return Double.parseDouble(rawValue);
@@ -590,13 +590,13 @@ public class EventLoader {
         switch(powerLinkState){
             case CURRENT:
                 return Double.parseDouble(rawValue);
-            case REAL_POWER_FLOW_FROM:
+            case POWER_FLOW_FROM_REAL:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_FLOW_FROM:
+            case POWER_FLOW_FROM_REACTIVE:
                 return Double.parseDouble(rawValue);
-            case REAL_POWER_FLOW_TO:
+            case POWER_FLOW_TO_REAL:
                 return Double.parseDouble(rawValue);
-            case REACTIVE_POWER_FLOW_TO:
+            case POWER_FLOW_TO_REACTIVE:
                 return Double.parseDouble(rawValue);
             case RESISTANCE:
                 return Double.parseDouble(rawValue);

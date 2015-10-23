@@ -27,6 +27,7 @@ import power.PowerNodeType;
 import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
+import power.output.PowerConsoleOutput;
 
 /**
  *
@@ -34,19 +35,17 @@ import power.input.PowerNodeState;
  */
 public class testMatpower {
     
-    static FlowNetwork net;
-    static PowerFlowType FlowType;
+    static FlowNetwork net = new FlowNetwork();
+    static PowerFlowType FlowType = PowerFlowType.DC;
     
     public static void main(String[] args){
-        net = new FlowNetwork();
         testLoader loader = new testLoader();
-        Output printer = new Output();
+        PowerConsoleOutput printer = new PowerConsoleOutput();
         
-        loader.load("case57", net);
-        FlowType = PowerFlowType.AC;
+        loader.load("case30", net);
         
         MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
-        resetLfData(net);
+        //resetLfData(net);
         algo.flowAnalysis(net);
         printer.printLfResults(net);
      
@@ -60,10 +59,10 @@ public class testMatpower {
     
     private static void resetLfData(FlowNetwork net){
         for(Link link : net.getLinks()){
-            link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, 0.0);
-            link.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, 0.0);
-            link.replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, 0.0);
-            link.replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, 0.0);
+            link.replacePropertyElement(PowerLinkState.POWER_FLOW_FROM_REAL, 0.0);
+            link.replacePropertyElement(PowerLinkState.POWER_FLOW_FROM_REACTIVE, 0.0);
+            link.replacePropertyElement(PowerLinkState.POWER_FLOW_TO_REAL, 0.0);
+            link.replacePropertyElement(PowerLinkState.POWER_FLOW_TO_REACTIVE, 0.0);
             link.replacePropertyElement(PowerLinkState.CURRENT, 0.0);            
             link.addProperty(PowerLinkState.LOSS_REAL, 0.0);
             link.addProperty(PowerLinkState.LOSS_REACTIVE, 0.0);

@@ -12,8 +12,8 @@ package power.input;
 public enum PowerNodeState {
     ID,
     TYPE,
-    REAL_POWER_DEMAND,
-    REACTIVE_POWER_DEMAND,
+    POWER_DEMAND_REAL,
+    POWER_DEMAND_REACTIVE,
     SHUNT_CONDUCT,
     SHUNT_SUSCEPT,
     AREA,
@@ -24,14 +24,14 @@ public enum PowerNodeState {
     VOLTAGE_MAX,
     VOLTAGE_MIN,
     // From here on generator specific data
-    REAL_POWER_GENERATION,
-    REACTIVE_POWER_GENERATION,
-    REACTIVE_POWER_MAX,
-    REACTIVE_POWER_MIN,
+    POWER_GENERATION_REAL,
+    POWER_GENERATION_REACTIVE,
+    POWER_MAX_REACTIVE,
+    POWER_MIN_REACTIVE,
     VOLTAGE_SETPOINT,
-    TOTAL_MVA_BASE,
-    REAL_POWER_MAX,
-    REAL_POWER_MIN,
+    MVA_BASE_TOTAL,
+    POWER_MAX_REAL,
+    POWER_MIN_REAL,
     PC1,        // lower real power output of PQ capability curve (Matpower parameter)
     PC2,
     QC1_MIN,    // minimum reactive power output at PC1 (Matpower parameter)

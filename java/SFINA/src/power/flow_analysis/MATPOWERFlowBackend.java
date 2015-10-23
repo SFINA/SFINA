@@ -295,17 +295,17 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
             nodes.get(i).replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, busesPowerFlowInfo[i][7]);
             nodes.get(i).replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, busesPowerFlowInfo[i][8]);
             if(powerFlowType.equals(PowerFlowType.DC))
-                nodes.get(i).replacePropertyElement(PowerNodeState.REACTIVE_POWER_DEMAND, 0.0);
+                nodes.get(i).replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, 0.0);
 
         }
         for (int i=0; i<this.generatorsPowerFlowInfo.length; i++){
             String busIndex = String.valueOf((int)generatorsPowerFlowInfo[i][0]);
-            net.getNode(busIndex).replacePropertyElement(PowerNodeState.REAL_POWER_GENERATION, generatorsPowerFlowInfo[i][1]);
+            net.getNode(busIndex).replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, generatorsPowerFlowInfo[i][1]);
             if(powerFlowType.equals(PowerFlowType.AC))
-                net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, generatorsPowerFlowInfo[i][2]);
+                net.getNode(busIndex).replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, generatorsPowerFlowInfo[i][2]);
             else {
-                net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_GENERATION, 0.0);
-                net.getNode(busIndex).replacePropertyElement(PowerNodeState.REACTIVE_POWER_DEMAND, 0.0);
+                net.getNode(busIndex).replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, 0.0);
+                net.getNode(busIndex).replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, 0.0);
             }
         }
     }
@@ -313,13 +313,13 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     private void updateLinks(ArrayList<Link> links){
         //update with branches power flow info
         for (int i=0; i<this.branchesPowerFlowInfo.length; i++){
-            links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_FROM, branchesPowerFlowInfo[i][13]);
-            links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_FROM, branchesPowerFlowInfo[i][14]);
-            links.get(i).replacePropertyElement(PowerLinkState.REAL_POWER_FLOW_TO, branchesPowerFlowInfo[i][15]);
-            links.get(i).replacePropertyElement(PowerLinkState.REACTIVE_POWER_FLOW_TO, branchesPowerFlowInfo[i][16]);
+            links.get(i).replacePropertyElement(PowerLinkState.POWER_FLOW_FROM_REAL, branchesPowerFlowInfo[i][13]);
+            links.get(i).replacePropertyElement(PowerLinkState.POWER_FLOW_FROM_REACTIVE, branchesPowerFlowInfo[i][14]);
+            links.get(i).replacePropertyElement(PowerLinkState.POWER_FLOW_TO_REAL, branchesPowerFlowInfo[i][15]);
+            links.get(i).replacePropertyElement(PowerLinkState.POWER_FLOW_TO_REACTIVE, branchesPowerFlowInfo[i][16]);
             // Loss
-            double lossReal = Math.abs(Math.abs((Double)links.get(i).getProperty(PowerLinkState.REAL_POWER_FLOW_TO)) - Math.abs((Double)links.get(i).getProperty(PowerLinkState.REAL_POWER_FLOW_FROM)));
-            double lossReactive = (Double)links.get(i).getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO) + (Double)links.get(i).getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM);
+            double lossReal = Math.abs(Math.abs((Double)links.get(i).getProperty(PowerLinkState.POWER_FLOW_TO_REAL)) - Math.abs((Double)links.get(i).getProperty(PowerLinkState.POWER_FLOW_FROM_REAL)));
+            double lossReactive = (Double)links.get(i).getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE) + (Double)links.get(i).getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE);
             lossReactive = 0.0;
             links.get(i).addProperty(PowerLinkState.LOSS_REAL, lossReal);
             links.get(i).addProperty(PowerLinkState.LOSS_REACTIVE, lossReactive);

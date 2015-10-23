@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package testing;
+package power.output;
 
 import java.util.ArrayList;
 import network.FlowNetwork;
@@ -30,12 +30,122 @@ import static protopeer.time.EventScheduler.logger;
  *
  * @author Ben
  */
-public class Output {
-    FlowNetwork net;
+public class PowerConsoleOutput {
+    private FlowNetwork net;
     
-    public Output(){
+    public PowerConsoleOutput(){
+        
     }
     
+    public void printLfResults(FlowNetwork net){
+        this.net = net;
+        // Nodes
+        int col = 10;
+        String dashes = "";
+        for (int i=0; i<col-1;i++)
+             dashes += "-";
+        
+        String busHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        String genFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f\n";
+        String busFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f\n";
+
+        System.out.println();
+        System.out.format("%" + 2*col + "s\n", "BUS DATA");
+        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        System.out.format("%" + col + "s%-" + 2*col + "s%-" + 2*col + "s%-" + 2*col + "s\n", "Bus", "       Voltage", "      Generation", "         Load");
+        System.out.format(busHeaderFormatter, "id", "Mag(pu)", "Ang(deg)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
+        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        for (Node node : net.getNodes()){
+            if ((PowerNodeType)node.getProperty(PowerNodeState.TYPE) == PowerNodeType.BUS)
+                System.out.format(busFormatter, node.getIndex(), node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), node.getProperty(PowerNodeState.VOLTAGE_ANGLE), "-","-", node.getProperty(PowerNodeState.POWER_DEMAND_REAL), node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE));
+            else
+                System.out.format(genFormatter, node.getIndex(), node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), node.getProperty(PowerNodeState.VOLTAGE_ANGLE), node.getProperty(PowerNodeState.POWER_GENERATION_REAL), node.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE), node.getProperty(PowerNodeState.POWER_DEMAND_REAL), node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE));
+        }
+        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+
+        
+        // Links
+        String braHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".3f%" + col + ".2f\n";
+
+        System.out.println();
+        System.out.format("%" + 2*col + "s\n", "BRANCH DATA");
+        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        System.out.format("%" + col + "s%" + col + "s%" + col + "s%" + 2*col + "s%" + 2*col + "s%" + 2*col + "s\n", "Branch", "From", "To", "From Bus Injection", "To Bus Injection",  "Loss");
+        System.out.format(braHeaderFormatter, "id", "Bus", "Bus", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
+        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        double lossRealTot = 0.0;
+        double lossReacTot = 0.0;
+        for (Link link : net.getLinks()){
+            //double lossReal = Math.abs(Math.abs((Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL)) - Math.abs((Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL)));
+            //double lossReactive = (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE) + (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE);
+            //lossReactive = 0.0;
+            System.out.format(braFormatter, link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL), link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE), link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL), link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE), link.getProperty(PowerLinkState.LOSS_REAL), link.getProperty(PowerLinkState.LOSS_REACTIVE));
+            if (link.getProperty(PowerLinkState.LOSS_REAL) != null) {
+                lossRealTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REAL));
+                lossReacTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REACTIVE));
+            }
+        }
+        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        System.out.format("%" + 6*col + "s%" + col + "s%" + col + ".3f%" + col + ".2f\n", "" , "Total:", lossRealTot, lossReacTot);
+        
+    }
+    
+    public void compareLFResults(FlowNetwork net1, FlowNetwork net2){
+        if(net1.getNodes().size() != net2.getNodes().size() || net1.getLinks().size() != net2.getLinks().size()){
+            logger.debug("Comparing different networks not possible.");
+            return;
+        }
+        int col = 10;
+        String dashes = "";
+        for (int i=0; i<col-1;i++)
+             dashes += "-";
+        
+        String busHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        String genFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f\n";
+        String busFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f\n";
+
+        System.out.println();
+        System.out.format("%" + 2*col + "s\n", "BUS DATA DIFFERENCE");
+        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        System.out.format("%" + col + "s%-" + 2*col + "s%-" + 2*col + "s%-" + 2*col + "s\n", "Bus", "       Voltage", "      Generation", "         Load");
+        System.out.format(busHeaderFormatter, "id", "Mag(pu)", "Ang(deg)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
+        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        for (Node node : net1.getNodes()){
+            if ((PowerNodeType)node.getProperty(PowerNodeState.TYPE) == PowerNodeType.BUS)
+                System.out.format(busFormatter, node.getIndex(), (Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_ANGLE), "-","-", (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REAL), (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REACTIVE));
+            else
+                System.out.format(genFormatter, node.getIndex(), (Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_ANGLE), (Double)node.getProperty(PowerNodeState.POWER_GENERATION_REAL) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REAL), (Double)node.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REACTIVE), (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REAL), (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REACTIVE));
+        }
+        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+
+        
+        // Links
+        String braHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".3f%" + col + ".2f\n";
+
+        System.out.println();
+        System.out.format("%" + 2*col + "s\n", "BRANCH DATA DIFFERENCE");
+        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        System.out.format("%" + col + "s%" + col + "s%" + col + "s%" + 2*col + "s%" + 2*col + "s%" + 2*col + "s\n", "Branch", "From", "To", "From Bus Injection", "To Bus Injection",  "Loss");
+        System.out.format(braHeaderFormatter, "id", "Bus", "Bus", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
+        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        double lossRealTot = 0.0;
+        double lossReacTot = 0.0;
+        for (Link link : net1.getLinks()){
+            //double lossReal = Math.abs(Math.abs((Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL)) - Math.abs((Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL)));
+            //double lossReactive = (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE) + (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE);
+            //lossReactive = 0.0;
+            System.out.format(braFormatter, link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_FROM_REAL), (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE), (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_TO_REAL), (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE), (Double)link.getProperty(PowerLinkState.LOSS_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REAL), (Double)link.getProperty(PowerLinkState.LOSS_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REACTIVE));
+            if (link.getProperty(PowerLinkState.LOSS_REAL) != null) {
+                lossRealTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REAL)) - Math.abs((Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REAL));
+                lossReacTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REACTIVE)) - Math.abs((Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REACTIVE));
+            }
+        }
+        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
+        System.out.format("%" + 6*col + "s%" + col + "s%" + col + ".3f%" + col + ".2f\n", "" , "Total:", lossRealTot, lossReacTot);    
+    }
+
     public void printNodesAll(FlowNetwork net){
         this.net = net;
         ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
@@ -97,112 +207,4 @@ public class Output {
         }
     }
     
-    public void printLfResults(FlowNetwork net){
-        this.net = net;
-        // Nodes
-        int col = 10;
-        String dashes = "";
-        for (int i=0; i<col-1;i++)
-             dashes += "-";
-        
-        String busHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        String genFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f\n";
-        String busFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f\n";
-
-        System.out.println();
-        System.out.format("%" + 2*col + "s\n", "BUS DATA");
-        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        System.out.format("%" + col + "s%-" + 2*col + "s%-" + 2*col + "s%-" + 2*col + "s\n", "Bus", "       Voltage", "      Generation", "         Load");
-        System.out.format(busHeaderFormatter, "id", "Mag(pu)", "Ang(deg)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
-        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        for (Node node : net.getNodes()){
-            if ((PowerNodeType)node.getProperty(PowerNodeState.TYPE) == PowerNodeType.BUS)
-                System.out.format(busFormatter, node.getIndex(), node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), node.getProperty(PowerNodeState.VOLTAGE_ANGLE), "-","-", node.getProperty(PowerNodeState.REAL_POWER_DEMAND), node.getProperty(PowerNodeState.REACTIVE_POWER_DEMAND));
-            else
-                System.out.format(genFormatter, node.getIndex(), node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), node.getProperty(PowerNodeState.VOLTAGE_ANGLE), node.getProperty(PowerNodeState.REAL_POWER_GENERATION), node.getProperty(PowerNodeState.REACTIVE_POWER_GENERATION), node.getProperty(PowerNodeState.REAL_POWER_DEMAND), node.getProperty(PowerNodeState.REACTIVE_POWER_DEMAND));
-        }
-        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-
-        
-        // Links
-        String braHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".3f%" + col + ".2f\n";
-
-        System.out.println();
-        System.out.format("%" + 2*col + "s\n", "BRANCH DATA");
-        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        System.out.format("%" + col + "s%" + col + "s%" + col + "s%" + 2*col + "s%" + 2*col + "s%" + 2*col + "s\n", "Branch", "From", "To", "From Bus Injection", "To Bus Injection",  "Loss");
-        System.out.format(braHeaderFormatter, "id", "Bus", "Bus", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
-        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        double lossRealTot = 0.0;
-        double lossReacTot = 0.0;
-        for (Link link : net.getLinks()){
-            //double lossReal = Math.abs(Math.abs((Double)link.getProperty(PowerLinkState.REAL_POWER_FLOW_TO)) - Math.abs((Double)link.getProperty(PowerLinkState.REAL_POWER_FLOW_FROM)));
-            //double lossReactive = (Double)link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO) + (Double)link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM);
-            //lossReactive = 0.0;
-            System.out.format(braFormatter, link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), link.getProperty(PowerLinkState.REAL_POWER_FLOW_FROM), link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM), link.getProperty(PowerLinkState.REAL_POWER_FLOW_TO), link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO), link.getProperty(PowerLinkState.LOSS_REAL), link.getProperty(PowerLinkState.LOSS_REACTIVE));
-            if (link.getProperty(PowerLinkState.LOSS_REAL) != null) {
-                lossRealTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REAL));
-                lossReacTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REACTIVE));
-            }
-        }
-        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        System.out.format("%" + 6*col + "s%" + col + "s%" + col + ".3f%" + col + ".2f\n", "" , "Total:", lossRealTot, lossReacTot);
-        
-    }
-    
-    public void compareLFResults(FlowNetwork net1, FlowNetwork net2){
-        if(net1.getNodes().size() != net2.getNodes().size() || net1.getLinks().size() != net2.getLinks().size()){
-            logger.debug("Comparing different networks not possible.");
-            return;
-        }
-        int col = 10;
-        String dashes = "";
-        for (int i=0; i<col-1;i++)
-             dashes += "-";
-        
-        String busHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        String genFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f\n";
-        String busFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f\n";
-
-        System.out.println();
-        System.out.format("%" + 2*col + "s\n", "BUS DATA DIFFERENCE");
-        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        System.out.format("%" + col + "s%-" + 2*col + "s%-" + 2*col + "s%-" + 2*col + "s\n", "Bus", "       Voltage", "      Generation", "         Load");
-        System.out.format(busHeaderFormatter, "id", "Mag(pu)", "Ang(deg)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
-        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        for (Node node : net1.getNodes()){
-            if ((PowerNodeType)node.getProperty(PowerNodeState.TYPE) == PowerNodeType.BUS)
-                System.out.format(busFormatter, node.getIndex(), (Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_ANGLE), "-","-", (Double)node.getProperty(PowerNodeState.REAL_POWER_DEMAND) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.REAL_POWER_DEMAND), (Double)node.getProperty(PowerNodeState.REACTIVE_POWER_DEMAND) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.REACTIVE_POWER_DEMAND));
-            else
-                System.out.format(genFormatter, node.getIndex(), (Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_ANGLE), (Double)node.getProperty(PowerNodeState.REAL_POWER_GENERATION) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.REAL_POWER_GENERATION), (Double)node.getProperty(PowerNodeState.REACTIVE_POWER_GENERATION) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.REACTIVE_POWER_GENERATION), (Double)node.getProperty(PowerNodeState.REAL_POWER_DEMAND) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.REAL_POWER_DEMAND), (Double)node.getProperty(PowerNodeState.REACTIVE_POWER_DEMAND) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.REACTIVE_POWER_DEMAND));
-        }
-        System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-
-        
-        // Links
-        String braHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".3f%" + col + ".2f\n";
-
-        System.out.println();
-        System.out.format("%" + 2*col + "s\n", "BRANCH DATA DIFFERENCE");
-        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        System.out.format("%" + col + "s%" + col + "s%" + col + "s%" + 2*col + "s%" + 2*col + "s%" + 2*col + "s\n", "Branch", "From", "To", "From Bus Injection", "To Bus Injection",  "Loss");
-        System.out.format(braHeaderFormatter, "id", "Bus", "Bus", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
-        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        double lossRealTot = 0.0;
-        double lossReacTot = 0.0;
-        for (Link link : net1.getLinks()){
-            //double lossReal = Math.abs(Math.abs((Double)link.getProperty(PowerLinkState.REAL_POWER_FLOW_TO)) - Math.abs((Double)link.getProperty(PowerLinkState.REAL_POWER_FLOW_FROM)));
-            //double lossReactive = (Double)link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO) + (Double)link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM);
-            //lossReactive = 0.0;
-            System.out.format(braFormatter, link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), (Double)link.getProperty(PowerLinkState.REAL_POWER_FLOW_FROM) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.REAL_POWER_FLOW_FROM), (Double)link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.REACTIVE_POWER_FLOW_FROM), (Double)link.getProperty(PowerLinkState.REAL_POWER_FLOW_TO) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.REAL_POWER_FLOW_TO), (Double)link.getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.REACTIVE_POWER_FLOW_TO), (Double)link.getProperty(PowerLinkState.LOSS_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REAL), (Double)link.getProperty(PowerLinkState.LOSS_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REACTIVE));
-            if (link.getProperty(PowerLinkState.LOSS_REAL) != null) {
-                lossRealTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REAL)) - Math.abs((Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REAL));
-                lossReacTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REACTIVE)) - Math.abs((Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REACTIVE));
-            }
-        }
-        System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
-        System.out.format("%" + 6*col + "s%" + col + "s%" + col + ".3f%" + col + ".2f\n", "" , "Total:", lossRealTot, lossReacTot);    
-    }
 }

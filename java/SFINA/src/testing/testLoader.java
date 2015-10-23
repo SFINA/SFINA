@@ -22,6 +22,7 @@ import network.Node;
 import org.apache.log4j.Logger;
 import power.input.PowerNodeState;
 import power.input.PowerLinkState;
+import power.output.PowerConsoleOutput;
 
 /**
  *
@@ -91,7 +92,7 @@ public class testLoader {
     }
     
     public void printLoadedData(){
-            Output printer = new Output();
+            PowerConsoleOutput printer = new PowerConsoleOutput();
             printer.printNodesAll(net);
             printer.printLinksAll(net);
             printParam();

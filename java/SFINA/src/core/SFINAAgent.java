@@ -206,8 +206,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
                     flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
                     flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
-                    flowNetwork.setLinkFlowType(PowerLinkState.REAL_POWER_FLOW_FROM);
-                    flowNetwork.setNodeFlowType(PowerNodeState.REAL_POWER_DEMAND);
+                    flowNetwork.setLinkFlowType(PowerLinkState.POWER_FLOW_FROM_REAL);
+                    flowNetwork.setNodeFlowType(PowerNodeState.POWER_DEMAND_REAL);
                     flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
                     flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
                     break;

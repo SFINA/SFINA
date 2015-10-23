@@ -27,8 +27,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import static org.jgrapht.alg.DijkstraShortestPath.findPathBetween;
+import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
@@ -471,6 +473,26 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         }
         return path;
     }
+    
+    private ArrayList<Link> getShortestPath(Node v, Node w, Graph<String, DefaultEdge> g){
+        ArrayList<Link> path = new ArrayList();
+        List<DefaultEdge> jgraphtPath = findPathBetween(g,v.getIndex(),w.getIndex());
+        if (jgraphtPath == null)
+            return null;
+        for (DefaultEdge edge : jgraphtPath){
+            path.add(this.getLink(this.getNode(g.getEdgeSource(edge)), this.getNode(g.getEdgeTarget(edge))));
+        }
+        return path;
+    }
+//    
+//    private ArrayList<ArrayList<Link>> getAllShortestPaths(){
+//        ArrayList<ArrayList<Link>> paths = new ArrayList();
+//        ArrayList<Link> currentPath = new ArrayList();
+//        Graph<String, DefaultEdge> g = buildJGraphT();
+//        FloydWarshallShortestPaths floydAlgo = new FloydWarshallShortestPaths(g);
+//        Collection<GraphPath<String,DefaultEdge>> pathsJGT = floydAlgo.getShortestPaths();
+//        return paths;
+//    }
     
     private Graph<String, DefaultEdge> buildJGraphT(){
         Graph<String, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
