@@ -22,9 +22,11 @@ import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import power.PowerFlowType;
+import power.PowerNodeType;
 import power.flow_analysis.InterpssFlowBackend;
 import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerLinkState;
+import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;
 
 /**
@@ -32,7 +34,7 @@ import power.output.PowerConsoleOutput;
  * @author Ben
  */
 public class testInterpss {
-    static PowerFlowType FlowType = PowerFlowType.AC;
+    static PowerFlowType FlowType = PowerFlowType.DC;
     static String caseName = "case57";
     
     public static void main(String[] args){
@@ -43,37 +45,59 @@ public class testInterpss {
         loader.load(caseName, net1); 
         FlowNetwork net2 = new FlowNetwork();
         loader.load(caseName, net2);
+        FlowNetwork net3 = new FlowNetwork();
+        loader.load(caseName, net3);
         //resetLfData(net1);
+        
+        compareData(net1);
+        
+        runMatlabSimu(net3);
+        printer.printLfResults(net3);
 
-        //compareData();
-              
+        //adjustGenReact(net1,net3);
+        
         runInterpssOurData(net1);
+        printer.printLfResults(net1);
+
         runInterpssTheirLoader(net2);
-        //runMatlabSimu(net2);
-        //System.out.println("\n--------------------------------------------------\n    " + FlowType + ", " +net.getNodes().size()+ " BUS\n--------------------------------------------------\n");
-        //printer.printLfResults(net1);
-        //printer.printLfResults(net2);
+        printer.printLfResults(net2);
+        
+        System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS OUR DATA <-> INTERPSS THEIR LOADER\n--------------------------------------------------");
         printer.compareLFResults(net1, net2);
+//        System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS OUR DATA <-> MATPOWER OUR DATA\n--------------------------------------------------");
+//        printer.compareLFResults(net1, net3);
+//        System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS THEIR LOADER <-> MATPOWER OUR DATA\n--------------------------------------------------");
+//        printer.compareLFResults(net2, net3);
     }
 
+    private static void adjustGenReact(FlowNetwork net1, FlowNetwork net2){
+        for (Node node1 : net1.getNodes()){
+            if (node1.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR)){
+                //node1.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, net2.getNode(node1.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REACTIVE));
+                node1.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, net2.getNode(node1.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REACTIVE));
+            }            
+        }
+    }
     
     private static void runInterpssOurData(FlowNetwork net){
+        System.out.println("\n--------------------------------------------------\n    INTERPSS, SFINA DATA\n--------------------------------------------------");
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
         IpssObject.flowAnalysis(net);
-        System.out.println("\n--------------------------------------------------\n    INTERPSS WITH SFINA DATA CONVERSION\n--------------------------------------------------");
+        System.out.println("Ipss our data converged = " + IpssObject.isConverged());
     }
 
     private static void runInterpssTheirLoader(FlowNetwork net){
+        System.out.println("\n--------------------------------------------------\n    INTERPSS, DATA LOADED BY INTERPSS' LOADERS\n--------------------------------------------------");        
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
-        IpssObject.flowAnalysisIpssDataLoader(net, caseName);
-        
-        System.out.println("\n--------------------------------------------------\n    INTERPSS WITH DATA LOADED BY INTERPSS' LOADERS\n--------------------------------------------------");        
+        IpssObject.flowAnalysisIpssDataLoader(net, caseName);    
+        System.out.println("Ipss their loader converged = " + IpssObject.isConverged());
     }    
     
-    private static void compareData(){
-        FlowNetwork net = new FlowNetwork();
-        testLoader loader = new testLoader();
-        loader.load(caseName, net);
+    private static void compareData(FlowNetwork net){
+        System.out.println("\n--------------------------------------------------\n    COMPARING DATA FROM INTERPSS & SFINA LOADER\n--------------------------------------------------");
+//        FlowNetwork net = new FlowNetwork();
+//        testLoader loader = new testLoader();
+//        loader.load(caseName, net);
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
         try{
             IpssObject.compareDataToCaseLoaded(net, caseName);
@@ -81,12 +105,13 @@ public class testInterpss {
         catch(InterpssException ie){
             ie.printStackTrace();
         }
-        System.out.println("\n--------------------------------------------------\n    COMPARED DATA FROM IEEE FILE <-> SFINA LOADERS\n--------------------------------------------------");
     }
     
     private static void runMatlabSimu(FlowNetwork net){
+        System.out.println("\n--------------------------------------------------\n    MATPOWER, SFINA DATA\n--------------------------------------------------");
         MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
         algo.flowAnalysis(net);
+        System.out.println("Matpwr our data converged = " + algo.isConverged());
     }
     
     private static void resetLfData(FlowNetwork net){

@@ -87,7 +87,7 @@ public class testLoader {
         EventLoader eventLoader = new EventLoader(Domain.POWER, col_seperator);
         events = eventLoader.loadEvents(eventLocation);
          
-        System.out.println("\n--------------------------------------------------\n    LOADING DATA SUCCESSFUL\n--------------------------------------------------\n");
+        //System.out.println("\n--------------------------------------------------\n    LOADING DATA SUCCESSFUL\n--------------------------------------------------\n");
 
     }
     

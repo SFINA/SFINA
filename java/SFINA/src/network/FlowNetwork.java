@@ -291,33 +291,46 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * 
      * @return ArrayList where each entry is an sorted ArrayList of nodes belonging to one island. islands.size() gives number of islands.
      */
-    public ArrayList<ArrayList<Node>> getIslands(){
-        ArrayList islands = new ArrayList();
+    public ArrayList<FlowNetwork> getIslands(){
+        ArrayList<FlowNetwork> islands = new ArrayList<>();
         ArrayList leftNodes = new ArrayList();
         for (Node node : this.nodes.values())
             leftNodes.add(node);
         while (leftNodes.size() > 0){
-            ArrayList<Node> newIsland = new ArrayList();
+            ArrayList<Node> newIslandNodes = new ArrayList();
+            ArrayList<Link> newIslandLinks = new ArrayList();
             Node currentNode = (Node)leftNodes.get(0);
-            iterateIsland(currentNode, newIsland, leftNodes);
+            iterateIsland(currentNode, newIslandNodes, newIslandLinks, leftNodes);
             
-            Collections.sort(newIsland, new Comparator<Node>(){
+            Collections.sort(newIslandNodes, new Comparator<Node>(){
                 public int compare(Node node1, Node node2) {
                 return Integer.compare(Integer.parseInt(node1.getIndex()), Integer.parseInt(node2.getIndex()));
                 }
             });
+            
+            Collections.sort(newIslandLinks, new Comparator<Link>(){
+                public int compare(Link link1, Link link2) {
+                return Integer.compare(Integer.parseInt(link1.getIndex()), Integer.parseInt(link2.getIndex()));
+                }
+            });
+            
+            FlowNetwork newIsland = new FlowNetwork();
+            for (Node node : newIslandNodes)
+                newIsland.addNode(node);
+            for (Link link : newIslandLinks)
+                newIsland.addLink(link);
             
             islands.add(newIsland);
         }
         return islands;
     }
     
-    private void iterateIsland(Node currentNode, ArrayList<Node> currentIsland, ArrayList leftNodes){
-        if (currentIsland.contains(currentNode)){
+    private void iterateIsland(Node currentNode, ArrayList<Node> currentIslandNodes, ArrayList<Link> currentIslandLinks, ArrayList leftNodes){
+        if (currentIslandNodes.contains(currentNode)){
             System.out.println("Island iterator was called even though node is already in Island, which should not happen! Check algorithm!");
             return;
         }
-        currentIsland.add(currentNode);
+        currentIslandNodes.add(currentNode);
         
         if (!leftNodes.contains(currentNode)){
             System.out.println("Attention: Node " + currentNode.getIndex() + " not in array of Nodes not assigned to island, which should not happen! Check algorithm!");
@@ -329,15 +342,17 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         ArrayList<Link> currentLinks = (ArrayList)currentNode.getLinks();
         if (currentLinks.size() > 0){
             for (Link link : currentLinks){
+                if (!currentIslandLinks.contains(link))
+                    currentIslandLinks.add(link);
                 // Restart Iteration with EndNode of current Link
                 currentNode = link.getEndNode();
-                if (!currentIsland.contains(currentNode)){
-                    iterateIsland(currentNode, currentIsland, leftNodes);
+                if (!currentIslandNodes.contains(currentNode)){
+                    iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
                 }
                 // Restart Iteration with StartNode of current Link
                 currentNode = link.getStartNode();
-                if (!currentIsland.contains(currentNode)){
-                    iterateIsland(currentNode, currentIsland, leftNodes);
+                if (!currentIslandNodes.contains(currentNode)){
+                    iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
                 }
             }
         }

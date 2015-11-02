@@ -17,11 +17,9 @@ import com.interpss.core.algo.AclfMethod;
 import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
-import com.interpss.core.net.Area;
-import com.interpss.core.net.Zone;
 import flow_analysis.FlowBackendInterface;
 import static java.lang.Math.PI;
-import java.util.ArrayList;
+import java.util.logging.Level;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
@@ -50,10 +48,12 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     private PowerFlowType powerFlowType;
     private FlowNetwork SfinaNet;
     private AclfNetwork IpssNet;
+    private boolean converged;
     private static final Logger logger = Logger.getLogger(InterpssFlowBackend.class);
     
     public InterpssFlowBackend(PowerFlowType powerFlowType){
         this.powerFlowType=powerFlowType;
+        this.converged=false;
     }
     
     
@@ -62,7 +62,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         
         this.SfinaNet = net;
         
-        IpssCorePlugin.init();
+        IpssCorePlugin.init(Level.OFF);
         try{
             switch(powerFlowType){
                 case AC:
@@ -86,6 +86,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 default:
                     logger.debug("Power flow type is not recognized.");
             }
+            this.converged = IpssNet.isLfConverged();
         }
         catch(ReferenceBusException rbe){
             rbe.printStackTrace();
@@ -97,6 +98,14 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             ie.printStackTrace();
         }
         
+    }
+    
+    /**
+     * @return true if loadflow converged
+     */
+    @Override
+    public boolean isConverged() {
+        return converged;
     }
     
     /**
@@ -146,7 +155,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 
                 IpssBus.setLoadCode(AclfLoadCode.CONST_P);
                 if ((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL) == 0.0)
-                    IpssBus.setLoadCode(AclfLoadCode.NON_LOAD);
+                   IpssBus.setLoadCode(AclfLoadCode.NON_LOAD);
                 
                 IpssBus.setLoadP((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)/IpssNet.getBaseMva()); // in MW
                 IpssBus.setLoadQ((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)/IpssNet.getBaseMva()); // in MVAr
@@ -160,7 +169,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 if ((Double)node.getProperty(PowerNodeState.BASE_VOLTAGE) == 0.0)
                     IpssBus.setBaseVoltage(1000.0);
                 else 
-                    IpssBus.setBaseVoltage((Double)node.getProperty(PowerNodeState.BASE_VOLTAGE));
+                    IpssBus.setBaseVoltage((Double)node.getProperty(PowerNodeState.BASE_VOLTAGE)*1000.0);
                 
                 
                 /*** Area and Zone are optional for Power Flow calculation ***/
@@ -181,7 +190,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 AclfBranch IpssBranch = CoreObjectFactory.createAclfBranch();
                 IpssNet.addBranch(IpssBranch, link.getStartNode().getIndex(), link.getEndNode().getIndex()); // names of buses in InterPSS are index of SFINA nodes
                 IpssBranch.setId(link.getIndex()); // set branch id to SFINA branch id to make better accessible
-                
+                IpssBranch.setStatus(link.isActivated());
                 // Set Impedance z = r + j*x
                 Complex z = new Complex((Double)link.getProperty(PowerLinkState.RESISTANCE),(Double)link.getProperty(PowerLinkState.REACTANCE));
                 IpssBranch.setZ(z);
@@ -198,6 +207,10 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 else
                     IpssBranch.setFromTurnRatio(1.0);
                 IpssBranch.setFromTurnRatio(1.0);
+                IpssBranch.setToTurnRatio(1.0);
+                //System.out.println("toTurnRatio" + IpssBranch.getToTurnRatio());
+                
+                
                 //IpssBranch.setFromTurnRatio((Double)link.getProperty(PowerLinkState.TAP_RATIO));
                 // Set angle difference: in matpower only one value is defined. Assume that it's the angle difference, so we set in InterPSS from = 0 and to = angle_shift
                 IpssBranch.setFromPSXfrAngle(0.0);
@@ -285,7 +298,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     
     public void flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
         this.SfinaNet = net;
-        IpssCorePlugin.init();
+        IpssCorePlugin.init(Level.OFF);
         
         try{
             switch(powerFlowType){
@@ -309,12 +322,13 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     dcAlgo.calculateDclf();	
 
                     String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
-                    //System.out.println(resultDC);
+                    // System.out.println(resultDC);
                     getIpssDCResults(dcAlgo);
                     break;
                 default:
                     logger.debug("Power flow type is not recognized.");
             }
+            this.converged = IpssNet.isLfConverged();
         }
         catch(ReferenceBusException rbe){
             rbe.printStackTrace();
@@ -343,46 +357,76 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     
     public void compareDataToCaseLoaded(FlowNetwork net, String CaseName) throws InterpssException{
         this.SfinaNet = net;
-        IpssCorePlugin.init();
+        IpssCorePlugin.init(Level.OFF);
         buildIpssNet();
         AclfNetwork caseNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/ieee/" + CaseName + ".txt").getAclfNet();
+        
+        int j = 1;
+        for (AclfBus bus : caseNet.getBusList()){
+            bus.setId(String.valueOf(j++));
+            
+        }
+        j = 1;
+        for (AclfBranch branch : caseNet.getBranchList()){
+            branch.setId(String.valueOf(j++));
+            //branch.setName(String.valueOf(j++));
+        }
         
         //System.out.println(SfinaNet.getNode("9").getProperty(PowerNodeState.SHUNT_CONDUCT) + "," + SfinaNet.getNode("9").getProperty(PowerNodeState.SHUNT_SUSCEPT));
         //System.out.println(caseNet.getBus("Bus9").getShuntY());
         
-        String BranchData = "";
         int col = 20;
-        String busHeadFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        String busHeadFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
         System.out.println("--- Buses Data Difference----");
-        System.out.format(busHeadFormatter, "ID", "Voltage Mag", "Voltage Ang", "LoadP", "LoadQ", "LoadCode", "GenP", "GenQ", "GenCode", "ShuntY", "BaseMVA", "BaseKVA", "GenPartFactor", "DesiredVoltMag", "ExpectedLoadP", "LoadDistFactor");
-        String busFormatter = "%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        for (int i=1; i < caseNet.getNoBus()+1; i++){
-            AclfBus busLoaded = caseNet.getBus("Bus" + i);
-            AclfBus busDirect = IpssNet.getBus("" + i);
-            System.out.format(busFormatter, i, busLoaded.getVoltageMag() - busDirect.getVoltageMag(), busLoaded.getVoltageAng() - busDirect.getVoltageAng(), busLoaded.getLoadP() - busDirect.getLoadP(), busLoaded.getLoadQ() - busDirect.getLoadQ(), busLoaded.getLoadCode() + " vs " +  busDirect.getLoadCode(), busLoaded.getGenP() - busDirect.getGenP(), busLoaded.getGenQ() - busDirect.getGenQ(), busLoaded.getGenCode() + " vs " +  busDirect.getGenCode(), busLoaded.getShuntY().subtract(busDirect.getShuntY()), caseNet.getBaseMva() + " vs " +  IpssNet.getBaseMva(), caseNet.getBaseKva() + " vs " +  IpssNet.getBaseKva(), busLoaded.getGenPartFactor() + " vs " +  busDirect.getGenPartFactor(), busLoaded.getDesiredVoltMag() - busDirect.getDesiredVoltMag(), busLoaded.getExpLoadP() - busDirect.getExpLoadP(), busLoaded.getLoadDistFactor() - busDirect.getLoadDistFactor());
-        }
-        EList<AclfBranch> caseNetBranches = caseNet.getBranchList();
-        EList<AclfBranch> netBranches = IpssNet.getBranchList();
+        System.out.format(busHeadFormatter, "ID", "Voltage Mag", "Voltage Ang", "Base Voltage" ,"LoadP", "LoadQ", "LoadCode", "GenP", "GenQ", "GenCode", "ShuntY", "BaseMVA", "BaseKVA", "GenPartFactor", "DesiredVoltMag", "ExpectedLoadP", "LoadDistFactor");
+        String busFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+//        for (int i=1; i < caseNet.getNoBus()+1; i++){
+//            AclfBus busLoaded = caseNet.getBus("" + i);
+//            System.out.println(caseNet.getBusList());
+//            AclfBus busDirect = IpssNet.getBus("" + i);
+//            System.out.println(IpssNet.getBusList());
+//            System.out.format(busFormatter, i, getRelative(busLoaded.getVoltageMag(),busDirect.getVoltageMag()), getRelative(busLoaded.getVoltageAng(), busDirect.getVoltageAng()), getRelative(busLoaded.getBaseVoltage(),  busDirect.getBaseVoltage()), getRelative(busLoaded.getLoadP(), busDirect.getLoadP()), getRelative(busLoaded.getLoadQ(), busDirect.getLoadQ()), busLoaded.getLoadCode() + " vs " +  busDirect.getLoadCode(), getRelative(busLoaded.getGenP(), busDirect.getGenP()), getRelative(busLoaded.getGenQ(), busDirect.getGenQ()), busLoaded.getGenCode() + " vs " +  busDirect.getGenCode(), "(" + getRelative(busLoaded.getShuntY().getReal(),busDirect.getShuntY().getReal()) + " , " + getRelative(busLoaded.getShuntY().getImaginary(),busDirect.getShuntY().getImaginary()) + ")", getRelative(caseNet.getBaseMva(),IpssNet.getBaseMva()), getRelative(caseNet.getBaseKva(), IpssNet.getBaseKva()), getRelative(busLoaded.getGenPartFactor(),  busDirect.getGenPartFactor()), getRelative(busLoaded.getDesiredVoltMag(), busDirect.getDesiredVoltMag()), getRelative(busLoaded.getExpLoadP(), busDirect.getExpLoadP()), getRelative(busLoaded.getLoadDistFactor(), busDirect.getLoadDistFactor()));
+//        }
         
-        String braHeadFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        for (int i=1; i < caseNet.getNoBus()+1; i++){
+            AclfBus busLoaded = caseNet.getBusList().get(i-1);
+            AclfBus busDirect = IpssNet.getBusList().get(i-1);
+            System.out.format(busFormatter, busLoaded.getId(), getRelative(busLoaded.getVoltageMag(),busDirect.getVoltageMag()), getRelative(busLoaded.getVoltageAng(), busDirect.getVoltageAng()), getRelative(busLoaded.getBaseVoltage(),  busDirect.getBaseVoltage()), getRelative(busLoaded.getLoadP(), busDirect.getLoadP()), getRelative(busLoaded.getLoadQ(), busDirect.getLoadQ()), compBool(busLoaded.getLoadCode(), busDirect.getLoadCode()), getRelative(busLoaded.getGenP(), busDirect.getGenP()), getRelative(busLoaded.getGenQ(), busDirect.getGenQ()), compBool(busLoaded.getGenCode(), busDirect.getGenCode()), "(" + getRelative(busLoaded.getShuntY().getReal(),busDirect.getShuntY().getReal()) + " , " + getRelative(busLoaded.getShuntY().getImaginary(),busDirect.getShuntY().getImaginary()) + ")", getRelative(caseNet.getBaseMva(),IpssNet.getBaseMva()), getRelative(caseNet.getBaseKva(), IpssNet.getBaseKva()), getRelative(busLoaded.getGenPartFactor(),  busDirect.getGenPartFactor()), getRelative(busLoaded.getDesiredVoltMag(), busDirect.getDesiredVoltMag()), getRelative(busLoaded.getExpLoadP(), busDirect.getExpLoadP()), getRelative(busLoaded.getLoadDistFactor(), busDirect.getLoadDistFactor()));
+        }
+        
+        String braHeadFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
         System.out.println("--- Branches Data Difference----");
-        System.out.format(braHeadFormatter, "ID", "Z", "HShuntY", "Y", "FromTurnRatio", "ToTurnRatio", "FromPSXfrAngle", "ToPSXfrAngle");
-        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        System.out.format(braHeadFormatter, "ID", "fromBus", "toBus", "Z", "HShuntY", "Y", "FromTurnRatio", "ToTurnRatio", "FromPSXfrAngle", "ToPSXfrAngle");
+        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
         for (int i=1; i < caseNet.getNoBranch()+1; i++){
-            AclfBranch branchLoaded = caseNetBranches.get(i-1);
-            AclfBranch branchDirect = netBranches.get(i-1);
+            AclfBranch branchLoaded = caseNet.getBranchList().get(i-1);
+            AclfBranch branchDirect = IpssNet.getBranchList().get(i-1);
             
-            System.out.format(braFormatter, i, branchLoaded.getZ().subtract(branchDirect.getZ()), branchLoaded.getHShuntY().subtract(branchDirect.getHShuntY()), branchLoaded.getY().subtract(branchDirect.getY()), branchLoaded.getFromTurnRatio() + " vs " + branchDirect.getFromTurnRatio(), branchLoaded.getToTurnRatio() - branchDirect.getToTurnRatio(), branchLoaded.getFromPSXfrAngle() - branchDirect.getFromPSXfrAngle(), branchLoaded.getToPSXfrAngle() - branchDirect.getToPSXfrAngle());            
+            System.out.format(braFormatter, i,compBool(branchLoaded.getFromBus().getId(), branchDirect.getFromBus().getId()), compBool(branchLoaded.getToBus().getId(), branchDirect.getToBus().getId()), "(" + getRelative(branchLoaded.getZ().getReal(),branchDirect.getZ().getReal()) + " , "+ getRelative(branchLoaded.getZ().getImaginary(),branchDirect.getZ().getImaginary()) + ")", "(" + getRelative(branchLoaded.getHShuntY().getReal(),branchDirect.getHShuntY().getReal()) + " , "+ getRelative(branchLoaded.getHShuntY().getImaginary(),branchDirect.getHShuntY().getImaginary()) + ")", "(" + getRelative(branchLoaded.getY().getReal(),branchDirect.getY().getReal()) + " , "+ getRelative(branchLoaded.getY().getImaginary(),branchDirect.getY().getImaginary()) + ")", compBool(branchLoaded.getFromTurnRatio(), branchDirect.getFromTurnRatio()), compBool(branchLoaded.getToTurnRatio(), branchDirect.getToTurnRatio()), getRelative(branchLoaded.getFromPSXfrAngle(), branchDirect.getFromPSXfrAngle()), getRelative(branchLoaded.getToPSXfrAngle(), branchDirect.getToPSXfrAngle()));
             
         }
         
         LoadflowAlgorithm acAlgoLoaded = CoreObjectFactory.createLoadflowAlgorithm(caseNet);
         LoadflowAlgorithm acAlgoDirect = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
-        System.out.println(acAlgoLoaded.toString());
-        System.out.println(acAlgoDirect.toString());
-        
-                    
-        
+        //System.out.println(acAlgoLoaded.toString());
+        //System.out.println(acAlgoDirect.toString());
+              
+    }
+    
+    private String getRelative(double val1, double val2){
+        double result = (val1-val2)/val1;
+        result = Math.round(result*10000)/100.0d; // convert to % with 2 digits precision
+        if (result == 0.0)
+            return "-";
+        else 
+            return result + "%";
+    }
+    
+    private String compBool(Object obj1, Object obj2){
+        if (obj1.equals(obj2))
+            return "-";
+        else
+            return obj1 + " vs " + obj2;
     }
     
 }

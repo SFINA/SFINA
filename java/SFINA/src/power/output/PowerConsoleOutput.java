@@ -102,8 +102,8 @@ public class PowerConsoleOutput {
              dashes += "-";
         
         String busHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        String genFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f\n";
-        String busFormatter = "%" + col + "s%" + col + ".3f%" + col + ".3f%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f\n";
+        String genFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
+        String busFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
 
         System.out.println();
         System.out.format("%" + 2*col + "s\n", "BUS DATA DIFFERENCE");
@@ -112,17 +112,18 @@ public class PowerConsoleOutput {
         System.out.format(busHeaderFormatter, "id", "Mag(pu)", "Ang(deg)", "P (MW)", "Q (MVAr)", "P (MW)", "Q (MVAr)");
         System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
         for (Node node : net1.getNodes()){
+            Node node2 = net2.getNode(node.getIndex());
             if ((PowerNodeType)node.getProperty(PowerNodeState.TYPE) == PowerNodeType.BUS)
-                System.out.format(busFormatter, node.getIndex(), (Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_ANGLE), "-","-", (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REAL), (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REACTIVE));
+                System.out.format(busFormatter, node.getIndex(), getRelative((Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node2.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE)), getRelative((Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE), (Double)node2.getProperty(PowerNodeState.VOLTAGE_ANGLE)), "-","-", getRelative((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL), (Double)node2.getProperty(PowerNodeState.POWER_DEMAND_REAL)), getRelative((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE), (Double)node2.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)));
             else
-                System.out.format(genFormatter, node.getIndex(), (Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.VOLTAGE_ANGLE), (Double)node.getProperty(PowerNodeState.POWER_GENERATION_REAL) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REAL), (Double)node.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REACTIVE), (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REAL), (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE) - (Double)net2.getNode(node.getIndex()).getProperty(PowerNodeState.POWER_DEMAND_REACTIVE));
+                System.out.format(genFormatter, node.getIndex(), getRelative((Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE), (Double)node2.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE)), getRelative((Double)node.getProperty(PowerNodeState.VOLTAGE_ANGLE), (Double)node2.getProperty(PowerNodeState.VOLTAGE_ANGLE)), getRelative((Double)node.getProperty(PowerNodeState.POWER_GENERATION_REAL), (Double)node2.getProperty(PowerNodeState.POWER_GENERATION_REAL)), getRelative((Double)node.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE), (Double)node2.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE)), getRelative((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL), (Double)node2.getProperty(PowerNodeState.POWER_DEMAND_REAL)), getRelative((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE), (Double)node2.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)));
         }
         System.out.format(busHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
 
         
         // Links
         String braHeaderFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
-        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".2f%" + col + ".3f%" + col + ".2f\n";
+        String braFormatter = "%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s%" + col + "s\n";
 
         System.out.println();
         System.out.format("%" + 2*col + "s\n", "BRANCH DATA DIFFERENCE");
@@ -133,14 +134,18 @@ public class PowerConsoleOutput {
         double lossRealTot = 0.0;
         double lossReacTot = 0.0;
         for (Link link : net1.getLinks()){
+            Link link2 = net2.getLink(link.getIndex());
             //double lossReal = Math.abs(Math.abs((Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL)) - Math.abs((Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL)));
             //double lossReactive = (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE) + (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE);
             //lossReactive = 0.0;
-            System.out.format(braFormatter, link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_FROM_REAL), (Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE), (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_TO_REAL), (Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE), (Double)link.getProperty(PowerLinkState.LOSS_REAL) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REAL), (Double)link.getProperty(PowerLinkState.LOSS_REACTIVE) - (Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REACTIVE));
+            System.out.format(braFormatter, link.getIndex(), link.getStartNode().getIndex(), link.getEndNode().getIndex(), getRelative((Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL), (Double)link2.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL)), getRelative((Double)link.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE), (Double)link2.getProperty(PowerLinkState.POWER_FLOW_FROM_REACTIVE)), getRelative((Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REAL), (Double)link2.getProperty(PowerLinkState.POWER_FLOW_TO_REAL)), getRelative((Double)link.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE), (Double)link2.getProperty(PowerLinkState.POWER_FLOW_TO_REACTIVE)), getRelative((Double)link.getProperty(PowerLinkState.LOSS_REAL), (Double)link2.getProperty(PowerLinkState.LOSS_REAL)), getRelative((Double)link.getProperty(PowerLinkState.LOSS_REACTIVE), (Double)link2.getProperty(PowerLinkState.LOSS_REACTIVE)));
             if (link.getProperty(PowerLinkState.LOSS_REAL) != null) {
                 lossRealTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REAL)) - Math.abs((Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REAL));
                 lossReacTot += Math.abs((Double)link.getProperty(PowerLinkState.LOSS_REACTIVE)) - Math.abs((Double)net2.getLink(link.getIndex()).getProperty(PowerLinkState.LOSS_REACTIVE));
             }
+//            if (link.getIndex().equals("14")){
+//                System.out.println("!!!" + link.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL) + " & " + link2.getProperty(PowerLinkState.POWER_FLOW_FROM_REAL) + "!!!");
+//            }
         }
         System.out.format(braHeaderFormatter, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes, dashes);
         System.out.format("%" + 6*col + "s%" + col + "s%" + col + ".3f%" + col + ".2f\n", "" , "Total:", lossRealTot, lossReacTot);    
@@ -206,5 +211,14 @@ public class PowerConsoleOutput {
             System.out.print("\n");
         }
     }
-    
+    private String getRelative(double val1, double val2){
+        double result = Math.abs((val1-val2)/val1);
+        result = Math.round(result*10000)/100.0d;
+        if (result == 0.0)
+            return "-";
+        if (result > 1000)
+            return ">1000%";
+        else 
+            return result + "%";
+    }    
 }

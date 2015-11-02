@@ -53,7 +53,7 @@ public interface FlowNetworkInterface {
     
     public void deactivateLink(String index);
     
-    public ArrayList<ArrayList<Node>> getIslands();
+    public ArrayList<FlowNetwork> getIslands();
     
     public double getAvgNodeDegree();
     

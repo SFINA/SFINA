@@ -29,8 +29,14 @@ public interface SimulationAgentInterface {
     
     public void initMeasurements();
     
-    public void runFlowAnalysis();
+    public void runAnalysis(FlowNetwork flowNetwork);
+
+    public boolean handleConvergence(FlowNetwork flowNetwork);
+
+    public boolean handleOverload(FlowNetwork flowNetwork);
     
+    public boolean runFlowAnalysis(FlowNetwork flowNetwork);
+
     public void scheduleMeasurements();
     
 }

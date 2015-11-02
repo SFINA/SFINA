@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
+import power.PowerNodeType;
+import power.flow_analysis.InterpssFlowBackend;
+import power.input.PowerNodeState;
+import power.output.PowerConsoleOutput;
+import static testing.testInterpss.FlowType;
 
 /**
  *
@@ -34,8 +39,17 @@ public class testNetworkMethods {
         net = new FlowNetwork();
         loader.load("case57", net);
         String[] removeLinks = {"8","15","16","17","18","19","20","21","22","41","80"};
+        //net.getNode("9").replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
+        //String[] removeLinks = {};
         testIslandFinder(removeLinks);
-        testMetrics();
+        
+        //InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
+        //IpssObject.flowAnalysis(net);
+        
+        //PowerConsoleOutput printer = new PowerConsoleOutput();
+        //printer.printLfResults(net);
+
+        //testMetrics();
     }
     
     public static void testIslandFinder(String[] removedLinks){
@@ -43,14 +57,20 @@ public class testNetworkMethods {
         for (String el : removedLinks)
             net.deactivateLink(el);
         
-        ArrayList<ArrayList<Node>> islands = net.getIslands();
+        ArrayList<FlowNetwork> islands = net.getIslands();
+        
+        for (Link link : net.getLinks())
+            System.out.format("%3s", link.getIndex());
+        
         System.out.println("\n--------------------------------------------------\n    FOUND " + islands.size() + " ISLAND(S)\n--------------------------------------------------\n");
         for (int i=0; i < islands.size(); i++){
-            System.out.println("Island " + i);
-            for (Node node : islands.get(i)){
+            System.out.print("--> Island " + (i+1) + "\nNodes: ");
+            for (Node node : islands.get(i).getNodes())
                 System.out.format("%3s", node.getIndex());
-            }
-            System.out.println("\n");
+            System.out.print("\nLinks: ");
+            for (Link link : islands.get(i).getLinks())
+                System.out.format("%3s", link.getIndex());
+            System.out.println("\n\n");
         }
     }
     

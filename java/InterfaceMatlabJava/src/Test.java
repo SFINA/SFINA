@@ -13,19 +13,18 @@ public class Test {
 		System.out.println("______InterPSS DC on Case14___________________________________________________________________");
 		testInterPSSloadflow();
 		
-		System.out.println("______Matpower DC on Case14___________________________________________________________________");
-		testMatpowerloadflow();
+		//System.out.println("______Matpower DC on Case14___________________________________________________________________");
+		//testMatpowerloadflow();
 		
 		//testConversion();
 	}
 	
 	private static void testInterPSSloadflow() throws ReferenceBusException, IpssNumericException{
 		// Call InterPSS simulation on case IEEE009
-		String path = "./Data/ieee/IEEE14Bus.dat";
+		String path = "/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/ieee/case14.txt";
 		InterPSS_loadflow lf = new InterPSS_loadflow(path, "DC");
 		String result = lf.runlf();
 		System.out.println(result);	
-		return;
 	}
 	
 	private static void testMatpowerloadflow() throws MatlabConnectionException, MatlabInvocationException{
