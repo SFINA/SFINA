@@ -7,6 +7,7 @@ package power.flow_analysis;
 
 import flow_analysis.FlowBackendInterface;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
@@ -18,6 +19,7 @@ import matlabcontrol.extensions.MatlabTypeConverter;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
+import network.NodeState;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.PowerNodeType;
@@ -75,7 +77,7 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
             processor.setNumericArray(caseFile + ".gen", new MatlabNumericArray(getGeneratorsPowerFlowInfo(), null));
             processor.setNumericArray(caseFile + ".branch", new MatlabNumericArray(getBranchesPowerFlowInfo(), null));
             processor.setNumericArray(caseFile + ".gencost", new MatlabNumericArray(getCostsPowerFlowInfo(), null));
-
+            
             switch(powerFlowType){
                 case AC:
                     proxy.eval("result = runpf(" + caseFile + ");");
@@ -113,6 +115,21 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
         
     private double[][] getBuses(List<Node> nodes){
         ArrayList MatpowerBusData = new ArrayList();
+//        ArrayList neededBusData = new ArrayList();
+//        neededBusData.addAll(Arrays.asList(
+//                NodeState.ID,
+//                PowerNodeState.TYPE,
+//                PowerNodeState.POWER_DEMAND_REAL,
+//                PowerNodeState.POWER_DEMAND_REACTIVE,
+//                PowerNodeState.SHUNT_CONDUCT,
+//                PowerNodeState.SHUNT_SUSCEPT,
+//                PowerNodeState.AREA,
+//                PowerNodeState.VOLTAGE_MAGNITUDE,
+//                PowerNodeState.VOLTAGE_ANGLE,
+//                PowerNodeState.BASE_VOLTAGE,
+//                PowerNodeState.ZONE,
+//                PowerNodeState.VOLTAGE_MAX,
+//                PowerNodeState.VOLTAGE_MIN));
         for (Node node : nodes){
             ArrayList<Double> row = new ArrayList<>();
             for (NeededBusData BusState : NeededBusData.values()){
@@ -144,8 +161,8 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     private enum NeededBusData {
         ID,
         TYPE,
-        REAL_POWER_DEMAND,
-        REACTIVE_POWER_DEMAND,
+        POWER_DEMAND_REAL,
+        POWER_DEMAND_REACTIVE,
         SHUNT_CONDUCT,
         SHUNT_SUSCEPT,
         AREA,
@@ -185,15 +202,15 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     
     private enum NeededGenData{
         ID,
-        REAL_POWER_GENERATION,
-        REACTIVE_POWER_GENERATION,
-        REACTIVE_POWER_MAX,
-        REACTIVE_POWER_MIN,
+        POWER_GENERATION_REAL,
+        POWER_GENERATION_REACTIVE,
+        POWER_MAX_REACTIVE,
+        POWER_MIN_REACTIVE,
         VOLTAGE_SETPOINT,
-        TOTAL_MVA_BASE,
+        MVA_BASE_TOTAL,
         STATUS,             
-        REAL_POWER_MAX,
-        REAL_POWER_MIN,
+        POWER_MAX_REAL,
+        POWER_MIN_REAL,
         PC1,        
         PC2,
         QC1_MIN,    
@@ -346,6 +363,7 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     /**
      * @return the converged
      */
+    @Override
     public boolean isConverged() {
         return converged;
     }
