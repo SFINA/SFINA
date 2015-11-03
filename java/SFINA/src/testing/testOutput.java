@@ -30,22 +30,22 @@ public class testOutput {
     
     public static void main(String[] args){
         testLoader loader = new testLoader();
-        loader.load("case57", net);
+        loader.load("case14", net);
         String colSeparator = ",";
         String missingValue = "-";
         
-        String nodeTopLocation = "configuration_files/output/topology/nodes.txt";
-        String linkTopLocation = "configuration_files/output/topology/links.txt";
-        String nodeFlowLocation = "configuration_files/output/flow/nodes.txt";
-        String linkFlowLocation = "configuration_files/output/flow/links.txt";
+        String nodeTopLocation = "configuration_files/output/time_1/topology/nodes.txt";
+        String linkTopLocation = "configuration_files/output/time_1/topology/links.txt";
+        String nodeFlowLocation = "configuration_files/output/time_1/flow/nodes.txt";
+        String linkFlowLocation = "configuration_files/output/time_1/flow/links.txt";
         
         TopologyWriter topOut = new TopologyWriter(net,colSeparator);
         topOut.writeNodes(nodeTopLocation);
         topOut.writeLinks(linkTopLocation);
         
         PowerFlowWriter flowOut = new PowerFlowWriter(net,colSeparator,missingValue);
-        flowOut.writeNodes(nodeFlowLocation);
-        flowOut.writeLinks(linkFlowLocation);
+        flowOut.writeNodeFlowData(nodeFlowLocation);
+        flowOut.writeLinkFlowData(linkFlowLocation);
         
     }
 }

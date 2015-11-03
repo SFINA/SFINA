@@ -49,9 +49,12 @@ public class PowerFlowWriter {
         this.missingValue = missingValue;
     }
     
-    public void writeNodes(String location){
+    public void writeNodeFlowData(String location){
         try{
             File file = new File(location);
+            File parent = file.getParentFile();
+            if(!parent.exists() && !parent.mkdirs())
+                logger.debug("Couldn't create output folder");
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.print("id");
@@ -82,9 +85,12 @@ public class PowerFlowWriter {
         }
     }
     
-    public void writeLinks(String location){
+    public void writeLinkFlowData(String location){
         try{
             File file = new File(location);
+            File parent = file.getParentFile();
+            if(!parent.exists() && !parent.mkdirs())
+                logger.debug("Couldn't create output folder");
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.print("id");

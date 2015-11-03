@@ -29,6 +29,7 @@ import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
+import output.TopologyWriter;
 import power.PowerFlowType;
 import power.PowerNodeType;
 import power.flow_analysis.InterpssFlowBackend;
@@ -36,6 +37,7 @@ import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerFlowLoader;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
+import power.output.PowerFlowWriter;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -67,6 +69,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private String timeToken;
     private String timeTokenName;
     private String experimentConfigurationFilesLocation;
+    private String experimentOutputFilesLocation;
     private String inputParametersLocation;
     private String nodesLocation;
     private String linksLocation;
@@ -96,6 +99,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             Time runTime, 
             String timeTokenName, 
             String experimentConfigurationFilesLocation, 
+            String experimentOutputFilesLocation,
             String inputParametersLocation, 
             String nodesLocation, 
             String linksLocation, 
@@ -111,6 +115,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.runTime=runTime;
         this.timeTokenName=timeTokenName;
         this.experimentConfigurationFilesLocation=experimentConfigurationFilesLocation;
+        this.experimentOutputFilesLocation=experimentOutputFilesLocation;
         this.inputParametersLocation=inputParametersLocation;
         this.nodesLocation=nodesLocation;
         this.linksLocation=linksLocation;
@@ -231,6 +236,29 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         }
     }
     
+    private void outputNetworkData(){
+        TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
+        topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+nodesLocation);
+        topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+linksLocation);
+        switch(domain){
+                case POWER:
+                    PowerFlowWriter flowLoader=new PowerFlowWriter(flowNetwork, columnSeparator, missingValue);
+                    flowLoader.writeNodeFlowData(experimentOutputFilesLocation+timeToken+nodesFlowLocation);
+                    flowLoader.writeLinkFlowData(experimentOutputFilesLocation+timeToken+linksFlowLocation);
+                    break;
+                case GAS:
+                    logger.debug("This domain is not supported at this moment");
+                    break;
+                case WATER:
+                    logger.debug("This domain is not supported at this moment");
+                    break;
+                case TRANSPORTATION:
+                    logger.debug("This domain is not supported at this moment");
+                    break;
+                default:
+                    logger.debug("This domain is not supported at this moment");
+            }
+    }
     
     @Override
     public void runPassiveState(Message message){
@@ -379,7 +407,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 int nrGen = generators.size();
                 int loadIterator = 0;
                 int maxLoadShedIterations = 20;
-                double loadReductionFactor = 0.2;
+                double loadReductionFactor = 0.05;
                 
                 // blackout if no generator in island
                 if (nrGen == 0)

@@ -45,6 +45,9 @@ public class TopologyWriter {
     public void writeNodes(String location){
         try{
             File file = new File(location);
+            File parent = file.getParentFile();
+            if(!parent.exists() && !parent.mkdirs())
+                logger.debug("Couldn't create output folder");
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("id" + columnSeparator + "status");
@@ -67,6 +70,9 @@ public class TopologyWriter {
     public void writeLinks(String location){
         try{
             File file = new File(location);
+            File parent = file.getParentFile();
+            if(!parent.exists() && !parent.mkdirs())
+                logger.debug("Couldn't create output folder");
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("id" + columnSeparator + "from_node_id" + columnSeparator + "to_node_id" + columnSeparator + "status");
