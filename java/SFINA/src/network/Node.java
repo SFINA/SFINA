@@ -143,7 +143,8 @@ public class Node extends State{
      * @param link the added link
      */
     public void addLink(Link link){
-        this.getLinks().add(link);
+        if (!this.getLinks().contains(link))
+            this.getLinks().add(link);
         this.evaluateConnectivity();
     }
     

@@ -439,7 +439,7 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     
     private double[][] convertToDoubleArray(ArrayList<ArrayList<Double>> list){
         int rows = list.size();
-        int cols = list.get(1).size();
+        int cols = list.get(0).size();
         double[][] doubleArray = new double[rows][cols];
         for (int i=0; i < rows; i++){
             for (int j=0; j < cols; j++){

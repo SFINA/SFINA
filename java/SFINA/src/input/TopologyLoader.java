@@ -36,14 +36,7 @@ public class TopologyLoader {
         this.columnSeparator=columnSeparator;
         
         // empty network if it has nodes and links
-        if (net.getLinks().size() != 0){
-            for (Link link : net.getLinks())
-                net.removeLink(link);
-        }
-        if (net.getNodes().size() != 0){
-            for (Node node : net.getNodes())
-                net.removeNode(node);
-        }
+        emptyNetwork();
     }
     
 //    public ArrayList<Link> loadAttackedLinks(String location, List<Link> links){
@@ -74,9 +67,24 @@ public class TopologyLoader {
 //        return attackedLinks;
 //    }
     
+    private void emptyNetwork(){
+        if (net.getLinks().size() != 0){
+            ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
+            for (Link link : links)
+                net.removeLink(link);
+        }
+        if (net.getNodes().size() != 0){
+            ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
+            for (Node node : nodes)
+                net.removeNode(node);
+        }
+    }
+    
     public void loadNodes(String location){
+        // empty network if it has nodes and links, not sure if needed
+        //emptyNetwork();
+        
         ArrayList<NodeState> nodeStates=new ArrayList<NodeState>();
-        ArrayList<Node> nodes=new ArrayList<Node>();
         File file = new File(location);
         Scanner scr = null;
         try {
@@ -109,7 +117,6 @@ public class TopologyLoader {
     public void loadLinks(String location){
         ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
         ArrayList<LinkState> linkStates=new ArrayList<LinkState>();
-        ArrayList<Link> links=new ArrayList<Link>();
         File file = new File(location);
         Scanner scr = null;
         try {

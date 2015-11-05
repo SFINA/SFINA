@@ -119,9 +119,11 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void removeNode(Node node){
         for(Link link:node.getIncomingLinks()){
             link.setEndNode(null);
+            deactivateLink(link.getIndex());
         }
         for(Link link:node.getOutgoingLinks()){
             link.setStartNode(null);
+            deactivateLink(link.getIndex());
         }
         this.nodes.remove(node.getIndex());
     }
@@ -134,7 +136,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public void removeLink(Link link){
         for(Node node:nodes.values()){
-            node.getLinks().remove(link);
+            node.removeLink(link);
         }
         this.links.remove(link.getIndex());
     }
@@ -264,11 +266,13 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         deactivatedNode.setActivated(false);
         List<Link> incomingLinks=deactivatedNode.getIncomingLinks();
         for(Link incomingLink:incomingLinks){
-            incomingLink.setEndNode(null);
+            //incomingLink.setEndNode(null); // this is wrong I think, and gives errors later when trying to call getIncomingLinks and getOutcomingLinks in Node.
+            deactivateLink(incomingLink.getIndex()); // when a node is deactivated, it should deactivate the attached links, not disconnecting them entirely from the node.
         }
         List<Link> outgoingLinks=deactivatedNode.getOutgoingLinks();
         for(Link outgoingLink:outgoingLinks){
-            outgoingLink.setStartNode(null);
+            //outgoingLink.setStartNode(null);
+            deactivateLink(outgoingLink.getIndex());
         }
     }
     

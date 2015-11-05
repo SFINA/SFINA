@@ -198,9 +198,9 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 Complex y = new Complex(0,(Double)link.getProperty(PowerLinkState.SUSCEPTANCE)/2); // divided by 2, because it's in matpower total line charging susceptance, in InterPSS half of total branch shunt admittance
                 IpssBranch.setHShuntY(y);
                 // Set Ratings
-                IpssBranch.setRatingMva1((Double)link.getProperty(PowerLinkState.RATE_A));
-                IpssBranch.setRatingMva2((Double)link.getProperty(PowerLinkState.RATE_B));
-                IpssBranch.setRatingMva3((Double)link.getProperty(PowerLinkState.RATE_C));
+                //IpssBranch.setRatingMva1((Double)link.getProperty(PowerLinkState.RATE_A));
+                //IpssBranch.setRatingMva2((Double)link.getProperty(PowerLinkState.RATE_B));
+                //IpssBranch.setRatingMva3((Double)link.getProperty(PowerLinkState.RATE_C));
                 // Set Tap ratio: in matpower nominal tap ratio n = from/to. So we set to = 1 -> n = from
                 if ((Double)link.getProperty(PowerLinkState.TAP_RATIO) != 0.0)
                     IpssBranch.setFromTurnRatio((Double)link.getProperty(PowerLinkState.TAP_RATIO));

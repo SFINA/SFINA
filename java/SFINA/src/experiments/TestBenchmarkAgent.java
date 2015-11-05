@@ -54,6 +54,7 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     private final static String flowDirectoryName="flow";
     
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
+    private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
     private final static String inputParametersLocation=experimentConfigurationFilesLocation+"/parameters.txt";
     private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
@@ -82,6 +83,7 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
                         Time.inMilliseconds(runTime),                        
                         timeTokenName,
                         experimentConfigurationFilesLocation,
+                        experimentOutputFilesLocation,
                         inputParametersLocation,
                         nodesLocation,
                         linksLocation,
