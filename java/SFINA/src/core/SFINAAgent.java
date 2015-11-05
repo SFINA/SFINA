@@ -173,7 +173,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                timeToken=timeTokenName+(getSimulationTime()+1);
+                timeToken=timeTokenName+(getSimulationTime());
                 inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
                 domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
                 loadNetworkData();
@@ -194,7 +194,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                timeToken=timeTokenName+(getSimulationTime()+1); // why +1?
+                timeToken=timeTokenName+(getSimulationTime());
                 System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------");
                 loadNetworkData();
                 System.out.println("loaded net data");
@@ -235,7 +235,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
                     flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
                     flowNetwork.setLinkFlowType(PowerLinkState.POWER_FLOW_FROM_REAL);
-                    flowNetwork.setNodeFlowType(PowerNodeState.POWER_DEMAND_REAL);
+                    flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
                     flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
                     flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
 //                    System.out.println("Ratings");
@@ -337,7 +337,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 break;
                             case STATUS:
                                 // node.setActivated((Boolean)event.getValue()); // This doesn't reevaluate the status of connected links
-                                System.out.println("deactivating node " + node.getIndex());
+                                System.out.println("..deactivating node " + node.getIndex());
                                 // Proper way, but can we make it simpler?
                                 if((Boolean)event.getValue())
                                     flowNetwork.activateNode(node.getIndex());
@@ -365,7 +365,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 break;
                             case STATUS:
                                 // link.setActivated((Boolean)event.getValue()); // see above for nodes
-                                System.out.println("deactivating link " + link.getIndex());
+                                System.out.println("..deactivating link " + link.getIndex());
                                 if((Boolean)event.getValue())
                                     flowNetwork.activateLink(link.getIndex());
                                 else if(!(Boolean)event.getValue())
@@ -433,6 +433,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 if(flowNetwork.getNodes().size() == 1)
                     return false;
                 
+                // necessary, because if island has slack, we don't consider it in the gen balancing, but it doesn't have to be a blackout (can still do load shedding) -> see check nrGen == 0 below
+                boolean hasSlack = false;
+                
                 // extract generators in island and treat slack bus if existent
                 ArrayList<Node> generators = new ArrayList<>();
                 for (Node node : flowNetwork.getNodes()){
@@ -460,7 +463,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 double loadReductionFactor = 0.05; // 5%
                 
                 // blackout if no generator in island
-                if (nrGen == 0)
+                if (nrGen == 0 && !hasSlack)
                     return false; 
                 
                 // Sort Generators according to their real power generation in descending order
@@ -472,6 +475,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 
                 // Gen balancing
                 while (!converged && genIterator < nrGen){
+                    System.out.println("..Doing gen balancing");
                     Node currentGen = generators.get(genIterator);
                     currentGen.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
                     converged = runFlowAnalysis(flowNetwork);
@@ -496,6 +500,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 
                 // Load shedding
                 while (!converged && loadIterator < maxLoadShedIterations){
+                    System.out.println("..Doing load shedding");
                     for (Node node : flowNetwork.getNodes()){
                         node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REAL, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)*(1.0-loadReductionFactor));
                         node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)*(1.0-loadReductionFactor));
@@ -524,7 +529,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         boolean overloaded = false;
         for (Link link : flowNetwork.getLinks()){
             if(link.isActivated() && link.getFlow() > link.getCapacity()){
-                System.out.println("link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
+                System.out.println("..violating link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
                 Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
                 events.add(event);
                 overloaded = true;
@@ -532,7 +537,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         }
         for (Node node : flowNetwork.getNodes()){
             if(node.isActivated() && node.getFlow() > node.getCapacity()){
-                System.out.println("node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
+                System.out.println("..violating node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
                 Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.NODE,node.getIndex(),NodeState.STATUS,false);
                 events.add(event);
                 overloaded = true;
