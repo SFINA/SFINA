@@ -66,11 +66,18 @@ public class BenchmarkAgent extends SFINAAgent{
                 missingValue);
     }
     
+    private void calculateTotalLines(){
+        for(Link link:this.getFlowNetwork().getLinks()){
+            HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
+            metrics.put(Metrics.TOTAL_LINES, (double)this.getFlowNetwork().getLinks().size());
+        }
+    }
+    
     private void calculateActivationStatus(){
         for(Link link:this.getFlowNetwork().getLinks()){
             boolean activationStatus=link.isActivated();
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
-            metrics.put(Metrics.ACTIVATION_STATUS, (activationStatus==true) ? 1.0 : 0.0);
+            metrics.put(Metrics.ACTIVATED_LINES, (activationStatus==true) ? 1.0 : 0.0);
         }
     }
     
@@ -78,7 +85,7 @@ public class BenchmarkAgent extends SFINAAgent{
         for(Link link:this.getFlowNetwork().getLinks()){
             double flow=link.getFlow();
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
-            metrics.put(Metrics.FLOW, flow);
+            metrics.put(Metrics.LINE_FLOW, flow);
         }
     }
     
@@ -88,7 +95,7 @@ public class BenchmarkAgent extends SFINAAgent{
             double capacity=link.getCapacity();
             double utilization=flow/capacity;
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
-            metrics.put(Metrics.UTILIZATION, utilization);
+            metrics.put(Metrics.LINE_UTILIZATION, utilization);
         }
     }
     
@@ -98,6 +105,7 @@ public class BenchmarkAgent extends SFINAAgent{
         this.calculateActivationStatus();
         this.calculateFlow();
         this.calculateUtilization();
+        this.calculateTotalLines();
     }
     
     //****************** MEASUREMENTS ******************
@@ -116,9 +124,10 @@ public class BenchmarkAgent extends SFINAAgent{
                     log.logTagSet(epochNumber, new HashSet(getFlowNetwork().getLinks()), epochNumber);
                     for(Link link:getFlowNetwork().getLinks()){
                         HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
-                        log.log(epochNumber, Metrics.UTILIZATION, ((Double)linkMetrics.get(Metrics.UTILIZATION)).doubleValue());
-                        log.log(epochNumber, Metrics.FLOW, ((Double)linkMetrics.get(Metrics.FLOW)).doubleValue());
-                        log.log(epochNumber, Metrics.ACTIVATION_STATUS, ((Double)linkMetrics.get(Metrics.ACTIVATION_STATUS)).doubleValue());
+                        log.log(epochNumber, Metrics.LINE_UTILIZATION, ((Double)linkMetrics.get(Metrics.LINE_UTILIZATION)).doubleValue());
+                        log.log(epochNumber, Metrics.LINE_FLOW, ((Double)linkMetrics.get(Metrics.LINE_FLOW)).doubleValue());
+                        log.log(epochNumber, Metrics.ACTIVATED_LINES, ((Double)linkMetrics.get(Metrics.ACTIVATED_LINES)).doubleValue());
+                        log.log(epochNumber, Metrics.TOTAL_LINES, ((Double)linkMetrics.get(Metrics.TOTAL_LINES)).doubleValue());
                     }
                 }
                 getMeasurementDumper().measurementEpochEnded(log, epochNumber);

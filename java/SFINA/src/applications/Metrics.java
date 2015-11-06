@@ -22,8 +22,9 @@ package applications;
  * @author evangelospournaras
  */
 public enum Metrics {
-    FLOW,
-    UTILIZATION,
-    ACTIVATION_STATUS,
+    LINE_FLOW,
+    LINE_UTILIZATION,
+    ACTIVATED_LINES,
+    TOTAL_LINES,
     
 }

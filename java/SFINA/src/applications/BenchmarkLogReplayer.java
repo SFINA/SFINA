@@ -77,11 +77,11 @@ public class BenchmarkLogReplayer {
 
     private void calculateEpochResults(MeasurementLog log, int epochNumber){
         double epochNum=epochNumber;
-        double avgActivationStatusPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.ACTIVATION_STATUS).getAverage();
-        double avgFlowPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.FLOW).getAverage();
-        double avgUtilizationPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.UTILIZATION).getAverage();
+        double avgLineLossesPerEpoch=1-(log.getAggregateByEpochNumber(epochNumber, Metrics.ACTIVATED_LINES).getSum()/log.getAggregateByEpochNumber(epochNumber, Metrics.TOTAL_LINES).getSum());
+        double avgFlowPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_FLOW).getAverage();
+        double avgUtilizationPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_UTILIZATION).getAverage();
         
-        System.out.println(epochNum+coma+avgActivationStatusPerEpoch+coma+avgFlowPerEpoch+coma+avgUtilizationPerEpoch);
+        System.out.println(epochNum+coma+avgLineLossesPerEpoch+coma+avgFlowPerEpoch+coma+avgUtilizationPerEpoch);
         
     }
 
