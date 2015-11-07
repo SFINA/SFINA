@@ -34,8 +34,8 @@ import power.output.PowerConsoleOutput;
  * @author Ben
  */
 public class testInterpss {
-    static PowerFlowType FlowType = PowerFlowType.DC;
-    static String caseName = "case57";
+    static PowerFlowType FlowType = PowerFlowType.AC;
+    static String caseName = "case30";
     
     public static void main(String[] args){
         testLoader loader = new testLoader();
@@ -51,8 +51,8 @@ public class testInterpss {
         
         compareData(net1);
         
-        runMatlabSimu(net3);
-        printer.printLfResults(net3);
+//        runMatlabSimu(net3);
+//        printer.printLfResults(net3);
 
         //adjustGenReact(net1,net3);
         

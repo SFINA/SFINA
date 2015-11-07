@@ -69,7 +69,7 @@ public class BenchmarkAgent extends SFINAAgent{
     private void calculateTotalLines(){
         for(Link link:this.getFlowNetwork().getLinks()){
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
-            metrics.put(Metrics.TOTAL_LINES, (double)this.getFlowNetwork().getLinks().size());
+            metrics.put(Metrics.TOTAL_LINES, 1.0);
         }
     }
     
@@ -118,7 +118,6 @@ public class BenchmarkAgent extends SFINAAgent{
         setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-                log.log(epochNumber, "link", "metric", epochNumber);
                 int simulationTime=getSimulationTime();
                 if(simulationTime>=1){
                     log.logTagSet(epochNumber, new HashSet(getFlowNetwork().getLinks()), epochNumber);

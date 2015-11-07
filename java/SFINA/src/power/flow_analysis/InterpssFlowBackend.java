@@ -67,8 +67,9 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             switch(powerFlowType){
                 case AC:
                     buildIpssNet();
+                    //setVoltZero();
                     LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
-                    acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
+                    //acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
                     acAlgo.loadflow();
                     String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();        
                     //System.out.println(resultLoaded);
@@ -160,7 +161,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 IpssBus.setLoadP((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)/IpssNet.getBaseMva()); // in MW
                 IpssBus.setLoadQ((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)/IpssNet.getBaseMva()); // in MVAr
                 
-                Complex y = new Complex((Double)node.getProperty(PowerNodeState.SHUNT_CONDUCT),(Double)node.getProperty(PowerNodeState.SHUNT_SUSCEPT)/IpssNet.getBaseMva());
+                Complex y = new Complex((Double)node.getProperty(PowerNodeState.SHUNT_CONDUCT)/IpssNet.getBaseMva(),(Double)node.getProperty(PowerNodeState.SHUNT_SUSCEPT)/IpssNet.getBaseMva());
                 IpssBus.setShuntY(y);
 
                 IpssBus.setVoltageMag((Double)node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE)); // in p.u.
@@ -304,10 +305,10 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             switch(powerFlowType){
                 case AC:
                     this.IpssNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/ieee/" + CaseName + ".txt").getAclfNet();
-                    LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
-                    acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
-                    
                     renameIpssObjects();
+                    //setVoltZero();
+                    LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
+                    acAlgo.loadflow();
                     
                     String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();
                     //System.out.println(resultLoaded);
@@ -352,6 +353,12 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         j = 1;
         for (AclfBranch branch : IpssNet.getBranchList()){
             branch.setId(String.valueOf(j++));
+        }
+    }
+    
+    private void setVoltZero(){
+        for(AclfBus bus : IpssNet.getBusList()){
+            bus.setVoltage(1.0,0.0);
         }
     }
     

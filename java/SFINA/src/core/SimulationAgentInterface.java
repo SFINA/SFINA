@@ -29,11 +29,13 @@ public interface SimulationAgentInterface {
     
     public void initMeasurements();
     
-    public void runAnalysis(FlowNetwork flowNetwork);
+    public void runCascade();
 
-    public boolean handleConvergence(FlowNetwork flowNetwork);
+    public boolean flowConvergenceAlgo(FlowNetwork flowNetwork);
 
-    public boolean handleOverload(FlowNetwork flowNetwork);
+    public void mitigateOverload(FlowNetwork flowNetwork);
+    
+    public boolean overloadAlgo(FlowNetwork flowNetwork);
     
     public boolean runFlowAnalysis(FlowNetwork flowNetwork);
 
