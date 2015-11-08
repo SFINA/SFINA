@@ -35,7 +35,7 @@ public interface SimulationAgentInterface {
 
     public void mitigateOverload(FlowNetwork flowNetwork);
     
-    public boolean overloadAlgo(FlowNetwork flowNetwork);
+    public boolean linkOverloadAlgo(FlowNetwork flowNetwork);
     
     public boolean runFlowAnalysis(FlowNetwork flowNetwork);
 
