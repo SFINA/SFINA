@@ -262,5 +262,23 @@ public class Node extends State{
      */
     public void setActivated(boolean activated) {
         this.activated = activated;
+        if(activated){
+            for(Link link : this.getIncomingLinks()){
+                if(link.getStartNode() != null && link.getStartNode().isActivated()) // link should be activated if it has nodes at both ends and if both nodes are activated
+                    link.setActivated(true);
+            }
+            for(Link link : this.getOutgoingLinks()){
+                if(link.getEndNode() != null && link.getEndNode().isActivated()) 
+                    link.setActivated(true);
+            }
+        }
+        else{
+            for(Link link:this.getIncomingLinks()){
+                link.setActivated(false);
+            }
+            for(Link link : this.getOutgoingLinks()){
+                link.setActivated(false);
+            }
+        }
     }
 }

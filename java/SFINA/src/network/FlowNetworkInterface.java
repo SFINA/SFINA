@@ -53,6 +53,11 @@ public interface FlowNetworkInterface {
     
     public void deactivateLink(String index);
     
+    /**
+     * Extract islands
+     * 
+     * @return ArrayList where each entry is a new FlowNetwork object containing nodes and links belonging to this island. islands.size() gives number of islands.
+     */
     public ArrayList<FlowNetwork> getIslands();
     
     public double getAvgNodeDegree();

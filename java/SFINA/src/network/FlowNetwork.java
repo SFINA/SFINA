@@ -43,10 +43,10 @@ import org.jgrapht.graph.SimpleGraph;
  * - Access nodes and links
  * - Compute topological generic metrics
  * 
- * <code>FlowNetwork</code> is a <code>State</code> class so that it contain
+ * <code>FlowNetwork</code> is a <code>State</code> class that contains
  * global information about the network.
  * 
- * Recommended use of this class: First add all nodes as disconnected and then
+ * Recommended use of this class: First add all nodes and then
  * add the links to connect them!
  * 
  * @author evangelospournaras
@@ -232,14 +232,19 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void activateNode(String index){
         Node activatedNode=nodes.get(index);
         activatedNode.setActivated(true);
-        List<Link> incomingLinks=activatedNode.getIncomingLinks();
-        for(Link incomingLink:incomingLinks){
-            incomingLink.setEndNode(activatedNode);
-        }
-        List<Link> outgoingLinks=activatedNode.getOutgoingLinks();
-        for(Link outgoingLink:outgoingLinks){
-            outgoingLink.setStartNode(activatedNode);
-        }
+        // the following is handled in node class
+//        List<Link> incomingLinks=activatedNode.getIncomingLinks();
+//        for(Link incomingLink:incomingLinks){
+//            //incomingLink.setEndNode(activatedNode); // see deactivateNode for explanations
+//            if(incomingLink.getStartNode() != null && incomingLink.getStartNode().isActivated()) // link should be activated if it has nodes at both ends and if both nodes are activated
+//                activateLink(incomingLink.getIndex());
+//        }
+//        List<Link> outgoingLinks=activatedNode.getOutgoingLinks();
+//        for(Link outgoingLink:outgoingLinks){
+//            //outgoingLink.setStartNode(activatedNode);
+//            if(outgoingLink.getEndNode() != null && outgoingLink.getEndNode().isActivated()) 
+//                activateLink(outgoingLink.getIndex());
+//        }
     }
     
     @Override
@@ -251,8 +256,8 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void activateLink(String index){
         Link activatedLink=links.get(index);
         activatedLink.setActivated(true);
-        activatedLink.getStartNode().addLink(activatedLink);
-        activatedLink.getEndNode().addLink(activatedLink);
+        //activatedLink.getStartNode().addLink(activatedLink); // handled in link object to ensure, that both methods can be used
+        //activatedLink.getEndNode().addLink(activatedLink);
     }
     
     @Override
@@ -264,16 +269,17 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void deactivateNode(String index){
         Node deactivatedNode=nodes.get(index);
         deactivatedNode.setActivated(false);
-        List<Link> incomingLinks=deactivatedNode.getIncomingLinks();
-        for(Link incomingLink:incomingLinks){
-            //incomingLink.setEndNode(null); // this is wrong I think, and gives errors later when trying to call getIncomingLinks and getOutcomingLinks in Node.
-            deactivateLink(incomingLink.getIndex()); // when a node is deactivated, it should deactivate the attached links, not disconnecting them entirely from the node.
-        }
-        List<Link> outgoingLinks=deactivatedNode.getOutgoingLinks();
-        for(Link outgoingLink:outgoingLinks){
-            //outgoingLink.setStartNode(null);
-            deactivateLink(outgoingLink.getIndex());
-        }
+        // see activateNode() for explanation
+//        List<Link> incomingLinks=deactivatedNode.getIncomingLinks();
+//        for(Link incomingLink:incomingLinks){
+//            //incomingLink.setEndNode(null); // this is wrong I think, and gives errors later when trying to call getIncomingLinks and getOutcomingLinks in Node.
+//            deactivateLink(incomingLink.getIndex()); // when a node is deactivated, it should deactivate the attached links, not disconnecting them entirely from the node.
+//        }
+//        List<Link> outgoingLinks=deactivatedNode.getOutgoingLinks();
+//        for(Link outgoingLink:outgoingLinks){
+//            //outgoingLink.setStartNode(null);
+//            deactivateLink(outgoingLink.getIndex());
+//        }
     }
     
     @Override
@@ -285,16 +291,11 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void deactivateLink(String index){
         Link deactivatedLink=links.get(index);
         deactivatedLink.setActivated(false);
-        deactivatedLink.getStartNode().removeLink(deactivatedLink);
-        deactivatedLink.getEndNode().removeLink(deactivatedLink);
+        //deactivatedLink.getStartNode().removeLink(deactivatedLink); // handled in link object to ensure, that both methods can be used
+        //deactivatedLink.getEndNode().removeLink(deactivatedLink);
     }
     
     @Override
-    /**
-     * Extract islands
-     * 
-     * @return ArrayList where each entry is an sorted ArrayList of nodes belonging to one island. islands.size() gives number of islands.
-     */
     public ArrayList<FlowNetwork> getIslands(){
         ArrayList<FlowNetwork> islands = new ArrayList<>();
         ArrayList leftNodes = new ArrayList();

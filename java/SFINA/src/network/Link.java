@@ -250,6 +250,14 @@ public class Link extends State{
      */
     public void setActivated(boolean activated) {
         this.activated = activated;
+        if(activated){
+            this.getStartNode().addLink(this);
+            this.getEndNode().addLink(this);
+        }
+        else{
+            this.getStartNode().removeLink(this);
+            this.getEndNode().removeLink(this);
+        }
     }
     
 }
