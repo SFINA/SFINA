@@ -81,7 +81,7 @@ public class BenchmarkLogReplayer {
         double avgFlowPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_FLOW).getAverage();
         double avgUtilizationPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_UTILIZATION).getAverage();
         
-        System.out.println(epochNum+coma+avgLineLossesPerEpoch+coma+avgFlowPerEpoch+coma+avgUtilizationPerEpoch);
+        System.out.format("%20.0f%20.2f%20.2f%20.2f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch);
         
     }
 
@@ -95,7 +95,7 @@ public class BenchmarkLogReplayer {
 
     public void printLocalMetricsTags(){
         System.out.println("*** RESULTS PER EPOCH ***\n");
-        System.out.println("# of Epoch,AVG Activation Status,AVG Flow,AVG Utilization");
+        System.out.format("%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization");
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

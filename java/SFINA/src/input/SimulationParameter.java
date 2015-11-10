@@ -9,12 +9,11 @@ package input;
  *
  * @author evangelospournaras
  */
-public enum InputParameter {
+public enum SimulationParameter {
     DOMAIN,
     BACKEND,
-    FLOW_ANALYSIS_TYPE,
     FLOW_TYPE,
     TOLERANCE_PARAMETER,
     ATTACK_STRATEGY,
-    TIME_STEPS
+    LINE_RATE_CHANGE_FACTOR
 }

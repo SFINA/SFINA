@@ -9,14 +9,14 @@ import input.Backend;
 import static input.Backend.INTERPSS;
 import static input.Backend.MATPOWER;
 import flow_analysis.FlowBackendInterface;
+import input.AttackStrategy;
 import input.Domain;
 import static input.Domain.GAS;
 import static input.Domain.POWER;
 import static input.Domain.TRANSPORTATION;
 import static input.Domain.WATER;
 import input.EventLoader;
-import input.InputParameter;
-import input.InputParametersLoader;
+import input.SimulationParameter;
 import input.TopologyLoader;
 import java.io.File;
 import java.util.ArrayList;
@@ -74,17 +74,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private String experimentConfigurationFilesLocation;
     private String experimentOutputFilesLocation;
     private int iteration;
-    private String inputParametersLocation;
     private String nodesLocation;
     private String linksLocation;
     private String nodesFlowLocation;
     private String linksFlowLocation;
     private String eventsLocation;
-    private String parameterValueSeparator;
     private String columnSeparator;
     private String missingValue;
-    private Map<InputParameter,Object> inputParameters;
-    private InputParametersLoader inputParametersLoader;
+    private HashMap<SimulationParameter,Object> simulationParameters;
     private FlowNetwork flowNetwork;
     private LinkedHashMap<FlowNetwork, Boolean> finalIslands;
     private TopologyLoader topologyLoader;
@@ -92,6 +89,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
     private Domain domain;
+    private Backend backend;
     private ArrayList<Event> events;
     
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
@@ -104,15 +102,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             String timeTokenName, 
             String experimentConfigurationFilesLocation, 
             String experimentOutputFilesLocation,
-            String inputParametersLocation, 
             String nodesLocation, 
             String linksLocation, 
             String nodesFlowLocation, 
             String linksFlowLocation, 
             String eventsLocation, 
-            String parameterValueSeparator, 
             String columnSeparator, 
-            String missingValue){
+            String missingValue,
+            HashMap simulationParameters){
         this.experimentID=experimentID;
         this.peersLogDirectory=peersLogDirectory;
         this.bootstrapTime=bootstrapTime;
@@ -121,16 +118,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.experimentConfigurationFilesLocation=experimentConfigurationFilesLocation;
         this.experimentOutputFilesLocation=experimentOutputFilesLocation;
         this.iteration=0;
-        this.inputParametersLocation=inputParametersLocation;
         this.nodesLocation=nodesLocation;
         this.linksLocation=linksLocation;
         this.nodesFlowLocation=nodesFlowLocation;
         this.linksFlowLocation=linksFlowLocation;
         this.eventsLocation=eventsLocation;
-        this.parameterValueSeparator=parameterValueSeparator;
         this.columnSeparator=columnSeparator;
         this.missingValue=missingValue;
-        this.inputParametersLoader=new InputParametersLoader(this.parameterValueSeparator);
+        this.simulationParameters=simulationParameters;
         this.temporalLinkMetrics=new HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>>();
         this.flowNetwork=new FlowNetwork();
         this.finalIslands=new LinkedHashMap();
@@ -155,6 +150,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     */
     @Override
     public void start(){
+        scheduleMeasurements();
         this.runBootstraping();
     }
 
@@ -175,12 +171,18 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime());
-                inputParameters=inputParametersLoader.loadInputParameters(inputParametersLocation);
-                domain=(Domain)inputParameters.get(InputParameter.DOMAIN);
+                if (simulationParameters.containsKey(SimulationParameter.DOMAIN))
+                    domain = (Domain)simulationParameters.get(SimulationParameter.DOMAIN);
+                else 
+                    logger.debug("Domain not specified.");
+                if (simulationParameters.containsKey(SimulationParameter.BACKEND))
+                    backend = (Backend)simulationParameters.get(SimulationParameter.BACKEND);
+                else
+                    logger.debug("Backend not specified.");
                 loadNetworkData();
-                eventLoader=new EventLoader(domain,columnSeparator);
+                eventLoader=new EventLoader(domain,columnSeparator,missingValue);
                 events=eventLoader.loadEvents(eventsLocation);
-                scheduleMeasurements();
+                //scheduleMeasurements();
                 runActiveState();
             }
         });
@@ -196,6 +198,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime());
+                System.out.println("--------> simu time " + getSimulationTime());
                 finalIslands.clear();
                 System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------");
                 
@@ -203,13 +206,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 
                 executeAllEvents(getSimulationTime());
                 
-                // Reducing rating to trigger bigger cascade
-                //reduceLineRating(0.5);
-                
                 runCascade();
                 
                 // Print final steady state after cascade
-                System.out.println("-------------------\n" + finalIslands.size() + " final islands:");
+                System.out.println("--------------------------------------\n" + finalIslands.size() + " final islands:");
                 String nodesInIsland;
                 for (FlowNetwork net : finalIslands.keySet()){
                     nodesInIsland = "";
@@ -228,11 +228,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
        }
         });
         loadAgentTimer.schedule(this.runTime);
-    }
-    
-    private void reduceLineRating(double reductionFactor){
-        for (Link link : flowNetwork.getLinks())
-            link.replacePropertyElement(PowerLinkState.RATE_C, link.getCapacity()*(1-reductionFactor));
     }
     
     public int getSimulationTime(){
@@ -254,9 +249,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
                     flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
                     flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
-//                    System.out.println("Ratings");
-//                    for (Link link : flowNetwork.getLinks())
-//                        System.out.println(link.getFlow() + " -> limit is " + link.getCapacity());
+                    if (!simulationParameters.containsKey(SimulationParameter.FLOW_TYPE)){
+                        logger.debug("Flow Type not specified. Setting to AC.");
+                    }
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");
@@ -334,12 +329,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         }
 //        if (TopologyChange)
 //            checkIslands();
-//        
-//        for(Event event:events){
-//            if(event.getTime()==time){
-//                this.executeEvent(flowNetwork, event);
-//            }
-//        }
     }
     
     @Override
@@ -413,6 +402,34 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         logger.debug("Network component cannot be recognised");
                 }
                 break;
+            case PARAMETER:
+                System.out.println("..changing " + (SimulationParameter)event.getParameter());
+                switch((SimulationParameter)event.getParameter()){
+                    case DOMAIN:
+                        simulationParameters.put(SimulationParameter.DOMAIN, (Domain)event.getValue());
+                        domain=(Domain)event.getValue();
+                        break;
+                    case BACKEND:
+                        simulationParameters.put(SimulationParameter.BACKEND, (Backend)event.getValue());
+                        backend=(Backend)event.getValue();
+                        break;
+                    case FLOW_TYPE:
+                        simulationParameters.put(SimulationParameter.FLOW_TYPE, (PowerFlowType)event.getValue());
+                        break;
+                    case TOLERANCE_PARAMETER:
+                        simulationParameters.put(SimulationParameter.TOLERANCE_PARAMETER, (Double)event.getValue());
+                        break;
+                    case ATTACK_STRATEGY:
+                        simulationParameters.put(SimulationParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
+                        break;
+                    case LINE_RATE_CHANGE_FACTOR:
+                        simulationParameters.put(SimulationParameter.LINE_RATE_CHANGE_FACTOR, (Double)event.getValue());
+                        for (Link link : flowNetwork.getLinks())
+                            link.setCapacity(link.getCapacity()*(1.0-(Double)simulationParameters.get(SimulationParameter.LINE_RATE_CHANGE_FACTOR)));
+                        break;
+                    default:
+                        logger.debug("Simulation parameter cannot be regognized.");
+                }
             default:
                 logger.debug("Event type cannot be recognised");
         }
@@ -424,22 +441,22 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
         islandBuffer.add(flowNetwork.getIslands());
         while(!islandBuffer.get(iter).isEmpty()){
-            System.out.println("---> Iteration " + (iter+1) + " <---");
+            System.out.println("---------------------\n---- Iteration " + (iter+1) + " ----");
             islandBuffer.add(new ArrayList<>()); // List of islands for next iteration (iter+1)
             for(int i=0; i < islandBuffer.get(iter).size(); i++){ // go through islands at current iteration
                 FlowNetwork currentIsland = islandBuffer.get(iter).get(i);
                 System.out.println("---> Treating island with " + currentIsland.getNodes().size() + " nodes.");
                 
                 boolean converged = flowConvergenceAlgo(currentIsland); // do flow analysis
-                System.out.println("..converged " + converged);
+                System.out.println("=> converged " + converged);
                 if (converged){
                     
                     // if mitigation strategy is implemented
                     mitigateOverload(currentIsland);
                     
                     boolean linkOverloaded = linkOverloadAlgo(currentIsland);
-                    boolean nodeOverloaded = nodeOverloadAlgo(currentIsland);
-                    System.out.println("..overloaded " + linkOverloaded);
+                    //boolean nodeOverloaded = nodeOverloadAlgo(currentIsland);
+                    System.out.println("=> overloaded " + linkOverloaded);
                     if(linkOverloaded){
                         // add islands of the current island to next iteration
                         for (FlowNetwork net : currentIsland.getIslands())
@@ -465,7 +482,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     @Override
     public boolean flowConvergenceAlgo(FlowNetwork flowNetwork){
         boolean converged = false;
-        Domain domain=(Domain)this.inputParameters.get(InputParameter.DOMAIN);
         switch(domain){
             case POWER:
                 // blackout if isolated node
@@ -505,8 +521,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 boolean limViolation = true;
                 converged = runFlowAnalysis(flowNetwork);
                 while(limViolation){
+                    System.out.println("....converged " + converged);
                     if (converged){
-                        System.out.println("....converged " + converged);
                         limViolation = powerGenLimitAlgo2(flowNetwork, slack);
                         if (limViolation){
                             converged = false;
@@ -657,8 +673,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         }
         
         // Load shedding
-        if (!converged)
+        if (!converged){
+            generators.get(0).replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
             converged = powerLoadShedAlgo(flowNetwork);
+        }
         
         return converged;
     }
@@ -703,17 +721,15 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     @Override
     public boolean runFlowAnalysis(FlowNetwork flowNetwork){
         FlowBackendInterface flowBackend;
-        Domain domain=(Domain)this.inputParameters.get(InputParameter.DOMAIN);
-        Backend backend=(Backend)this.inputParameters.get(InputParameter.BACKEND);
         switch(domain){
             case POWER:
                 switch(backend){
                     case MATPOWER:
-                        flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
+                        flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.simulationParameters.get(SimulationParameter.FLOW_TYPE));
                         flowBackend.flowAnalysis(flowNetwork);
                         return flowBackend.isConverged();
                     case INTERPSS:
-                        flowBackend=new InterpssFlowBackend((PowerFlowType)this.inputParameters.get(InputParameter.FLOW_TYPE));
+                        flowBackend=new InterpssFlowBackend((PowerFlowType)this.simulationParameters.get(SimulationParameter.FLOW_TYPE));
                         flowBackend.flowAnalysis(flowNetwork);
                         return flowBackend.isConverged();
                     default:

@@ -21,6 +21,7 @@ import com.interpss.common.exp.InterpssException;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
+import output.TopologyWriter;
 import power.PowerFlowType;
 import power.PowerNodeType;
 import power.flow_analysis.InterpssFlowBackend;
@@ -28,6 +29,7 @@ import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;
+import power.output.PowerFlowWriter;
 
 /**
  *
@@ -49,25 +51,37 @@ public class testInterpss {
         loader.load(caseName, net3);
         //resetLfData(net1);
         
-        compareData(net1);
+        getIpssData(net1);
+        for(Node node : net1.getNodes()){
+            net2.getNode(node.getIndex()).replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, node.getProperty(PowerNodeState.VOLTAGE_MAGNITUDE));
+            net2.getNode(node.getIndex()).replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, node.getProperty(PowerNodeState.VOLTAGE_ANGLE));
+        }
+        compareData(net2);
+        runInterpssOurData(net2);
+        runInterpssTheirLoader(net3);
+        
         
 //        runMatlabSimu(net3);
 //        printer.printLfResults(net3);
 
+        //runInterpssOurData(net1);
+        //printer.printLfResults(net1);
+        
         //adjustGenReact(net1,net3);
         
-        runInterpssOurData(net1);
-        printer.printLfResults(net1);
-
-        runInterpssTheirLoader(net2);
-        printer.printLfResults(net2);
+        //runInterpssTheirLoader(net2);
+        //printer.printLfResults(net2);
         
-        System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS OUR DATA <-> INTERPSS THEIR LOADER\n--------------------------------------------------");
-        printer.compareLFResults(net1, net2);
+        
+
+        
+        
+        //System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS OUR DATA <-> INTERPSS THEIR LOADER\n--------------------------------------------------");
+        //printer.compareLFResults(net1, net2);
 //        System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS OUR DATA <-> MATPOWER OUR DATA\n--------------------------------------------------");
 //        printer.compareLFResults(net1, net3);
 //        System.out.println("\n--------------------------------------------------\n    COMPARING INTERPSS THEIR LOADER <-> MATPOWER OUR DATA\n--------------------------------------------------");
-//        printer.compareLFResults(net2, net3);
+        printer.compareLFResults(net2, net3);
     }
 
     private static void adjustGenReact(FlowNetwork net1, FlowNetwork net2){
@@ -77,6 +91,24 @@ public class testInterpss {
                 node1.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, net2.getNode(node1.getIndex()).getProperty(PowerNodeState.POWER_GENERATION_REACTIVE));
             }            
         }
+    }
+    
+    private static void getIpssData(FlowNetwork net){
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
+        IpssObject.getIpssData(net, caseName);
+    }
+    
+    private static void writeData(FlowNetwork net){
+        String topLocation = "";
+        String flowLocation = "";
+        String colSep = ",";
+        String missVal = "-";
+        TopologyWriter topWriter = new TopologyWriter(net, colSep);
+        topWriter.writeNodes(topLocation);
+        topWriter.writeLinks(topLocation);
+        PowerFlowWriter flowWriter = new PowerFlowWriter(net, colSep, missVal);
+        flowWriter.writeNodeFlowData(flowLocation);
+        flowWriter.writeLinkFlowData(flowLocation);
     }
     
     private static void runInterpssOurData(FlowNetwork net){

@@ -11,17 +11,12 @@ import input.EventLoader;
 import java.util.HashMap;
 import java.util.ArrayList;
 import input.TopologyLoader;
-import input.InputParameter;
-import input.InputParametersLoader;
+import input.SimulationParameter;
 import java.io.File;
-import java.util.List;
 import network.FlowNetwork;
 import power.input.PowerFlowLoader;
 import network.Link;
 import network.Node;
-import org.apache.log4j.Logger;
-import power.input.PowerNodeState;
-import power.input.PowerLinkState;
 import power.output.PowerConsoleOutput;
 
 /**
@@ -36,14 +31,13 @@ public class testLoader {
     private String linkLocation;
     private String nodeFlowLocation;
     private String linkFlowLocation;
-    private static String paramLocation = "configuration_files/input/parameters.txt";
     private static String eventLocation = "configuration_files/input/events.txt";
     
     // make imported nodes and links accessible for testing other stuff
     private FlowNetwork net;
     private static ArrayList<Node> nodes;
     private static ArrayList<Link> links;
-    private static HashMap<InputParameter,Object> parameters;
+    private static HashMap<SimulationParameter,Object> parameters;
     private static ArrayList<Event> events;
     
     public testLoader(){
@@ -79,12 +73,8 @@ public class testLoader {
         nodes = new ArrayList<Node>(net.getNodes());
         links = new ArrayList<Link>(net.getLinks());
         
-        // Load Input Parameters
-        InputParametersLoader paramLoader = new InputParametersLoader(param_seperator);
-        parameters = paramLoader.loadInputParameters(paramLocation);
-        
         // Load Event Parameters
-        EventLoader eventLoader = new EventLoader(Domain.POWER, col_seperator);
+        EventLoader eventLoader = new EventLoader(Domain.POWER, col_seperator, missingValue);
         events = eventLoader.loadEvents(eventLocation);
          
         //System.out.println("\n--------------------------------------------------\n    LOADING DATA SUCCESSFUL\n--------------------------------------------------\n");
@@ -102,7 +92,7 @@ public class testLoader {
     private static void printParam(){
         System.out.println("\n-------------------------\n    INPUT PARAMETERS\n-------------------------");
         
-        for (HashMap.Entry<InputParameter, Object> entry : parameters.entrySet()) {
+        for (HashMap.Entry<SimulationParameter, Object> entry : parameters.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());           
         }
     }

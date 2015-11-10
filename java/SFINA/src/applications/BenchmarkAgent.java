@@ -39,15 +39,14 @@ public class BenchmarkAgent extends SFINAAgent{
             String timeTokenName, 
             String experimentConfigurationFilesLocation, 
             String experimentOutputFilesLocation,
-            String inputParametersLocation, 
             String nodesLocation, 
             String linksLocation, 
             String nodesFlowLocation, 
             String linksFlowLocation, 
             String eventsLocation, 
-            String parameterValueSeparator, 
             String columnSeparator, 
-            String missingValue){
+            String missingValue,
+            HashMap simulationParameters){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -55,15 +54,14 @@ public class BenchmarkAgent extends SFINAAgent{
                 timeTokenName,
                 experimentConfigurationFilesLocation,
                 experimentOutputFilesLocation,
-                inputParametersLocation,
                 nodesLocation,
                 linksLocation,
                 nodesFlowLocation,
                 linksFlowLocation,
                 eventsLocation,
-                parameterValueSeparator,
                 columnSeparator,
-                missingValue);
+                missingValue,
+                simulationParameters);
     }
     
     private void calculateTotalLines(){
@@ -119,7 +117,10 @@ public class BenchmarkAgent extends SFINAAgent{
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
                 int simulationTime=getSimulationTime();
+                
                 if(simulationTime>=1){
+                    System.out.println("------------- epoch time " + epochNumber);
+                    System.out.println("------------- sime time " + simulationTime);
                     log.logTagSet(epochNumber, new HashSet(getFlowNetwork().getLinks()), epochNumber);
                     for(Link link:getFlowNetwork().getLinks()){
                         HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());

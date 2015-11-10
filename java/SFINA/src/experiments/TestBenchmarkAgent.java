@@ -18,7 +18,12 @@
 package experiments;
 
 import applications.BenchmarkAgent;
+import input.Backend;
+import input.Domain;
+import input.SimulationParameter;
 import java.io.File;
+import java.util.HashMap;
+import power.PowerFlowType;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -38,11 +43,12 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=10;
+    private final static int runDuration=8;
     private final static int N=1;
     
     // SFINA parameters
-    private final static String parameterValueSeparator="=";
+    private final static HashMap<SimulationParameter,Object> simulationParameters = new HashMap();
+
     private final static String columnSeparator=",";
     private final static String missingValue="-";
     
@@ -55,7 +61,6 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
     private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String inputParametersLocation=experimentConfigurationFilesLocation+"/parameters.txt";
     private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
     private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
@@ -63,6 +68,15 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
+        // Necessary
+        simulationParameters.put(SimulationParameter.DOMAIN, Domain.POWER);
+        simulationParameters.put(SimulationParameter.BACKEND, Backend.MATPOWER);
+        simulationParameters.put(SimulationParameter.FLOW_TYPE, PowerFlowType.AC);
+        
+        // Optional, not yet implemented to afffect anything
+        simulationParameters.put(SimulationParameter.TOLERANCE_PARAMETER, 2.0);
+        simulationParameters.put(SimulationParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
         final TestBenchmarkAgent test = new TestBenchmarkAgent();
@@ -84,15 +98,14 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
                         timeTokenName,
                         experimentConfigurationFilesLocation,
                         experimentOutputFilesLocation,
-                        inputParametersLocation,
                         nodesLocation,
                         linksLocation,
                         nodesFlowLocation,
                         linksFlowLocation,
                         eventsLocation,
-                        parameterValueSeparator,
                         columnSeparator,
-                        missingValue));
+                        missingValue,
+                        simulationParameters));
                 return newPeer;
             }
         };

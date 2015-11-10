@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 import network.LinkState;
 import network.NodeState;
 import org.apache.log4j.Logger;
+import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
@@ -81,13 +82,15 @@ public class EventLoader {
     
     private Domain domain;
     private String columnSeparator;
+    private String missingValue;
     private static final Logger logger = Logger.getLogger(EventLoader.class);
     private ArrayList<Event> events;
     
     
-    public EventLoader(Domain domain, String columnSeparator){
+    public EventLoader(Domain domain, String columnSeparator, String missingValue){
         this.domain=domain;
         this.columnSeparator=columnSeparator;
+        this.missingValue=missingValue;
         this.events=new ArrayList<Event>();
     }
     
@@ -127,6 +130,8 @@ public class EventLoader {
                     case "flow":
                         networkFeature=EventType.FLOW;
                         break;
+                    case "parameter":
+                        networkFeature=EventType.PARAMETER;
                     default:
                         logger.debug("Network feature cannot be recognized.");
                 }
@@ -201,6 +206,24 @@ public class EventLoader {
                                 logger.debug("Network component cannot be recognized.");
                         }
                         break;
+                    case PARAMETER:
+                        switch(domain){
+                            case POWER:
+                                parameter=this.lookupPowerParameterState(values.get(4));
+                                break;
+                            case GAS:
+                                logger.debug("This domain is not supported at this moment");
+                                break;
+                            case WATER:
+                                logger.debug("This domain is not supported at this moment");
+                                break;
+                            case TRANSPORTATION:
+                                logger.debug("This domain is not supported at this moment");
+                                break;
+                            default:
+                                logger.debug("Wrong backend detected.");
+                        }
+                        break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
                 }
@@ -260,6 +283,9 @@ public class EventLoader {
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
+                        break;
+                    case PARAMETER:
+                        value=this.getActualParameterValue((SimulationParameter)parameter, values.get(5));
                         break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
@@ -416,6 +442,26 @@ public class EventLoader {
                 return PowerLinkState.ANGLE_DIFFERENCE_MAX;
             default:
                 logger.debug("Power link state is not recognized.");
+                return null;
+        }
+    }
+    
+    private SimulationParameter lookupPowerParameterState(String powerParameterState){
+        switch(powerParameterState){
+            case "domain":
+                return SimulationParameter.DOMAIN;
+            case "backend":
+                return SimulationParameter.BACKEND;
+            case "flow_type":
+                return SimulationParameter.FLOW_TYPE;
+            case "tolerance_parameter":
+                return SimulationParameter.TOLERANCE_PARAMETER;
+            case "attack_strategy":
+                return SimulationParameter.ATTACK_STRATEGY;
+            case "line_rate_change_factor":
+                return SimulationParameter.LINE_RATE_CHANGE_FACTOR;
+            default:
+                logger.debug(("Parameter state is not recognized."));
                 return null;
         }
     }
@@ -620,6 +666,59 @@ public class EventLoader {
                 return Double.parseDouble(rawValue);
             default:
                 logger.debug("Power link state is not recognized.");
+                return null;
+        }
+    }
+    
+    private Object getActualParameterValue(SimulationParameter simulationParameter, String rawValue){
+        switch(simulationParameter){
+            case DOMAIN:
+                switch(rawValue){
+                    case "power":
+                        return Domain.POWER;
+                    case "gas":
+                        return Domain.GAS;
+                    case "water":
+                        return Domain.WATER;
+                    case "transportation":
+                        return Domain.TRANSPORTATION;
+                    default:
+                        logger.debug("Domain not regognized.");
+                        return null;
+                }
+            case BACKEND:
+                switch(rawValue){
+                    case "matpower":
+                        return Backend.MATPOWER;
+                    case "interpss":
+                        return Backend.INTERPSS;
+                    default:
+                        logger.debug("Backend not regognized.");
+                }
+            case FLOW_TYPE:
+                switch(rawValue){
+                    case "ac":
+                        return PowerFlowType.AC;
+                    case "dc":
+                        return PowerFlowType.DC;
+                    default:
+                        logger.debug("Flow Type not regognized.");
+                }
+            case TOLERANCE_PARAMETER:
+                return Double.parseDouble(rawValue);
+            case ATTACK_STRATEGY:
+                switch(rawValue){
+                    case "sequential":
+                        return AttackStrategy.SEQUENTIAL;
+                    case "simultaneous":
+                        return AttackStrategy.SIMULTANEOUS;
+                    default:
+                        logger.debug("Attack Strategy not regognized.");
+                }
+            case LINE_RATE_CHANGE_FACTOR:
+                return Double.parseDouble(rawValue);
+            default:
+                logger.debug("Parameter value is not recognized.");
                 return null;
         }
     }

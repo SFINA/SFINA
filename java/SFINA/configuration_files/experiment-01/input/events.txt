@@ -1,2 +1,4 @@
 time,feature,component,id,parameter,value
-2,topology,node,6,status,0
+2,parameter,-,-,line_rate_change_factor,0.5
+3,parameter,-,-,backend,interpss
+4,parameter,-,-,line_rate_change_factor,0.5
