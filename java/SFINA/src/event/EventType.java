@@ -24,5 +24,5 @@ package event;
 public enum EventType {
     TOPOLOGY,
     FLOW,
-    PARAMETER
+    SYSTEM
 }

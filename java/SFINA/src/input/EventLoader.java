@@ -130,8 +130,8 @@ public class EventLoader {
                     case "flow":
                         networkFeature=EventType.FLOW;
                         break;
-                    case "parameter":
-                        networkFeature=EventType.PARAMETER;
+                    case "system":
+                        networkFeature=EventType.SYSTEM;
                     default:
                         logger.debug("Network feature cannot be recognized.");
                 }
@@ -206,10 +206,10 @@ public class EventLoader {
                                 logger.debug("Network component cannot be recognized.");
                         }
                         break;
-                    case PARAMETER:
+                    case SYSTEM:
                         switch(domain){
                             case POWER:
-                                parameter=this.lookupPowerParameterState(values.get(4));
+                                parameter=this.lookupPowerSystemParameterState(values.get(4));
                                 break;
                             case GAS:
                                 logger.debug("This domain is not supported at this moment");
@@ -284,8 +284,8 @@ public class EventLoader {
                                 logger.debug("Network component cannot be recognized.");
                         }
                         break;
-                    case PARAMETER:
-                        value=this.getActualParameterValue((SimulationParameter)parameter, values.get(5));
+                    case SYSTEM:
+                        value=this.getActualSystemValue((SystemParameter)parameter, values.get(5));
                         break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
@@ -446,22 +446,22 @@ public class EventLoader {
         }
     }
     
-    private SimulationParameter lookupPowerParameterState(String powerParameterState){
+    private SystemParameter lookupPowerSystemParameterState(String powerParameterState){
         switch(powerParameterState){
             case "domain":
-                return SimulationParameter.DOMAIN;
+                return SystemParameter.DOMAIN;
             case "backend":
-                return SimulationParameter.BACKEND;
+                return SystemParameter.BACKEND;
             case "flow_type":
-                return SimulationParameter.FLOW_TYPE;
+                return SystemParameter.FLOW_TYPE;
             case "tolerance_parameter":
-                return SimulationParameter.TOLERANCE_PARAMETER;
+                return SystemParameter.TOLERANCE_PARAMETER;
             case "attack_strategy":
-                return SimulationParameter.ATTACK_STRATEGY;
+                return SystemParameter.ATTACK_STRATEGY;
             case "line_rate_change_factor":
-                return SimulationParameter.LINE_RATE_CHANGE_FACTOR;
+                return SystemParameter.LINE_RATE_CHANGE_FACTOR;
             default:
-                logger.debug(("Parameter state is not recognized."));
+                logger.debug(("System parameter state is not recognized."));
                 return null;
         }
     }
@@ -670,8 +670,8 @@ public class EventLoader {
         }
     }
     
-    private Object getActualParameterValue(SimulationParameter simulationParameter, String rawValue){
-        switch(simulationParameter){
+    private Object getActualSystemValue(SystemParameter systemParameter, String rawValue){
+        switch(systemParameter){
             case DOMAIN:
                 switch(rawValue){
                     case "power":

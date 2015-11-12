@@ -18,9 +18,13 @@
 package applications;
 
 import core.SFINAAgent;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import network.FlowNetwork;
 import network.Link;
+import network.Node;
+import power.input.PowerNodeState;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
@@ -46,7 +50,7 @@ public class BenchmarkAgent extends SFINAAgent{
             String eventsLocation, 
             String columnSeparator, 
             String missingValue,
-            HashMap simulationParameters){
+            HashMap systemParameters){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -61,7 +65,7 @@ public class BenchmarkAgent extends SFINAAgent{
                 eventsLocation,
                 columnSeparator,
                 missingValue,
-                simulationParameters);
+                systemParameters);
     }
     
     private void calculateTotalLines(){
@@ -97,6 +101,47 @@ public class BenchmarkAgent extends SFINAAgent{
         }
     }
     
+    private void calculateInitialLoad(){
+        for(Node node : this.getFlowNetwork().getNodes()){
+            double initialLoadPerEpoch = (Double)this.getInitialLoadPerEpoch(this.getSimulationTime()).get(node.getIndex());
+            HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+            metrics.put(Metrics.NODE_INIT_LOADING, initialLoadPerEpoch);
+        }
+    }
+    
+    private void calculateFinalLoad(){
+        for(Node node : this.getFlowNetwork().getNodes()){
+            if(node.isActivated()){
+                double load = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
+                HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+                metrics.put(Metrics.NODE_FINAL_LOADING, load);
+            }
+            else{
+                HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+                metrics.put(Metrics.NODE_FINAL_LOADING, 0.0);
+            }
+                
+        }
+    }
+    
+//    private void calculateFinalLoad1(){
+//        for(FlowNetwork net : this.getFinalIslands().keySet()){
+//            if(this.getFinalIslands().get(net)){
+//                for(Node node : net.getNodes()){
+//                    double load = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
+//                    HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+//                    metrics.put(Metrics.NODE_FINAL_LOADING, load);
+//                }
+//            }
+//            else{
+//                for(Node node : net.getNodes()){
+//                    double load = 0.0;
+//                    HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+//                    metrics.put(Metrics.NODE_FINAL_LOADING, load);
+//                }
+//            }
+//        }
+//    }
     
     @Override
     public void performMeasurements(){
@@ -104,6 +149,8 @@ public class BenchmarkAgent extends SFINAAgent{
         this.calculateFlow();
         this.calculateUtilization();
         this.calculateTotalLines();
+        this.calculateInitialLoad();
+        this.calculateFinalLoad();
     }
     
     //****************** MEASUREMENTS ******************
@@ -119,19 +166,30 @@ public class BenchmarkAgent extends SFINAAgent{
                 int simulationTime=getSimulationTime();
                 
                 if(simulationTime>=1){
-                    System.out.println("------------- epoch time " + epochNumber);
-                    System.out.println("------------- sime time " + simulationTime);
-                    log.logTagSet(epochNumber, new HashSet(getFlowNetwork().getLinks()), epochNumber);
+                    System.out.println("\n------------- epoch time " + epochNumber);
+                    System.out.println("------------- simu time " + simulationTime);
+                    log.logTagSet(simulationTime, new HashSet(getFlowNetwork().getLinks()), simulationTime);
                     for(Link link:getFlowNetwork().getLinks()){
                         HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
-                        log.log(epochNumber, Metrics.LINE_UTILIZATION, ((Double)linkMetrics.get(Metrics.LINE_UTILIZATION)).doubleValue());
-                        log.log(epochNumber, Metrics.LINE_FLOW, ((Double)linkMetrics.get(Metrics.LINE_FLOW)).doubleValue());
-                        log.log(epochNumber, Metrics.ACTIVATED_LINES, ((Double)linkMetrics.get(Metrics.ACTIVATED_LINES)).doubleValue());
-                        log.log(epochNumber, Metrics.TOTAL_LINES, ((Double)linkMetrics.get(Metrics.TOTAL_LINES)).doubleValue());
+                        log.log(simulationTime, Metrics.LINE_UTILIZATION, ((Double)linkMetrics.get(Metrics.LINE_UTILIZATION)).doubleValue());
+                        log.log(simulationTime, Metrics.LINE_FLOW, ((Double)linkMetrics.get(Metrics.LINE_FLOW)).doubleValue());
+                        log.log(simulationTime, Metrics.ACTIVATED_LINES, ((Double)linkMetrics.get(Metrics.ACTIVATED_LINES)).doubleValue());
+                        log.log(simulationTime, Metrics.TOTAL_LINES, ((Double)linkMetrics.get(Metrics.TOTAL_LINES)).doubleValue());
+                    }
+                    log.logTagSet(simulationTime, new HashSet(getFlowNetwork().getNodes()), simulationTime);
+                    for(Node node:getFlowNetwork().getNodes()){
+                        HashMap<Metrics,Object> nodeMetrics=getTemporalNodeMetrics().get(simulationTime).get(node.getIndex());
+                        log.log(simulationTime, Metrics.NODE_INIT_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_INIT_LOADING)).doubleValue());
+                        log.log(simulationTime, Metrics.NODE_FINAL_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_FINAL_LOADING)).doubleValue());
+                    }
+                    // this logTagSet uses as tagSet the iterations per epoch as collection of Integers
+                    log.logTagSet(simulationTime, new HashSet((Collection)getFlowSimuTime().get(simulationTime).keySet()), simulationTime);
+                    for(int iteration : getFlowSimuTime().get(simulationTime).keySet()){
+                        log.log(simulationTime, Metrics.SYSTEM_FLOW_SIMU_TIME, ((Long)getFlowSimuTime().get(simulationTime).get(iteration)).doubleValue());
                     }
                 }
-                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
-                log.shrink(epochNumber, epochNumber+1);
+                getMeasurementDumper().measurementEpochEnded(log, simulationTime);
+                log.shrink(simulationTime, simulationTime+1);
             }
         });
     }

@@ -54,6 +54,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     public InterpssFlowBackend(PowerFlowType powerFlowType){
         this.powerFlowType=powerFlowType;
         this.converged=false;
+        IpssCorePlugin.init(Level.OFF);
     }
     
     
@@ -62,7 +63,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         
         this.SfinaNet = net;
         
-        IpssCorePlugin.init(Level.OFF);
         try{
             switch(powerFlowType){
                 case AC:
@@ -74,6 +74,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();        
                     //System.out.println(resultLoaded);
                     getIpssACResults();
+                    this.converged = IpssNet.isLfConverged();
                     break;
                 case DC:
                     buildIpssNet();
@@ -82,12 +83,13 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     getIpssDCResults(dcAlgo);
                     String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
                     //System.out.println(resultDC);
-                    dcAlgo.destroy();	
+                    this.converged = dcAlgo.isDclfCalculated();
+                    dcAlgo.destroy();
                     break;
                 default:
                     logger.debug("Power flow type is not recognized.");
             }
-            this.converged = IpssNet.isLfConverged();
+            
         }
         catch(ReferenceBusException rbe){
             rbe.printStackTrace();
@@ -359,6 +361,21 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     private void setVoltZero(){
         for(AclfBus bus : IpssNet.getBusList()){
             bus.setVoltage(1.0,0.0);
+        }
+    }
+    
+    public void getIpssData(FlowNetwork net, String caseName){
+        this.SfinaNet = net;
+        IpssCorePlugin.init(Level.OFF);
+        
+        try{
+            this.IpssNet = CorePluginObjFactory.getFileAdapter(IpssFileAdapter.FileFormat.IEEECDF).load("/Users/Ben/Documents/Studium/COSS/SFINA/java/SFINA/configuration_files/case_files/ieee/" + caseName + ".txt").getAclfNet();
+            renameIpssObjects();
+            getIpssACResults();
+
+        }
+        catch(InterpssException ie){
+            ie.printStackTrace();
         }
     }
     

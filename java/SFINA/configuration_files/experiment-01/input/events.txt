@@ -1,4 +1,12 @@
 time,feature,component,id,parameter,value
-2,parameter,-,-,line_rate_change_factor,0.5
-3,parameter,-,-,backend,interpss
-4,parameter,-,-,line_rate_change_factor,0.5
+2,topology,link,30,status,0
+3,topology,link,31,status,0
+4,topology,link,32,status,0
+5,topology,link,33,status,0
+6,topology,link,34,status,0
+7,system,-,-,backend,interpss
+8,topology,link,30,status,0
+9,topology,link,31,status,0
+10,topology,link,32,status,0
+11,topology,link,33,status,0
+12,topology,link,34,status,0

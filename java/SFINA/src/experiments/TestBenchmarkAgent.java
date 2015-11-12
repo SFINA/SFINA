@@ -20,7 +20,7 @@ package experiments;
 import applications.BenchmarkAgent;
 import input.Backend;
 import input.Domain;
-import input.SimulationParameter;
+import input.SystemParameter;
 import java.io.File;
 import java.util.HashMap;
 import power.PowerFlowType;
@@ -43,11 +43,11 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=8;
+    private final static int runDuration=16;
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SimulationParameter,Object> simulationParameters = new HashMap();
+    private final static HashMap<SystemParameter,Object> simulationParameters = new HashMap();
 
     private final static String columnSeparator=",";
     private final static String missingValue="-";
@@ -69,13 +69,13 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     
     public static void main(String[] args) {
         // Necessary
-        simulationParameters.put(SimulationParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SimulationParameter.BACKEND, Backend.MATPOWER);
-        simulationParameters.put(SimulationParameter.FLOW_TYPE, PowerFlowType.AC);
+        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
+        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
+        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
         
         // Optional, not yet implemented to afffect anything
-        simulationParameters.put(SimulationParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SimulationParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
+        simulationParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
