@@ -6,9 +6,14 @@
 package applications;
 
 import dsutil.protopeer.services.aggregation.AggregationFunction;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import protopeer.measurement.LogReplayer;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
@@ -19,17 +24,26 @@ import protopeer.measurement.MeasurementLoggerListener;
  */
 public class BenchmarkLogReplayer {
 
-    private final static String expSeqNum="01";
+    private final static String expSeqNum="PFTimeCase30";
     private final static String expID="experiment-"+expSeqNum+"/";
+    private final static String resultID="results/"+expSeqNum+"/";
 
     private LogReplayer replayer;
     private final String coma=",";
 
+    private PrintWriter lineLossOut;
+    private PrintWriter flowOut;
+    private PrintWriter utilizationOut;
+    private PrintWriter epochLoadingOut;
+    private PrintWriter totalLoadingOut;
+    private PrintWriter flowTimeOut;
 
     public BenchmarkLogReplayer(String logsDir, int minLoad, int maxLoad){
         this.replayer=new LogReplayer();
         this.loadLogs(logsDir, minLoad, maxLoad);
+        this.prepareResultOutput();
         this.replayResults();
+        this.closeFiles();
     }
 
     public static void main(String args[]){
@@ -59,6 +73,40 @@ public class BenchmarkLogReplayer {
 
         }
     }
+    
+    private void prepareResultOutput(){
+        try{
+            File resultLocation = new File(resultID);
+            resultLocation.mkdirs();
+            
+            lineLossOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"lineLoss.txt", true)));
+            flowOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flow.txt", true)));
+            utilizationOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"utilization.txt", true)));
+            epochLoadingOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"epochLoading.txt", true)));;
+            totalLoadingOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalLoading.txt", true)));;
+            flowTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flowTime.txt", true)));;
+        }
+        catch (IOException e) {
+                //exception handling left as an exercise for the reader
+        }
+    }
+    
+    
+    private void closeFiles(){
+        lineLossOut.print("\n");
+        flowOut.print("\n");
+        utilizationOut.print("\n");
+        epochLoadingOut.print("\n");
+        totalLoadingOut.print("\n");
+        flowTimeOut.print("\n");
+        
+        lineLossOut.close();
+        flowOut.close();
+        utilizationOut.close();
+        epochLoadingOut.close();
+        totalLoadingOut.close();
+        flowTimeOut.close();
+    }
 
     public void replayResults(){
 //        this.printGlobalMetricsTags();
@@ -81,9 +129,17 @@ public class BenchmarkLogReplayer {
         double avgFlowPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_FLOW).getAverage();
         double avgUtilizationPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_UTILIZATION).getAverage();
         double relLoadReductionBetweenEpochs = log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_FINAL_LOADING).getSum()/log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_INIT_LOADING).getSum();
+        double relLoadReductionSinceEpoch1 = log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_FINAL_LOADING).getSum()/log.getAggregateByEpochNumber(1, Metrics.NODE_INIT_LOADING).getSum();
         double avgflowSimuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.SYSTEM_FLOW_SIMU_TIME).getAverage();
         
-        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relLoadReductionBetweenEpochs, avgflowSimuTimePerEpoch);
+        lineLossOut.print(avgLineLossesPerEpoch + coma);
+        flowOut.print(avgFlowPerEpoch + coma);
+        utilizationOut.print(avgUtilizationPerEpoch + coma);
+        epochLoadingOut.print(relLoadReductionBetweenEpochs + coma);
+        totalLoadingOut.print(relLoadReductionSinceEpoch1 + coma);
+        flowTimeOut.print(avgflowSimuTimePerEpoch + coma);
+        
+        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.4f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relLoadReductionBetweenEpochs, relLoadReductionSinceEpoch1, avgflowSimuTimePerEpoch);
         
     }
 
@@ -97,7 +153,7 @@ public class BenchmarkLogReplayer {
 
     public void printLocalMetricsTags(){
         System.out.println("*** RESULTS PER EPOCH ***\n");
-        System.out.format("%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization", "Rel Load Loss", "Flow Simu Time (ms)");
+        System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization", "Rel load this epoch", "Rel load since ep1", "Avg Flow Simu Time", "Nr of iterations");
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

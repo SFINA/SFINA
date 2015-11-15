@@ -189,11 +189,26 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 loadNetworkData();
                 eventLoader=new EventLoader(domain,columnSeparator,missingValue);
                 events=eventLoader.loadEvents(eventsLocation);
+                clearOutputFiles(new File(experimentOutputFilesLocation));
                 //scheduleMeasurements();
                 runActiveState();
             }
         });
         loadAgentTimer.schedule(this.bootstrapTime);
+    }
+    
+    private final static void clearOutputFiles(File experiment){
+        File[] files = experiment.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    clearOutputFiles(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        experiment.delete();
     }
     
     /**
@@ -382,6 +397,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 node.setIndex((String)event.getValue());
                                 break;
                             case STATUS:
+                                if(node.isActivated() == (Boolean)event.getValue())
+                                    logger.debug("Node status same, not changed by event.");
                                 node.setActivated((Boolean)event.getValue()); // This doesn't reevaluate the status of connected links
                                 System.out.println("..deactivating node " + node.getIndex());
                                 // Proper way, but can we make it simpler?
@@ -410,6 +427,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 link.setEndNode(flowNetwork.getNode((String)event.getValue()));
                                 break;
                             case STATUS:
+                                if(link.isActivated() == (Boolean)event.getValue())
+                                    logger.debug("Link status same, not changed by event.");
                                 // link.setActivated((Boolean)event.getValue()); // see above for nodes
                                 System.out.println("..deactivating link " + link.getIndex());
                                 if((Boolean)event.getValue())
@@ -417,7 +436,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 else if(!(Boolean)event.getValue())
                                     flowNetwork.deactivateLink(link.getIndex());
                                 else
-                                    logger.debug("Node status cannot be recognised");
+                                    logger.debug("Link status cannot be recognised");
                                 break;
                             default:
                                 logger.debug("Link state cannot be recognised");

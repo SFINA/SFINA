@@ -1,6 +1,7 @@
 time,feature,component,id,parameter,value
 2,topology,link,30,status,0
 3,topology,link,31,status,0
+3,system,-,-,line_rate_change_factor,0.5
 4,topology,link,32,status,0
 5,topology,link,33,status,0
 6,topology,link,34,status,0
