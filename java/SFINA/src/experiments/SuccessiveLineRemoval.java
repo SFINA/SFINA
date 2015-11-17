@@ -78,8 +78,8 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     public static void main(String[] args) {
         // Necessary
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
+        simulationParameters.put(SystemParameter.BACKEND, Backend.INTERPSS);
+        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.DC);
         
         // Optional, not yet implemented to afffect anything
         simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);

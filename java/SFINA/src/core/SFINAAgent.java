@@ -93,10 +93,13 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private Backend backend;
     private ArrayList<Event> events;
     
+    // Measurement variables
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
     private HashMap<Integer,HashMap<String,Object>> initialLoadPerEpoch;
     private HashMap<Integer,HashMap<Integer,Object>> flowSimuTime;
+    private HashMap<Integer,Object> totalSimuTime;
+    //private int nrPowerFlowSimuCalled;
     
     public SFINAAgent(
             String experimentID, 
@@ -134,6 +137,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.temporalNodeMetrics=new HashMap();
         this.initialLoadPerEpoch=new HashMap();
         this.flowSimuTime = new HashMap();
+        this.totalSimuTime = new HashMap();
         this.flowNetwork=new FlowNetwork();
         this.finalIslands=new LinkedHashMap();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
@@ -219,6 +223,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
+                long simulationStartTime = System.currentTimeMillis();
                 timeToken=timeTokenName+(getSimulationTime());
                 finalIslands.clear();
                 iteration=0;
@@ -233,6 +238,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 executeAllEvents(getSimulationTime());
                 
                 runCascade();
+                
+                totalSimuTime.put(getSimulationTime(), System.currentTimeMillis()-simulationStartTime);
                 
                 // Print final steady state after cascade
                 System.out.println("--------------------------------------\n" + finalIslands.size() + " final islands:");
@@ -783,6 +790,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     public boolean runFlowAnalysis(FlowNetwork flowNetwork){
         FlowBackendInterface flowBackend;
         long analysisStartTime;
+        //nrPowerFlowSimuCalled++;
         switch(domain){
             case POWER:
                 switch(backend){
@@ -855,10 +863,18 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     /**
      * 
-     * @return time of Flow Simulation in Milliseconds per time and iteration.
+     * @return time of flow simulation in Milliseconds per time and iteration.
      */
     public HashMap<Integer,HashMap<Integer,Object>> getFlowSimuTime(){
         return this.flowSimuTime;
+    }
+    
+    /**
+     * 
+     * @return time of whole simulation per epoch
+     */
+    public HashMap<Integer,Object> getTotalSimuTime(){
+        return this.totalSimuTime;
     }
     
     

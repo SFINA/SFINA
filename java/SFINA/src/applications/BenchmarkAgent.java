@@ -166,8 +166,6 @@ public class BenchmarkAgent extends SFINAAgent{
                 int simulationTime=getSimulationTime();
                 
                 if(simulationTime>=1){
-                    System.out.println("\n------------- epoch time " + epochNumber);
-                    System.out.println("------------- simu time " + simulationTime);
                     log.logTagSet(simulationTime, new HashSet(getFlowNetwork().getLinks()), simulationTime);
                     for(Link link:getFlowNetwork().getLinks()){
                         HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
@@ -183,10 +181,13 @@ public class BenchmarkAgent extends SFINAAgent{
                         log.log(simulationTime, Metrics.NODE_FINAL_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_FINAL_LOADING)).doubleValue());
                     }
                     // this logTagSet uses as tagSet the iterations per epoch as collection of Integers
-                    log.logTagSet(simulationTime, new HashSet((Collection)getFlowSimuTime().get(simulationTime).keySet()), simulationTime);
+//                    log.logTagSet(simulationTime, new HashSet((Collection)getFlowSimuTime().get(simulationTime).keySet()), simulationTime);
                     for(int iteration : getFlowSimuTime().get(simulationTime).keySet()){
                         log.log(simulationTime, Metrics.SYSTEM_FLOW_SIMU_TIME, ((Long)getFlowSimuTime().get(simulationTime).get(iteration)).doubleValue());
+                        
                     }
+                    log.log(simulationTime, Metrics.SYSTEM_TOT_SIMU_TIME, ((Long)getTotalSimuTime().get(simulationTime)).doubleValue());
+                    log.log(simulationTime, Metrics.NEEDED_ITERATIONS, ((Integer)getFlowSimuTime().get(simulationTime).size()));
                 }
                 getMeasurementDumper().measurementEpochEnded(log, simulationTime);
                 log.shrink(simulationTime, simulationTime+1);

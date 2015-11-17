@@ -1,0 +1,6 @@
+Removing lines successively according to experimental significance ranking from Manish
+
+1-10 	Matpower	AC	diff.rand.sequ.
+11-20 	Matpower	DC	diff.rand.sequ.
+21-30 	Interpss	AC	diff.rand.sequ.
+31-40 	Interpss	DC	diff.rand.sequ.
