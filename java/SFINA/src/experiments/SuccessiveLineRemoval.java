@@ -44,14 +44,14 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveLineRemoval extends SimulatedExperiment{
     
-    private final static String expSeqNum="LineRemovalManishRankingCase30";
+    private final static String expSeqNum="LineRemovalRandomConsistentCase30";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=29;
+    private final static int runDuration=34;
     private final static int N=1;
     
     // SFINA parameters
@@ -75,11 +75,14 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
-    public static void main(String[] args) {
+    public SuccessiveLineRemoval(Backend backend, PowerFlowType flowType){
+        simulationParameters.put(SystemParameter.BACKEND, backend);
+        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
+    }
+    
+    public static void run() {
         // Necessary
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, Backend.INTERPSS);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.DC);
         
         // Optional, not yet implemented to afffect anything
         simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
@@ -92,7 +95,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
         folder.mkdir();
-        createLinkAttackEvents();
+        //createLinkAttackEvents();
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
@@ -129,14 +132,14 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         ArrayList<Integer> attackLinks = new ArrayList<>();
         
         // random link attacks
-//        for(int i=0; i<linkNr; i++)
-//            attackLinks.add(i+1);
-//        Collections.shuffle(attackLinks);
+        for(int i=0; i<linkNr; i++)
+            attackLinks.add(i+1);
+        Collections.shuffle(attackLinks);
         
         // Manish link rating
-        int[] manishLinks = new int[]{30,34,41,40,38,21,31,27,23,20,28,6,32,33,22,15,39,24,25,3,12,36,26,37,8,17,1,19,5,11,14,4,9,2,29,13,16,18,35,7,10};
-        for(int i=0; i<manishLinks.length; i++)
-            attackLinks.add(manishLinks[i]);
+//        int[] manishLinks = new int[]{30,34,41,40,38,21,31,27,23,20,28,6,32,33,22,15,39,24,25,3,12,36,26,37,8,17,1,19,5,11,14,4,9,2,29,13,16,18,35,7,10};
+//        for(int i=0; i<manishLinks.length; i++)
+//            attackLinks.add(manishLinks[i]);
         //Collections.reverse(attackLinks);
         
         try{

@@ -24,7 +24,7 @@ import protopeer.measurement.MeasurementLoggerListener;
  */
 public class BenchmarkLogReplayer {
 
-    private final static String expSeqNum="PFTimeCase30";
+    private final static String expSeqNum="LineRemovalRandomConsistentCase30";
     private final static String expID="experiment-"+expSeqNum+"/";
     private final static String resultID="results/"+expSeqNum+"/";
 
@@ -38,6 +38,7 @@ public class BenchmarkLogReplayer {
     private PrintWriter totalLoadingOut;
     private PrintWriter flowTimeOut;
     private PrintWriter totalTimeOut;
+    private PrintWriter iterations;
 
     public BenchmarkLogReplayer(String logsDir, int minLoad, int maxLoad){
         this.replayer=new LogReplayer();
@@ -83,10 +84,11 @@ public class BenchmarkLogReplayer {
             lineLossOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"lineLoss.txt", true)));
             flowOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flow.txt", true)));
             utilizationOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"utilization.txt", true)));
-            epochLoadingOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"epochLoading.txt", true)));;
-            totalLoadingOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalLoading.txt", true)));;
-            flowTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flowTime.txt", true)));;
-            totalTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalTime.txt", true)));;
+            epochLoadingOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"epochLoading.txt", true)));
+            totalLoadingOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalLoading.txt", true)));
+            flowTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flowTime.txt", true)));
+            totalTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalTime.txt", true)));
+            iterations  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"iterations.txt", true)));
         }
         catch (IOException e) {
                 //exception handling left as an exercise for the reader
@@ -102,6 +104,7 @@ public class BenchmarkLogReplayer {
         totalLoadingOut.print("\n");
         flowTimeOut.print("\n");
         totalTimeOut.print("\n");
+        iterations.print("\n");
         
         lineLossOut.close();
         flowOut.close();
@@ -110,6 +113,7 @@ public class BenchmarkLogReplayer {
         totalLoadingOut.close();
         flowTimeOut.close();
         totalTimeOut.close();
+        iterations.close();
     }
 
     public void replayResults(){
@@ -145,6 +149,7 @@ public class BenchmarkLogReplayer {
         totalLoadingOut.print(relLoadReductionSinceEpoch1 + coma);
         flowTimeOut.print(avgflowSimuTimePerEpoch + coma);
         totalTimeOut.print(simuTimePerEpoch + coma);
+        iterations.print(neededIterations + coma);
         
         System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.4f%20.0f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relLoadReductionBetweenEpochs, relLoadReductionSinceEpoch1, avgflowSimuTimePerEpoch, simuTimePerEpoch, neededIterations);
         
