@@ -133,10 +133,10 @@ public class EventExecution {
                     case ATTACK_STRATEGY:
                         systemParameters.put(SystemParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
                         break;
-                    case LINE_RATE_CHANGE_FACTOR:
-                        systemParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, (Double)event.getValue());
+                    case CAPACITY_CHANGE:
+                        systemParameters.put(SystemParameter.CAPACITY_CHANGE, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
-                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.LINE_RATE_CHANGE_FACTOR)));
+                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");

@@ -459,7 +459,7 @@ public class EventLoader {
             case "attack_strategy":
                 return SystemParameter.ATTACK_STRATEGY;
             case "line_rate_change_factor":
-                return SystemParameter.LINE_RATE_CHANGE_FACTOR;
+                return SystemParameter.CAPACITY_CHANGE;
             default:
                 logger.debug(("System parameter state is not recognized."));
                 return null;
@@ -715,7 +715,7 @@ public class EventLoader {
                     default:
                         logger.debug("Attack Strategy not regognized.");
                 }
-            case LINE_RATE_CHANGE_FACTOR:
+            case CAPACITY_CHANGE:
                 return Double.parseDouble(rawValue);
             default:
                 logger.debug("Parameter value is not recognized.");

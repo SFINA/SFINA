@@ -24,7 +24,7 @@ import protopeer.measurement.MeasurementLoggerListener;
  */
 public class BenchmarkLogReplayer {
 
-    private final static String expSeqNum="LineRemovalRandomConsistentCase30";
+    private final static String expSeqNum="RateReductionReloadCase30";
     private final static String expID="experiment-"+expSeqNum+"/";
     private final static String resultID="results/"+expSeqNum+"/";
 

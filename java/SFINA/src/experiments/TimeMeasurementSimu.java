@@ -18,6 +18,7 @@
 package experiments;
 
 import applications.BenchmarkAgent;
+import applications.BenchmarkLogReplayer;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -27,6 +28,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import power.PowerFlowType;
 import protopeer.Experiment;
@@ -41,14 +43,15 @@ import protopeer.util.quantities.Time;
  */
 public class TimeMeasurementSimu extends SimulatedExperiment{
     
-    private final static String expSeqNum="PFTimeCase30";
+    private final static String expSeqNum="Case118PFTime";
+    private final static String expID="experiment-"+expSeqNum+"/";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=104;
+    private final static int runDuration=3;
     private final static int N=1;
     
     // SFINA parameters
@@ -73,14 +76,24 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
+        ArrayList<Backend> backends = new ArrayList();
+        backends.add(Backend.MATPOWER);
+        backends.add(Backend.INTERPSS);
+        ArrayList<PowerFlowType> flowTypes = new ArrayList();
+        flowTypes.add(PowerFlowType.AC);
+        flowTypes.add(PowerFlowType.DC);
+        
+        run(Backend.MATPOWER, PowerFlowType.AC);
+        //BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("peerlets-log/"+expID, 0, 1000);
+    }
+    
+    private static void run(Backend backend, PowerFlowType flowType){
         // Necessary
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, Backend.INTERPSS);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.DC);
-        
-        // Optional, not yet implemented to afffect anything
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        simulationParameters.put(SystemParameter.BACKEND, backend);
+        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
+        //simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
+        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.5);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -90,7 +103,7 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
         clearExperimentFile(folder);
         folder.mkdir();
         
-//        replicateFirstInputFolder();
+        //ReplicateFirstInputFolder createTimeFolders = new ReplicateFirstInputFolder(runDuration, configurationFilesLocation, timeTokenName);
         
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
@@ -135,23 +148,5 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
             }
         }
         experiment.delete();
-    }
-    
-    private static void replicateFirstInputFolder(){
-        for(int i=1; i<runDuration; i++){
-            File nextTimeFolderLocation = new File(experimentConfigurationFilesLocation+timeTokenName+(i+1));
-            nextTimeFolderLocation.mkdirs();
-//            
-//            try{
-//                File sourceTop = new File(experimentConfigurationFilesLocation+timeTokenName+i+"/"+topologyDirectoryName);
-//                File target = new File(experimentConfigurationFilesLocation+timeTokenName+(i+1)+"/");
-//                System.out.println(sourceTop.toString());
-//                System.out.println(target.toString());
-//                Files.copy(sourceTop.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-//            }
-//            catch(IOException ex){
-//                logger.debug("Error copying input files.");
-//            }
-        }
     }
 }

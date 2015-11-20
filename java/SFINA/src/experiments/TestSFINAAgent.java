@@ -75,7 +75,7 @@ public class TestSFINAAgent extends SimulatedExperiment{
         
         // Optional, not yet implemented to afffect anything
         systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        systemParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        systemParameters.put(SystemParameter.CAPACITY_CHANGE, 0.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();

@@ -75,7 +75,7 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
         
         // Optional, not yet implemented to afffect anything
         simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();

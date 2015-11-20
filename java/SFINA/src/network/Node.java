@@ -77,7 +77,7 @@ public class Node extends State{
     public double getFlow(){
         if(this.flowType==null)
             logger.debug("Flow type is not defined.");
-        return (double)this.getProperty(flowType);
+        return Math.abs((double)this.getProperty(flowType));
     }
     
     /**
@@ -102,7 +102,7 @@ public class Node extends State{
     public double getCapacity(){
         if(this.capacityType==null)
             logger.debug("Capacity type is not defined.");
-        return (double)this.getProperty(capacityType);
+        return Math.abs((double)this.getProperty(capacityType));
     }
     
     /**

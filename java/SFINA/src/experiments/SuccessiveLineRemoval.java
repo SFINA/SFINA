@@ -18,6 +18,7 @@
 package experiments;
 
 import applications.BenchmarkAgent;
+import applications.BenchmarkLogReplayer;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -44,7 +45,8 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveLineRemoval extends SimulatedExperiment{
     
-    private final static String expSeqNum="LineRemovalRandomConsistentCase30";
+    private static String expSeqNum="Case30LineRemovalRandomConsistent";
+    private final static String expID="experiment-"+expSeqNum+"/";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
@@ -75,18 +77,54 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
+    private static ArrayList<ArrayList<Integer>> attackLinks = new ArrayList();
+    
     public SuccessiveLineRemoval(Backend backend, PowerFlowType flowType){
-        simulationParameters.put(SystemParameter.BACKEND, backend);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
+        run(backend, flowType);
     }
     
-    public static void run() {
-        // Necessary
-        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
+    public void main(String args[]){
+        int iterations = 10;
+        ArrayList<Backend> backends = new ArrayList();
+        backends.add(Backend.MATPOWER);
+        backends.add(Backend.INTERPSS);
+        ArrayList<PowerFlowType> flowTypes = new ArrayList();
+        flowTypes.add(PowerFlowType.AC);
+        flowTypes.add(PowerFlowType.DC);
         
+        // Random
+        int linkNr = 41;
+        for(int i=0; i<iterations; i++){
+            ArrayList<Integer> links = new ArrayList<>();
+            for(int j=0; j<linkNr; j++)
+                links.add(j+1);
+            Collections.shuffle(links);
+            attackLinks.add(links);
+        }
+        // Manish ranking
+//        int[] manishLinks = new int[]{30,34,41,40,38,21,31,27,23,20,28,6,32,33,22,15,39,24,25,3,12,36,26,37,8,17,1,19,5,11,14,4,9,2,29,13,16,18,35,7,10};
+//        for(int i=0; i<manishLinks.length; i++)
+//            attackLinks.add(manishLinks[i]);
+//        Collections.reverse(attackLinks);
+        
+        for(Backend backend : backends){
+            for(PowerFlowType flowType : flowTypes){
+                for(int i=0; i<iterations; i++){
+                    createLinkAttackEvents(i);
+                    run(backend, flowType);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("peerlets-log/"+expID, 0, 1000);
+                }
+            }
+        }
+    }
+    
+    public static void run(Backend backend, PowerFlowType flowType) {
+        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
+        simulationParameters.put(SystemParameter.BACKEND, backend);
+        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
         // Optional, not yet implemented to afffect anything
         simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -127,28 +165,14 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         test.runSimulation(Time.inSeconds(runDuration));
     }
     
-    private static void createLinkAttackEvents(){
-        int linkNr = 41;
-        ArrayList<Integer> attackLinks = new ArrayList<>();
-        
-        // random link attacks
-        for(int i=0; i<linkNr; i++)
-            attackLinks.add(i+1);
-        Collections.shuffle(attackLinks);
-        
-        // Manish link rating
-//        int[] manishLinks = new int[]{30,34,41,40,38,21,31,27,23,20,28,6,32,33,22,15,39,24,25,3,12,36,26,37,8,17,1,19,5,11,14,4,9,2,29,13,16,18,35,7,10};
-//        for(int i=0; i<manishLinks.length; i++)
-//            attackLinks.add(manishLinks[i]);
-        //Collections.reverse(attackLinks);
-        
+    private static void createLinkAttackEvents(int iteration){
         try{
             File file = new File(eventsLocation);
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
             int time = 2;
-            for (int linkId : attackLinks){
+            for (int linkId : attackLinks.get(iteration)){
                 writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId + columnSeparator + "status" + columnSeparator + "0");
                 time++;
             }

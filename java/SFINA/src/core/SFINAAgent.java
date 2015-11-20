@@ -254,8 +254,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     if(!finalIslands.get(net))
                         System.out.print(" -> Blackout\n");
                 }
-                //for(int i=0; i<iteration;i++)
-                //    System.out.println("simu time iteration " + i + ": " + flowSimuTime.get(getSimulationTime()).get(i));
                 
                 initMeasurements();
                 performMeasurements();
@@ -301,8 +299,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
                     flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
                     flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
+                    this.adjustCapacityBySystemParameter();
                     if (!systemParameters.containsKey(SystemParameter.FLOW_TYPE)){
-                        logger.debug("Flow Type not specified. Setting to AC.");
+                        logger.debug("Flow Type not specified.");
                     }
                     break;
                 case GAS:
@@ -317,6 +316,32 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 default:
                     logger.debug("This domain is not supported at this moment");
             }
+        }
+    }
+    
+    /**
+     * Sets capacity according to SystemParameter user inputs. Setting the capacity by tolerance parameter if doesn't exist or is 0 in loaded data. Reduce capacity if specified in SystemParameters.
+     */
+    private void adjustCapacityBySystemParameter(){
+        runFlowAnalysis(flowNetwork);
+        if (!systemParameters.containsKey(SystemParameter.TOLERANCE_PARAMETER)){
+            Double tolParam = 1.5;
+            systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, tolParam);
+            logger.debug("SystemParameter.TOLERANCE_PARAMETER not specified, automatically set to " + tolParam + ".");
+        }
+        for (Link link : flowNetwork.getLinks()){
+            Double capacity = link.getCapacity();
+            if (capacity == null || capacity == 0.0)
+                link.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*link.getFlow());
+            if (systemParameters.containsKey(SystemParameter.CAPACITY_CHANGE))
+                link.setCapacity(link.getCapacity()*(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE));
+        }
+        for (Node node : flowNetwork.getNodes()){
+            Double capacity = node.getCapacity();
+            if (capacity == null || capacity == 0.0)
+                node.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*node.getFlow());
+            if (systemParameters.containsKey(SystemParameter.CAPACITY_CHANGE))
+                node.setCapacity(node.getCapacity()*(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE));
         }
     }
     
@@ -487,10 +512,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     case ATTACK_STRATEGY:
                         systemParameters.put(SystemParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
                         break;
-                    case LINE_RATE_CHANGE_FACTOR:
-                        systemParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, (Double)event.getValue());
+                    case CAPACITY_CHANGE:
+                        systemParameters.put(SystemParameter.CAPACITY_CHANGE, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
-                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.LINE_RATE_CHANGE_FACTOR)));
+                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");
@@ -587,8 +612,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 }
                 
                 boolean limViolation = true;
-                converged = runFlowAnalysis(flowNetwork);
                 while(limViolation){
+                    converged = runFlowAnalysis(flowNetwork);
                     System.out.println("....converged " + converged);
                     if (converged){
                         limViolation = powerGenLimitAlgo2(flowNetwork, slack);

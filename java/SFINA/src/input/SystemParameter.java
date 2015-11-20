@@ -14,6 +14,6 @@ public enum SystemParameter {
     BACKEND,
     FLOW_TYPE,
     TOLERANCE_PARAMETER,
-    ATTACK_STRATEGY,
-    LINE_RATE_CHANGE_FACTOR
+    ATTACK_STRATEGY, // we don't need this
+    CAPACITY_CHANGE
 }

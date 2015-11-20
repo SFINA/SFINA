@@ -18,6 +18,7 @@
 package experiments;
 
 import applications.BenchmarkAgent;
+import applications.BenchmarkLogReplayer;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -44,14 +45,15 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveRateReduction extends SimulatedExperiment{
     
-    private final static String expSeqNum="RateReductionCase30";
+    private final static String expSeqNum="Case30RateReductionReload";
+    private final static String expID="experiment-"+expSeqNum+"/";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=29;
+    private final static int runDuration=34;
     private final static int N=1;
     
     // SFINA parameters
@@ -75,15 +77,38 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
-    public static void main(String[] args) {
-        // Necessary
-        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
+    public SuccessiveRateReduction(Backend backend, PowerFlowType flowType){
+        run(backend, flowType);
+    }
+    
+    public static void main(String args[]){
+        int iterations = 5;
+        ArrayList<Backend> backends = new ArrayList();
+        backends.add(Backend.MATPOWER);
+        backends.add(Backend.INTERPSS);
+        ArrayList<PowerFlowType> flowTypes = new ArrayList();
+        flowTypes.add(PowerFlowType.AC);
+        flowTypes.add(PowerFlowType.DC);
         
-        // Optional, not yet implemented to afffect anything
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SystemParameter.LINE_RATE_CHANGE_FACTOR, 0.0);
+        createRateReductionEvents();
+        
+        for(Backend backend : backends){
+            for(PowerFlowType flowType : flowTypes){
+                for(int i=0; i<iterations; i++){
+                    run(backend, flowType);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("peerlets-log/"+expID, 0, 1000);
+                }
+            }
+        }
+    }
+    
+    private static void run(Backend backend, PowerFlowType flowType) {
+        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
+        simulationParameters.put(SystemParameter.BACKEND, backend);
+        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
+        
+        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 1.5);
+        simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 1.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -93,8 +118,8 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
         clearExperimentFile(folder);
         folder.mkdir();
         
-        createRateReductionEvents();
-        //makeTimeFolders();
+        //createRateReductionEvents();
+        //ReplicateFirstInputFolder createTimeFolders = new ReplicateFirstInputFolder(runDuration, configurationFilesLocation, timeTokenName);
         
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
@@ -138,23 +163,15 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
             int time = 2;
             for (int i=0;i<n;i++){
-                writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + factor);
-                //writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + (1d-Math.pow((1d-factor), i+1)));
+                //writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + factor);
+                writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + (1d-Math.pow((1d-factor), i+1)));
                 time++;
             }
             writer.close();
         }
         catch(IOException ex){
             ex.printStackTrace();
-        }
-        
-    }
-    
-    private static void makeTimeFolders(){
-        for(int i=0; i<runDuration; i++){
-            File resultLocation = new File(experimentConfigurationFilesLocation+timeTokenName+(i+1));
-            resultLocation.mkdirs();
-        }
+        }   
     }
     
     public final static void clearExperimentFile(File experiment){
