@@ -45,15 +45,14 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveRateReduction extends SimulatedExperiment{
     
-    private final static String expSeqNum="Case30RateReductionReload";
-    private final static String expID="experiment-"+expSeqNum+"/";
+    private final static String expSeqNum="Case118RateReduction";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=34;
+    private final static int runDuration=29;
     private final static int N=1;
     
     // SFINA parameters
@@ -82,7 +81,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     }
     
     public static void main(String args[]){
-        int iterations = 5;
+        int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
         backends.add(Backend.MATPOWER);
         backends.add(Backend.INTERPSS);
@@ -96,7 +95,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
             for(PowerFlowType flowType : flowTypes){
                 for(int i=0; i<iterations; i++){
                     run(backend, flowType);
-                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("peerlets-log/"+expID, 0, 1000);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
                 }
             }
         }
@@ -107,8 +106,8 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
         simulationParameters.put(SystemParameter.BACKEND, backend);
         simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
         
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 1.5);
-        simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 1.0);
+        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.5);
+        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.6);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -154,8 +153,9 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     
     private static void createRateReductionEvents(){
         // Goal: Reduce rating in n steps, s.t. at the end we're at 0.5 times the initial value
-        int n = 25;
+        int n = runDuration-4;
         double factor = 1d-Math.pow(0.5, 1./n);
+        int rmLinkId = 50;
         try{
             File file = new File(eventsLocation);
             file.createNewFile();
@@ -163,6 +163,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
             int time = 2;
             for (int i=0;i<n;i++){
+                //writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + rmLinkId + columnSeparator + "status" + columnSeparator + "0");
                 //writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + factor);
                 writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + (1d-Math.pow((1d-factor), i+1)));
                 time++;

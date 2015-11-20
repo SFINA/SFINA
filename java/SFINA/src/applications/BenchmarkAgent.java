@@ -87,7 +87,7 @@ public class BenchmarkAgent extends SFINAAgent{
         for(Link link:this.getFlowNetwork().getLinks()){
             double flow=link.getFlow();
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
-            metrics.put(Metrics.LINE_FLOW, flow);
+            metrics.put(Metrics.LINE_FLOW, (link.isActivated()) ? flow : 0.0);
         }
     }
     
@@ -97,7 +97,7 @@ public class BenchmarkAgent extends SFINAAgent{
             double capacity=link.getCapacity();
             double utilization=flow/capacity;
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
-            metrics.put(Metrics.LINE_UTILIZATION, utilization);
+            metrics.put(Metrics.LINE_UTILIZATION, (link.isActivated()) ? utilization : 1.0);
         }
     }
     

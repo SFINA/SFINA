@@ -20,7 +20,7 @@ totTimeErr = [np.std(totTimeData[0]), np.std(totTimeData[1]), np.std(totTimeData
 print(flowTimeErr)
 print(totTimeErr)
 
-fig = plt.figure()
+fig = plt.figure(figsize=(5, 5))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
@@ -43,11 +43,11 @@ rects2 = ax.bar(ind+width, totTime, width,
                     error_kw=dict(elinewidth=2,ecolor='black'))
 
 # axes and labels
-ax.set_xlim(-width,len(ind)+width)
-ax.set_ylim(0,280)
+ax.set_xlim(-width,len(ind)+width-0.3)
+#ax.set_ylim(0,280)
 ax.set_ylabel('Simulation Time [ms]')
 xTickMarks = ['Matpower AC', 'Matpower DC', 'InterPSS AC', 'InterPSS DC']
-ax.set_xticks(ind+width-0.4)
+ax.set_xticks(ind+width-0.55)
 xtickNames = ax.set_xticklabels(xTickMarks, fontsize=16)
 plt.setp(xtickNames, rotation=45)
 plt.tick_params(axis='y',length=8, width=1)
@@ -58,8 +58,8 @@ y0, y1 = ax.get_ylim()
 #ax.set_aspect((x1-x0)/(y1-y0))
 
 ## add a legend
-ax.legend((rects1[0], rects2[0]), ('Flow Analysis', 'Total Runtime'), loc=2 , fontsize=16, labelspacing=0.2)
+ax.legend((rects1[0], rects2[0]), ('Flow Analysis', 'Total Runtime'), loc=2 , fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15,)
 
-plt.gcf().subplots_adjust(bottom=0.35)
+plt.gcf().subplots_adjust(bottom=0.3,left=0.2)
 plt.savefig('case30TimeMeasurment.pdf')
 plt.show()

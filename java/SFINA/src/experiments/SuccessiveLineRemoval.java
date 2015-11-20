@@ -45,8 +45,7 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveLineRemoval extends SimulatedExperiment{
     
-    private static String expSeqNum="Case30LineRemovalRandomConsistent";
-    private final static String expID="experiment-"+expSeqNum+"/";
+    private static String expSeqNum="Case2736LineRemovalRandom";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
@@ -83,17 +82,17 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         run(backend, flowType);
     }
     
-    public void main(String args[]){
-        int iterations = 10;
+    public static void main(String args[]){
+        int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
         backends.add(Backend.MATPOWER);
         backends.add(Backend.INTERPSS);
         ArrayList<PowerFlowType> flowTypes = new ArrayList();
-        flowTypes.add(PowerFlowType.AC);
+        //flowTypes.add(PowerFlowType.AC);
         flowTypes.add(PowerFlowType.DC);
         
         // Random
-        int linkNr = 41;
+        int linkNr = 3000;
         for(int i=0; i<iterations; i++){
             ArrayList<Integer> links = new ArrayList<>();
             for(int j=0; j<linkNr; j++)
@@ -112,7 +111,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
                 for(int i=0; i<iterations; i++){
                     createLinkAttackEvents(i);
                     run(backend, flowType);
-                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("peerlets-log/"+expID, 0, 1000);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
                 }
             }
         }
@@ -124,7 +123,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
         // Optional, not yet implemented to afffect anything
         simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.0);
+        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 1.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -173,8 +172,14 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
             int time = 2;
             for (int linkId : attackLinks.get(iteration)){
+                int linkId2 = attackLinks.get(iteration).get(linkId-1);
                 writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId + columnSeparator + "status" + columnSeparator + "0");
+                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId2 + columnSeparator + "status" + columnSeparator + "0");
+                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + (linkId-1) + columnSeparator + "status" + columnSeparator + "0");
+                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + (linkId2-1) + columnSeparator + "status" + columnSeparator + "0");
+
                 time++;
+                
             }
             writer.close();
         }

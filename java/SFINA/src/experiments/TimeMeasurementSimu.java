@@ -43,15 +43,14 @@ import protopeer.util.quantities.Time;
  */
 public class TimeMeasurementSimu extends SimulatedExperiment{
     
-    private final static String expSeqNum="Case118PFTime";
-    private final static String expID="experiment-"+expSeqNum+"/";
+    private final static String expSeqNum="Case57PFTime";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=3;
+    private final static int runDuration=104;
     private final static int N=1;
     
     // SFINA parameters
@@ -82,9 +81,17 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
         ArrayList<PowerFlowType> flowTypes = new ArrayList();
         flowTypes.add(PowerFlowType.AC);
         flowTypes.add(PowerFlowType.DC);
+        int iterations = 1;
         
-        run(Backend.MATPOWER, PowerFlowType.AC);
-        //BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("peerlets-log/"+expID, 0, 1000);
+        for(Backend backend : backends){
+            for(PowerFlowType flowType : flowTypes){
+                for(int i=0; i<iterations; i++){
+                    run(backend, flowType);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
+                }
+            }
+        }
+        
     }
     
     private static void run(Backend backend, PowerFlowType flowType){
@@ -92,7 +99,7 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
         simulationParameters.put(SystemParameter.BACKEND, backend);
         simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
-        //simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
+        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
         //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.5);
         
         System.out.println("Experiment "+expSeqNum+"\n");

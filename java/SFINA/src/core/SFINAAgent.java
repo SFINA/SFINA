@@ -258,7 +258,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 initMeasurements();
                 performMeasurements();
                 runActiveState(); 
-       }
+            }
         });
         loadAgentTimer.schedule(this.runTime);
     }
@@ -325,24 +325,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private void adjustCapacityBySystemParameter(){
         runFlowAnalysis(flowNetwork);
         if (!systemParameters.containsKey(SystemParameter.TOLERANCE_PARAMETER)){
-            Double tolParam = 1.5;
+            Double tolParam = 2.0;
             systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, tolParam);
             logger.debug("SystemParameter.TOLERANCE_PARAMETER not specified, automatically set to " + tolParam + ".");
         }
-        for (Link link : flowNetwork.getLinks()){
-            Double capacity = link.getCapacity();
-            if (capacity == null || capacity == 0.0)
-                link.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*link.getFlow());
-            if (systemParameters.containsKey(SystemParameter.CAPACITY_CHANGE))
-                link.setCapacity(link.getCapacity()*(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE));
-        }
-        for (Node node : flowNetwork.getNodes()){
-            Double capacity = node.getCapacity();
-            if (capacity == null || capacity == 0.0)
-                node.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*node.getFlow());
-            if (systemParameters.containsKey(SystemParameter.CAPACITY_CHANGE))
-                node.setCapacity(node.getCapacity()*(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE));
-        }
+        events.add(new Event(getSimulationTime(),EventType.SYSTEM,null,null,SystemParameter.TOLERANCE_PARAMETER,systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)));
+        if (systemParameters.containsKey(SystemParameter.CAPACITY_CHANGE))
+            events.add(new Event(getSimulationTime(),EventType.SYSTEM,null,null,SystemParameter.CAPACITY_CHANGE,systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
+        executeAllEvents(getSimulationTime());
     }
     
     private void outputNetworkData(){
@@ -493,7 +483,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 }
                 break;
             case SYSTEM:
-                System.out.println("..changing " + (SystemParameter)event.getParameter());
+                System.out.println("..changing/setting system param: " + (SystemParameter)event.getParameter());
                 switch((SystemParameter)event.getParameter()){
                     case DOMAIN:
                         systemParameters.put(SystemParameter.DOMAIN, (Domain)event.getValue());
@@ -508,6 +498,17 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         break;
                     case TOLERANCE_PARAMETER:
                         systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, (Double)event.getValue());
+                        for (Link link : flowNetwork.getLinks()){
+                            Double capacity = link.getCapacity();
+                            if (capacity == null || capacity == 0.0){
+                                link.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*link.getFlow());
+                            }
+                        }
+//                        for (Node node : flowNetwork.getNodes()){
+//                            Double capacity = node.getCapacity();
+//                            if (capacity == null || capacity == 0.0)
+//                                node.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*node.getFlow());
+//                        }
                         break;
                     case ATTACK_STRATEGY:
                         systemParameters.put(SystemParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
@@ -516,6 +517,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         systemParameters.put(SystemParameter.CAPACITY_CHANGE, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
                             link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
+//                        for (Node node : flowNetwork.getNodes())
+//                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");
@@ -617,6 +620,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     System.out.println("....converged " + converged);
                     if (converged){
                         limViolation = powerGenLimitAlgo2(flowNetwork, slack);
+                        // Without the following line big cases (like polish) even DC doesn't converge..
+                        if(systemParameters.get(SystemParameter.FLOW_TYPE).equals(PowerFlowType.DC))
+                            limViolation=false;
                         if (limViolation){
                             converged = false;
                             if(generators.size() > 0){ // make next bus a slack

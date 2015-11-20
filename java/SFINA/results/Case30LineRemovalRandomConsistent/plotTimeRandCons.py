@@ -45,7 +45,7 @@ ax2.bar(times,iterDataAvg,color='0.8')
 ax2.set_ylabel('Iterations')
 ax2.set_ylim(0,6)
 
-#ax.legend(loc='best', fontsize=16)
+ax.legend(loc='best', fontsize=16)
 ax.tick_params(axis='both',length=8, width=1)
 ax.set_ylabel('Simulation Time [ms]')
 ax.set_xlabel('Nr. Removed Lines')

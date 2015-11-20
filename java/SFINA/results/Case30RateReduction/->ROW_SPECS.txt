@@ -5,7 +5,3 @@ reducing line rating successively.
 6-10 	Matpower	DC	
 11-15 	Interpss	AC	
 16-20 	Interpss	DC	
-21-25 	Matpower	AC	reloading in each step
-26-30 	Matpower	DC	reloading in each step
-31-35 	Interpss	AC	reloading in each step
-36-40 	Interpss	DC	reloading in each step
