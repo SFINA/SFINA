@@ -29,14 +29,14 @@ print(mDcDataAvg.shape)
 print(iAcDataAvg.shape)
 print(iDcDataAvg.shape)
 
-fig = plt.figure(figsize=(6,6))
+fig = plt.figure(figsize=(5.5,5.5))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
-plt.plot(redFactor[0:cut],mAcDataAvg[0:cut], color='0', linewidth=3, linestyle='-', label='Matpower AC')
-plt.plot(redFactor[0:cut],iAcDataAvg[0:cut], color='0', linewidth=3, linestyle='-', marker='o',label='InterPSS AC')
-plt.plot(redFactor[0:cut],mDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle='-', label='Matpower DC')
-plt.plot(redFactor[0:cut],iDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle='-', marker='o', label='InterPSS DC')
+plt.plot(redFactor[0:cut],mAcDataAvg[0:cut], color='0', linewidth=3, linestyle='-', label='MATPOWER AC')
+plt.plot(redFactor[0:cut],iAcDataAvg[0:cut], color='0', linewidth=3, linestyle='', marker='o',label='InterPSS AC')
+plt.plot(redFactor[0:cut],mDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle='-', label='MATPOWER DC')
+plt.plot(redFactor[0:cut],iDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle='', marker='o', label='InterPSS DC')
 
 # Adding line rating axis on top
 #ax2 = ax.twiny()
@@ -48,9 +48,9 @@ plt.plot(redFactor[0:cut],iDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle
 # Removing the doube 1.00 in top left corner
 #ax.set_yticks(np.linspace(ax.get_ybound()[0],0.99,7))
 
-ax.legend(loc='best', fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
+ax.legend(loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 ax.tick_params(axis='both',length=8, width=1)
-ax.set_ylabel('Power Loss [%]')
+ax.set_ylabel('Power Losses [%]')
 ax.set_xlabel('Capacity Reduction [%]')
 
 x0, x1 = ax.get_xlim()

@@ -33,14 +33,14 @@ fig = plt.figure(figsize=(6,6))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
-plt.plot(redFactor,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='Matpower AC')
+plt.plot(redFactor,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='MATPOWER AC')
 plt.plot(redFactor,iAcDataAvg, color='0', linewidth=3, linestyle='', marker='o',label='InterPSS AC')
-plt.plot(redFactor,mDcDataAvg, color='0.5', linewidth=3, linestyle='-', label='Matpower DC')
+plt.plot(redFactor,mDcDataAvg, color='0.5', linewidth=3, linestyle='-', label='MATPOWER DC')
 plt.plot(redFactor,iDcDataAvg, color='0.5', linewidth=3, linestyle='',marker='o', label='InterPSS DC')
 
 plt.legend(loc='best', fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 plt.tick_params(axis='both',length=8, width=1)
-plt.ylabel('Power Loss [%]')
+plt.ylabel('Power Losses [%]')
 ax.set_xlabel('Capacity Reduction [%]')
 
 #plt.gcf().subplots_adjust(bottom=0.15,left=0.15)

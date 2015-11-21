@@ -46,7 +46,7 @@ rects2 = ax.bar(ind+width, totTime, width,
 ax.set_xlim(-width,len(ind)+width-0.3)
 #ax.set_ylim(0,280)
 ax.set_ylabel('Simulation Time [ms]')
-xTickMarks = ['Matpower AC', 'Matpower DC', 'InterPSS AC', 'InterPSS DC']
+xTickMarks = ['MATPOWER AC', 'MATPOWER DC', 'InterPSS AC', 'InterPSS DC']
 ax.set_xticks(ind+width-0.55)
 xtickNames = ax.set_xticklabels(xTickMarks, fontsize=16)
 plt.setp(xtickNames, rotation=45)

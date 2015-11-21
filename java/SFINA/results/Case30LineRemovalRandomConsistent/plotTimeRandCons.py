@@ -18,8 +18,11 @@ iDcDataAvg = np.average(iDcData,axis=0)
 
 iterDataAvg = np.average(iterData,axis=0)
 
-times = np.linspace(1,30,30)
+times = np.linspace(0,29,30)
 print(times)
+redFactor = np.linspace(0,50,30)
+redFactor = [2.4*i for i in times]
+
 
 print(mAcData.shape)
 print(mDcData.shape)
@@ -31,59 +34,60 @@ print(mDcDataAvg)
 print(iAcDataAvg)
 print(iDcDataAvg)
 
-fig = plt.figure()
+fig = plt.figure(figsize=(7.5, 7))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
-plt.plot(times,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='Matlab AC')
-plt.plot(times,mDcDataAvg, color='0', linewidth=3, linestyle='--', label='Matlab DC')
-plt.plot(times,iAcDataAvg, color='0.6', linewidth=3, linestyle='-', label='InterPSS AC')
-plt.plot(times,iDcDataAvg, color='0.6', linewidth=3, linestyle='--', label='InterPSS DC')
+plt.plot(redFactor,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='MATPOWER AC')
+plt.plot(redFactor,iAcDataAvg, color='0', linewidth=3, linestyle='--', label='InterPSS AC')
+plt.plot(redFactor,mDcDataAvg, color='0.5', linewidth=3, linestyle='-', label='MATPOWER DC')
+plt.plot(redFactor,iDcDataAvg, color='0.5', linewidth=3, linestyle='--', label='InterPSS DC')
 
 ax2 = ax.twinx()
-ax2.bar(times,iterDataAvg,color='0.8')
-ax2.set_ylabel('Iterations')
-ax2.set_ylim(0,6)
+ax2.bar(redFactor,iterDataAvg,color='0.8',linewidth=0, width=1.6, label='Iterations')
 
-ax.legend(loc='best', fontsize=16)
+ax.legend(loc=1, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15, title='Simulation Time')
 ax.tick_params(axis='both',length=8, width=1)
 ax.set_ylabel('Simulation Time [ms]')
-ax.set_xlabel('Nr. Removed Lines')
-plt.xlim(1,30)
+ax.set_xlabel('Removed Lines [%]')
+ax2.set_ylabel('Average Number of Iterations')
+ax2.legend(fontsize=16, loc=4)
+ax2.set_ylim(0,6)
+plt.xlim(0,70)
 
 x0, x1 = ax.get_xlim()
 y0, y1 = ax.get_ylim()
 #ax.set_aspect((x1-x0)/(y1-y0))
 
-plt.gcf().subplots_adjust(bottom=0.15)
+plt.gcf().subplots_adjust(bottom=0.1)
 
-#plt.savefig('case30RandRemovalConsistentAvgLoading.pdf')
-#plt.show()
-
-fig2 = plt.figure()
-ax = fig2.add_subplot(111)
-for line in mAcData:
-    plot(times,line)
-plt.title('MAT,AC') 
-    
-fig3 = plt.figure()
-ax = fig3.add_subplot(111)
-for line in mDcData:
-    plot(times,line)
-plt.title('MAT,DC')    
-    
-fig4 = plt.figure()
-ax = fig4.add_subplot(111)
-for line in iAcData:
-    plot(times,line)
-plt.title('IPSS,AC')    
-    
-fig5 = plt.figure()
-ax = fig5.add_subplot(111)
-for line in iDcData:
-    plot(times,line)
-plt.title('IPSS,DC')
-    
+plt.savefig('case30RandRemovalConsistentTimeIteration.pdf')
+##plt.show()
+#
+#fig2 = plt.figure()
+#ax = fig2.add_subplot(111)
+#for line in mAcData:
+#    plot(times,line)
+#plt.title('MAT,AC') 
+#    
+#fig3 = plt.figure()
+#ax = fig3.add_subplot(111)
+#for line in mDcData:
+#    plot(times,line)
+#plt.title('MAT,DC')    
+#    
+#fig4 = plt.figure()
+#ax = fig4.add_subplot(111)
+#for line in iAcData:
+#    plot(times,line)
+#plt.title('IPSS,AC')    
+#    
+#fig5 = plt.figure()
+#ax = fig5.add_subplot(111)
+#for line in iDcData:
+#    plot(times,line)
+#plt.title('IPSS,DC')
+#    
 plt.show()
 
 ## the data
