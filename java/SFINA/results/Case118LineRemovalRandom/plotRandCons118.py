@@ -18,18 +18,27 @@ iDcDataAvg = np.average(iDcData,axis=0)*100
 
 iterDataAvg = np.average(iterData,axis=0)*100
 
+
+#---- Percentage deviation calc ---#
+#AcAvg = np.add(mAcDataAvg,iAcDataAvg)/2.+1.
+#AcAvg = mDcDataAvg+1.
+#print(AcAvg)
+##DcAvg = np.add(mDcDataAvg,iDcDataAvg)/2.+1.
+#DcAvg = iDcDataAvg+1.
+#print(DcAvg)
+#AcDcDiff=np.subtract(AcAvg,DcAvg)
+#print(AcDcDiff)
+#AcDcDev = np.average(np.divide(AcDcDiff,DcAvg))
+#print('------')
+#print(AcDcDev)
+#print(np.std(np.divide(AcDcDiff,DcAvg)))
+#print('------')
+#print(np.average(mAcDataAvg))
+#---- End Percentage deviation calc ---#
+
+
 times = np.linspace(0,29,30)/186*100
 print(times)
-
-print(mAcData.shape)
-print(mDcData.shape)
-print(iAcData.shape)
-print(iDcData.shape)
-
-print(mAcDataAvg)
-print(mDcDataAvg)
-print(iAcDataAvg)
-print(iDcDataAvg)
 
 fig = plt.figure(figsize=(5.5,5))
 ax = fig.add_subplot(111)
@@ -57,7 +66,7 @@ plt.xlim(0,16)
 
 plt.gcf().subplots_adjust(left=0.15,right=0.85)
 
-plt.savefig('case118RandRemovalConsistentPowerLineLoss2.pdf')
+plt.savefig('case118RandRemovalConsistentPowerLineLoss.pdf')
 #
 #fig2 = plt.figure()
 #ax = fig2.add_subplot(111)

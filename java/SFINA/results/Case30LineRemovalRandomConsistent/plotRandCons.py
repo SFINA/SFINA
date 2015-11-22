@@ -14,18 +14,19 @@ mDcDataAvg = np.average(mDcData,axis=0)*100
 iAcDataAvg = np.average(iAcData,axis=0)*100
 iDcDataAvg = np.average(iDcData,axis=0)*100
 
+#---- Percentage deviation calc ---#
+AcAvg = np.add(mAcDataAvg,iAcDataAvg)/2.+1.
+print(AcAvg)
+DcAvg = np.add(mDcDataAvg,iDcDataAvg)/2.+1.
+print(DcAvg)
+AcDcDiff=np.subtract(AcAvg,DcAvg)
+print(AcDcDiff)
+AcDcDev = np.average(np.divide(AcDcDiff,DcAvg))
+print(AcDcDev)
+print(np.std(np.divide(AcDcDiff,DcAvg)))
+#---- End Percentage deviation calc ---#
+
 times = np.linspace(1,30,30)/41*100
-print(times)
-
-print(mAcData.shape)
-print(mDcData.shape)
-print(iAcData.shape)
-print(iDcData.shape)
-
-print(mAcDataAvg)
-print(mDcDataAvg)
-print(iAcDataAvg)
-print(iDcDataAvg)
 
 fig = plt.figure(figsize=(5.5,5))
 ax = fig.add_subplot(111)
@@ -48,30 +49,30 @@ y0, y1 = ax.get_ylim()
 
 plt.gcf().subplots_adjust(left=0.15)
 
-plt.savefig('case30RandRemovalConsistentPowerLoss.pdf')
+#plt.savefig('case30RandRemovalConsistentPowerLoss.pdf')
 
-fig2 = plt.figure()
-ax = fig2.add_subplot(111)
-for line in mAcData:
-    plot(times,line)
-plt.title('MAT,AC') 
+#fig2 = plt.figure()
+#ax = fig2.add_subplot(111)
+#for line in mAcData:
+#    plot(times,line)
+#plt.title('MAT,AC') 
+#    
+#fig3 = plt.figure()
+#ax = fig3.add_subplot(111)
+#for line in mDcData:
+#    plot(times,line)
+#plt.title('MAT,DC')    
+#    
+#fig4 = plt.figure()
+#ax = fig4.add_subplot(111)
+#for line in iAcData:
+#    plot(times,line)
+#plt.title('IPSS,AC')    
+#    
+#fig5 = plt.figure()
+#ax = fig5.add_subplot(111)
+#for line in iDcData:
+#    plot(times,line)
+#plt.title('IPSS,DC')
     
-fig3 = plt.figure()
-ax = fig3.add_subplot(111)
-for line in mDcData:
-    plot(times,line)
-plt.title('MAT,DC')    
-    
-fig4 = plt.figure()
-ax = fig4.add_subplot(111)
-for line in iAcData:
-    plot(times,line)
-plt.title('IPSS,AC')    
-    
-fig5 = plt.figure()
-ax = fig5.add_subplot(111)
-for line in iDcData:
-    plot(times,line)
-plt.title('IPSS,DC')
-    
-plt.show()
+#plt.show()

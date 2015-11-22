@@ -14,20 +14,22 @@ mDcDataAvg = (1.0-np.average(mDcData,axis=0))*100
 iAcDataAvg = (1.0-np.average(iAcData,axis=0))*100
 iDcDataAvg = (1.0-np.average(iDcData,axis=0))*100
 
+#---- Percentage deviation calc ---#
+AcAvg = np.add(mAcDataAvg,iAcDataAvg)/2.+1.
+print(AcAvg)
+DcAvg = np.add(mDcDataAvg,iDcDataAvg)/2.+1.
+print(DcAvg)
+AcDcDiff=np.subtract(AcAvg,DcAvg)
+print(AcDcDiff)
+AcDcDev = np.average(np.divide(AcDcDiff,DcAvg))
+print(AcDcDev)
+print(np.std(np.divide(AcDcDiff,DcAvg)))
+#---- End Percentage deviation calc ---#
+
 times = np.linspace(0,29,30)
 
 redFactor = [(1-np.power(1-0.0236,n))*100 for n in times]
 cut = 25
-
-print(mAcData.shape)
-print(mDcData.shape)
-print(iAcData.shape)
-print(iDcData.shape)
-
-print(mAcDataAvg.shape)
-print(mDcDataAvg.shape)
-print(iAcDataAvg.shape)
-print(iDcDataAvg.shape)
 
 fig = plt.figure(figsize=(5.5,5.5))
 ax = fig.add_subplot(111)

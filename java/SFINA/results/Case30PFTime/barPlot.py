@@ -10,8 +10,8 @@ totTimeData = np.array(loadData('totalTime.txt',[4,8]))
 flowTimeData = np.delete(flowTimeData, 0,1) # delete first entries
 totTimeData = np.delete(totTimeData, 0,1) 
 
-flowTime = [np.mean(flowTimeData[0]), np.mean(flowTimeData[1]), np.mean(flowTimeData[2]), np.mean(flowTimeData[3])]
-totTime = [np.mean(totTimeData[0]), np.mean(totTimeData[1]), np.mean(totTimeData[2]), np.mean(totTimeData[3])]
+flowTime = np.array([np.mean(flowTimeData[0]), np.mean(flowTimeData[1]), np.mean(flowTimeData[2]), np.mean(flowTimeData[3])])
+totTime = np.array([np.mean(totTimeData[0]), np.mean(totTimeData[1]), np.mean(totTimeData[2]), np.mean(totTimeData[3])])
 print(flowTime)
 print(totTime)
 
@@ -19,6 +19,17 @@ flowTimeErr = [np.std(flowTimeData[0]), np.std(flowTimeData[1]), np.std(flowTime
 totTimeErr = [np.std(totTimeData[0]), np.std(totTimeData[1]), np.std(totTimeData[2]), np.std(totTimeData[3])]
 print(flowTimeErr)
 print(totTimeErr)
+
+#---- Percentage deviation calc ---#
+print('----')
+AcDiff = (flowTime[0]-flowTime[2])/flowTime[0]
+DcDiff = (flowTime[1]-flowTime[3])/flowTime[1]
+print(AcDiff)
+print(DcDiff)
+print((AcDiff+DcDiff)/2.)
+print('----')
+#---- End Percentage deviation calc ---#
+
 
 fig = plt.figure(figsize=(5, 5))
 ax = fig.add_subplot(111)

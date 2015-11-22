@@ -17,22 +17,32 @@ iAcDataAvg = np.average(iAcData,axis=0)
 iDcDataAvg = np.average(iDcData,axis=0)
 
 iterDataAvg = np.average(iterData,axis=0)
+print(iterDataAvg)
+
+#---- Percentage deviation calc ---#
+#AcAvg = np.add(mAcDataAvg,iAcDataAvg)/2.+1.
+#print(AcAvg)
+#DcAvg = np.add(mDcDataAvg,iDcDataAvg)/2.+1.
+#print(DcAvg)
+#AcDcDiff=np.subtract(AcAvg,DcAvg)
+#print(AcDcDiff)
+#AcDcDev = np.average(np.divide(AcDcDiff,DcAvg))
+#print('----')
+#print(AcDcDev)
+#print(np.std(np.divide(AcDcDiff,DcAvg)))
+#print('----')
+print(np.average(iterDataAvg))
+print(np.average(mAcDataAvg))
+print(np.average(mDcDataAvg))
+print(np.average(iAcDataAvg))
+print(np.average(iDcDataAvg))
+#---- End Percentage deviation calc ---#
+
 
 times = np.linspace(0,29,30)
 print(times)
 redFactor = np.linspace(0,50,30)
 redFactor = [2.4*i for i in times]
-
-
-print(mAcData.shape)
-print(mDcData.shape)
-print(iAcData.shape)
-print(iDcData.shape)
-
-print(mAcDataAvg)
-print(mDcDataAvg)
-print(iAcDataAvg)
-print(iDcDataAvg)
 
 fig = plt.figure(figsize=(7.5, 7))
 ax = fig.add_subplot(111)
@@ -93,40 +103,3 @@ plt.show()
 #plt.title('IPSS,DC')
 #    
 plt.show()
-
-## the data
-#N = 4
-#
-### necessary variables
-#ind = np.arange(N)                # the x locations for the groups
-#width = 0.35                      # the width of the bars
-#
-### the bars
-#rects1 = ax.bar(ind, flowTime, width,
-#                color='0.75',
-#                yerr=flowTimeErr,
-#                error_kw=dict(elinewidth=2,ecolor='black'))
-#
-#rects2 = ax.bar(ind+width, totTime, width,
-#                    color='0.5',
-#                    yerr=totTimeErr,
-#                    error_kw=dict(elinewidth=2,ecolor='black'))
-#
-## axes and labels
-#ax.set_xlim(-width,len(ind)+width)
-#ax.set_ylim(0,280)
-#ax.set_ylabel('Simulation Time [ms]')
-#xTickMarks = ['Matpower AC', 'Matpower DC', 'InterPSS AC', 'InterPSS DC']
-#ax.set_xticks(ind+width-0.4)
-#xtickNames = ax.set_xticklabels(xTickMarks, fontsize=16)
-#plt.setp(xtickNames, rotation=45)
-#plt.tick_params(axis='y',length=8, width=1)
-#plt.tick_params(axis='x',length=0)
-#
-#x0, x1 = ax.get_xlim()
-#y0, y1 = ax.get_ylim()
-##ax.set_aspect((x1-x0)/(y1-y0))
-#
-### add a legend
-#ax.legend((rects1[0], rects2[0]), ('Flow Analysis', 'Total Runtime'), loc=2 , fontsize=16, labelspacing=0.2)
-#

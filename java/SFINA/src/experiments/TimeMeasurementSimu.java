@@ -43,7 +43,7 @@ import protopeer.util.quantities.Time;
  */
 public class TimeMeasurementSimu extends SimulatedExperiment{
     
-    private final static String expSeqNum="Case57PFTime";
+    private final static String expSeqNum="Case118PFTime";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     

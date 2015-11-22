@@ -18,6 +18,25 @@ iDcDataAvg = mDcData*100
 
 iterDataAvg = np.average(iterData,axis=0)*100
 
+
+#---- Percentage deviation calc ---#
+#AcAvg = np.add(mAcDataAvg,iAcDataAvg)/2.+1.
+#AcAvg = mDcDataAvg+1.
+#print(AcAvg)
+##DcAvg = np.add(mDcDataAvg,iDcDataAvg)/2.+1.
+#DcAvg = iDcDataAvg+1.
+#print(DcAvg)
+#AcDcDiff=np.subtract(AcAvg,DcAvg)
+#print(AcDcDiff)
+#AcDcDev = np.average(np.divide(AcDcDiff,DcAvg))
+#print('------')
+#print(AcDcDev)
+#print(np.std(np.divide(AcDcDiff,DcAvg)))
+#print('------')
+print(np.average(np.add(mDcDataAvg,iDcDataAvg)/2.))
+#---- End Percentage deviation calc ---#
+
+
 times = np.linspace(1,30,30)/3504*100*18
 print(mDcDataAvg.shape)
 print(times.shape)
