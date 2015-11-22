@@ -14,10 +14,10 @@ mDcDataAvg = (1.0-np.average(mDcData,axis=0))*100
 iAcDataAvg = (1.0-np.average(iAcData,axis=0))*100
 iDcDataAvg = (1.0-np.average(iDcData,axis=0))*100
 
-times = np.linspace(1,30,30)
-redFactor = [(1-np.power(1-0.02,n))*100 for n in times]
+times = np.linspace(0,29,30)
+
+redFactor = [(1-np.power(1-0.0236,n))*100 for n in times]
 cut = 25
-print(redFactor)
 
 print(mAcData.shape)
 print(mDcData.shape)
@@ -33,10 +33,10 @@ fig = plt.figure(figsize=(5.5,5.5))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
-plt.plot(redFactor[0:cut],mAcDataAvg[0:cut], color='0', linewidth=3, linestyle='-', label='MATPOWER AC')
-plt.plot(redFactor[0:cut],iAcDataAvg[0:cut], color='0', linewidth=3, linestyle='', marker='o',label='InterPSS AC')
-plt.plot(redFactor[0:cut],mDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle='-', label='MATPOWER DC')
-plt.plot(redFactor[0:cut],iDcDataAvg[0:cut], color='0.5', linewidth=3, linestyle='', marker='o', label='InterPSS DC')
+plt.plot(redFactor,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='MATPOWER AC')
+plt.plot(redFactor,iAcDataAvg, color='0', linewidth=3, linestyle='', marker='o',label='InterPSS AC')
+plt.plot(redFactor,mDcDataAvg, color='0.5', linewidth=3, linestyle='-', label='MATPOWER DC')
+plt.plot(redFactor,iDcDataAvg, color='0.5', linewidth=3, linestyle='', marker='o', label='InterPSS DC')
 
 # Adding line rating axis on top
 #ax2 = ax.twiny()
@@ -52,10 +52,8 @@ ax.legend(loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.
 ax.tick_params(axis='both',length=8, width=1)
 ax.set_ylabel('Power Losses [%]')
 ax.set_xlabel('Capacity Reduction [%]')
-
-x0, x1 = ax.get_xlim()
-y0, y1 = ax.get_ylim()
-ax.set_aspect((x1-x0)/(y1-y0))
+ax.set_ylim(0,10)
+ax.set_xlim(0,50)
 
 #plt.gcf().subplots_adjust(bottom=0.15,left=0.15)
 

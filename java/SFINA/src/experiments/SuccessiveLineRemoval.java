@@ -92,7 +92,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         flowTypes.add(PowerFlowType.DC);
         
         // Random
-        int linkNr = 3000;
+        int linkNr = 3500;
         for(int i=0; i<iterations; i++){
             ArrayList<Integer> links = new ArrayList<>();
             for(int j=0; j<linkNr; j++)
@@ -171,15 +171,12 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
             int time = 2;
-            for (int linkId : attackLinks.get(iteration)){
-                int linkId2 = attackLinks.get(iteration).get(linkId-1);
-                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId + columnSeparator + "status" + columnSeparator + "0");
-                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId2 + columnSeparator + "status" + columnSeparator + "0");
-                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + (linkId-1) + columnSeparator + "status" + columnSeparator + "0");
-                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + (linkId2-1) + columnSeparator + "status" + columnSeparator + "0");
-
+            for (int i=0; i<30; i++){
+                for (int j=0; j<18; j++){
+                    int linkId = attackLinks.get(iteration).get(i*18+j);
+                    writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId + columnSeparator + "status" + columnSeparator + "0");
+                }
                 time++;
-                
             }
             writer.close();
         }

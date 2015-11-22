@@ -18,18 +18,18 @@ iDcDataAvg = mDcData*100
 
 iterDataAvg = np.average(iterData,axis=0)*100
 
-times = np.linspace(1,30,30)/3504*100*4 
+times = np.linspace(1,30,30)/3504*100*18
 print(mDcDataAvg.shape)
 print(times.shape)
 
-fig = plt.figure(figsize=(5,4.5))
+fig = plt.figure(figsize=(5.5,5))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
 #plt.plot(times,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='Matpower AC')
 #plt.plot(times,iAcDataAvg, color='0', linewidth=3, linestyle='-', marker='o', label='InterPSS AC')
-line1, = ax.plot(times,mDcDataAvg, color='0', linewidth=3, linestyle='-',  label='Matpower DC')
-line2, = ax.plot(times,iDcDataAvg, color='0', linewidth=3, linestyle='', marker ='o', label='InterPSS DC')
+line1, = ax.plot(times,mDcDataAvg, color='0.5', linewidth=3, linestyle='-',  label='Matpower DC')
+line2, = ax.plot(times,iDcDataAvg, color='0.5', linewidth=3, linestyle='-', marker ='o', label='InterPSS DC')
 
 ax2 = ax.twinx()
 line3, = ax2.plot(times,iterDataAvg,color='0.8', linewidth=3, linestyle='-', label='Link Loss')
@@ -46,12 +46,13 @@ ax.set_ylabel('Power Losses [%]')
 ax.set_xlabel('Removed Lines [%]')
 #plt.xlim(0,73)
 start, end = ax.get_xlim()
-ax.xaxis.set_ticks(np.arange(start, end, 1))
+#ax.xaxis.set_ticks(np.arange(start, end, 1))
 
 start, end = ax.get_ylim()
-ax.yaxis.set_ticks(np.arange(39, 45, 1))
+ax.yaxis.set_ticks(np.arange(0, 110, 20))
+ax2.yaxis.set_ticks(np.arange(0, 110, 20))
 
-plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.85)
+plt.gcf().subplots_adjust(left=0.15,right=0.85)
 
 plt.savefig('case2736RandRemovalConsistentPowerLoss.pdf')
 

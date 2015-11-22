@@ -14,9 +14,10 @@ mDcDataAvg = (1.0-np.average(mDcData,axis=0))*100
 iAcDataAvg = (1.0-np.average(iAcData,axis=0))*100
 iDcDataAvg = (1.0-np.average(iDcData,axis=0))*100
 
-times = np.linspace(1,30,30)
+times = np.linspace(0,29,30)
+print(times)
+redFactor = [(1-np.power(1-0.0236,n))*100 for n in times]
 
-redFactor = [(1-np.power(1-0.02,n))*100 for n in times]
 cut = 25
 
 print(mAcData.shape)
@@ -29,7 +30,7 @@ print(mDcDataAvg.shape)
 print(iAcDataAvg.shape)
 print(iDcDataAvg.shape)
 
-fig = plt.figure(figsize=(6,6))
+fig = plt.figure(figsize=(5.5,5.5))
 ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
@@ -40,8 +41,9 @@ plt.plot(redFactor,iDcDataAvg, color='0.5', linewidth=3, linestyle='',marker='o'
 
 plt.legend(loc='best', fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 plt.tick_params(axis='both',length=8, width=1)
-plt.ylabel('Power Losses [%]')
+ax.set_ylabel('Power Losses [%]')
 ax.set_xlabel('Capacity Reduction [%]')
+ax.set_ylim(0,10)
 
 #plt.gcf().subplots_adjust(bottom=0.15,left=0.15)
 

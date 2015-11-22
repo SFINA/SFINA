@@ -9,7 +9,7 @@ mDcData = np.array(loadData('totalTime.txt',[5,10]))
 iAcData = np.array(loadData('totalTime.txt',[10,15]))
 iDcData = np.array(loadData('totalTime.txt',[15,20]))
 
-iterData = np.array(loadData('iterations.txt',[0,8]))
+iterData = np.array(loadData('iterations.txt',[0,20]))
 
 mAcDataAvg = np.average(mAcData,axis=0)
 mDcDataAvg = np.average(mDcData,axis=0)
@@ -43,9 +43,12 @@ ax2.legend(fontsize=16, loc=4)
 
 ax.legend(loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15, title='Simulation Time')
 ax.tick_params(axis='both',length=8, width=1)
+ax2.tick_params(axis='both',length=8, width=1)
+ax.tick_params(axis='x',length=0, width=0)
 ax.set_ylabel('Simulation Time [ms]')
 ax.set_xlabel('Capacity Reduction [%]')
 plt.xlim(1,50)
+#ax.xaxis.set_ticks(np.arange(0, 70, 15))
 
 x0, x1 = ax.get_xlim()
 y0, y1 = ax.get_ylim()

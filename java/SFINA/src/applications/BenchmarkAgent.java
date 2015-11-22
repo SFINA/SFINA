@@ -18,6 +18,7 @@
 package applications;
 
 import core.SFINAAgent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -124,24 +125,20 @@ public class BenchmarkAgent extends SFINAAgent{
         }
     }
     
-//    private void calculateFinalLoad1(){
-//        for(FlowNetwork net : this.getFinalIslands().keySet()){
-//            if(this.getFinalIslands().get(net)){
-//                for(Node node : net.getNodes()){
-//                    double load = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
-//                    HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
-//                    metrics.put(Metrics.NODE_FINAL_LOADING, load);
-//                }
-//            }
-//            else{
-//                for(Node node : net.getNodes()){
-//                    double load = 0.0;
-//                    HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
-//                    metrics.put(Metrics.NODE_FINAL_LOADING, load);
-//                }
-//            }
-//        }
-//    }
+    private void calculateSystemMetrics(){
+        double totSimuTime = ((Long)getTotalSimuTime().get(getSimulationTime())).doubleValue();
+        int iterations =((Integer)getFlowSimuTime().get(getSimulationTime()).size());
+        int nrIslands = this.getFinalIslands().keySet().size();
+        int nrIsolatedNodes = 0;
+        for(FlowNetwork net : this.getFinalIslands().keySet())
+            if(net.getNodes().size()==1)
+                nrIsolatedNodes++;
+        this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<Metrics,Object>());
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.TOT_SIMU_TIME, totSimuTime);
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.NEEDED_ITERATIONS, iterations);
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISLANDS, nrIslands);
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISOLATED_NODES, nrIsolatedNodes);
+    }
     
     @Override
     public void performMeasurements(){
@@ -151,6 +148,7 @@ public class BenchmarkAgent extends SFINAAgent{
         this.calculateTotalLines();
         this.calculateInitialLoad();
         this.calculateFinalLoad();
+        this.calculateSystemMetrics();
     }
     
     //****************** MEASUREMENTS ******************
@@ -183,11 +181,14 @@ public class BenchmarkAgent extends SFINAAgent{
                     // this logTagSet uses as tagSet the iterations per epoch as collection of Integers
 //                    log.logTagSet(simulationTime, new HashSet((Collection)getFlowSimuTime().get(simulationTime).keySet()), simulationTime);
                     for(int iteration : getFlowSimuTime().get(simulationTime).keySet()){
-                        log.log(simulationTime, Metrics.SYSTEM_FLOW_SIMU_TIME, ((Long)getFlowSimuTime().get(simulationTime).get(iteration)).doubleValue());
+                        log.log(simulationTime, Metrics.FLOW_SIMU_TIME, ((Long)getFlowSimuTime().get(simulationTime).get(iteration)).doubleValue());
                         
                     }
-                    log.log(simulationTime, Metrics.SYSTEM_TOT_SIMU_TIME, ((Long)getTotalSimuTime().get(simulationTime)).doubleValue());
-                    log.log(simulationTime, Metrics.NEEDED_ITERATIONS, ((Integer)getFlowSimuTime().get(simulationTime).size()));
+                    HashMap<Metrics,Object> sysMetrics=getTemporalSystemMetrics().get(simulationTime);
+                    log.log(simulationTime, Metrics.TOT_SIMU_TIME, ((Double)sysMetrics.get(Metrics.TOT_SIMU_TIME)).doubleValue());
+                    log.log(simulationTime, Metrics.NEEDED_ITERATIONS, ((Integer)sysMetrics.get(Metrics.NEEDED_ITERATIONS)).intValue());
+                    log.log(simulationTime, Metrics.ISLANDS, ((Integer)sysMetrics.get(Metrics.ISLANDS)).intValue());
+                    log.log(simulationTime, Metrics.ISOLATED_NODES, ((Integer)sysMetrics.get(Metrics.ISOLATED_NODES)).intValue());
                 }
                 getMeasurementDumper().measurementEpochEnded(log, simulationTime);
                 log.shrink(simulationTime, simulationTime+1);

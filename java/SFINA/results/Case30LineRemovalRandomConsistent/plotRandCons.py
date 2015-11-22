@@ -32,9 +32,9 @@ ax = fig.add_subplot(111)
 plt.rcParams.update({'font.size': 16})
 
 plt.plot(times,mAcDataAvg, color='0', linewidth=3, linestyle='-', label='MATPOWER AC')
-plt.plot(times,iAcDataAvg, color='0', linewidth=3, linestyle='', marker='o', label='InterPSS AC')
+plt.plot(times,iAcDataAvg, color='0', linewidth=3, linestyle='-', marker='o', label='InterPSS AC')
 plt.plot(times,mDcDataAvg, color='0.5', linewidth=3, linestyle='-', label='MATPOWER DC')
-plt.plot(times,iDcDataAvg, color='0.5', linewidth=3, linestyle='', marker='o', label='InterPSS DC')
+plt.plot(times,iDcDataAvg, color='0.5', linewidth=3, linestyle='-', marker='o', label='InterPSS DC')
 
 plt.legend(loc='best', fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 plt.tick_params(axis='both',length=8, width=1)

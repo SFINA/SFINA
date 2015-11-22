@@ -96,6 +96,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     // Measurement variables
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
+    private HashMap<Integer,HashMap<Metrics,Object>> temporalSystemMetrics;
     private HashMap<Integer,HashMap<String,Object>> initialLoadPerEpoch;
     private HashMap<Integer,HashMap<Integer,Object>> flowSimuTime;
     private HashMap<Integer,Object> totalSimuTime;
@@ -135,6 +136,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.systemParameters=simulationParameters;
         this.temporalLinkMetrics=new HashMap();
         this.temporalNodeMetrics=new HashMap();
+        this.temporalSystemMetrics=new HashMap();
         this.initialLoadPerEpoch=new HashMap();
         this.flowSimuTime = new HashMap();
         this.totalSimuTime = new HashMap();
@@ -620,9 +622,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     System.out.println("....converged " + converged);
                     if (converged){
                         limViolation = powerGenLimitAlgo2(flowNetwork, slack);
+                        
                         // Without the following line big cases (like polish) even DC doesn't converge..
                         if(systemParameters.get(SystemParameter.FLOW_TYPE).equals(PowerFlowType.DC))
                             limViolation=false;
+                        
                         if (limViolation){
                             converged = false;
                             if(generators.size() > 0){ // make next bus a slack
@@ -897,7 +901,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * @return time of flow simulation in Milliseconds per time and iteration.
      */
     public HashMap<Integer,HashMap<Integer,Object>> getFlowSimuTime(){
-        return this.flowSimuTime;
+        return flowSimuTime;
     }
     
     /**
@@ -905,7 +909,15 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * @return time of whole simulation per epoch
      */
     public HashMap<Integer,Object> getTotalSimuTime(){
-        return this.totalSimuTime;
+        return totalSimuTime;
+    }
+    
+    /**
+     * 
+     * @return islands and if they are blacked out at current simulation time
+     */
+    public HashMap<FlowNetwork,Boolean> getFinalIslands(){
+        return finalIslands;
     }
     
     
@@ -959,6 +971,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      */
     public HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> getTemporalNodeMetrics() {
         return temporalNodeMetrics;
+    }
+    
+    public HashMap<Integer,HashMap<Metrics,Object>> getTemporalSystemMetrics() {
+        return temporalSystemMetrics;
     }
     
     /**

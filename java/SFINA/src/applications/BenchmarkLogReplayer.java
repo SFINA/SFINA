@@ -39,6 +39,8 @@ public class BenchmarkLogReplayer {
     private PrintWriter flowTimeOut;
     private PrintWriter totalTimeOut;
     private PrintWriter iterations;
+    private PrintWriter islandNum;
+    private PrintWriter isolatedNodes;
 
     public BenchmarkLogReplayer(String experimentSequenceNumber, int minLoad, int maxLoad){
         this.expSeqNum=experimentSequenceNumber;
@@ -93,6 +95,8 @@ public class BenchmarkLogReplayer {
             flowTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flowTime.txt", true)));
             totalTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalTime.txt", true)));
             iterations  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"iterations.txt", true)));
+            islandNum  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"islands.txt", true)));
+            isolatedNodes  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"isolatedNodes.txt", true)));
         }
         catch (IOException e) {
                 //exception handling left as an exercise for the reader
@@ -109,6 +113,8 @@ public class BenchmarkLogReplayer {
         flowTimeOut.print("\n");
         totalTimeOut.print("\n");
         iterations.print("\n");
+        islandNum.print("\n");
+        isolatedNodes.print("\n");
         
         lineLossOut.close();
         flowOut.close();
@@ -118,6 +124,8 @@ public class BenchmarkLogReplayer {
         flowTimeOut.close();
         totalTimeOut.close();
         iterations.close();
+        islandNum.close();
+        isolatedNodes.close();
     }
 
     public void replayResults(){
@@ -142,9 +150,11 @@ public class BenchmarkLogReplayer {
         double avgUtilizationPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_UTILIZATION).getAverage();
         double relPowerLossBetweenEpochs = 1.0-log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_FINAL_LOADING).getSum()/log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_INIT_LOADING).getSum();
         double relPowerLossSinceEpoch1 = 1.0-log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_FINAL_LOADING).getSum()/log.getAggregateByEpochNumber(1, Metrics.NODE_INIT_LOADING).getSum();
-        double avgflowSimuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.SYSTEM_FLOW_SIMU_TIME).getAverage();
-        double simuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.SYSTEM_TOT_SIMU_TIME).getMax();
+        double avgflowSimuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.FLOW_SIMU_TIME).getAverage();
+        double simuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.TOT_SIMU_TIME).getMax();
         double neededIterations = log.getAggregateByEpochNumber(epochNumber, Metrics.NEEDED_ITERATIONS).getMax();
+        double islands = log.getAggregateByEpochNumber(epochNumber, Metrics.ISLANDS).getMax();
+        double isolNodes = log.getAggregateByEpochNumber(epochNumber, Metrics.ISOLATED_NODES).getMax();
         
         lineLossOut.print(avgLineLossesPerEpoch + coma);
         flowOut.print(avgFlowPerEpoch + coma);
@@ -154,7 +164,9 @@ public class BenchmarkLogReplayer {
         flowTimeOut.print(avgflowSimuTimePerEpoch + coma);
         totalTimeOut.print(simuTimePerEpoch + coma);
         iterations.print(neededIterations + coma);
-        
+        islandNum.print(islands + coma);
+        isolatedNodes.print(isolNodes + coma);
+                
         System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.4f%20.0f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, avgflowSimuTimePerEpoch, simuTimePerEpoch, neededIterations);
         
     }

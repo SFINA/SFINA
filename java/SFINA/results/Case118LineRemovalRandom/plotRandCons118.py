@@ -41,21 +41,23 @@ l3, = plt.plot(times,mDcDataAvg, color='0.5', linewidth=3, linestyle='-', label=
 l4, = plt.plot(times,iDcDataAvg, color='0.5', linewidth=3, linestyle='-', marker='o', label='InterPSS DC')
 
 #plt.legend(loc='best', fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
-plt.tick_params(axis='both',length=8, width=1)
 plt.ylabel('Power Losses [%]')
 plt.xlabel('Removed Lines [%]')
 
 ax2 = ax.twinx()
 l5, = ax2.plot(times,iterDataAvg,color='0.8', linewidth=3, linestyle='-', label='Link Loss')
 ax2.set_ylabel('Line Losses [%]')
-ax2.yaxis.set_ticks(np.arange(0,110,10))
+ax2.yaxis.set_ticks(np.arange(0,110,20))
+ax.yaxis.set_ticks(np.arange(0,110,20))
+ax.tick_params(axis='both',length=6, width=1)
+ax2.tick_params(axis='both',length=6, width=1)
 
-plt.legend((l1,l2,l3,l4,l5),('MATPOWER AC', 'InterPSS AC', 'MATPOWER DC', 'InterPSS AC', 'Line Losses'),loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
+plt.legend((l1,l2,l3,l4,l5),('MATPOWER AC','InterPSS AC',  'MATPOWER DC', 'InterPSS DC', 'Line Losses'),loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 plt.xlim(0,16)
 
 plt.gcf().subplots_adjust(left=0.15,right=0.85)
 
-plt.savefig('case118RandRemovalConsistentPowerLineLoss.pdf')
+plt.savefig('case118RandRemovalConsistentPowerLineLoss2.pdf')
 #
 #fig2 = plt.figure()
 #ax = fig2.add_subplot(111)

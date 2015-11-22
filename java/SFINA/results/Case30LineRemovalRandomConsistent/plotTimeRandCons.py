@@ -48,12 +48,16 @@ ax2.bar(redFactor,iterDataAvg,color='0.8',linewidth=0, width=1.6, label='Iterati
 
 ax.legend(loc=1, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15, title='Simulation Time')
 ax.tick_params(axis='both',length=8, width=1)
+ax2.tick_params(axis='both',length=8, width=1)
+ax.tick_params(axis='x',length=0, width=0)
 ax.set_ylabel('Simulation Time [ms]')
 ax.set_xlabel('Removed Lines [%]')
 ax2.set_ylabel('Average Number of Iterations')
-ax2.legend(fontsize=16, loc=4)
-ax2.set_ylim(0,6)
+ax2.legend(fontsize=16, loc=(0.695,0.075), labelspacing=0.15, borderpad=0.3, handletextpad=0.3)
+ax2.set_ylim(0,20)
 plt.xlim(0,70)
+ax.xaxis.set_ticks(np.arange(0, 70, 10))
+
 
 x0, x1 = ax.get_xlim()
 y0, y1 = ax.get_ylim()
@@ -62,7 +66,7 @@ y0, y1 = ax.get_ylim()
 plt.gcf().subplots_adjust(bottom=0.1)
 
 plt.savefig('case30RandRemovalConsistentTimeIteration.pdf')
-##plt.show()
+plt.show()
 #
 #fig2 = plt.figure()
 #ax = fig2.add_subplot(111)
