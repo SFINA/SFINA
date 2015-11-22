@@ -63,7 +63,7 @@ x0, x1 = ax.get_xlim()
 y0, y1 = ax.get_ylim()
 #ax.set_aspect((x1-x0)/(y1-y0))
 
-plt.gcf().subplots_adjust(bottom=0.1)
+plt.gcf().subplots_adjust(bottom=0.1, left=0.12)
 
 plt.savefig('case30RandRemovalConsistentTimeIteration.pdf')
 plt.show()

@@ -26,7 +26,7 @@ l4, = ax2.plot(times[1:30],iDcDataIso[1:30],color='0.5', linewidth=3, linestyle=
 plt.legend((l1, l2, l3, l4),('MATPOWER DC','InterPSS DC','MATPOWER DC', 'InterPSS DC'), loc=4, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 ax.tick_params(axis='both',length=6, width=1)
 ax2.tick_params(axis='both',length=6, width=1)
-ax.set_ylabel('Number of Islands', color='0')
+ax.set_ylabel('Total Number of Islands', color='0')
 ax2.set_ylabel('Islands without Isolated Nodes', color='0.5')
 ax.set_xlabel('Removed Lines [%]')
 ax.set_ylim(400,1800)
