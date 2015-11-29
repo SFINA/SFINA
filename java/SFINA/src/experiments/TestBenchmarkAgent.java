@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import applications.BenchmarkAgent;
+import applications.BenchmarkSFINAAgent;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -90,7 +90,7 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new BenchmarkAgent(
+                newPeer.addPeerlet(new BenchmarkSFINAAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),

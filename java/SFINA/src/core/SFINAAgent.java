@@ -84,7 +84,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private String missingValue;
     private HashMap<SystemParameter,Object> systemParameters;
     private FlowNetwork flowNetwork;
-    private LinkedHashMap<FlowNetwork, Boolean> finalIslands;
     private TopologyLoader topologyLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
@@ -97,10 +96,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
     private HashMap<Integer,HashMap<Metrics,Object>> temporalSystemMetrics;
+    private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus;
     private HashMap<Integer,HashMap<String,Object>> initialLoadPerEpoch;
     private HashMap<Integer,HashMap<Integer,Object>> flowSimuTime;
     private HashMap<Integer,Object> totalSimuTime;
-    //private int nrPowerFlowSimuCalled;
+    private HashMap<Integer,Integer> nrFlowSimuCalled;
     
     public SFINAAgent(
             String experimentID, 
@@ -140,8 +140,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.initialLoadPerEpoch=new HashMap();
         this.flowSimuTime = new HashMap();
         this.totalSimuTime = new HashMap();
+        this.nrFlowSimuCalled = new HashMap();
         this.flowNetwork=new FlowNetwork();
-        this.finalIslands=new LinkedHashMap();
+        this.temporalIslandStatus=new HashMap();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
     }
@@ -227,8 +228,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             public void timerExpired(Timer timer){
                 long simulationStartTime = System.currentTimeMillis();
                 timeToken=timeTokenName+(getSimulationTime());
-                finalIslands.clear();
+                temporalIslandStatus.put(getSimulationTime(), new LinkedHashMap());
                 iteration=0;
+                nrFlowSimuCalled.put(getSimulationTime(), 0);
                 flowSimuTime.put(getSimulationTime(), new HashMap());
                 
                 System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------");
@@ -244,16 +246,16 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 totalSimuTime.put(getSimulationTime(), System.currentTimeMillis()-simulationStartTime);
                 
                 // Print final steady state after cascade
-                System.out.println("--------------------------------------\n" + finalIslands.size() + " final islands:");
+                System.out.println("--------------------------------------\n" + temporalIslandStatus.size() + " final islands:");
                 String nodesInIsland;
-                for (FlowNetwork net : finalIslands.keySet()){
+                for (FlowNetwork net : temporalIslandStatus.get(getSimulationTime()).keySet()){
                     nodesInIsland = "";
                     for (Node node : net.getNodes())
                         nodesInIsland += node.getIndex() + ", ";
                     System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
-                    if(finalIslands.get(net))
+                    if(temporalIslandStatus.get(getSimulationTime()).get(net))
                         System.out.print(" -> Converged :)\n");
-                    if(!finalIslands.get(net))
+                    if(!temporalIslandStatus.get(getSimulationTime()).get(net))
                         System.out.print(" -> Blackout\n");
                 }
                 
@@ -337,7 +339,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         executeAllEvents(getSimulationTime());
     }
     
-    private void outputNetworkData(){
+    public void outputNetworkData(){
         System.out.println("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
@@ -423,15 +425,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                             case STATUS:
                                 if(node.isActivated() == (Boolean)event.getValue())
                                     logger.debug("Node status same, not changed by event.");
-                                node.setActivated((Boolean)event.getValue()); // This doesn't reevaluate the status of connected links
+                                node.setActivated((Boolean)event.getValue()); 
                                 System.out.println("..deactivating node " + node.getIndex());
-                                // Proper way, but can we make it simpler?
-//                                if((Boolean)event.getValue())
-//                                    flowNetwork.activateNode(node.getIndex());
-//                                else if(!(Boolean)event.getValue())
-//                                    flowNetwork.deactivateNode(node.getIndex());
-//                                else
-//                                    logger.debug("Node status cannot be recognised");
                                 break;
                             default:
                                 logger.debug("Node state cannot be recognised");
@@ -453,14 +448,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                             case STATUS:
                                 if(link.isActivated() == (Boolean)event.getValue())
                                     logger.debug("Link status same, not changed by event.");
-                                // link.setActivated((Boolean)event.getValue()); // see above for nodes
+                                link.setActivated((Boolean)event.getValue()); 
                                 System.out.println("..deactivating link " + link.getIndex());
-                                if((Boolean)event.getValue())
-                                    flowNetwork.activateLink(link.getIndex());
-                                else if(!(Boolean)event.getValue())
-                                    flowNetwork.deactivateLink(link.getIndex());
-                                else
-                                    logger.debug("Link status cannot be recognised");
                                 break;
                             default:
                                 logger.debug("Link state cannot be recognised");
@@ -532,119 +521,63 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      
     @Override
     public void runCascade(){
-        int iter = 0;
-        ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
-        islandBuffer.add(flowNetwork.getIslands());
-        while(!islandBuffer.get(iter).isEmpty()){
-            System.out.println("---------------------\n---- Iteration " + (iter+1) + " ----");
-            islandBuffer.add(new ArrayList<>()); // List of islands for next iteration (iter+1)
-            for(int i=0; i < islandBuffer.get(iter).size(); i++){ // go through islands at current iteration
-                FlowNetwork currentIsland = islandBuffer.get(iter).get(i);
-                System.out.println("---> Treating island with " + currentIsland.getNodes().size() + " nodes.");
-                
-                boolean converged = flowConvergenceAlgo(currentIsland); // do flow analysis
-                System.out.println("=> converged " + converged);
-                if (converged){
-                    
-                    // if mitigation strategy is implemented
-                    mitigateOverload(currentIsland);
-                    
-                    boolean linkOverloaded = linkOverloadAlgo(currentIsland);
-                    //boolean nodeOverloaded = nodeOverloadAlgo(currentIsland);
-                    System.out.println("=> overloaded " + linkOverloaded);
-                    if(linkOverloaded){
-                        // add islands of the current island to next iteration
-                        for (FlowNetwork net : currentIsland.getIslands())
-                            islandBuffer.get(iter+1).add(net);
-                    }
-                    else
-                        finalIslands.put(currentIsland, true);
-                }
-                else{
-                    finalIslands.put(currentIsland, false);
-                    for (Node node : currentIsland.getNodes())
-                        node.setActivated(false);
-                }
-            }
-            
-            // Output network snapshot of current iteration
-            iteration = iter+1;
-            outputNetworkData(); 
-            
-            // Go to next iteration if there were islands added to it
-            iter++;
+        iteration = 1;
+        for(FlowNetwork currentIsland : flowNetwork.getIslands()){
+            boolean converged = flowConvergenceAlgo(currentIsland);
+            temporalIslandStatus.get(getSimulationTime()).put(currentIsland, converged);
         }
-        
+        outputNetworkData();
+    }
+    
+    @Override 
+    public boolean flowConvergenceAlgo(FlowNetwork flowNetwork){
+        switch(domain){
+            case POWER:
+                ArrayList<Node> generators = new ArrayList();
+                for(Node node : flowNetwork.getNodes()){
+                    if(node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS)){
+                        break;
+                    }
+                    if(node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR)){
+                        generators.add(node);
+                    } 
+                }
+                generators.get(0).replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
+                break;
+            case GAS:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            case WATER:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            case TRANSPORTATION:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            default:
+                logger.debug("This domain is not supported at this moment");
+        }
+        return runFlowAnalysis(flowNetwork);
     }
     
     @Override
-    public boolean flowConvergenceAlgo(FlowNetwork flowNetwork){
+    public boolean runFlowAnalysis(FlowNetwork flowNetwork){
+        FlowBackendInterface flowBackend;
         boolean converged = false;
+        long analysisStartTime = System.currentTimeMillis();
+        nrFlowSimuCalled.put(getSimulationTime(), nrFlowSimuCalled.get(getSimulationTime())+1);
         switch(domain){
             case POWER:
-                // blackout if isolated node
-                if(flowNetwork.getNodes().size() == 1)
-                    return false;
-                
-                // first implementation
-                //converged = powerGenLimitAlgo(flowNetwork);
-                
-                // Jose's implementation
-                ArrayList<Node> generators = new ArrayList();
-                Node slack = null;
-                for (Node node : flowNetwork.getNodes()){
-                    if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR))
-                        generators.add(node);
-                    if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS)){
-                        slack = node;
-                    }
-                }
-                // Sort generators by max power output
-                Collections.sort(generators, new Comparator<Node>(){
-                    public int compare(Node node1, Node node2) {
-                    return Double.compare((Double)node1.getProperty(PowerNodeState.POWER_MAX_REAL), (Double)node2.getProperty(PowerNodeState.POWER_MAX_REAL));
-                    }
-                }.reversed());
-                
-                if (slack == null){
-                    if (generators.size() == 0)
-                        return false; // blackout if no generator in island
-                    else{
-                        slack = generators.get(0);
-                        slack.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
-                        generators.remove(0);
-                    }
-                }
-                
-                boolean limViolation = true;
-                while(limViolation){
-                    converged = runFlowAnalysis(flowNetwork);
-                    System.out.println("....converged " + converged);
-                    if (converged){
-                        limViolation = powerGenLimitAlgo2(flowNetwork, slack);
-                        
-                        // Without the following line big cases (like polish) even DC doesn't converge..
-                        if(systemParameters.get(SystemParameter.FLOW_TYPE).equals(PowerFlowType.DC))
-                            limViolation=false;
-                        
-                        if (limViolation){
-                            converged = false;
-                            if(generators.size() > 0){ // make next bus a slack
-                                slack = generators.get(0);
-                                slack.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
-                                generators.remove(0);
-                            }
-                            else{
-                                System.out.println("....no more generators");
-                                return false; // all generator limits were hit -> blackout
-                            }
-                        }
-                    }
-                    else{
-                        converged = powerLoadShedAlgo(flowNetwork);
-                        if (!converged)
-                            return false; // blackout if no convergence after load shedding
-                    }
+                switch(backend){
+                    case MATPOWER:
+                        flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
+                        flowBackend.flowAnalysis(flowNetwork);
+                        converged = flowBackend.isConverged();
+                    case INTERPSS:
+                        flowBackend=new InterpssFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
+                        flowBackend.flowAnalysis(flowNetwork);
+                        converged = flowBackend.isConverged();
+                    default:
+                        logger.debug("This flow backend is not supported at this moment.");
                 }
                 break;
             case GAS:
@@ -659,134 +592,13 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             default:
                 logger.debug("This domain is not supported at this moment");
         }
-        return converged;
-    }
-    
-    public boolean powerGenLimitAlgo2(FlowNetwork flowNetwork, Node slack){
-        boolean limViolation = false;
-        if ((Double)slack.getProperty(PowerNodeState.POWER_GENERATION_REAL) > (Double)slack.getProperty(PowerNodeState.POWER_MAX_REAL)){
-            slack.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, slack.getProperty(PowerNodeState.POWER_MAX_REAL));
-            limViolation = true;
-        }
-        if ((Double)slack.getProperty(PowerNodeState.POWER_GENERATION_REAL) < (Double)slack.getProperty(PowerNodeState.POWER_MIN_REAL)){
-            slack.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, slack.getProperty(PowerNodeState.POWER_MIN_REAL));
-            limViolation = true;
-        }
-        slack.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.GENERATOR);
-        if (limViolation)
-            System.out.println("....generator limit violated at node " + slack.getIndex());
-        else
-            System.out.println("....no generator limit violated");
-        return limViolation;
-    }
-    
-    public boolean powerLoadShedAlgo(FlowNetwork flowNetwork){
-        boolean converged = false;
-        int loadIter = 0;
-        int maxLoadShedIterations = 15; // according to paper
-        double loadReductionFactor = 0.05; // 5%, according to paper
-        while (!converged && loadIter < maxLoadShedIterations){
-            System.out.println("....Doing load shedding at iteration " + loadIter);
-            for (Node node : flowNetwork.getNodes()){
-                node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REAL, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)*(1.0-loadReductionFactor));
-                node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)*(1.0-loadReductionFactor));
-            }
-            converged = runFlowAnalysis(flowNetwork);
-            loadIter++;
-        }
-        return converged;
-    }
-    
-    public boolean powerGenLimitAlgo(FlowNetwork flowNetwork){
-        boolean converged = false;
-        
-        // necessary, because if island has slack, we don't consider it in the gen balancing, but it doesn't have to be a blackout (can still do load shedding) -> see check nrGen == 0 below
-        boolean hasSlack = false;
-
-        // extract generators in island and treat slack bus if existent
-        ArrayList<Node> generators = new ArrayList<>();
-        for (Node node : flowNetwork.getNodes()){
-            if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR))
-                generators.add(node);
-            // Set Slack to limits and make normal generator. It will not be considered for generation balancing later.
-            if (node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS)){ // Set Slack to limits and make normal generator
-                converged = runFlowAnalysis(flowNetwork);
-                hasSlack = true;
-                node.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.GENERATOR);
-                if ((Double)node.getProperty(PowerNodeState.POWER_GENERATION_REAL) > (Double)node.getProperty(PowerNodeState.POWER_MAX_REAL)){
-                    node.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, node.getProperty(PowerNodeState.POWER_MAX_REAL));
-                    converged = false;
-                }
-                    // Could also do these adjustments by means of events                            
-                    //events.add(new Event(getSimulationTime(),EventType.FLOW,NetworkComponent.NODE,node.getIndex(),PowerNodeState.POWER_GENERATION_REAL,node.getProperty(PowerNodeState.POWER_MAX_REAL)));
-                if ((Double)node.getProperty(PowerNodeState.POWER_GENERATION_REAL) < (Double)node.getProperty(PowerNodeState.POWER_MIN_REAL)){
-                    node.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, node.getProperty(PowerNodeState.POWER_MIN_REAL));
-                    converged = false;
-                }
-//                if ((Double)node.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE) > (Double)node.getProperty(PowerNodeState.POWER_MAX_REACTIVE))
-//                    node.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, node.getProperty(PowerNodeState.POWER_MAX_REACTIVE));
-//                if ((Double)node.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE) < (Double)node.getProperty(PowerNodeState.POWER_MIN_REACTIVE))
-//                    node.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, node.getProperty(PowerNodeState.POWER_MIN_REACTIVE));
-            }
-        }
-
-        // set needed variables
-        int genIterator = 0;
-        int nrGen = generators.size();
-
-        // blackout if no generator in island
-        if (nrGen == 0 && !hasSlack)
-            return false; 
-
-        // Sort Generators according to their real power generation in descending order
-        Collections.sort(generators, new Comparator<Node>(){
-            public int compare(Node node1, Node node2) {
-            return Double.compare((Double)node1.getProperty(PowerNodeState.POWER_MAX_REAL), (Double)node2.getProperty(PowerNodeState.POWER_MAX_REAL));
-            }
-        }.reversed());
-
-        // Gen balancing
-        while (!converged && genIterator < nrGen){
-            System.out.println("..Doing gen balancing");
-            Node currentGen = generators.get(genIterator);
-            
-            currentGen.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
-            converged = runFlowAnalysis(flowNetwork);
-            currentGen.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.GENERATOR);
-            
-            if ((Double)currentGen.getProperty(PowerNodeState.POWER_GENERATION_REAL) > (Double)currentGen.getProperty(PowerNodeState.POWER_MAX_REAL)){
-                currentGen.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, currentGen.getProperty(PowerNodeState.POWER_MAX_REAL));
-                converged = false; // limits violated
-            }
-            if ((Double)currentGen.getProperty(PowerNodeState.POWER_GENERATION_REAL) < (Double)currentGen.getProperty(PowerNodeState.POWER_MIN_REAL)){
-                currentGen.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, currentGen.getProperty(PowerNodeState.POWER_MIN_REAL));
-                converged = false; // limits violated
-            }
-
-            // Jose didn't check the reactive limits
-//            if ((Double)currentGen.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE) > (Double)currentGen.getProperty(PowerNodeState.POWER_MAX_REACTIVE)){
-//                currentGen.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, currentGen.getProperty(PowerNodeState.POWER_MAX_REACTIVE));
-//                converged = false; // limits violated
-//            }
-//            if ((Double)currentGen.getProperty(PowerNodeState.POWER_GENERATION_REACTIVE) < (Double)currentGen.getProperty(PowerNodeState.POWER_MIN_REACTIVE)){
-//                currentGen.replacePropertyElement(PowerNodeState.POWER_GENERATION_REACTIVE, currentGen.getProperty(PowerNodeState.POWER_MIN_REACTIVE));
-//                converged = false; // limits violated
-//            }
-            genIterator++;
-        }
-        
-        // Load shedding
-        if (!converged){
-            generators.get(0).replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
-            converged = powerLoadShedAlgo(flowNetwork);
-        }
-        
+        long analysisEndTime = System.currentTimeMillis();
+        flowSimuTime.get(getSimulationTime()).put(iteration,analysisEndTime-analysisStartTime);
         return converged;
     }
     
     @Override
     public void mitigateOverload(FlowNetwork flowNetwork){
-        
     }
     
     @Override
@@ -805,6 +617,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return overloaded;
     }
     
+    @Override
     public boolean nodeOverloadAlgo(FlowNetwork flowNetwork){
         boolean overloaded = false;
         for (Node node : flowNetwork.getNodes()){
@@ -818,46 +631,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         if (overloaded)
             executeAllEvents(getSimulationTime());
         return overloaded;
-    }
-    
-    
-    @Override
-    public boolean runFlowAnalysis(FlowNetwork flowNetwork){
-        FlowBackendInterface flowBackend;
-        long analysisStartTime;
-        //nrPowerFlowSimuCalled++;
-        switch(domain){
-            case POWER:
-                switch(backend){
-                    case MATPOWER:
-                        flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
-                        analysisStartTime = System.currentTimeMillis();
-                        flowBackend.flowAnalysis(flowNetwork);
-                        flowSimuTime.get(getSimulationTime()).put(iteration,System.currentTimeMillis()-analysisStartTime);
-                        return flowBackend.isConverged();
-                    case INTERPSS:
-                        flowBackend=new InterpssFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
-                        analysisStartTime = System.currentTimeMillis();
-                        flowBackend.flowAnalysis(flowNetwork);
-                        flowSimuTime.get(getSimulationTime()).put(iteration,System.currentTimeMillis()-analysisStartTime);
-                        return flowBackend.isConverged();
-                    default:
-                        logger.debug("Flow backend is not supported at this moment.");
-                }
-                break;
-            case GAS:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case WATER:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case TRANSPORTATION:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            default:
-                logger.debug("This domain is not supported at this moment");
-        }
-        return false;
     }
     
     /**
@@ -896,28 +669,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.backend=backend;
     }
     
-    /**
-     * 
-     * @return time of flow simulation in Milliseconds per time and iteration.
-     */
-    public HashMap<Integer,HashMap<Integer,Object>> getFlowSimuTime(){
-        return flowSimuTime;
+    public void setCurrentIteration(Integer iter){
+        this.iteration=iter;
     }
     
-    /**
-     * 
-     * @return time of whole simulation per epoch
-     */
-    public HashMap<Integer,Object> getTotalSimuTime(){
-        return totalSimuTime;
-    }
-    
-    /**
-     * 
-     * @return islands and if they are blacked out at current simulation time
-     */
-    public HashMap<FlowNetwork,Boolean> getFinalIslands(){
-        return finalIslands;
+    public HashMap<SystemParameter,Object> getSystemParameters(){
+        return systemParameters;
     }
     
     
@@ -973,8 +730,36 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return temporalNodeMetrics;
     }
     
+    /**
+     * 
+     * @return the temporalSystemMetrics
+     */
     public HashMap<Integer,HashMap<Metrics,Object>> getTemporalSystemMetrics() {
         return temporalSystemMetrics;
+    }
+    
+    /**
+     * 
+     * @return the temporalIslandStatus.
+     */
+    public HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> getTemporalIslandStatus(){
+        return temporalIslandStatus;
+    }
+    
+    /**
+     * 
+     * @return time of flow simulation in Milliseconds per time and iteration.
+     */
+    public HashMap<Integer,HashMap<Integer,Object>> getFlowSimuTime(){
+        return flowSimuTime;
+    }
+    
+    /**
+     * 
+     * @return time of whole simulation per epoch
+     */
+    public HashMap<Integer,Object> getTotalSimuTime(){
+        return totalSimuTime;
     }
     
     /**

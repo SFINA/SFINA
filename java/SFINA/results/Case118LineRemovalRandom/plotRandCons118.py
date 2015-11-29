@@ -61,7 +61,7 @@ ax.yaxis.set_ticks(np.arange(0,110,20))
 ax.tick_params(axis='both',length=6, width=1)
 ax2.tick_params(axis='both',length=6, width=1)
 
-plt.legend((l1,l2,l3,l4,l5),('MATPOWER AC','InterPSS AC',  'MATPOWER DC', 'InterPSS DC', 'Line Losses'),loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
+plt.legend((l1,l2,l3,l4,l5),('MATPOWER AC','InterPSS AC',  'MATPOWER DC', 'InterPSS DC', 'Avg. Line Losses'),loc=2, fontsize=16, labelspacing=0.15, borderpad=0.3, handletextpad=0.15)
 plt.xlim(0,16)
 
 plt.gcf().subplots_adjust(left=0.15,right=0.85)

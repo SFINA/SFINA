@@ -17,8 +17,9 @@
  */
 package experiments;
 
-import applications.BenchmarkAgent;
-import applications.BenchmarkLogReplayer;
+import applications.BenchmarkCascadeAgent;
+import applications.BenchmarkSFINAAgent;
+import applications.BenchmarkCascadeLogReplayer;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -87,7 +88,7 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
             for(PowerFlowType flowType : flowTypes){
                 for(int i=0; i<iterations; i++){
                     run(backend, flowType);
-                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
+                    BenchmarkCascadeLogReplayer replayer=new BenchmarkCascadeLogReplayer(expSeqNum, 0, 1000);
                 }
             }
         }
@@ -118,7 +119,7 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new BenchmarkAgent(
+                newPeer.addPeerlet(new BenchmarkCascadeAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
