@@ -3,7 +3,6 @@ package core;
 import applications.Metrics;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import event.EventExecution;
 import event.EventType;
 import event.NetworkComponent;
 import input.Backend;
@@ -21,12 +20,9 @@ import input.SystemParameter;
 import input.TopologyLoader;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import network.FlowNetwork;
 import network.Link;
 import network.LinkState;
@@ -226,38 +222,25 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                long simulationStartTime = System.currentTimeMillis();
                 timeToken=timeTokenName+(getSimulationTime());
+                System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------");
                 temporalIslandStatus.put(getSimulationTime(), new LinkedHashMap());
                 iteration=0;
                 nrFlowSimuCalled.put(getSimulationTime(), 0);
                 flowSimuTime.put(getSimulationTime(), new HashMap());
-                
-                System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------");
-                
+                long simulationStartTime = System.currentTimeMillis();
+                                
                 loadNetworkData();
                 
                 saveInitialLoad();
                 
                 executeAllEvents(getSimulationTime());
                 
-                runCascade();
+                runAnalysis();
                 
                 totalSimuTime.put(getSimulationTime(), System.currentTimeMillis()-simulationStartTime);
                 
-                // Print final steady state after cascade
-                System.out.println("--------------------------------------\n" + temporalIslandStatus.size() + " final islands:");
-                String nodesInIsland;
-                for (FlowNetwork net : temporalIslandStatus.get(getSimulationTime()).keySet()){
-                    nodesInIsland = "";
-                    for (Node node : net.getNodes())
-                        nodesInIsland += node.getIndex() + ", ";
-                    System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
-                    if(temporalIslandStatus.get(getSimulationTime()).get(net))
-                        System.out.print(" -> Converged :)\n");
-                    if(!temporalIslandStatus.get(getSimulationTime()).get(net))
-                        System.out.print(" -> Blackout\n");
-                }
+                printFinalIslands();
                 
                 initMeasurements();
                 performMeasurements();
@@ -265,6 +248,24 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             }
         });
         loadAgentTimer.schedule(this.runTime);
+    }
+
+    /**
+     * Prints final islands in each time step to console
+     */
+    private void printFinalIslands(){
+        System.out.println("--------------------------------------\n" + temporalIslandStatus.get(getSimulationTime()).size() + " final islands:");
+        String nodesInIsland;
+        for (FlowNetwork net : temporalIslandStatus.get(getSimulationTime()).keySet()){
+            nodesInIsland = "";
+            for (Node node : net.getNodes())
+                nodesInIsland += node.getIndex() + ", ";
+            System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
+            if(temporalIslandStatus.get(getSimulationTime()).get(net))
+                System.out.print(" -> Converged :)\n");
+            if(!temporalIslandStatus.get(getSimulationTime()).get(net))
+                System.out.print(" -> Blackout\n");
+        }
     }
     
     /**
@@ -519,18 +520,27 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         }
     }
      
+    /**
+     * Iterates islands and calls flowConvergenceStrategy(). Saves the island and a boolean value describing if it converged. Finally outputs the network data. Doesn't call mitigateOverload or linkOverload method.
+     */
     @Override
-    public void runCascade(){
+    public void runAnalysis(){
         iteration = 1;
         for(FlowNetwork currentIsland : flowNetwork.getIslands()){
-            boolean converged = flowConvergenceAlgo(currentIsland);
+            boolean converged = flowConvergenceStrategy(currentIsland);
             temporalIslandStatus.get(getSimulationTime()).put(currentIsland, converged);
         }
         outputNetworkData();
     }
     
+    /**
+     * Domain specific strategy and/or necessary adjustments before loadflow simulation is executed. 
+     * Power: For current island, turn first generator into slack if it doesn't exist yet.
+     * @param flowNetwork
+     * @return true if flow analysis finally converged, else false
+     */
     @Override 
-    public boolean flowConvergenceAlgo(FlowNetwork flowNetwork){
+    public boolean flowConvergenceStrategy(FlowNetwork flowNetwork){
         switch(domain){
             case POWER:
                 ArrayList<Node> generators = new ArrayList();
@@ -559,6 +569,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return runFlowAnalysis(flowNetwork);
     }
     
+    /**
+     * Executes domain and backend specific flow analysis. Currently implemented for power domain: Matpower and InterPSS.
+     * @param flowNetwork
+     * @return true if converged, else false.
+     */
     @Override
     public boolean runFlowAnalysis(FlowNetwork flowNetwork){
         FlowBackendInterface flowBackend;
@@ -572,10 +587,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
                         flowBackend.flowAnalysis(flowNetwork);
                         converged = flowBackend.isConverged();
+                        break;
                     case INTERPSS:
                         flowBackend=new InterpssFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
                         flowBackend.flowAnalysis(flowNetwork);
                         converged = flowBackend.isConverged();
+                        break;
                     default:
                         logger.debug("This flow backend is not supported at this moment.");
                 }
@@ -597,12 +614,21 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return converged;
     }
     
+    /**
+     * Method to mitigate overload. Strategy to respond to (possible) overloading can be implemented here. This method is called before the OverLoadAlgo is called which deactivates affected links/nodes.
+     * @param flowNetwork 
+     */
     @Override
     public void mitigateOverload(FlowNetwork flowNetwork){
     }
     
+    /**
+     * Checks link limits. If a limit is violated, an event is executed which deactivates the link.
+     * @param flowNetwork
+     * @return 
+     */
     @Override
-    public boolean linkOverloadAlgo(FlowNetwork flowNetwork){
+    public boolean linkOverload(FlowNetwork flowNetwork){
         boolean overloaded = false;
         for (Link link : flowNetwork.getLinks()){
             if(link.isActivated() && link.getFlow() > link.getCapacity()){
@@ -618,7 +644,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     @Override
-    public boolean nodeOverloadAlgo(FlowNetwork flowNetwork){
+    public boolean nodeOverload(FlowNetwork flowNetwork){
         boolean overloaded = false;
         for (Node node : flowNetwork.getNodes()){
             if(node.isActivated() && node.getFlow() > node.getCapacity()){

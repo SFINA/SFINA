@@ -19,10 +19,10 @@ import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
 
 /**
- *
+ * Loads logs, calculates and prints measurement results.
  * @author Evangelos
  */
-public class BenchmarkCascadeLogReplayer {
+public class BenchmarkLogReplayer {
 
     private String expSeqNum;
     private String expID;
@@ -44,7 +44,7 @@ public class BenchmarkCascadeLogReplayer {
     
     static boolean writeToFile=false;
 
-    public BenchmarkCascadeLogReplayer(String experimentSequenceNumber, int minLoad, int maxLoad){
+    public BenchmarkLogReplayer(String experimentSequenceNumber, int minLoad, int maxLoad){
         this.expSeqNum=experimentSequenceNumber;
         this.expID="experiment-"+expSeqNum+"/";
         this.resultID="results/"+expSeqNum+"/";
@@ -59,7 +59,7 @@ public class BenchmarkCascadeLogReplayer {
     }
 
     public static void main(String args[]){
-        BenchmarkCascadeLogReplayer replayer=new BenchmarkCascadeLogReplayer("Case2736LineRemovalRandom", 0, 1000);
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("Case2736LineRemovalRandom", 0, 1000);
     }
 
     public void loadLogs(String directory, int minLoad, int maxLoad){
