@@ -229,7 +229,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 nrFlowSimuCalled.put(getSimulationTime(), 0);
                 flowSimuTime.put(getSimulationTime(), new HashMap());
                 long simulationStartTime = System.currentTimeMillis();
-                                
+                
                 loadNetworkData();
                 
                 saveInitialLoad();
@@ -241,6 +241,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 totalSimuTime.put(getSimulationTime(), System.currentTimeMillis()-simulationStartTime);
                 
                 printFinalIslands();
+                //printFinalIslandsFromNetworkObject();
                 
                 initMeasurements();
                 performMeasurements();
@@ -267,6 +268,23 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 System.out.print(" -> Blackout\n");
         }
     }
+    
+    private void printFinalIslandsFromNetworkObject(){
+        System.out.println("--------------------------------------(From network method)\n" + temporalIslandStatus.get(getSimulationTime()).size() + " final islands:");
+        String nodesInIsland;
+        HashMap<FlowNetwork, Boolean> finalIslands = flowNetwork.getFinalIslands();
+        for (FlowNetwork net : finalIslands.keySet()){
+            nodesInIsland = "";
+            for (Node node : net.getNodes())
+                nodesInIsland += node.getIndex() + ", ";
+            System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
+            if(finalIslands.get(net))
+                System.out.print(" -> Converged :)\n");
+            if(!finalIslands.get(net))
+                System.out.print(" -> Blackout\n");
+        }
+    }
+    
     
     /**
      * Saves the load in Power Analysis. Executed at beginning of each epoch. 
@@ -526,7 +544,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     @Override
     public void runAnalysis(){
         iteration = 1;
-        for(FlowNetwork currentIsland : flowNetwork.getIslands()){
+        for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = flowConvergenceStrategy(currentIsland);
             temporalIslandStatus.get(getSimulationTime()).put(currentIsland, converged);
         }
@@ -535,7 +553,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     /**
      * Domain specific strategy and/or necessary adjustments before loadflow simulation is executed. 
-     * Power: For current island, turn first generator into slack if it doesn't exist yet.
+     * - Power: Most simple strategy: Not converged if isolated node. For current island, turn first generator into slack if it doesn't exist yet. 
      * @param flowNetwork
      * @return true if flow analysis finally converged, else false
      */
@@ -543,16 +561,20 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     public boolean flowConvergenceStrategy(FlowNetwork flowNetwork){
         switch(domain){
             case POWER:
+                if(flowNetwork.getNodes().size() == 1)
+                    return false;
                 ArrayList<Node> generators = new ArrayList();
+                boolean hasSlack = false;
                 for(Node node : flowNetwork.getNodes()){
                     if(node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.SLACK_BUS)){
-                        break;
+                        hasSlack = true;
                     }
                     if(node.getProperty(PowerNodeState.TYPE).equals(PowerNodeType.GENERATOR)){
                         generators.add(node);
                     } 
                 }
-                generators.get(0).replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
+                if(!hasSlack && !generators.isEmpty())
+                    generators.get(0).replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.SLACK_BUS);
                 break;
             case GAS:
                 logger.debug("This domain is not supported at this moment");

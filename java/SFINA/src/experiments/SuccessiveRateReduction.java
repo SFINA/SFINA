@@ -17,9 +17,9 @@
  */
 package experiments;
 
-import applications.BenchmarkCascadeAgent;
+import applications.BenchmarkDomainAgent;
 import applications.BenchmarkSFINAAgent;
-import applications.BenchmarkCascadeLogReplayer;
+import applications.BenchmarkLogReplayer;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -96,7 +96,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
             for(PowerFlowType flowType : flowTypes){
                 for(int i=0; i<iterations; i++){
                     run(backend, flowType);
-                    BenchmarkCascadeLogReplayer replayer=new BenchmarkCascadeLogReplayer(expSeqNum, 0, 1000);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
                 }
             }
         }
@@ -127,7 +127,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new BenchmarkCascadeAgent(
+                newPeer.addPeerlet(new BenchmarkDomainAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),

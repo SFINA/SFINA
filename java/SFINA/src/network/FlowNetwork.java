@@ -27,10 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.UndirectedGraph;
 import static org.jgrapht.alg.DijkstraShortestPath.findPathBetween;
-import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
@@ -55,6 +52,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private LinkedHashMap<String,Node> nodes;
     private LinkedHashMap<String,Link> links;
+    private HashMap<FlowNetwork, Boolean> islands;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**
@@ -62,8 +60,9 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public FlowNetwork(){
         super();
-        this.nodes=new LinkedHashMap<String,Node>();
-        this.links=new LinkedHashMap<String,Link>();
+        this.nodes=new LinkedHashMap<>();
+        this.links=new LinkedHashMap<>();
+        this.islands=new HashMap<>();
     }
     
     @Override
@@ -269,17 +268,6 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void deactivateNode(String index){
         Node deactivatedNode=nodes.get(index);
         deactivatedNode.setActivated(false);
-        // see activateNode() for explanation
-//        List<Link> incomingLinks=deactivatedNode.getIncomingLinks();
-//        for(Link incomingLink:incomingLinks){
-//            //incomingLink.setEndNode(null); // this is wrong I think, and gives errors later when trying to call getIncomingLinks and getOutcomingLinks in Node.
-//            deactivateLink(incomingLink.getIndex()); // when a node is deactivated, it should deactivate the attached links, not disconnecting them entirely from the node.
-//        }
-//        List<Link> outgoingLinks=deactivatedNode.getOutgoingLinks();
-//        for(Link outgoingLink:outgoingLinks){
-//            //outgoingLink.setStartNode(null);
-//            deactivateLink(outgoingLink.getIndex());
-//        }
     }
     
     @Override
@@ -291,13 +279,16 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void deactivateLink(String index){
         Link deactivatedLink=links.get(index);
         deactivatedLink.setActivated(false);
-        //deactivatedLink.getStartNode().removeLink(deactivatedLink); // handled in link object to ensure, that both methods can be used
-        //deactivatedLink.getEndNode().removeLink(deactivatedLink);
     }
     
+    /**
+     * Compute islands.
+     * 
+     * @return ArrayList where each entry is a new FlowNetwork object containing nodes and links belonging to this island. Also saves the current islands 
+     */
     @Override
-    public ArrayList<FlowNetwork> getIslands(){
-        ArrayList<FlowNetwork> islands = new ArrayList<>();
+    public ArrayList<FlowNetwork> computeIslands(){
+        islands.clear();
         ArrayList leftNodes = new ArrayList();
         for (Node node : this.nodes.values())
             leftNodes.add(node);
@@ -325,9 +316,61 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
             for (Link link : newIslandLinks)
                 newIsland.addLink(link);
             
-            islands.add(newIsland);
+            this.islands.put(newIsland, null);
         }
-        return islands;
+        return new ArrayList<>(islands.keySet());
+    }
+    
+    /**
+     * Set if island converged after running flow analysis. Also sets the activation status of the nodes in this island to false.
+     * @param island
+     * @param converged 
+     */
+    public void setIslandConvergence(FlowNetwork island, Boolean converged){
+        if(islands.containsKey(island)){
+            islands.put(island, converged);
+            if(!converged) // deactivate nodes in non-converged islands
+                for (Node node : island.getNodes())
+                    node.setActivated(false);
+        }
+        else if(!islands.isEmpty()){
+            for (FlowNetwork net : islands.keySet())
+                net.setIslandConvergence(island,converged);
+        }
+        else{
+            System.out.println("Trying to set if island converged but island not in this flowNetwork or its islands.");
+            logger.debug("Trying to set if island converged but island not in this flowNetwork or its islands.");
+        }
+    }
+    
+    /**
+     * Get islands including their convergence status. It automatically iterates over all subnetworks. To work properly, the islands should have been computed before, and for each subnetwork, the convegence status has to be set by setIslandConverged before.
+     * @return HashMap<FlowNetwork, Boolean> of the islands and their convergence
+     */
+
+    /**
+     * Get islands including their convergence status.It automatically iterates over all subnetworks. To work properly, the islands should have been computed before, and for each subnetwork, the convegence status has to be set by setIslandConvergence before.
+     * @return HashMap<FlowNetwork, Boolean> of the islands and their convergence
+     */
+    public HashMap<FlowNetwork, Boolean> getFinalIslands(){
+        HashMap<FlowNetwork, Boolean> finalIslands = new HashMap<>();
+        if(!islands.isEmpty()){
+            for(FlowNetwork net : islands.keySet()){
+                if(islands.get(net) == null){
+                    HashMap<FlowNetwork, Boolean> childNets = net.getFinalIslands();
+                    for (FlowNetwork childNet : childNets.keySet()){
+                        finalIslands.put(childNet, childNets.get(childNet));
+                    }
+                }
+                else
+                    finalIslands.put(net, islands.get(net));
+            }
+            return finalIslands;
+        }
+        else{
+            logger.debug("Trying to get final islands even though islands were never computed.");
+            return null;
+        }
     }
     
     private void iterateIsland(Node currentNode, ArrayList<Node> currentIslandNodes, ArrayList<Link> currentIslandLinks, ArrayList leftNodes){

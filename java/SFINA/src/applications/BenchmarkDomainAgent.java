@@ -32,7 +32,7 @@ import protopeer.util.quantities.Time;
  * Domain specific measurements.
  * @author Ben
  */
-public class BenchmarkDomainAgent extends CascadeAgent{
+public class BenchmarkDomainAgent extends BenchmarkSFINAAgent{
     public BenchmarkDomainAgent(String experimentID, 
             String peersLogDirectory, 
             Time bootstrapTime, 

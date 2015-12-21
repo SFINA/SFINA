@@ -17,24 +17,18 @@
  */
 package applications;
 
-import input.SystemParameter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import network.FlowNetwork;
 import network.Node;
 import org.apache.log4j.Logger;
-import power.PowerFlowType;
-import power.PowerNodeType;
-import power.input.PowerNodeState;
 import protopeer.util.quantities.Time;
 
 /**
  * Cascade if link limits violated. Domain independent.
  * @author Ben
  */
-public class CascadeAgent extends BenchmarkSFINAAgent{
+public class CascadeAgent extends BenchmarkDomainAgent{
     
     private static final Logger logger = Logger.getLogger(CascadeAgent.class);
     
@@ -77,7 +71,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     public void runAnalysis(){
         int iter = 0;
         ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
-        islandBuffer.add(getFlowNetwork().getIslands());
+        islandBuffer.add(getFlowNetwork().computeIslands());
         while(!islandBuffer.get(iter).isEmpty()){
             System.out.println("---------------------\n---- Iteration " + (iter+1) + " ----");
             islandBuffer.add(new ArrayList<>()); // List of islands for next iteration (iter+1)
@@ -89,7 +83,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                 System.out.println("=> converged " + converged);
                 if (converged){
                     
-                    // if mitigation strategy is implemented
+                    // mitigation strategy if implemented
                     mitigateOverload(currentIsland);
                     
                     boolean linkOverloaded = linkOverload(currentIsland);
@@ -97,16 +91,17 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                     System.out.println("=> overloaded " + linkOverloaded);
                     if(linkOverloaded){
                         // add islands of the current island to next iteration
-                        for (FlowNetwork net : currentIsland.getIslands())
+                        for (FlowNetwork net : currentIsland.computeIslands())
                             islandBuffer.get(iter+1).add(net);
                     }
-                    else
+                    else{
                         getTemporalIslandStatus().get(getSimulationTime()).put(currentIsland, true);
+                        getFlowNetwork().setIslandConvergence(currentIsland, true);
+                    }
                 }
                 else{
                     getTemporalIslandStatus().get(getSimulationTime()).put(currentIsland, false);
-                    for (Node node : currentIsland.getNodes())
-                        node.setActivated(false);
+                    getFlowNetwork().setIslandConvergence(currentIsland, false);
                 }
             }
             
