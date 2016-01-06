@@ -59,7 +59,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     
     
     @Override
-    public void flowAnalysis(FlowNetwork net){
+    public boolean flowAnalysis(FlowNetwork net){
         
         this.SfinaNet = net;
         
@@ -101,13 +101,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             ie.printStackTrace();
         }
         
-    }
-    
-    /**
-     * @return true if loadflow converged
-     */
-    @Override
-    public boolean isConverged() {
         return converged;
     }
     

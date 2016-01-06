@@ -54,7 +54,7 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     }
     
     @Override
-    public void flowAnalysis(FlowNetwork net){
+    public boolean flowAnalysis(FlowNetwork net){
         // Initialize local variables
         this.net = net;
         ArrayList<Node> nodes = new ArrayList<Node>(this.net.getNodes());
@@ -112,6 +112,8 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
         catch(MatlabInvocationException miex){
             miex.printStackTrace();
         }
+        
+        return converged;
     }
         
     private double[][] getBuses(List<Node> nodes){
@@ -365,22 +367,6 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
         }
     }
 
-//    private enum NeededBranchData {
-//        FROM_BUS,   // !
-//        TO_BUS,     // !
-//        RESISTANCE,
-//        REACTANCE,
-//        SUSCEPTANCE,
-//        RATE_A, 
-//        RATE_B, 
-//        RATE_C, 
-//        TAP_RATIO,
-//        ANGLE_SHIFT,
-//        STATUS,     // !
-//        ANGLE_DIFFERENCE_MIN,
-//        ANGLE_DIFFERENCE_MAX,
-//    }
-
     private double[][] getGenerationCosts(ArrayList<Node> nodes){
         ArrayList MatpowerGenCostData = new ArrayList();
         ArrayList<String> neededGenCostData = new ArrayList();
@@ -426,16 +412,6 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
                 return 0.0;
         }
     }
-    
-//    private enum NeededGenCostData {
-//        MODEL,      
-//        STARTUP,    
-//        SHUTDOWN,
-//        N_COST,     
-//        COST_PARAM_1,
-//        COST_PARAM_2,
-//        COST_PARAM_3,
-//    }
     
     private double[][] convertToDoubleArray(ArrayList<ArrayList<Double>> list){
         int rows = list.size();
@@ -504,14 +480,6 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
      */
     public void setPowerFlowType(PowerFlowType powerFlowType) {
         this.powerFlowType = powerFlowType;
-    }
-
-    /**
-     * @return the converged
-     */
-    @Override
-    public boolean isConverged() {
-        return converged;
     }
 
     /**
