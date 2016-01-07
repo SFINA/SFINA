@@ -292,7 +292,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     };
     
     
-    public void flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
+    public boolean flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
         this.SfinaNet = net;
         IpssCorePlugin.init(Level.OFF);
         
@@ -335,6 +335,8 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         catch(InterpssException ie){
             ie.printStackTrace();
         }
+        
+        return converged;
 
     }    
     /**

@@ -350,7 +350,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
 
     /**
      * Get islands including their convergence status.It automatically iterates over all subnetworks. To work properly, the islands should have been computed before, and for each subnetwork, the convegence status has to be set by setIslandConvergence before.
-     * @return HashMap<FlowNetwork, Boolean> of the islands and their convergence
+     * @return HashMap where the keys are the islands and the values their convergence.
      */
     public HashMap<FlowNetwork, Boolean> getFinalIslands(){
         HashMap<FlowNetwork, Boolean> finalIslands = new HashMap<>();

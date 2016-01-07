@@ -81,7 +81,7 @@ public class CascadeAgent extends BenchmarkDomainAgent{
                 
                 boolean converged = flowConvergenceStrategy(currentIsland); // do flow analysis
                 System.out.println("=> converged " + converged);
-                if (converged){
+                if(converged){
                     
                     // mitigation strategy if implemented
                     mitigateOverload(currentIsland);
