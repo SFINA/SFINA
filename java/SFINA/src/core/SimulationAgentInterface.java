@@ -29,7 +29,7 @@ public interface SimulationAgentInterface {
     
     public void initMeasurements();
     
-    public void runAnalysis();
+    public void runFlowAnalysis();
     
     public boolean flowConvergenceStrategy(FlowNetwork flowNetwork);
 

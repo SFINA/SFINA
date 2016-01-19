@@ -68,7 +68,7 @@ public class CascadeAgent extends BenchmarkDomainAgent{
      * Implements cascade as a result of overloaded links. Continues until system stabilizes, i.e. no more link overloads occur. Calls mitigateOverload method before finally calling linkOverload method, therefore mitigation strategies can be implemented.
      */
     @Override
-    public void runAnalysis(){
+    public void runFlowAnalysis(){
         int iter = 0;
         ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
         islandBuffer.add(getFlowNetwork().computeIslands());
