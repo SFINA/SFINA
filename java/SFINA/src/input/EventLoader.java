@@ -144,6 +144,9 @@ public class EventLoader {
                     case "link":
                         networkComponent=NetworkComponent.LINK;
                         break;
+                    case "-":
+                        logger.debug("Network component not applicable for system parameter event.");
+                        break;
                     default:
                         logger.debug("Network component cannot be recognized.");
                 }

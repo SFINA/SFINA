@@ -114,15 +114,15 @@ public class testInterpss {
     private static void runInterpssOurData(FlowNetwork net){
         System.out.println("\n--------------------------------------------------\n    INTERPSS, SFINA DATA\n--------------------------------------------------");
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
-        IpssObject.flowAnalysis(net);
-        System.out.println("Ipss our data converged = " + IpssObject.isConverged());
+        boolean converged = IpssObject.flowAnalysis(net);
+        System.out.println("Ipss our data converged = " + converged);
     }
 
     private static void runInterpssTheirLoader(FlowNetwork net){
         System.out.println("\n--------------------------------------------------\n    INTERPSS, DATA LOADED BY INTERPSS' LOADERS\n--------------------------------------------------");        
         InterpssFlowBackend IpssObject = new InterpssFlowBackend(FlowType);
-        IpssObject.flowAnalysisIpssDataLoader(net, caseName);    
-        System.out.println("Ipss their loader converged = " + IpssObject.isConverged());
+        boolean converged = IpssObject.flowAnalysisIpssDataLoader(net, caseName);    
+        System.out.println("Ipss their loader converged = " + converged);
     }    
     
     private static void compareData(FlowNetwork net){
@@ -142,8 +142,8 @@ public class testInterpss {
     private static void runMatlabSimu(FlowNetwork net){
         System.out.println("\n--------------------------------------------------\n    MATPOWER, SFINA DATA\n--------------------------------------------------");
         MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
-        algo.flowAnalysis(net);
-        System.out.println("Matpwr our data converged = " + algo.isConverged());
+        boolean converged = algo.flowAnalysis(net);
+        System.out.println("Matpwr our data converged = " + converged);
     }
     
     private static void resetLfData(FlowNetwork net){

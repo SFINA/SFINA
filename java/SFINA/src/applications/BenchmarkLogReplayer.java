@@ -5,24 +5,21 @@
 
 package applications;
 
-import dsutil.protopeer.services.aggregation.AggregationFunction;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
 import protopeer.measurement.LogReplayer;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
 
 /**
- *
+ * Loads logs, calculates and prints measurement results.
  * @author Evangelos
  */
-public class BenchmarkCascadeLogReplayer {
+public class BenchmarkLogReplayer {
 
     private String expSeqNum;
     private String expID;
@@ -44,7 +41,7 @@ public class BenchmarkCascadeLogReplayer {
     
     static boolean writeToFile=false;
 
-    public BenchmarkCascadeLogReplayer(String experimentSequenceNumber, int minLoad, int maxLoad){
+    public BenchmarkLogReplayer(String experimentSequenceNumber, int minLoad, int maxLoad){
         this.expSeqNum=experimentSequenceNumber;
         this.expID="experiment-"+expSeqNum+"/";
         this.resultID="results/"+expSeqNum+"/";
@@ -59,7 +56,7 @@ public class BenchmarkCascadeLogReplayer {
     }
 
     public static void main(String args[]){
-        BenchmarkCascadeLogReplayer replayer=new BenchmarkCascadeLogReplayer("Case2736LineRemovalRandom", 0, 1000);
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("Case30LineRemovalRandomConsistent", 0, 1000);
     }
 
     public void loadLogs(String directory, int minLoad, int maxLoad){
@@ -172,7 +169,7 @@ public class BenchmarkCascadeLogReplayer {
             islandNum.print(islands + coma);
             isolatedNodes.print(isolNodes + coma);
         }
-        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.4f%20.0f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, avgflowSimuTimePerEpoch, simuTimePerEpoch, neededIterations);
+        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.4f%20.0f%20.0f%20.0f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, avgflowSimuTimePerEpoch, simuTimePerEpoch, neededIterations, islands, isolNodes);
         
     }
 
@@ -186,7 +183,7 @@ public class BenchmarkCascadeLogReplayer {
 
     public void printLocalMetricsTags(){
         System.out.println("*** RESULTS PER EPOCH ***\n");
-        System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization", "Pow Loss this epoch", "Pow Loss since ep1", "Avg Flow Simu Time", "Total Simu Time", "Nr of iterations");
+        System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization", "Pow Loss this epoch", "Pow Loss since ep1", "Avg Flow Simu Time", "Total Simu Time", "Nr of iterations", "Nr of islands", "Nr of isol. nodes");
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

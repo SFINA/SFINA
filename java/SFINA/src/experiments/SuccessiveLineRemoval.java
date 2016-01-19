@@ -17,9 +17,9 @@
  */
 package experiments;
 
-import applications.BenchmarkCascadeAgent;
-import applications.BenchmarkSFINAAgent;
-import applications.BenchmarkCascadeLogReplayer;
+import applications.BenchmarkLogReplayer;
+import applications.CascadeAgent;
+import applications.PowerGenBalancingLoadSheddingAgent;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -28,11 +28,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import network.Node;
 import power.PowerFlowType;
 import protopeer.Experiment;
 import protopeer.Peer;
@@ -46,7 +43,7 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveLineRemoval extends SimulatedExperiment{
     
-    private static String expSeqNum="Case2736LineRemovalRandom";
+    private static String expSeqNum="Case30LineRemovalRandomConsistent";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
@@ -89,11 +86,11 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         //backends.add(Backend.MATPOWER);
         backends.add(Backend.INTERPSS);
         ArrayList<PowerFlowType> flowTypes = new ArrayList();
-        //flowTypes.add(PowerFlowType.AC);
+        flowTypes.add(PowerFlowType.AC);
         flowTypes.add(PowerFlowType.DC);
         
         // Random
-        int linkNr = 3500;
+        int linkNr = 41;
         for(int i=0; i<iterations; i++){
             ArrayList<Integer> links = new ArrayList<>();
             for(int j=0; j<linkNr; j++)
@@ -112,7 +109,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
                 for(int i=0; i<iterations; i++){
                     createLinkAttackEvents(i);
                     run(backend, flowType);
-                    //BenchmarkCascadeLogReplayer replayer=new BenchmarkCascadeLogReplayer(expSeqNum, 0, 1000);
+                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
                 }
             }
         }
@@ -122,7 +119,6 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
         simulationParameters.put(SystemParameter.BACKEND, backend);
         simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
-        // Optional, not yet implemented to afffect anything
         simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
         //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 1.0);
         
@@ -140,7 +136,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new BenchmarkCascadeAgent(
+                newPeer.addPeerlet(new PowerGenBalancingLoadSheddingAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
@@ -172,11 +168,15 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
             int time = 2;
-            for (int i=0; i<30; i++){
-                for (int j=0; j<18; j++){
-                    int linkId = attackLinks.get(iteration).get(i*18+j);
-                    writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId + columnSeparator + "status" + columnSeparator + "0");
-                }
+//            for (int i=0; i<30; i++){
+//                for (int j=0; j<18; j++){
+//                    int linkId = attackLinks.get(iteration).get(i*18+j);
+//                    writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + linkId + columnSeparator + "status" + columnSeparator + "0");
+//                }
+//                time++;
+//            }
+            for(int i=0; i<attackLinks.get(iteration).size(); i++){
+                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + attackLinks.get(iteration).get(i) + columnSeparator + "status" + columnSeparator + "0");
                 time++;
             }
             writer.close();

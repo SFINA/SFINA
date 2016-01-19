@@ -57,7 +57,7 @@ public class testNetworkMethods {
         for (String el : removedLinks)
             net.deactivateLink(el);
         
-        ArrayList<FlowNetwork> islands = net.getIslands();
+        ArrayList<FlowNetwork> islands = net.computeIslands();
         
         for (Link link : net.getLinks())
             System.out.format("%3s", link.getIndex());

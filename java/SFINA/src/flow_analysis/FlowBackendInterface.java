@@ -16,7 +16,6 @@ import network.Node;
  */
 public interface FlowBackendInterface {
     
-    public void flowAnalysis(FlowNetwork net);
-    public boolean isConverged();
+    public boolean flowAnalysis(FlowNetwork net);
     
 }

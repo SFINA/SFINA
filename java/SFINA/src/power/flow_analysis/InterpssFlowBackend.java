@@ -59,7 +59,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     
     
     @Override
-    public void flowAnalysis(FlowNetwork net){
+    public boolean flowAnalysis(FlowNetwork net){
         
         this.SfinaNet = net;
         
@@ -101,13 +101,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
             ie.printStackTrace();
         }
         
-    }
-    
-    /**
-     * @return true if loadflow converged
-     */
-    @Override
-    public boolean isConverged() {
         return converged;
     }
     
@@ -299,7 +292,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     };
     
     
-    public void flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
+    public boolean flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
         this.SfinaNet = net;
         IpssCorePlugin.init(Level.OFF);
         
@@ -342,6 +335,8 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         catch(InterpssException ie){
             ie.printStackTrace();
         }
+        
+        return converged;
 
     }    
     /**

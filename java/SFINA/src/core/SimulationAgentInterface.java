@@ -29,27 +29,15 @@ public interface SimulationAgentInterface {
     
     public void initMeasurements();
     
-    /**
-     * Wrapper to handle cascades. This method takes care of the iterations and calls flowConvergenceAlgo().
-     */
-    public void runCascade();
+    public void runAnalysis();
     
-    /**
-     * Wrapper to handle convergence. Strategy to make flow analysis converge can be implemented here
-     * @param flowNetwork
-     * @return true if flow analysis finally converged, else false
-     */
-    public boolean flowConvergenceAlgo(FlowNetwork flowNetwork);
+    public boolean flowConvergenceStrategy(FlowNetwork flowNetwork);
 
-    /**
-     * Wrapper to mitigate overload. Strategy to respond to (possible) overloading can be implemented here. This method is called before the OverLoadAlgo is called which deactivates affected links/nodes.
-     * @param flowNetwork 
-     */
     public void mitigateOverload(FlowNetwork flowNetwork);
     
-    public boolean linkOverloadAlgo(FlowNetwork flowNetwork);
+    public boolean linkOverload(FlowNetwork flowNetwork);
     
-    public boolean nodeOverloadAlgo(FlowNetwork flowNetwork);
+    public boolean nodeOverload(FlowNetwork flowNetwork);
     
     public boolean runFlowAnalysis(FlowNetwork flowNetwork);
 
