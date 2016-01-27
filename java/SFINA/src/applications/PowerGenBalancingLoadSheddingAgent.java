@@ -117,7 +117,7 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
                 boolean limViolation = true;
                 while(limViolation){
                     converged = callBackend(flowNetwork);
-                    System.out.println("....converged " + converged);
+                    if(this.getIfConsoleOutput()) System.out.println("....converged " + converged);
                     if (converged){
                         limViolation = powerGenLimitAlgo(flowNetwork, slack);
                         
@@ -133,7 +133,7 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
                                 generators.remove(0);
                             }
                             else{
-                                System.out.println("....no more generators");
+                                if(this.getIfConsoleOutput()) System.out.println("....no more generators");
                                 return false; // all generator limits were hit -> blackout
                             }
                         }
@@ -173,9 +173,9 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
         }
         slack.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.GENERATOR);
         if (limViolation)
-            System.out.println("....generator limit violated at node " + slack.getIndex());
+            if(this.getIfConsoleOutput()) System.out.println("....generator limit violated at node " + slack.getIndex());
         else
-            System.out.println("....no generator limit violated");
+            if(this.getIfConsoleOutput()) System.out.println("....no generator limit violated");
         return limViolation;
     }
     
@@ -185,7 +185,7 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
         int maxLoadShedIterations = 15; // according to paper
         double loadReductionFactor = 0.05; // 5%, according to paper
         while (!converged && loadIter < maxLoadShedIterations){
-            System.out.println("....Doing load shedding at iteration " + loadIter);
+            if(this.getIfConsoleOutput()) System.out.println("....Doing load shedding at iteration " + loadIter);
             for (Node node : flowNetwork.getNodes()){
                 node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REAL, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)*(1.0-loadReductionFactor));
                 node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)*(1.0-loadReductionFactor));

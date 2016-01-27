@@ -77,14 +77,14 @@ public class CascadeAgent extends BenchmarkDomainAgent{
         ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
         islandBuffer.add(getFlowNetwork().computeIslands());
         while(!islandBuffer.get(iter).isEmpty()){
-            System.out.println("---------------------\n---- Iteration " + (iter+1) + " ----");
+            if(this.getIfConsoleOutput()) System.out.println("---------------------\n---- Iteration " + (iter+1) + " ----");
             islandBuffer.add(new ArrayList<>()); // List of islands for next iteration (iter+1)
             for(int i=0; i < islandBuffer.get(iter).size(); i++){ // go through islands at current iteration
                 FlowNetwork currentIsland = islandBuffer.get(iter).get(i);
-                System.out.println("---> Treating island with " + currentIsland.getNodes().size() + " nodes.");
-                
+                if(this.getIfConsoleOutput()) System.out.println("---> Treating island with " + currentIsland.getNodes().size() + " nodes.");
                 boolean converged = flowConvergenceStrategy(currentIsland); // do flow analysis
-                System.out.println("=> converged " + converged);
+                if(this.getIfConsoleOutput()) System.out.println("=> converged " + converged);
+                
                 if(converged){
                     
                     // mitigation strategy if implemented
@@ -92,21 +92,17 @@ public class CascadeAgent extends BenchmarkDomainAgent{
                     
                     boolean linkOverloaded = linkOverload(currentIsland);
                     //boolean nodeOverloaded = nodeOverload(currentIsland);
-                    System.out.println("=> overloaded " + linkOverloaded);
+                    if(this.getIfConsoleOutput()) System.out.println("=> overloaded " + linkOverloaded);
                     if(linkOverloaded){
                         // add islands of the current island to next iteration
                         for (FlowNetwork net : currentIsland.computeIslands())
                             islandBuffer.get(iter+1).add(net);
                     }
-                    else{
+                    else
                         temporalIslandStatus.get(getSimulationTime()).put(currentIsland, true);
-                        getFlowNetwork().setIslandConvergence(currentIsland, true);
-                    }
                 }
-                else{
+                else
                     temporalIslandStatus.get(getSimulationTime()).put(currentIsland, false);
-                    getFlowNetwork().setIslandConvergence(currentIsland, false);
-                }
             }
             
             // Output network snapshot of current iteration
@@ -117,8 +113,8 @@ public class CascadeAgent extends BenchmarkDomainAgent{
             iter++;
         }
         
-        printFinalIslands();
-        //printFinalIslandsFromNetworkObject();        
+        if(this.getIfConsoleOutput()) 
+            printFinalIslands();
     }
     
     /**
@@ -137,22 +133,5 @@ public class CascadeAgent extends BenchmarkDomainAgent{
             if(!temporalIslandStatus.get(getSimulationTime()).get(net))
                 System.out.print(" -> Blackout\n");
         }
-    }
-    
-    private void printFinalIslandsFromNetworkObject(){
-        System.out.println("--------------------------------------(From network method)\n" + temporalIslandStatus.get(getSimulationTime()).size() + " final islands:");
-        String nodesInIsland;
-        HashMap<FlowNetwork, Boolean> finalIslands = getFlowNetwork().getFinalIslands();
-        for (FlowNetwork net : finalIslands.keySet()){
-            nodesInIsland = "";
-            for (Node node : net.getNodes())
-                nodesInIsland += node.getIndex() + ", ";
-            System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
-            if(finalIslands.get(net))
-                System.out.print(" -> Converged :)\n");
-            if(!finalIslands.get(net))
-                System.out.print(" -> Blackout\n");
-        }
-    }
-    
+    }    
 }

@@ -71,6 +71,7 @@ import protopeer.util.quantities.Time;
 public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     private static final Logger logger = Logger.getLogger(SFINAAgent.class);
+    private boolean printInfoToConsole = false;
     
     private String experimentID;
     private String peersLogDirectory;
@@ -263,7 +264,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private void loadInputData(){
         File file = new File(experimentConfigurationFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
-            System.out.println("loading data at time " + timeToken);
+            if(this.getIfConsoleOutput()) System.out.println("loading data at time " + timeToken);
             topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
             switch(domain){
@@ -312,7 +313,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     public void outputNetworkData(){
-        System.out.println("doing output at iteration " + iteration);
+        if(this.getIfConsoleOutput()) System.out.println("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
         topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
@@ -374,7 +375,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     
     public void executeAllEvents(int time){
-        System.out.println("Executing events");
+        if(this.getIfConsoleOutput()) System.out.println("Executing events");
         Iterator<Event> i = events.iterator();
         while (i.hasNext()){
             Event event = i.next();
@@ -402,7 +403,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 if(node.isActivated() == (Boolean)event.getValue())
                                     logger.debug("Node status same, not changed by event.");
                                 node.setActivated((Boolean)event.getValue()); 
-                                System.out.println("..deactivating node " + node.getIndex());
+                                if(this.getIfConsoleOutput()) System.out.println("..deactivating node " + node.getIndex());
                                 break;
                             default:
                                 logger.debug("Node state cannot be recognised");
@@ -425,7 +426,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 if(link.isActivated() == (Boolean)event.getValue())
                                     logger.debug("Link status same, not changed by event.");
                                 link.setActivated((Boolean)event.getValue()); 
-                                System.out.println("..deactivating link " + link.getIndex());
+                                if(this.getIfConsoleOutput()) System.out.println("..deactivating link " + link.getIndex());
                                 break;
                             default:
                                 logger.debug("Link state cannot be recognised");
@@ -450,7 +451,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 }
                 break;
             case SYSTEM:
-                System.out.println("..changing/setting system param: " + (SystemParameter)event.getParameter());
+                if(this.getIfConsoleOutput()) System.out.println("..changing/setting system param: " + (SystemParameter)event.getParameter());
                 switch((SystemParameter)event.getParameter()){
                     case DOMAIN:
                         systemParameters.put(SystemParameter.DOMAIN, (Domain)event.getValue());
@@ -596,7 +597,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         boolean overloaded = false;
         for (Link link : flowNetwork.getLinks()){
             if(link.isActivated() && link.getFlow() > link.getCapacity()){
-                System.out.println("..violating link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
+                if(this.getIfConsoleOutput()) System.out.println("..violating link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
                 Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
                 events.add(event);
                 overloaded = true;
@@ -612,7 +613,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         boolean overloaded = false;
         for (Node node : flowNetwork.getNodes()){
             if(node.isActivated() && node.getFlow() > node.getCapacity()){
-                System.out.println("..violating node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
+                if(this.getIfConsoleOutput()) System.out.println("..violating node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
                 Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.NODE,node.getIndex(),NodeState.STATUS,false);
                 events.add(event);
                 overloaded = true;
@@ -675,6 +676,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return systemParameters;
     }
     
+    public boolean getIfConsoleOutput(){
+        return printInfoToConsole;
+    }
     
     //****************** MEASUREMENTS ******************
     
