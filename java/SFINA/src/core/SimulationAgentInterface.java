@@ -25,7 +25,9 @@ public interface SimulationAgentInterface {
     
     public void executeEvent(FlowNetwork flowNetwork, Event event);
     
-    public void performMeasurements();
+    public void performInitialMeasurements();
+    
+    public void performFinalMeasurements();
     
     public void initMeasurements();
     
@@ -39,7 +41,7 @@ public interface SimulationAgentInterface {
     
     public boolean nodeOverload(FlowNetwork flowNetwork);
     
-    public boolean runFlowAnalysis(FlowNetwork flowNetwork);
+    public boolean callBackend(FlowNetwork flowNetwork);
 
     public void scheduleMeasurements();
     

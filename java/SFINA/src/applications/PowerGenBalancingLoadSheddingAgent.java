@@ -116,7 +116,7 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
                 
                 boolean limViolation = true;
                 while(limViolation){
-                    converged = runFlowAnalysis(flowNetwork);
+                    converged = callBackend(flowNetwork);
                     System.out.println("....converged " + converged);
                     if (converged){
                         limViolation = powerGenLimitAlgo(flowNetwork, slack);
@@ -190,7 +190,7 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
                 node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REAL, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)*(1.0-loadReductionFactor));
                 node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)*(1.0-loadReductionFactor));
             }
-            converged = runFlowAnalysis(flowNetwork);
+            converged = callBackend(flowNetwork);
             loadIter++;
         }
         return converged;

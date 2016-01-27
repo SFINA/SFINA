@@ -19,6 +19,7 @@ package applications;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import network.FlowNetwork;
 import network.Node;
 import org.apache.log4j.Logger;
@@ -31,6 +32,7 @@ import protopeer.util.quantities.Time;
 public class CascadeAgent extends BenchmarkDomainAgent{
     
     private static final Logger logger = Logger.getLogger(CascadeAgent.class);
+    private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
     
     public CascadeAgent(String experimentID, 
             String peersLogDirectory, 
@@ -70,6 +72,8 @@ public class CascadeAgent extends BenchmarkDomainAgent{
     @Override
     public void runFlowAnalysis(){
         int iter = 0;
+        temporalIslandStatus.put(getSimulationTime(), new LinkedHashMap());
+        
         ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
         islandBuffer.add(getFlowNetwork().computeIslands());
         while(!islandBuffer.get(iter).isEmpty()){
@@ -95,12 +99,12 @@ public class CascadeAgent extends BenchmarkDomainAgent{
                             islandBuffer.get(iter+1).add(net);
                     }
                     else{
-                        getTemporalIslandStatus().get(getSimulationTime()).put(currentIsland, true);
+                        temporalIslandStatus.get(getSimulationTime()).put(currentIsland, true);
                         getFlowNetwork().setIslandConvergence(currentIsland, true);
                     }
                 }
                 else{
-                    getTemporalIslandStatus().get(getSimulationTime()).put(currentIsland, false);
+                    temporalIslandStatus.get(getSimulationTime()).put(currentIsland, false);
                     getFlowNetwork().setIslandConvergence(currentIsland, false);
                 }
             }
@@ -112,5 +116,43 @@ public class CascadeAgent extends BenchmarkDomainAgent{
             // Go to next iteration if there were islands added to it
             iter++;
         }
+        
+        printFinalIslands();
+        //printFinalIslandsFromNetworkObject();        
     }
+    
+    /**
+     * Prints final islands in each time step to console
+     */
+    private void printFinalIslands(){
+        System.out.println("--------------------------------------\n" + temporalIslandStatus.get(getSimulationTime()).size() + " final islands:");
+        String nodesInIsland;
+        for (FlowNetwork net : temporalIslandStatus.get(getSimulationTime()).keySet()){
+            nodesInIsland = "";
+            for (Node node : net.getNodes())
+                nodesInIsland += node.getIndex() + ", ";
+            System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
+            if(temporalIslandStatus.get(getSimulationTime()).get(net))
+                System.out.print(" -> Converged :)\n");
+            if(!temporalIslandStatus.get(getSimulationTime()).get(net))
+                System.out.print(" -> Blackout\n");
+        }
+    }
+    
+    private void printFinalIslandsFromNetworkObject(){
+        System.out.println("--------------------------------------(From network method)\n" + temporalIslandStatus.get(getSimulationTime()).size() + " final islands:");
+        String nodesInIsland;
+        HashMap<FlowNetwork, Boolean> finalIslands = getFlowNetwork().getFinalIslands();
+        for (FlowNetwork net : finalIslands.keySet()){
+            nodesInIsland = "";
+            for (Node node : net.getNodes())
+                nodesInIsland += node.getIndex() + ", ";
+            System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
+            if(finalIslands.get(net))
+                System.out.print(" -> Converged :)\n");
+            if(!finalIslands.get(net))
+                System.out.print(" -> Blackout\n");
+        }
+    }
+    
 }

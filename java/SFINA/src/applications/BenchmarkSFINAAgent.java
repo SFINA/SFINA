@@ -18,6 +18,7 @@
 package applications;
 
 import core.SFINAAgent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import network.FlowNetwork;
@@ -67,6 +68,7 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
                 systemParameters);
     }
     
+    private long simulationStartTime;
     
     private void calculateTotalLines(){
         for(Link link:this.getFlowNetwork().getLinks()){
@@ -103,36 +105,36 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
     
     private void calculateInitialLoad(){
         for(Node node : this.getFlowNetwork().getNodes()){
-            double initialLoadPerEpoch = (Double)this.getInitialLoadPerEpoch(this.getSimulationTime()).get(node.getIndex());
+            double initialLoad = 0.0;
+            if(node.isActivated() && node.isConnected()){
+                initialLoad = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
+            }
             HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
-            metrics.put(Metrics.NODE_INIT_LOADING, initialLoadPerEpoch);
+            metrics.put(Metrics.NODE_INIT_LOADING, initialLoad);
         }
     }
     
     private void calculateFinalLoad(){
         for(Node node : this.getFlowNetwork().getNodes()){
-            if(node.isActivated()){
-                double load = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
-                HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
-                metrics.put(Metrics.NODE_FINAL_LOADING, load);
+            double finalLoad = 0.0;
+            if(node.isActivated() && node.isConnected()){
+                finalLoad = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
             }
-            else{
-                HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
-                metrics.put(Metrics.NODE_FINAL_LOADING, 0.0);
-            }
-                
+            HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+            metrics.put(Metrics.NODE_FINAL_LOADING, finalLoad);
         }
     }
     
     private void calculateSystemMetrics(){
-        double totSimuTime = ((Long)getTotalSimuTime().get(getSimulationTime())).doubleValue();
-        int iterations =((Integer)getFlowSimuTime().get(getSimulationTime()).size());
-        int nrIslands = this.getTemporalIslandStatus().get(getSimulationTime()).keySet().size();
+        double totSimuTime = System.currentTimeMillis() - simulationStartTime;
+        int iterations = ((Integer)getBackendSimuTimePerIteration().get(getSimulationTime()).size());
+        ArrayList<FlowNetwork> finalIslands = getFlowNetwork().computeIslands();
+        int nrIslands = finalIslands.size();
         int nrIsolatedNodes = 0;
-        for(FlowNetwork net : this.getTemporalIslandStatus().get(getSimulationTime()).keySet())
+        for(FlowNetwork net : finalIslands)
             if(net.getNodes().size()==1)
                 nrIsolatedNodes++;
-        this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<Metrics,Object>());
+        
         this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.TOT_SIMU_TIME, totSimuTime);
         this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.NEEDED_ITERATIONS, iterations);
         this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISLANDS, nrIslands);
@@ -140,12 +142,17 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
     }
     
     @Override
-    public void performMeasurements(){
+    public void performInitialMeasurements(){
+        this.simulationStartTime = System.currentTimeMillis();
+        this.calculateInitialLoad();
+    }
+    
+    @Override
+    public void performFinalMeasurements(){
         this.calculateActivationStatus();
         this.calculateFlow();
         this.calculateUtilization();
         this.calculateTotalLines();
-        this.calculateInitialLoad();
         this.calculateFinalLoad();
         this.calculateSystemMetrics();
     }
@@ -177,9 +184,8 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
                         log.log(simulationTime, Metrics.NODE_INIT_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_INIT_LOADING)).doubleValue());
                         log.log(simulationTime, Metrics.NODE_FINAL_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_FINAL_LOADING)).doubleValue());
                     }
-                    for(int iteration : getFlowSimuTime().get(simulationTime).keySet()){
-                        log.log(simulationTime, Metrics.FLOW_SIMU_TIME, ((Long)getFlowSimuTime().get(simulationTime).get(iteration)).doubleValue());
-                        
+                    for(int iteration : getBackendSimuTimePerIteration().get(simulationTime).keySet()){
+                        log.log(simulationTime, Metrics.FLOW_SIMU_TIME, ((Long)getBackendSimuTimePerIteration().get(simulationTime).get(iteration)).doubleValue());
                     }
                     HashMap<Metrics,Object> sysMetrics=getTemporalSystemMetrics().get(simulationTime);
                     log.log(simulationTime, Metrics.TOT_SIMU_TIME, ((Double)sysMetrics.get(Metrics.TOT_SIMU_TIME)).doubleValue());

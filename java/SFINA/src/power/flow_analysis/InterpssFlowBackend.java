@@ -71,7 +71,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
                     //acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
                     acAlgo.loadflow();
-                    String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();        
+                    //String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();        
                     //System.out.println(resultLoaded);
                     getIpssACResults();
                     this.converged = IpssNet.isLfConverged();
@@ -81,7 +81,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(IpssNet);
                     dcAlgo.calculateDclf();
                     getIpssDCResults(dcAlgo);
-                    String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
+                    //String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
                     //System.out.println(resultDC);
                     this.converged = dcAlgo.isDclfCalculated();
                     dcAlgo.destroy();
@@ -110,7 +110,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     private void buildIpssNet(){
         IpssNet = CoreObjectFactory.createAclfNetwork();
         
-        // Set baseKVA. Not sure if we have this in our data, or if we need it. Or we just set it here to a default value.
         IpssNet.setBaseKva(100000.0);
         
         try {
@@ -148,7 +147,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                 
                 // Properties for all buses (Gen and non-Gen)
 
-                
                 IpssBus.setLoadCode(AclfLoadCode.CONST_P);
                 if ((Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL) == 0.0)
                    IpssBus.setLoadCode(AclfLoadCode.NON_LOAD);
@@ -291,6 +289,8 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         
     };
     
+    
+    // *************************** Test Methods ********************************
     
     public boolean flowAnalysisIpssDataLoader(FlowNetwork net, String CaseName){
         this.SfinaNet = net;
