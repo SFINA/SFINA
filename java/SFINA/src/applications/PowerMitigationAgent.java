@@ -26,7 +26,7 @@ import protopeer.util.quantities.Time;
  * Overrides mitigateOverload method. Here, mitigation strategies can be implemented, which will be called before the CascadeAgent calls the linkOverload check.
  * @author Ben
  */
-public class PowerMitigationAgent extends PowerGenBalancingLoadSheddingAgent{
+public class PowerMitigationAgent extends PowerConvergenceStrategyAgent{
     
     public PowerMitigationAgent(String experimentID, 
             String peersLogDirectory, 

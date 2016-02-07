@@ -34,9 +34,9 @@ import protopeer.util.quantities.Time;
  * Strategy to make power load flow analysis converge. Balancing generation limits and shedding load.
  * @author Ben
  */
-public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
+public class PowerConvergenceStrategyAgent extends CascadeAgent{
     
-    public PowerGenBalancingLoadSheddingAgent(String experimentID, 
+    public PowerConvergenceStrategyAgent(String experimentID, 
             String peersLogDirectory, 
             Time bootstrapTime, 
             Time runTime, 
@@ -68,7 +68,7 @@ public class PowerGenBalancingLoadSheddingAgent extends CascadeAgent{
                 systemParameters);
     }
     
-    private static final Logger logger = Logger.getLogger(PowerGenBalancingLoadSheddingAgent.class);
+    private static final Logger logger = Logger.getLogger(PowerConvergenceStrategyAgent.class);
     
     /**
      * Jose's strategy to meet generator limits and make flow analysis converge by load shedding.

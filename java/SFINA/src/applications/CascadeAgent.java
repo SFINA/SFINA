@@ -106,7 +106,6 @@ public class CascadeAgent extends BenchmarkDomainAgent{
             }
             
             // Output network snapshot of current iteration
-            setCurrentIteration(iter+1);
             outputNetworkData();
             
             // Go to next iteration if there were islands added to it

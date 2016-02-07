@@ -45,6 +45,7 @@ import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import output.TopologyWriter;
 import power.PowerFlowType;
 import power.PowerNodeType;
@@ -71,7 +72,7 @@ import protopeer.util.quantities.Time;
 public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     private static final Logger logger = Logger.getLogger(SFINAAgent.class);
-    private boolean printInfoToConsole = false;
+    private boolean printInfoToConsole = true;
     
     private String experimentID;
     private String peersLogDirectory;
@@ -128,7 +129,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.timeTokenName=timeTokenName;
         this.experimentConfigurationFilesLocation=experimentConfigurationFilesLocation;
         this.experimentOutputFilesLocation=experimentOutputFilesLocation;
-        this.iteration=0;
+        this.iteration=1;
         this.nodesLocation=nodesLocation;
         this.linksLocation=linksLocation;
         this.nodesFlowLocation=nodesFlowLocation;
@@ -239,7 +240,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime());
                 System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------"); // Just for seeing on the console when a new runActiveState is executed
-                iteration=0;
+                logger.log(Priority.INFO, "\n------------------------------------\n-------------- " + timeToken + " --------------");
+                resetIteration();
                 
                 loadInputData();
                 
@@ -265,6 +267,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         File file = new File(experimentConfigurationFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
             if(this.getIfConsoleOutput()) System.out.println("loading data at time " + timeToken);
+            logger.log(Priority.INFO, "loading data at time " + timeToken);
             topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
             switch(domain){
@@ -312,6 +315,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         executeAllEvents(getSimulationTime());
     }
     
+    /**
+     * Outputs txt files in same format as input. Automatically creates incremental iterations starting at 1 for each output as long as the current epoch is running. 
+     */
     public void outputNetworkData(){
         if(this.getIfConsoleOutput()) System.out.println("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
@@ -334,7 +340,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     break;
                 default:
                     logger.debug("This domain is not supported at this moment");
-            }
+        }
+        incrementIteration();
     }
     
     @Override
@@ -501,7 +508,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      */
     @Override
     public void runFlowAnalysis(){
-        iteration = 1;
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = flowConvergenceStrategy(currentIsland);
         }
@@ -574,8 +580,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 logger.debug("This domain is not supported at this moment");
         }
         long analysisEndTime = System.currentTimeMillis();
-        if(this.getCurrentIteration()>0)
-            this.getBackendSimuTimePerIteration().get(getSimulationTime()).put(this.getCurrentIteration(),analysisEndTime-analysisStartTime);
+        if(iteration>1)
+            this.getBackendSimuTimePerIteration().get(getSimulationTime()).put(iteration, analysisEndTime-analysisStartTime);
         return converged;
     }
     
@@ -661,15 +667,17 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     /**
-     * 
-     * @return which iteration the simulation is currently at
+     * Sets iteration to 1.
      */
-    public int getCurrentIteration(){
-        return iteration;
+    public void resetIteration(){
+        this.iteration=1;
     }
     
-    public void setCurrentIteration(Integer iter){
-        this.iteration=iter;
+    /**
+     * Increases iteration in steps of 1.
+     */
+    public void incrementIteration(){
+        this.iteration++;
     }
     
     public HashMap<SystemParameter,Object> getSystemParameters(){
