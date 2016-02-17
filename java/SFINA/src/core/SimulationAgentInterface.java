@@ -24,9 +24,9 @@ public interface SimulationAgentInterface {
     
     public void executeEvent(FlowNetwork flowNetwork, Event event);
     
-    public void performInitialMeasurements();
+    public void performInitialStateOperations();
     
-    public void performFinalMeasurements();
+    public void performFinalStateOperations();
     
     public void initMeasurements();
     

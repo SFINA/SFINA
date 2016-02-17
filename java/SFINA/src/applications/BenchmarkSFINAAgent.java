@@ -109,12 +109,12 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
     }
     
     @Override
-    public void performInitialMeasurements(){
+    public void performInitialStateOperations(){
         this.saveStartTime();
     }
     
     @Override
-    public void performFinalMeasurements(){
+    public void performFinalStateOperations(){
         this.calculateActivationStatus();
         this.calculateFlow();
         this.calculateUtilization();

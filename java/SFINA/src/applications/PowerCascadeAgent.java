@@ -83,13 +83,13 @@ public class PowerCascadeAgent extends CascadeAgent{
     }
     
     @Override
-    public void performInitialMeasurements(){
+    public void performInitialStateOperations(){
         this.adjustCapacityByToleranceParameter();
         this.calculateInitialLoad();
     }
     
     @Override
-    public void performFinalMeasurements(){
+    public void performFinalStateOperations(){
         this.calculateFinalLoad();
         this.calculateCascadeMetrics();
         

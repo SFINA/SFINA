@@ -243,13 +243,13 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 loadInputData();
                 
                 initMeasurements();
-                performInitialMeasurements(); // Rename -> more generic
+                performInitialStateOperations();
                 
                 executeAllEvents(getSimulationTime());
                 
                 runFlowAnalysis();
                 
-                performFinalMeasurements();
+                performFinalStateOperations();
                 runActiveState(); 
             }
         });
@@ -327,12 +327,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     @Override
-    public void performInitialMeasurements(){
+    public void performInitialStateOperations(){
         
     }
     
     @Override
-    public void performFinalMeasurements(){
+    public void performFinalStateOperations(){
         
     }
     
