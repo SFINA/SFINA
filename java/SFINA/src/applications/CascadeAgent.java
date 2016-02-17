@@ -17,11 +17,17 @@
  */
 package applications;
 
+import event.Event;
+import event.EventType;
+import event.NetworkComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import network.FlowNetwork;
+import network.Link;
+import network.LinkState;
 import network.Node;
+import network.NodeState;
 import org.apache.log4j.Logger;
 import protopeer.util.quantities.Time;
 
@@ -29,7 +35,7 @@ import protopeer.util.quantities.Time;
  * Cascade if link limits violated. Domain independent.
  * @author Ben
  */
-public class CascadeAgent extends BenchmarkDomainAgent{
+public class CascadeAgent extends BenchmarkSFINAAgent{
     
     private static final Logger logger = Logger.getLogger(CascadeAgent.class);
     private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
@@ -114,6 +120,80 @@ public class CascadeAgent extends BenchmarkDomainAgent{
         
         if(this.getIfConsoleOutput()) 
             printFinalIslands();
+    }
+    
+    
+    /**
+     * Domain specific strategy and/or necessary adjustments before backend is executed. 
+     *
+     * @param flowNetwork
+     * @return true if flow analysis finally converged, else false
+     */ 
+    public boolean flowConvergenceStrategy(FlowNetwork flowNetwork){
+        switch(this.getDomain()){
+            case POWER:
+                break;
+            case GAS:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            case WATER:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            case TRANSPORTATION:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            default:
+                logger.debug("This domain is not supported at this moment");
+        }
+        return callBackend(flowNetwork);
+    }
+    
+    /**
+     * Method to mitigate overload. Strategy to respond to (possible) overloading can be implemented here. This method is called before the OverLoadAlgo is called which deactivates affected links/nodes.
+     * @param flowNetwork 
+     */
+    public void mitigateOverload(FlowNetwork flowNetwork){
+        
+    }
+    
+    /**
+     * Checks link limits. If a limit is violated, an event is executed which deactivates the link.
+     * @param flowNetwork
+     * @return if overload happened
+     */
+    public boolean linkOverload(FlowNetwork flowNetwork){
+        boolean overloaded = false;
+        for (Link link : flowNetwork.getLinks()){
+            if(link.isActivated() && link.getFlow() > link.getCapacity()){
+                if(this.getIfConsoleOutput()) System.out.println("..violating link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
+                Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
+                this.getEvents().add(event);
+                overloaded = true;
+            }
+        }
+        if (overloaded)
+            this.executeAllEvents(getSimulationTime());
+        return overloaded;
+    }
+    
+    /**
+     * Checks node limits. If a limit is violated, an event is executed which deactivates the node.
+     * @param flowNetwork
+     * @return if overload happened
+     */
+    public boolean nodeOverload(FlowNetwork flowNetwork){
+        boolean overloaded = false;
+        for (Node node : flowNetwork.getNodes()){
+            if(node.isActivated() && node.getFlow() > node.getCapacity()){
+                if(this.getIfConsoleOutput()) System.out.println("..violating node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
+                Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.NODE,node.getIndex(),NodeState.STATUS,false);
+                this.getEvents().add(event);
+                overloaded = true;
+            }
+        }
+        if (overloaded)
+            this.executeAllEvents(getSimulationTime());
+        return overloaded;
     }
     
     /**

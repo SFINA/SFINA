@@ -8,7 +8,6 @@ package core;
 import event.Event;
 import network.FlowNetwork;
 import protopeer.network.Message;
-import protopeer.util.quantities.Time;
 
 
 /**
@@ -32,15 +31,7 @@ public interface SimulationAgentInterface {
     public void initMeasurements();
     
     public void runFlowAnalysis();
-    
-    public boolean flowConvergenceStrategy(FlowNetwork flowNetwork);
-
-    public void mitigateOverload(FlowNetwork flowNetwork);
-    
-    public boolean linkOverload(FlowNetwork flowNetwork);
-    
-    public boolean nodeOverload(FlowNetwork flowNetwork);
-    
+        
     public boolean callBackend(FlowNetwork flowNetwork);
 
     public void scheduleMeasurements();

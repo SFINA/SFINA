@@ -17,26 +17,35 @@
  */
 package applications;
 
-import input.SystemParameter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import network.FlowNetwork;
+import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.PowerNodeType;
+import power.input.PowerNetworkParameter;
 import power.input.PowerNodeState;
+import protopeer.measurement.MeasurementFileDumper;
+import protopeer.measurement.MeasurementLog;
+import protopeer.measurement.MeasurementLoggerListener;
 import protopeer.util.quantities.Time;
 
 /**
  * Strategy to make power load flow analysis converge. Balancing generation limits and shedding load.
  * @author Ben
  */
-public class PowerConvergenceStrategyAgent extends CascadeAgent{
+public class PowerCascadeAgent extends CascadeAgent{
     
-    public PowerConvergenceStrategyAgent(String experimentID, 
+    private static final Logger logger = Logger.getLogger(PowerCascadeAgent.class);
+    private PowerFlowType flowType;
+    private double toleranceParameter;
+    
+    public PowerCascadeAgent(String experimentID, 
             String peersLogDirectory, 
             Time bootstrapTime, 
             Time runTime, 
@@ -50,7 +59,9 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
             String eventsLocation, 
             String columnSeparator, 
             String missingValue,
-            HashMap systemParameters){
+            HashMap systemParameters,
+            PowerFlowType flowType,
+            Double toleranceParameter){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -66,9 +77,47 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
                 columnSeparator,
                 missingValue,
                 systemParameters);
+        this.flowType = flowType;
+        this.toleranceParameter = toleranceParameter;
+        getFlowNetwork().putNetworkParameter(PowerNetworkParameter.FLOW_TYPE, flowType);
     }
     
-    private static final Logger logger = Logger.getLogger(PowerConvergenceStrategyAgent.class);
+    @Override
+    public void performInitialMeasurements(){
+        this.adjustCapacityByToleranceParameter();
+        this.calculateInitialLoad();
+    }
+    
+    @Override
+    public void performFinalMeasurements(){
+        this.calculateFinalLoad();
+        this.calculateCascadeMetrics();
+        
+        // inherited from BenchmarkSFINAAgent
+        this.calculateActivationStatus();
+        this.calculateFlow();
+        this.calculateUtilization();
+        this.calculateTotalLines();
+    }
+    
+    /**
+     * Set Capacity by Tolerance Parameter. If no line ratings are given by data.
+     */
+    public void adjustCapacityByToleranceParameter(){
+        boolean capacityNotSet = false;
+        for (Link link : getFlowNetwork().getLinks()){
+            if (link.getCapacity() == 0.0){
+                capacityNotSet = true;
+            }
+            else capacityNotSet = false;
+        }
+        if(capacityNotSet){
+            callBackend(getFlowNetwork());
+            for (Link link : getFlowNetwork().getLinks()){
+                link.setCapacity(toleranceParameter*link.getFlow());
+            }
+        }
+    }
     
     /**
      * Jose's strategy to meet generator limits and make flow analysis converge by load shedding.
@@ -119,10 +168,10 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
                     converged = callBackend(flowNetwork);
                     if(this.getIfConsoleOutput()) System.out.println("....converged " + converged);
                     if (converged){
-                        limViolation = powerGenLimitAlgo(flowNetwork, slack);
+                        limViolation = GenerationBalancing(flowNetwork, slack);
                         
                         // Without the following line big cases (like polish) even DC doesn't converge..
-                        if(getSystemParameters().get(SystemParameter.FLOW_TYPE).equals(PowerFlowType.DC))
+                        if(getFlowType().equals(PowerFlowType.DC))
                             limViolation=false;
                         
                         if (limViolation){
@@ -139,7 +188,7 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
                         }
                     }
                     else{
-                        converged = powerLoadShedAlgo(flowNetwork);
+                        converged = loadShedding(flowNetwork);
                         if (!converged)
                             return false; // blackout if no convergence after load shedding
                     }
@@ -161,7 +210,7 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
         return converged;
     }
     
-    private boolean powerGenLimitAlgo(FlowNetwork flowNetwork, Node slack){
+    private boolean GenerationBalancing(FlowNetwork flowNetwork, Node slack){
         boolean limViolation = false;
         if ((Double)slack.getProperty(PowerNodeState.POWER_GENERATION_REAL) > (Double)slack.getProperty(PowerNodeState.POWER_MAX_REAL)){
             slack.replacePropertyElement(PowerNodeState.POWER_GENERATION_REAL, slack.getProperty(PowerNodeState.POWER_MAX_REAL));
@@ -179,7 +228,7 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
         return limViolation;
     }
     
-    private boolean powerLoadShedAlgo(FlowNetwork flowNetwork){
+    private boolean loadShedding(FlowNetwork flowNetwork){
         boolean converged = false;
         int loadIter = 0;
         int maxLoadShedIterations = 15; // according to paper
@@ -195,4 +244,116 @@ public class PowerConvergenceStrategyAgent extends CascadeAgent{
         }
         return converged;
     }
+    
+    @Override
+    public void mitigateOverload(FlowNetwork flowNetwork){
+        // Implement mitigation strategy here
+    }
+
+    /**
+     * @return the flowType
+     */
+    public PowerFlowType getFlowType() {
+        return flowType;
+    }
+
+    /**
+     * @param flowType the flowType to set
+     */
+    public void setFlowType(PowerFlowType flowType) {
+        this.flowType = flowType;
+    }
+
+    /**
+     * @return the toleranceParameter
+     */
+    public double getToleranceParameter() {
+        return toleranceParameter;
+    }
+
+    /**
+     * @param toleranceParameter the toleranceParameter to set
+     */
+    public void setToleranceParameter(double toleranceParameter) {
+        this.toleranceParameter = toleranceParameter;
+    }
+    
+    
+    // *************************** Measurements ********************************
+
+    
+    private void calculateInitialLoad(){
+        for(Node node : this.getFlowNetwork().getNodes()){
+            double initialLoad = 0.0;
+            if(node.isActivated() && node.isConnected()){
+                initialLoad = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
+            }
+            HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+            metrics.put(Metrics.NODE_INIT_LOADING, initialLoad);
+        }
+    }
+    
+    private void calculateFinalLoad(){
+        for(Node node : this.getFlowNetwork().getNodes()){
+            double finalLoad = 0.0;
+            if(node.isActivated() && node.isConnected()){
+                finalLoad = (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL);
+            }
+            HashMap<Metrics,Object> metrics=this.getTemporalNodeMetrics().get(this.getSimulationTime()).get(node.getIndex());
+            metrics.put(Metrics.NODE_FINAL_LOADING, finalLoad);
+        }
+    }
+    
+    private void calculateCascadeMetrics(){
+        int iterations = this.getIteration();
+        ArrayList<FlowNetwork> finalIslands = getFlowNetwork().computeIslands();
+        int nrIslands = finalIslands.size();
+        int nrIsolatedNodes = 0;
+        for(FlowNetwork net : finalIslands)
+            if(net.getNodes().size()==1)
+                nrIsolatedNodes++;
+        
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.NEEDED_ITERATIONS, iterations);
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISLANDS, nrIslands);
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISOLATED_NODES, nrIsolatedNodes);
+    }
+   
+    /**
+     * Scheduling the measurements for the simulation agent
+     */
+    @Override
+    public void scheduleMeasurements(){
+        setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
+        getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
+            public void measurementEpochEnded(MeasurementLog log, int epochNumber){
+                int simulationTime=getSimulationTime();
+                
+                if(simulationTime>=1){
+                    log.logTagSet(simulationTime, new HashSet(getFlowNetwork().getLinks()), simulationTime);
+                    for(Link link:getFlowNetwork().getLinks()){
+                        HashMap<Metrics,Object> linkMetrics=getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
+                        log.log(simulationTime, Metrics.LINE_UTILIZATION, ((Double)linkMetrics.get(Metrics.LINE_UTILIZATION)));
+                        log.log(simulationTime, Metrics.LINE_FLOW, ((Double)linkMetrics.get(Metrics.LINE_FLOW)));
+                        log.log(simulationTime, Metrics.ACTIVATED_LINES, ((Double)linkMetrics.get(Metrics.ACTIVATED_LINES)));
+                        log.log(simulationTime, Metrics.TOTAL_LINES, ((Double)linkMetrics.get(Metrics.TOTAL_LINES)));
+                    }
+                    log.logTagSet(simulationTime, new HashSet(getFlowNetwork().getNodes()), simulationTime);
+                    for(Node node:getFlowNetwork().getNodes()){
+                        HashMap<Metrics,Object> nodeMetrics=getTemporalNodeMetrics().get(simulationTime).get(node.getIndex());
+                        log.log(simulationTime, Metrics.NODE_INIT_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_INIT_LOADING)));
+                        log.log(simulationTime, Metrics.NODE_FINAL_LOADING, ((Double)nodeMetrics.get(Metrics.NODE_FINAL_LOADING)));
+                    }
+                    HashMap<Metrics,Object> sysMetrics=getTemporalSystemMetrics().get(simulationTime);
+                    log.log(simulationTime, Metrics.TOT_SIMU_TIME, ((Double)sysMetrics.get(Metrics.TOT_SIMU_TIME)));
+                    log.log(simulationTime, Metrics.NEEDED_ITERATIONS, ((Integer)sysMetrics.get(Metrics.NEEDED_ITERATIONS)));
+                    log.log(simulationTime, Metrics.ISLANDS, ((Integer)sysMetrics.get(Metrics.ISLANDS)));
+                    log.log(simulationTime, Metrics.ISOLATED_NODES, ((Integer)sysMetrics.get(Metrics.ISOLATED_NODES)));
+                }
+                getMeasurementDumper().measurementEpochEnded(log, simulationTime);
+                log.shrink(simulationTime, simulationTime+1);
+            }
+        });
+    }
 }
+
+    
