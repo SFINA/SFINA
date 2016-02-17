@@ -56,6 +56,8 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
         // Initialize local variables
         this.net = net;
         this.powerFlowType = (PowerFlowType)net.getNetworkParameter(PowerNetworkParameter.FLOW_TYPE);
+        if(powerFlowType.equals(null))
+            this.powerFlowType = PowerFlowType.AC;
         ArrayList<Node> nodes = new ArrayList<Node>(this.net.getNodes());
         ArrayList<Link> links = new ArrayList<Link>(this.net.getLinks());
         busesPowerFlowInfo = this.getBuses(nodes);

@@ -61,6 +61,8 @@ public class InterpssFlowBackend implements FlowBackendInterface{
         
         this.SfinaNet = net;
         this.powerFlowType = (PowerFlowType)net.getNetworkParameter(PowerNetworkParameter.FLOW_TYPE);
+        if(powerFlowType.equals(null))
+            this.powerFlowType = PowerFlowType.AC;
         
         try{
             switch(powerFlowType){

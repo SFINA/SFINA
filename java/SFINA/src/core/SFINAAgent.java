@@ -30,6 +30,7 @@ import static input.Domain.POWER;
 import static input.Domain.TRANSPORTATION;
 import static input.Domain.WATER;
 import input.EventLoader;
+import input.FilesConfiguration;
 import input.SystemParameter;
 import input.TopologyLoader;
 import java.io.File;
@@ -70,14 +71,17 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private boolean printInfoToConsole = true;
     
     private String experimentID;
-    private String peersLogDirectory;
     private Time bootstrapTime;
     private Time runTime;
+    private int iteration;
+    
+    private HashMap<FilesConfiguration, String> fileConfiguration;
+    
+    private String peersLogDirectory;
     private String timeToken;
     private String timeTokenName;
     private String experimentConfigurationFilesLocation;
     private String experimentOutputFilesLocation;
-    private int iteration;
     private String nodesLocation;
     private String linksLocation;
     private String nodesFlowLocation;
@@ -442,10 +446,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
                             link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
-//                        for (Node node : flowNetwork.getNodes())
-//                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
                         break;
                     case CAPACITY_CHANGE_NODE:
+                        for (Node node : flowNetwork.getNodes())
+                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");
