@@ -13,7 +13,6 @@ import com.interpss.core.aclf.AclfBus;
 import com.interpss.core.aclf.AclfGenCode;
 import com.interpss.core.aclf.AclfLoadCode;
 import com.interpss.core.aclf.AclfNetwork;
-import com.interpss.core.algo.AclfMethod;
 import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
@@ -25,7 +24,6 @@ import network.Link;
 import network.Node;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.log4j.Logger;
-import org.eclipse.emf.common.util.EList;
 import org.interpss.CorePluginObjFactory;
 import org.interpss.IpssCorePlugin;
 import org.interpss.display.AclfOutFunc.BusIdStyle;
@@ -37,6 +35,7 @@ import org.interpss.numeric.exp.IpssNumericException;
 import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
+import power.input.PowerNetworkParameter;
 import power.input.PowerNodeState;
 
 /**
@@ -51,8 +50,7 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     private boolean converged;
     private static final Logger logger = Logger.getLogger(InterpssFlowBackend.class);
     
-    public InterpssFlowBackend(PowerFlowType powerFlowType){
-        this.powerFlowType=powerFlowType;
+    public InterpssFlowBackend(){
         this.converged=false;
         IpssCorePlugin.init(Level.OFF);
     }
@@ -62,17 +60,15 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     public boolean flowAnalysis(FlowNetwork net){
         
         this.SfinaNet = net;
+        this.powerFlowType = (PowerFlowType)net.getNetworkParameter(PowerNetworkParameter.FLOW_TYPE);
         
         try{
             switch(powerFlowType){
                 case AC:
                     buildIpssNet();
-                    //setVoltZero();
                     LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
                     //acAlgo.setLfMethod(AclfMethod.NR); // NR = Newton-Raphson, PQ = fast decoupled, (GS = Gauss)
                     acAlgo.loadflow();
-                    //String resultLoaded = AclfOut_BusStyle.lfResultsBusStyle(IpssNet, BusIdStyle.BusId_No).toString();        
-                    //System.out.println(resultLoaded);
                     getIpssACResults();
                     this.converged = IpssNet.isLfConverged();
                     break;
@@ -81,8 +77,6 @@ public class InterpssFlowBackend implements FlowBackendInterface{
                     DclfAlgorithm dcAlgo = DclfObjectFactory.createDclfAlgorithm(IpssNet);
                     dcAlgo.calculateDclf();
                     getIpssDCResults(dcAlgo);
-                    //String resultDC = DclfOutFunc.dclfResults(dcAlgo, false).toString();
-                    //System.out.println(resultDC);
                     this.converged = dcAlgo.isDclfCalculated();
                     dcAlgo.destroy();
                     break;

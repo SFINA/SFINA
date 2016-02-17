@@ -19,12 +19,11 @@ import matlabcontrol.extensions.MatlabTypeConverter;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
-import network.NodeState;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
+import power.input.PowerNetworkParameter;
 import power.input.PowerNodeState;
 
 /**
@@ -34,22 +33,21 @@ import power.input.PowerNodeState;
 public class MATPOWERFlowBackend implements FlowBackendInterface{
     
     private FlowNetwork net;
+    private PowerFlowType powerFlowType;
     private double[][] busesPowerFlowInfo;
     private double[][] generatorsPowerFlowInfo;
     private double[][] branchesPowerFlowInfo;
     private double[][] costsPowerFlowInfo;
     private MatlabProxyFactory factory;
     private MatlabProxy proxy;
-    private PowerFlowType powerFlowType;
     private boolean converged;
     private final String caseFile="DumpCase";
     private static final Logger logger = Logger.getLogger(MATPOWERFlowBackend.class);
     
     
-    public MATPOWERFlowBackend(PowerFlowType powerFlowType){
+    public MATPOWERFlowBackend(){
         MatlabProxyFactoryOptions options = new MatlabProxyFactoryOptions.Builder().setUsePreviouslyControlledSession(true).build();
         factory = new MatlabProxyFactory(options);
-        this.powerFlowType=powerFlowType;
         this.converged=false;
     }
     
@@ -57,6 +55,7 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     public boolean flowAnalysis(FlowNetwork net){
         // Initialize local variables
         this.net = net;
+        this.powerFlowType = (PowerFlowType)net.getNetworkParameter(PowerNetworkParameter.FLOW_TYPE);
         ArrayList<Node> nodes = new ArrayList<Node>(this.net.getNodes());
         ArrayList<Link> links = new ArrayList<Link>(this.net.getLinks());
         busesPowerFlowInfo = this.getBuses(nodes);

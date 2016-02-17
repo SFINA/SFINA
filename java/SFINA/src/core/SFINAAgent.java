@@ -502,11 +502,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             case POWER:
                 switch(backend){
                     case MATPOWER:
-                        flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
+                        flowBackend=new MATPOWERFlowBackend();
                         converged=flowBackend.flowAnalysis(flowNetwork);
                         break;
                     case INTERPSS:
-                        flowBackend=new InterpssFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
+                        flowBackend=new InterpssFlowBackend();
                         converged=flowBackend.flowAnalysis(flowNetwork);
                         break;
                     default:
