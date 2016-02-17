@@ -291,7 +291,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     /**
      * Outputs txt files in same format as input. Automatically creates incremental iterations starting at 1 for each output as long as the current epoch is running. 
      */
-    public void outputNetworkData(){
+    private void outputNetworkData(){
         if(this.getIfConsoleOutput()) System.out.println("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
@@ -314,7 +314,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 default:
                     logger.debug("This domain is not supported at this moment");
         }
-        incrementIteration();
     }
     
     @Override
@@ -464,7 +463,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = callBackend(currentIsland);
         }
-        outputNetworkData();
+        nextIteration();
     }
     
     /**
@@ -550,9 +549,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     /**
-     * Increases iteration in steps of 1.
+     * Goes to next iteration and initiates output. First outputs network data at current iteration, then increases iteration by one.
+     * Has to be called at the end of the iteration.
      */
-    public void incrementIteration(){
+    public void nextIteration(){
+        this.outputNetworkData();
         this.iteration++;
     }
     

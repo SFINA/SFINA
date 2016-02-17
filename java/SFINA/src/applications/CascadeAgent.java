@@ -74,6 +74,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     
     /**
      * Implements cascade as a result of overloaded links. Continues until system stabilizes, i.e. no more link overloads occur. Calls mitigateOverload method before finally calling linkOverload method, therefore mitigation strategies can be implemented.
+     * Variable int iter = getIteration()-1
      */
     @Override
     public void runFlowAnalysis(){
@@ -111,8 +112,8 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                     temporalIslandStatus.get(getSimulationTime()).put(currentIsland, false);
             }
             
-            // Output network snapshot of current iteration
-            outputNetworkData();
+            // Output data at current iteration and go to next one
+            nextIteration();
             
             // Go to next iteration if there were islands added to it
             iter++;
