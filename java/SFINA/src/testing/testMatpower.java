@@ -44,7 +44,7 @@ public class testMatpower {
         
         loader.load("case30", net);
         
-        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(FlowType);
+        MATPOWERFlowBackend algo = new MATPOWERFlowBackend();
         //resetLfData(net);
         algo.flowAnalysis(net);
         printer.printLfResults(net);

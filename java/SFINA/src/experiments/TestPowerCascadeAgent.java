@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,15 +17,13 @@
  */
 package experiments;
 
-import core.SFINAAgent;
+import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import power.PowerFlowType;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -34,9 +32,9 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author evangelospournaras
+ * @author Ben
  */
-public class TestSFINAAgent extends SimulatedExperiment{
+public class TestPowerCascadeAgent extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -49,6 +47,8 @@ public class TestSFINAAgent extends SimulatedExperiment{
     private final static int N=1;
     
     // SFINA parameters
+    private final static HashMap<SystemParameter,Object> simulationParameters = new HashMap();
+
     private final static String columnSeparator=",";
     private final static String missingValue="-";
     
@@ -69,31 +69,23 @@ public class TestSFINAAgent extends SimulatedExperiment{
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
-        HashMap<SystemParameter,Object> systemParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
-        System.out.println(systemParameters);
-//        // Necessary
-//        systemParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-//        systemParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-//        systemParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
-//        
-//        // Optional, not yet implemented to afffect anything
-//        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-//        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, 0.0);
+        // Necessary
+        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
+        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
+        PowerFlowType flowType = PowerFlowType.AC;
+        double toleranceParameter = 2.0;
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
-        TestSFINAAgent test = new TestSFINAAgent();
+        final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
-        File folder = new File(peersLogDirectory+experimentID);
+        final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
         folder.mkdir();
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-//                if (peerIndex == 0) {
-//                   newPeer.addPeerlet(null);
-//                }
-                newPeer.addPeerlet(new SFINAAgent(
+                newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
@@ -108,7 +100,9 @@ public class TestSFINAAgent extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        systemParameters));
+                        simulationParameters,
+                        flowType,
+                        toleranceParameter));
                 return newPeer;
             }
         };
@@ -130,61 +124,5 @@ public class TestSFINAAgent extends SimulatedExperiment{
             }
         }
         experiment.delete();
-    }
-    
-    public final static HashMap<SystemParameter,Object> loadSystemParameters(String location, String separator){
-        HashMap<SystemParameter,Object> systemParameters = new HashMap();
-        File file = new File(location);
-        Scanner scr = null;
-        try {
-            scr = new Scanner(file);
-            while(scr.hasNext()){
-                StringTokenizer st = new StringTokenizer(scr.next(), separator);
-                switch(st.nextToken()){
-                    case "domain":
-                        Domain domain=null;
-                        String domainType=st.nextToken();
-                        switch(domainType){
-                            case "power":
-                                domain=Domain.POWER;
-                                break;
-                            case "gas":
-                                domain=Domain.GAS;
-                                break;
-                            case "water":
-                                domain=Domain.WATER;
-                                break;
-                            case "transportation":
-                                domain=Domain.TRANSPORTATION;
-                                break;
-                            default:
-                                logger.debug("This domain is not supported or cannot be recognized");
-                        }
-                        systemParameters.put(SystemParameter.DOMAIN, domain);
-                        break;
-                    case "backend":
-                        Backend backend=null;
-                        String backendType=st.nextToken();
-                        switch(backendType){
-                            case "MATPOWER":
-                                backend=Backend.MATPOWER;
-                                break;
-                            case "InterPSS":
-                                backend=Backend.INTERPSS;
-                                break;
-                            default:
-                                logger.debug("This backend is not supported or cannot be recognized");
-                        }
-                        systemParameters.put(SystemParameter.BACKEND, backend);
-                        break;
-                    default:
-                        logger.debug("This system parameter is not supported or cannot be recognized");
-                }
-            }
-        }
-        catch (FileNotFoundException ex){
-            ex.printStackTrace();
-        }
-        return systemParameters;
     }
 }
