@@ -20,13 +20,10 @@ package core;
 import applications.Metrics;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import event.EventType;
-import event.NetworkComponent;
 import input.Backend;
 import static input.Backend.INTERPSS;
 import static input.Backend.MATPOWER;
 import flow_analysis.FlowBackendInterface;
-import input.AttackStrategy;
 import input.Domain;
 import static input.Domain.GAS;
 import static input.Domain.POWER;
@@ -47,7 +44,6 @@ import network.NodeState;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import output.TopologyWriter;
-import power.PowerFlowType;
 import power.flow_analysis.InterpssFlowBackend;
 import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerFlowLoader;
@@ -443,32 +439,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         systemParameters.put(SystemParameter.BACKEND, (Backend)event.getValue());
                         backend=(Backend)event.getValue();
                         break;
-                    case FLOW_TYPE:
-                        systemParameters.put(SystemParameter.FLOW_TYPE, (PowerFlowType)event.getValue());
-                        break;
-                    case TOLERANCE_PARAMETER:
-                        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, (Double)event.getValue());
-                        for (Link link : flowNetwork.getLinks()){
-                            Double capacity = link.getCapacity();
-                            if (capacity == null || capacity == 0.0){
-                                link.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*link.getFlow());
-                            }
-                        }
-//                        for (Node node : flowNetwork.getNodes()){
-//                            Double capacity = node.getCapacity();
-//                            if (capacity == null || capacity == 0.0)
-//                                node.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*node.getFlow());
-//                        }
-                        break;
-                    case ATTACK_STRATEGY:
-                        systemParameters.put(SystemParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
-                        break;
-                    case CAPACITY_CHANGE:
-                        systemParameters.put(SystemParameter.CAPACITY_CHANGE, (Double)event.getValue());
+                    case CAPACITY_CHANGE_LINK:
+                        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
-                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
+                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
 //                        for (Node node : flowNetwork.getNodes())
-//                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
+//                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
+                        break;
+                    case CAPACITY_CHANGE_NODE:
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");
