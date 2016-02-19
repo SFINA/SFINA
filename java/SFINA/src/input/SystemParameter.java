@@ -12,8 +12,6 @@ package input;
 public enum SystemParameter {
     DOMAIN,
     BACKEND,
-    FLOW_TYPE,
-    TOLERANCE_PARAMETER,
-    ATTACK_STRATEGY, // we don't need this
-    CAPACITY_CHANGE
+    CAPACITY_CHANGE_LINK,
+    CAPACITY_CHANGE_NODE
 }

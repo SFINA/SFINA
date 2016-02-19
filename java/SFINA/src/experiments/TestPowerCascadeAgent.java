@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,19 +17,11 @@
  */
 package experiments;
 
-import applications.BenchmarkDomainAgent;
-import applications.BenchmarkSFINAAgent;
-import applications.BenchmarkLogReplayer;
+import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.HashMap;
 import power.PowerFlowType;
 import protopeer.Experiment;
@@ -40,18 +32,18 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author evangelospournaras
+ * @author Ben
  */
-public class TimeMeasurementSimu extends SimulatedExperiment{
+public class TestPowerCascadeAgent extends SimulatedExperiment{
     
-    private final static String expSeqNum="Case118PFTime";
+    private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=104;
+    private final static int runDuration=4;
     private final static int N=1;
     
     // SFINA parameters
@@ -70,56 +62,30 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
     private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
     private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
+    private final static String systemParametersLocation=experimentConfigurationFilesLocation+"/system-parameters.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
     private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
-        ArrayList<Backend> backends = new ArrayList();
-        backends.add(Backend.MATPOWER);
-        backends.add(Backend.INTERPSS);
-        ArrayList<PowerFlowType> flowTypes = new ArrayList();
-        flowTypes.add(PowerFlowType.AC);
-        flowTypes.add(PowerFlowType.DC);
-        int iterations = 1;
-        
-        for(Backend backend : backends){
-            for(PowerFlowType flowType : flowTypes){
-                for(int i=0; i<iterations; i++){
-                    run(backend, flowType);
-                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
-                }
-            }
-        }
-        
-    }
-    
-    private static void run(Backend backend, PowerFlowType flowType){
         // Necessary
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, backend);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.5);
+        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
+        PowerFlowType flowType = PowerFlowType.AC;
+        double toleranceParameter = 2.0;
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
-        final TimeMeasurementSimu test = new TimeMeasurementSimu();
+        final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
         folder.mkdir();
-        
-        //ReplicateFirstInputFolder createTimeFolders = new ReplicateFirstInputFolder(runDuration, configurationFilesLocation, timeTokenName);
-        
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-//                if (peerIndex == 0) {
-//                   newPeer.addPeerlet(null);
-//                }
-                newPeer.addPeerlet(new BenchmarkDomainAgent(
+                newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
@@ -134,7 +100,9 @@ public class TimeMeasurementSimu extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters));
+                        simulationParameters,
+                        flowType,
+                        toleranceParameter));
                 return newPeer;
             }
         };

@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import power.PowerFlowType;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -78,7 +77,7 @@ public class TestSFINAAgent extends SimulatedExperiment{
 //        
 //        // Optional, not yet implemented to afffect anything
 //        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-//        systemParameters.put(SystemParameter.CAPACITY_CHANGE, 0.0);
+//        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, 0.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -176,27 +175,6 @@ public class TestSFINAAgent extends SimulatedExperiment{
                                 logger.debug("This backend is not supported or cannot be recognized");
                         }
                         systemParameters.put(SystemParameter.BACKEND, backend);
-                        break;
-                    case "flow_type":
-                        PowerFlowType powerFlow=null;
-                        String powerFlowType=st.nextToken();
-                        switch(powerFlowType){
-                            case "DC":
-                                powerFlow=PowerFlowType.DC;
-                                break;
-                            case "AC":
-                                powerFlow=PowerFlowType.AC;
-                                break;
-                            default:
-                                logger.debug("This flow type is not supported or cannot be recognized");
-                        }
-                        systemParameters.put(SystemParameter.FLOW_TYPE, powerFlow);
-                        break;
-                    case "tolerance_parameter":
-                        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, Double.parseDouble(st.nextToken()));
-                        break;
-                    case "capacity_change":
-                        systemParameters.put(SystemParameter.CAPACITY_CHANGE, Double.parseDouble(st.nextToken()));
                         break;
                     default:
                         logger.debug("This system parameter is not supported or cannot be recognized");

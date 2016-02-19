@@ -20,19 +20,17 @@ package core;
 import applications.Metrics;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import event.EventType;
-import event.NetworkComponent;
 import input.Backend;
 import static input.Backend.INTERPSS;
 import static input.Backend.MATPOWER;
 import flow_analysis.FlowBackendInterface;
-import input.AttackStrategy;
 import input.Domain;
 import static input.Domain.GAS;
 import static input.Domain.POWER;
 import static input.Domain.TRANSPORTATION;
 import static input.Domain.WATER;
 import input.EventLoader;
+import input.FilesConfiguration;
 import input.SystemParameter;
 import input.TopologyLoader;
 import java.io.File;
@@ -45,9 +43,8 @@ import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import output.TopologyWriter;
-import power.PowerFlowType;
-import power.PowerNodeType;
 import power.flow_analysis.InterpssFlowBackend;
 import power.flow_analysis.MATPOWERFlowBackend;
 import power.input.PowerFlowLoader;
@@ -71,17 +68,20 @@ import protopeer.util.quantities.Time;
 public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     private static final Logger logger = Logger.getLogger(SFINAAgent.class);
-    private boolean printInfoToConsole = false;
+    private boolean printInfoToConsole = true;
     
     private String experimentID;
-    private String peersLogDirectory;
     private Time bootstrapTime;
     private Time runTime;
+    private int iteration;
+    
+    private HashMap<FilesConfiguration, String> fileConfiguration;
+    
+    private String peersLogDirectory;
     private String timeToken;
     private String timeTokenName;
     private String experimentConfigurationFilesLocation;
     private String experimentOutputFilesLocation;
-    private int iteration;
     private String nodesLocation;
     private String linksLocation;
     private String nodesFlowLocation;
@@ -103,7 +103,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
     private HashMap<Integer,HashMap<Metrics,Object>> temporalSystemMetrics;
-    private HashMap<Integer,HashMap<Integer,Object>> backendSimuTime;
     
     public SFINAAgent(
             String experimentID, 
@@ -128,7 +127,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.timeTokenName=timeTokenName;
         this.experimentConfigurationFilesLocation=experimentConfigurationFilesLocation;
         this.experimentOutputFilesLocation=experimentOutputFilesLocation;
-        this.iteration=0;
+        this.iteration=1;
         this.nodesLocation=nodesLocation;
         this.linksLocation=linksLocation;
         this.nodesFlowLocation=nodesFlowLocation;
@@ -140,7 +139,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.temporalLinkMetrics=new HashMap();
         this.temporalNodeMetrics=new HashMap();
         this.temporalSystemMetrics=new HashMap();
-        this.backendSimuTime = new HashMap();
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
@@ -229,7 +227,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * stay generic. At this moment, the runtime concerns the following:
      * 
      * 1. Counting simulation time.
-     * 2. Checking and loading new 
+     * 2. Checking and loading new data from files.
      * 
      */
     @Override
@@ -238,19 +236,20 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime());
-                System.out.println("\n------------------------------------\n-------------- " + timeToken + " --------------"); // Just for seeing on the console when a new runActiveState is executed
-                iteration=0;
+                logger.log(Priority.INFO, "\n------------------------------------\n-------------- " + timeToken + " --------------");
+                
+                resetIteration();
                 
                 loadInputData();
                 
                 initMeasurements();
-                performInitialMeasurements();
+                performInitialStateOperations();
                 
                 executeAllEvents(getSimulationTime());
                 
                 runFlowAnalysis();
                 
-                performFinalMeasurements();
+                performFinalStateOperations();
                 runActiveState(); 
             }
         });
@@ -265,6 +264,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         File file = new File(experimentConfigurationFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
             if(this.getIfConsoleOutput()) System.out.println("loading data at time " + timeToken);
+            logger.log(Priority.INFO, "loading data at time " + timeToken);
             topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
             switch(domain){
@@ -276,10 +276,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
                     flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
                     flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
-                    this.adjustCapacityBySystemParameter();
-                    if (!systemParameters.containsKey(SystemParameter.FLOW_TYPE)){
-                        logger.debug("Flow Type not specified.");
-                    }
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");
@@ -297,22 +293,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     /**
-     * Sets capacity according to SystemParameter user inputs. Setting the capacity by tolerance parameter if doesn't exist or is 0 in loaded data. Reduce capacity if specified in SystemParameters.
+     * Outputs txt files in same format as input. Automatically creates incremental iterations starting at 1 for each output as long as the current epoch is running. 
      */
-    private void adjustCapacityBySystemParameter(){
-        callBackend(flowNetwork);
-        if (!systemParameters.containsKey(SystemParameter.TOLERANCE_PARAMETER)){
-            Double tolParam = 2.0;
-            systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, tolParam);
-            logger.debug("SystemParameter.TOLERANCE_PARAMETER not specified, automatically set to " + tolParam + ".");
-        }
-        events.add(new Event(getSimulationTime(),EventType.SYSTEM,null,null,SystemParameter.TOLERANCE_PARAMETER,systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)));
-        if (systemParameters.containsKey(SystemParameter.CAPACITY_CHANGE))
-            events.add(new Event(getSimulationTime(),EventType.SYSTEM,null,null,SystemParameter.CAPACITY_CHANGE,systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
-        executeAllEvents(getSimulationTime());
-    }
-    
-    public void outputNetworkData(){
+    private void outputNetworkData(){
         if(this.getIfConsoleOutput()) System.out.println("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
@@ -334,7 +317,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     break;
                 default:
                     logger.debug("This domain is not supported at this moment");
-            }
+        }
     }
     
     @Override
@@ -343,12 +326,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     @Override
-    public void performInitialMeasurements(){
+    public void performInitialStateOperations(){
         
     }
     
     @Override
-    public void performFinalMeasurements(){
+    public void performFinalStateOperations(){
         
     }
     
@@ -369,14 +352,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.getTemporalNodeMetrics().put(this.getSimulationTime(), nodeMetrics);
         
         this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<Metrics,Object>());
-        
-        this.getBackendSimuTimePerIteration().put(this.getSimulationTime(), new HashMap<Integer,Object>());
     }
     
     
     public void executeAllEvents(int time){
         if(this.getIfConsoleOutput()) System.out.println("Executing events");
-        Iterator<Event> i = events.iterator();
+        Iterator<Event> i = getEvents().iterator();
         while (i.hasNext()){
             Event event = i.next();
             if(event.getTime() == time){
@@ -461,32 +442,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         systemParameters.put(SystemParameter.BACKEND, (Backend)event.getValue());
                         backend=(Backend)event.getValue();
                         break;
-                    case FLOW_TYPE:
-                        systemParameters.put(SystemParameter.FLOW_TYPE, (PowerFlowType)event.getValue());
-                        break;
-                    case TOLERANCE_PARAMETER:
-                        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, (Double)event.getValue());
-                        for (Link link : flowNetwork.getLinks()){
-                            Double capacity = link.getCapacity();
-                            if (capacity == null || capacity == 0.0){
-                                link.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*link.getFlow());
-                            }
-                        }
-//                        for (Node node : flowNetwork.getNodes()){
-//                            Double capacity = node.getCapacity();
-//                            if (capacity == null || capacity == 0.0)
-//                                node.setCapacity((Double)systemParameters.get(SystemParameter.TOLERANCE_PARAMETER)*node.getFlow());
-//                        }
-                        break;
-                    case ATTACK_STRATEGY:
-                        systemParameters.put(SystemParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
-                        break;
-                    case CAPACITY_CHANGE:
-                        systemParameters.put(SystemParameter.CAPACITY_CHANGE, (Double)event.getValue());
+                    case CAPACITY_CHANGE_LINK:
+                        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
-                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
-//                        for (Node node : flowNetwork.getNodes())
-//                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
+                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
+                        break;
+                    case CAPACITY_CHANGE_NODE:
+                        for (Node node : flowNetwork.getNodes())
+                            node.setCapacity(node.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");
@@ -501,39 +464,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      */
     @Override
     public void runFlowAnalysis(){
-        iteration = 1;
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
-            boolean converged = flowConvergenceStrategy(currentIsland);
+            boolean converged = callBackend(currentIsland);
         }
-        outputNetworkData();
-    }
-    
-    /**
-     * Domain specific strategy and/or necessary adjustments before loadflow simulation is executed. 
-     *
-     * @param flowNetwork
-     * @return true if flow analysis finally converged, else false
-     */
-    @Override 
-    public boolean flowConvergenceStrategy(FlowNetwork flowNetwork){
-        switch(domain){
-            case POWER:
-                if(flowNetwork.getNodes().size() == 1)
-                    return false;
-                break;
-            case GAS:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case WATER:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case TRANSPORTATION:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            default:
-                logger.debug("This domain is not supported at this moment");
-        }
-        return callBackend(flowNetwork);
+        nextIteration();
     }
     
     /**
@@ -545,16 +479,15 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     public boolean callBackend(FlowNetwork flowNetwork){
         FlowBackendInterface flowBackend;
         boolean converged = false;
-        long analysisStartTime = System.currentTimeMillis();
         switch(domain){
             case POWER:
                 switch(backend){
                     case MATPOWER:
-                        flowBackend=new MATPOWERFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
+                        flowBackend=new MATPOWERFlowBackend();
                         converged=flowBackend.flowAnalysis(flowNetwork);
                         break;
                     case INTERPSS:
-                        flowBackend=new InterpssFlowBackend((PowerFlowType)this.systemParameters.get(SystemParameter.FLOW_TYPE));
+                        flowBackend=new InterpssFlowBackend();
                         converged=flowBackend.flowAnalysis(flowNetwork);
                         break;
                     default:
@@ -573,55 +506,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             default:
                 logger.debug("This domain is not supported at this moment");
         }
-        long analysisEndTime = System.currentTimeMillis();
-        if(this.getCurrentIteration()>0)
-            this.getBackendSimuTimePerIteration().get(getSimulationTime()).put(this.getCurrentIteration(),analysisEndTime-analysisStartTime);
         return converged;
-    }
-    
-    /**
-     * Method to mitigate overload. Strategy to respond to (possible) overloading can be implemented here. This method is called before the OverLoadAlgo is called which deactivates affected links/nodes.
-     * @param flowNetwork 
-     */
-    @Override
-    public void mitigateOverload(FlowNetwork flowNetwork){
-    }
-    
-    /**
-     * Checks link limits. If a limit is violated, an event is executed which deactivates the link.
-     * @param flowNetwork
-     * @return 
-     */
-    @Override
-    public boolean linkOverload(FlowNetwork flowNetwork){
-        boolean overloaded = false;
-        for (Link link : flowNetwork.getLinks()){
-            if(link.isActivated() && link.getFlow() > link.getCapacity()){
-                if(this.getIfConsoleOutput()) System.out.println("..violating link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
-                Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
-                events.add(event);
-                overloaded = true;
-            }
-        }
-        if (overloaded)
-            executeAllEvents(getSimulationTime());
-        return overloaded;
-    }
-    
-    @Override
-    public boolean nodeOverload(FlowNetwork flowNetwork){
-        boolean overloaded = false;
-        for (Node node : flowNetwork.getNodes()){
-            if(node.isActivated() && node.getFlow() > node.getCapacity()){
-                if(this.getIfConsoleOutput()) System.out.println("..violating node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
-                Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.NODE,node.getIndex(),NodeState.STATUS,false);
-                events.add(event);
-                overloaded = true;
-            }
-        }
-        if (overloaded)
-            executeAllEvents(getSimulationTime());
-        return overloaded;
     }
     
     /**
@@ -661,15 +546,30 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     /**
-     * 
-     * @return which iteration the simulation is currently at
+     * Sets iteration to 1.
      */
-    public int getCurrentIteration(){
-        return iteration;
+    public void resetIteration(){
+        this.iteration=1;
     }
     
-    public void setCurrentIteration(Integer iter){
-        this.iteration=iter;
+    /**
+     * Goes to next iteration and initiates output. First outputs network data at current iteration, then increases iteration by one.
+     * Has to be called at the end of the iteration.
+     */
+    public void nextIteration(){
+        this.outputNetworkData();
+        this.iteration++;
+    }
+    
+    public int getIteration(){
+        return this.iteration;
+    }
+    
+    /**
+     * @return the events
+     */
+    public ArrayList<Event> getEvents() {
+        return events;
     }
     
     public HashMap<SystemParameter,Object> getSystemParameters(){
@@ -739,14 +639,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     public HashMap<Integer,HashMap<Metrics,Object>> getTemporalSystemMetrics() {
         return temporalSystemMetrics;
     }
-    
-    /**
-     * 
-     * @return time of flow simulation in Milliseconds per time and iteration.
-     */
-    public HashMap<Integer,HashMap<Integer,Object>> getBackendSimuTimePerIteration(){
-        return backendSimuTime;
-    }
+
     
     /**
      * @param measurementDumper the measurementDumper to set

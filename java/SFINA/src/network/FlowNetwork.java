@@ -53,6 +53,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private LinkedHashMap<String,Node> nodes;
     private LinkedHashMap<String,Link> links;
+    private HashMap<Object,Object> networkParameters;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**
@@ -62,6 +63,15 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         super();
         this.nodes=new LinkedHashMap<>();
         this.links=new LinkedHashMap<>();
+        this.networkParameters=new HashMap();
+    }
+    
+    public void putNetworkParameter(Object identifier, Object value){
+        this.networkParameters.put(identifier, value);
+    }
+    
+    public Object getNetworkParameter(Object identifier){
+        return networkParameters.get(identifier);
     }
     
     @Override

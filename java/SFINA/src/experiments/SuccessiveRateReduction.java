@@ -17,9 +17,8 @@
  */
 package experiments;
 
-import applications.BenchmarkDomainAgent;
-import applications.BenchmarkSFINAAgent;
 import applications.BenchmarkLogReplayer;
+import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -28,11 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import network.Node;
 import power.PowerFlowType;
 import protopeer.Experiment;
 import protopeer.Peer;
@@ -46,7 +41,7 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveRateReduction extends SimulatedExperiment{
     
-    private final static String expSeqNum="Case118RateReduction";
+    private final static String expSeqNum="Case30RateReduction";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
@@ -84,11 +79,11 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     public static void main(String args[]){
         int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
-        backends.add(Backend.MATPOWER);
+        //backends.add(Backend.MATPOWER);
         backends.add(Backend.INTERPSS);
         ArrayList<PowerFlowType> flowTypes = new ArrayList();
         flowTypes.add(PowerFlowType.AC);
-        flowTypes.add(PowerFlowType.DC);
+        //flowTypes.add(PowerFlowType.DC);
         
         createRateReductionEvents();
         
@@ -105,10 +100,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     private static void run(Backend backend, PowerFlowType flowType) {
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
         simulationParameters.put(SystemParameter.BACKEND, backend);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
-        
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.5);
-        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.6);
+        double toleranceParameter = 2.0;
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -127,7 +119,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new BenchmarkDomainAgent(
+                newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
@@ -142,7 +134,9 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters));
+                        simulationParameters,
+                        flowType,
+                        toleranceParameter));
                 return newPeer;
             }
         };

@@ -17,8 +17,6 @@
  */
 package event;
 
-import core.SFINAAgent;
-import input.AttackStrategy;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -29,7 +27,6 @@ import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
-import power.PowerFlowType;
 
 /**
  *
@@ -124,19 +121,12 @@ public class EventExecution {
                         systemParameters.put(SystemParameter.BACKEND, (Backend)event.getValue());
                         //backend=(Backend)event.getValue();
                         break;
-                    case FLOW_TYPE:
-                        systemParameters.put(SystemParameter.FLOW_TYPE, (PowerFlowType)event.getValue());
-                        break;
-                    case TOLERANCE_PARAMETER:
-                        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, (Double)event.getValue());
-                        break;
-                    case ATTACK_STRATEGY:
-                        systemParameters.put(SystemParameter.ATTACK_STRATEGY, (AttackStrategy)event.getValue());
-                        break;
-                    case CAPACITY_CHANGE:
-                        systemParameters.put(SystemParameter.CAPACITY_CHANGE, (Double)event.getValue());
+                    case CAPACITY_CHANGE_LINK:
+                        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, (Double)event.getValue());
                         for (Link link : flowNetwork.getLinks())
-                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE)));
+                            link.setCapacity(link.getCapacity()*(1.0-(Double)systemParameters.get(SystemParameter.CAPACITY_CHANGE_LINK)));
+                        break;
+                    case CAPACITY_CHANGE_NODE:
                         break;
                     default:
                         logger.debug("Simulation parameter cannot be regognized.");

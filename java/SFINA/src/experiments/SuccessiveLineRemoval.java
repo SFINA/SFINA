@@ -18,8 +18,7 @@
 package experiments;
 
 import applications.BenchmarkLogReplayer;
-import applications.CascadeAgent;
-import applications.PowerGenBalancingLoadSheddingAgent;
+import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
 import input.SystemParameter;
@@ -87,7 +86,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         backends.add(Backend.INTERPSS);
         ArrayList<PowerFlowType> flowTypes = new ArrayList();
         flowTypes.add(PowerFlowType.AC);
-        flowTypes.add(PowerFlowType.DC);
+        //flowTypes.add(PowerFlowType.DC);
         
         // Random
         int linkNr = 41;
@@ -118,9 +117,8 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     public static void run(Backend backend, PowerFlowType flowType) {
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
         simulationParameters.put(SystemParameter.BACKEND, backend);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, flowType);
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 1.0);
+        double toleranceParameter = 2.0;
+        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, 1.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -136,7 +134,7 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new PowerGenBalancingLoadSheddingAgent(
+                newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
                         peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
@@ -151,7 +149,9 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters));
+                        simulationParameters,
+                        flowType,
+                        toleranceParameter));
                 return newPeer;
             }
         };

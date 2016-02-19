@@ -455,14 +455,10 @@ public class EventLoader {
                 return SystemParameter.DOMAIN;
             case "backend":
                 return SystemParameter.BACKEND;
-            case "flow_type":
-                return SystemParameter.FLOW_TYPE;
-            case "tolerance_parameter":
-                return SystemParameter.TOLERANCE_PARAMETER;
-            case "attack_strategy":
-                return SystemParameter.ATTACK_STRATEGY;
-            case "line_rate_change_factor":
-                return SystemParameter.CAPACITY_CHANGE;
+            case "capacity_change_link":
+                return SystemParameter.CAPACITY_CHANGE_LINK;
+            case "capacity_change_node":
+                return SystemParameter.CAPACITY_CHANGE_NODE;
             default:
                 logger.debug(("System parameter state is not recognized."));
                 return null;
@@ -698,27 +694,9 @@ public class EventLoader {
                     default:
                         logger.debug("Backend not regognized.");
                 }
-            case FLOW_TYPE:
-                switch(rawValue){
-                    case "ac":
-                        return PowerFlowType.AC;
-                    case "dc":
-                        return PowerFlowType.DC;
-                    default:
-                        logger.debug("Flow Type not regognized.");
-                }
-            case TOLERANCE_PARAMETER:
+            case CAPACITY_CHANGE_LINK:
                 return Double.parseDouble(rawValue);
-            case ATTACK_STRATEGY:
-                switch(rawValue){
-                    case "sequential":
-                        return AttackStrategy.SEQUENTIAL;
-                    case "simultaneous":
-                        return AttackStrategy.SIMULTANEOUS;
-                    default:
-                        logger.debug("Attack Strategy not regognized.");
-                }
-            case CAPACITY_CHANGE:
+            case CAPACITY_CHANGE_NODE:
                 return Double.parseDouble(rawValue);
             default:
                 logger.debug("Parameter value is not recognized.");

@@ -23,7 +23,6 @@ import input.Domain;
 import input.SystemParameter;
 import java.io.File;
 import java.util.HashMap;
-import power.PowerFlowType;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -71,11 +70,6 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
         // Necessary
         simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
         simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-        simulationParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
-        
-        // Optional, not yet implemented to afffect anything
-        simulationParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-        simulationParameters.put(SystemParameter.CAPACITY_CHANGE, 0.0);
         
         System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
@@ -87,9 +81,6 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-//                if (peerIndex == 0) {
-//                   newPeer.addPeerlet(null);
-//                }
                 newPeer.addPeerlet(new BenchmarkSFINAAgent(
                         experimentID, 
                         peersLogDirectory, 
