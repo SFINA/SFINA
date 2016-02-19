@@ -71,7 +71,6 @@ public class TestSFINAAgent extends SimulatedExperiment{
     
     public static void main(String[] args) {
         HashMap<SystemParameter,Object> systemParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
-        System.out.println(systemParameters);
 //        // Necessary
 //        systemParameters.put(SystemParameter.DOMAIN, Domain.POWER);
 //        systemParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
