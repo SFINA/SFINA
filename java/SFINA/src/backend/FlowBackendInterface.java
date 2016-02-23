@@ -3,12 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package flow_analysis;
+package backend;
 
-import java.util.List;
+import java.util.HashMap;
 import network.FlowNetwork;
-import network.Link;
-import network.Node;
 
 /**
  *
@@ -17,5 +15,9 @@ import network.Node;
 public interface FlowBackendInterface {
     
     public boolean flowAnalysis(FlowNetwork net);
+    
+    public boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters);
+    
+    public void setBackendParameters(HashMap<Enum,Object> backendParameters);
     
 }

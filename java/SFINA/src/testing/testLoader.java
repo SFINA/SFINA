@@ -11,7 +11,7 @@ import input.EventLoader;
 import java.util.HashMap;
 import java.util.ArrayList;
 import input.TopologyLoader;
-import input.SystemParameter;
+import input.SfinaParameter;
 import java.io.File;
 import network.FlowNetwork;
 import power.input.PowerFlowLoader;
@@ -37,7 +37,7 @@ public class testLoader {
     private FlowNetwork net;
     private static ArrayList<Node> nodes;
     private static ArrayList<Link> links;
-    private static HashMap<SystemParameter,Object> parameters;
+    private static HashMap<SfinaParameter,Object> parameters;
     private static ArrayList<Event> events;
     
     public testLoader(){
@@ -92,7 +92,7 @@ public class testLoader {
     private static void printParam(){
         System.out.println("\n-------------------------\n    INPUT PARAMETERS\n-------------------------");
         
-        for (HashMap.Entry<SystemParameter, Object> entry : parameters.entrySet()) {
+        for (HashMap.Entry<SfinaParameter, Object> entry : parameters.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());           
         }
     }

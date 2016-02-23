@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package power.flow_analysis;
+package power.backend;
 
-import flow_analysis.FlowBackendInterface;
+import backend.FlowBackendInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
@@ -23,7 +24,6 @@ import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
-import power.input.PowerNetworkParameter;
 import power.input.PowerNodeState;
 
 /**
@@ -45,19 +45,29 @@ public class MATPOWERFlowBackend implements FlowBackendInterface{
     private static final Logger logger = Logger.getLogger(MATPOWERFlowBackend.class);
     
     
-    public MATPOWERFlowBackend(){
+    public MATPOWERFlowBackend(HashMap<Enum,Object> backendParameters){
         MatlabProxyFactoryOptions options = new MatlabProxyFactoryOptions.Builder().setUsePreviouslyControlledSession(true).build();
         factory = new MatlabProxyFactory(options);
         this.converged=false;
+        setBackendParameters(backendParameters);
+    }
+    
+    @Override
+    public void setBackendParameters(HashMap<Enum,Object> backendParameters){
+        this.powerFlowType = (PowerFlowType)backendParameters.get(PowerBackendParameter.FLOW_TYPE);
+    }
+    
+    @Override
+    public boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters){
+        setBackendParameters(backendParameters);
+        return flowAnalysis(net);
     }
     
     @Override
     public boolean flowAnalysis(FlowNetwork net){
         // Initialize local variables
         this.net = net;
-        this.powerFlowType = (PowerFlowType)net.getNetworkParameter(PowerNetworkParameter.FLOW_TYPE);
-        if(powerFlowType.equals(null))
-            this.powerFlowType = PowerFlowType.AC;
+        
         ArrayList<Node> nodes = new ArrayList<Node>(this.net.getNodes());
         ArrayList<Link> links = new ArrayList<Link>(this.net.getLinks());
         busesPowerFlowInfo = this.getBuses(nodes);

@@ -1,0 +1,1357 @@
+[Feb 23 14:04:00] DEBUG (EventScheduler.java:78) - Scheduling an event: (1020.0, 0)
+[Feb 23 14:04:00] DEBUG (EventScheduler.java:78) - Scheduling an event: (1020.0, 1)
+[Feb 23 14:04:00] DEBUG (Peer.java:178) - Starting the peer...
+[Feb 23 14:04:00] DEBUG (DelayLossNetworkInterfaceFactory.java:65) - Created network interface: 0
+[Feb 23 14:04:00] DEBUG (EventScheduler.java:78) - Scheduling an event: (2000.0, 2)
+[Feb 23 14:04:00] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 1020.0
+[Feb 23 14:04:00] DEBUG (EventScheduler.java:78) - Scheduling an event: (2020.0, 3)
+[Feb 23 14:04:00] DEBUG (MeasurementFileDumper.java:39) - Dumping an empty sublog
+[Feb 23 14:04:00] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 1020.0
+[Feb 23 14:04:00] DEBUG (EventScheduler.java:78) - Scheduling an event: (2020.0, 4)
+[Feb 23 14:04:00] DEBUG (EventScheduler.java:78) - Scheduling an event: (3000.0, 5)
+[Feb 23 14:04:01] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 2020.0
+[Feb 23 14:04:01] DEBUG (EventScheduler.java:78) - Scheduling an event: (3020.0, 6)
+[Feb 23 14:04:01] DEBUG (MeasurementFileDumper.java:39) - Dumping an empty sublog
+[Feb 23 14:04:01] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 2020.0
+[Feb 23 14:04:01] DEBUG (EventScheduler.java:78) - Scheduling an event: (3020.0, 7)
+[Feb 23 14:04:01] INFO  (SFINAAgent.java:237) - --------------> time_1 <--------------
+[Feb 23 14:04:01] INFO  (SFINAAgent.java:264) - loading data at time time_1
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] DEBUG (PowerFlowLoader.java:380) - Power link state is not recognized.
+[Feb 23 14:04:01] INFO  (SFINAAgent.java:357) - executing all events at time_1
+[Feb 23 14:04:01] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:01] INFO  (CascadeAgent.java:93) - treating island with 30 nodes
+[Feb 23 14:04:01] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:03] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:03] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:03] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:03] INFO  (CascadeAgent.java:215) - --------------> 1 final island(s):
+    - 30 Node(s) (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:03] DEBUG (EventScheduler.java:78) - Scheduling an event: (4000.0, 8)
+[Feb 23 14:04:03] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 3020.0
+[Feb 23 14:04:03] DEBUG (EventScheduler.java:78) - Scheduling an event: (4020.0, 9)
+[Feb 23 14:04:03] DEBUG (MeasurementFileDumper.java:39) - Dumping an empty sublog
+[Feb 23 14:04:03] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 3020.0
+[Feb 23 14:04:03] DEBUG (EventScheduler.java:78) - Scheduling an event: (4020.0, 10)
+[Feb 23 14:04:03] INFO  (SFINAAgent.java:237) - --------------> time_2 <--------------
+[Feb 23 14:04:03] INFO  (SFINAAgent.java:357) - executing all events at time_2
+[Feb 23 14:04:03] INFO  (SFINAAgent.java:408) - ..deactivating link 20
+[Feb 23 14:04:03] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:03] INFO  (CascadeAgent.java:93) - treating island with 30 nodes
+[Feb 23 14:04:03] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:04] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:04] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:04] INFO  (CascadeAgent.java:215) - --------------> 1 final island(s):
+    - 30 Node(s) (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:04] DEBUG (EventScheduler.java:78) - Scheduling an event: (5000.0, 11)
+[Feb 23 14:04:04] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 4020.0
+[Feb 23 14:04:04] DEBUG (EventScheduler.java:78) - Scheduling an event: (5020.0, 12)
+[Feb 23 14:04:04] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 1, maxEpoch: 1
+[Feb 23 14:04:04] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 4020.0
+[Feb 23 14:04:04] DEBUG (EventScheduler.java:78) - Scheduling an event: (5020.0, 13)
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:237) - --------------> time_3 <--------------
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:357) - executing all events at time_3
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:408) - ..deactivating link 24
+[Feb 23 14:04:04] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:04] INFO  (CascadeAgent.java:93) - treating island with 30 nodes
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:04] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:04] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:04] INFO  (CascadeAgent.java:215) - --------------> 1 final island(s):
+    - 30 Node(s) (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:04] DEBUG (EventScheduler.java:78) - Scheduling an event: (6000.0, 14)
+[Feb 23 14:04:04] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 5020.0
+[Feb 23 14:04:04] DEBUG (EventScheduler.java:78) - Scheduling an event: (6020.0, 15)
+[Feb 23 14:04:04] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 2, maxEpoch: 2
+[Feb 23 14:04:04] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 5020.0
+[Feb 23 14:04:04] DEBUG (EventScheduler.java:78) - Scheduling an event: (6020.0, 16)
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:237) - --------------> time_4 <--------------
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:357) - executing all events at time_4
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:408) - ..deactivating link 6
+[Feb 23 14:04:04] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:04] INFO  (CascadeAgent.java:93) - treating island with 30 nodes
+[Feb 23 14:04:04] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:05] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:05] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:215) - --------------> 1 final island(s):
+    - 30 Node(s) (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (7000.0, 17)
+[Feb 23 14:04:05] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 6020.0
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (7020.0, 18)
+[Feb 23 14:04:05] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 3, maxEpoch: 3
+[Feb 23 14:04:05] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 6020.0
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (7020.0, 19)
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:237) - --------------> time_5 <--------------
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:357) - executing all events at time_5
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:408) - ..deactivating link 31
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:93) - treating island with 30 nodes
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:05] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:05] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:215) - --------------> 1 final island(s):
+    - 30 Node(s) (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (8000.0, 20)
+[Feb 23 14:04:05] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 7020.0
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (8020.0, 21)
+[Feb 23 14:04:05] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 4, maxEpoch: 4
+[Feb 23 14:04:05] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 7020.0
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (8020.0, 22)
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:237) - --------------> time_6 <--------------
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:357) - executing all events at time_6
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:408) - ..deactivating link 10
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:93) - treating island with 30 nodes
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:05] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:05] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:215) - --------------> 1 final island(s):
+    - 30 Node(s) (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (9000.0, 23)
+[Feb 23 14:04:05] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 8020.0
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (9020.0, 24)
+[Feb 23 14:04:05] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 5, maxEpoch: 5
+[Feb 23 14:04:05] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 8020.0
+[Feb 23 14:04:05] DEBUG (EventScheduler.java:78) - Scheduling an event: (9020.0, 25)
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:237) - --------------> time_7 <--------------
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:357) - executing all events at time_7
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:408) - ..deactivating link 40
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:05] INFO  (CascadeAgent.java:93) - treating island with 29 nodes
+[Feb 23 14:04:05] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:06] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:06] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 1
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:06] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:06] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:215) - --------------> 2 final island(s):
+    - 29 Node(s) (1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (8, ) -> Blackout
+
+[Feb 23 14:04:06] DEBUG (EventScheduler.java:78) - Scheduling an event: (10000.0, 26)
+[Feb 23 14:04:06] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 9020.0
+[Feb 23 14:04:06] DEBUG (EventScheduler.java:78) - Scheduling an event: (10020.0, 27)
+[Feb 23 14:04:06] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 6, maxEpoch: 6
+[Feb 23 14:04:06] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 9020.0
+[Feb 23 14:04:06] DEBUG (EventScheduler.java:78) - Scheduling an event: (10020.0, 28)
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:237) - --------------> time_8 <--------------
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:357) - executing all events at time_8
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:408) - ..deactivating link 8
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:93) - treating island with 29 nodes
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:06] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:06] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:215) - --------------> 2 final island(s):
+    - 29 Node(s) (1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (8, ) -> Blackout
+
+[Feb 23 14:04:06] DEBUG (EventScheduler.java:78) - Scheduling an event: (11000.0, 29)
+[Feb 23 14:04:06] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 10020.0
+[Feb 23 14:04:06] DEBUG (EventScheduler.java:78) - Scheduling an event: (11020.0, 30)
+[Feb 23 14:04:06] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 7, maxEpoch: 7
+[Feb 23 14:04:06] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 10020.0
+[Feb 23 14:04:06] DEBUG (EventScheduler.java:78) - Scheduling an event: (11020.0, 31)
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:237) - --------------> time_9 <--------------
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:357) - executing all events at time_9
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:408) - ..deactivating link 32
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:06] INFO  (CascadeAgent.java:93) - treating island with 29 nodes
+[Feb 23 14:04:06] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:215) - --------------> 2 final island(s):
+    - 29 Node(s) (1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (8, ) -> Blackout
+
+[Feb 23 14:04:07] DEBUG (EventScheduler.java:78) - Scheduling an event: (12000.0, 32)
+[Feb 23 14:04:07] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 11020.0
+[Feb 23 14:04:07] DEBUG (EventScheduler.java:78) - Scheduling an event: (12020.0, 33)
+[Feb 23 14:04:07] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 8, maxEpoch: 8
+[Feb 23 14:04:07] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 11020.0
+[Feb 23 14:04:07] DEBUG (EventScheduler.java:78) - Scheduling an event: (12020.0, 34)
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:237) - --------------> time_10 <--------------
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:357) - executing all events at time_10
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:408) - ..deactivating link 34
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 28 nodes
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 1
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:215) - --------------> 3 final island(s):
+    - 28 Node(s) (1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (26, ) -> Blackout
+
+[Feb 23 14:04:07] DEBUG (EventScheduler.java:78) - Scheduling an event: (13000.0, 35)
+[Feb 23 14:04:07] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 12020.0
+[Feb 23 14:04:07] DEBUG (EventScheduler.java:78) - Scheduling an event: (13020.0, 36)
+[Feb 23 14:04:07] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 9, maxEpoch: 9
+[Feb 23 14:04:07] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 12020.0
+[Feb 23 14:04:07] DEBUG (EventScheduler.java:78) - Scheduling an event: (13020.0, 37)
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:237) - --------------> time_11 <--------------
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:357) - executing all events at time_11
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:408) - ..deactivating link 7
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 28 nodes
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:07] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:168) - ..violating link 19 limit: 37.969585994499916 > 32.0
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:168) - ..violating link 21 limit: 33.09302336076896 > 16.0
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:357) - executing all events at time_11
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:408) - ..deactivating link 19
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:408) - ..deactivating link 21
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:89) - ----> Iteration 2 <----
+[Feb 23 14:04:07] INFO  (CascadeAgent.java:93) - treating island with 12 nodes
+[Feb 23 14:04:07] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 1
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:08] INFO  (CascadeAgent.java:93) - treating island with 15 nodes
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 27
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:08] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:08] INFO  (CascadeAgent.java:168) - ..violating link 41 limit: 32.365845764278745 > 32.0
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:357) - executing all events at time_11
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:408) - ..deactivating link 41
+[Feb 23 14:04:08] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:297) - doing output at iteration 2
+[Feb 23 14:04:08] INFO  (CascadeAgent.java:89) - ----> Iteration 3 <----
+[Feb 23 14:04:08] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:08] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:297) - doing output at iteration 3
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:215) - --------------> 6 final island(s):
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (26, ) -> Blackout
+    - 12 Node(s) (1, 2, 3, 4, 5, 12, 13, 14, 15, 18, 19, 23, ) -> Converged :)
+    - 1 Node(s) (16, ) -> Blackout
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 6 Node(s) (24, 25, 27, 28, 29, 30, ) -> Converged :)
+
+[Feb 23 14:04:09] DEBUG (EventScheduler.java:78) - Scheduling an event: (14000.0, 38)
+[Feb 23 14:04:09] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 13020.0
+[Feb 23 14:04:09] DEBUG (EventScheduler.java:78) - Scheduling an event: (14020.0, 39)
+[Feb 23 14:04:09] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 10, maxEpoch: 10
+[Feb 23 14:04:09] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 13020.0
+[Feb 23 14:04:09] DEBUG (EventScheduler.java:78) - Scheduling an event: (14020.0, 40)
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:237) - --------------> time_12 <--------------
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:357) - executing all events at time_12
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:408) - ..deactivating link 14
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:93) - treating island with 12 nodes
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:09] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:09] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:09] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:215) - --------------> 6 final island(s):
+    - 12 Node(s) (1, 2, 3, 4, 5, 12, 13, 14, 15, 18, 19, 23, ) -> Converged :)
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 6 Node(s) (24, 25, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+
+[Feb 23 14:04:10] DEBUG (EventScheduler.java:78) - Scheduling an event: (15000.0, 41)
+[Feb 23 14:04:10] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 14020.0
+[Feb 23 14:04:10] DEBUG (EventScheduler.java:78) - Scheduling an event: (15020.0, 42)
+[Feb 23 14:04:10] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 11, maxEpoch: 11
+[Feb 23 14:04:10] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 14020.0
+[Feb 23 14:04:10] DEBUG (EventScheduler.java:78) - Scheduling an event: (15020.0, 43)
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:237) - --------------> time_13 <--------------
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:357) - executing all events at time_13
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:408) - ..deactivating link 3
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:93) - treating island with 12 nodes
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:10] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:10] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:10] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:11] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:11] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:11] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:11] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:11] INFO  (CascadeAgent.java:215) - --------------> 6 final island(s):
+    - 12 Node(s) (1, 2, 3, 4, 5, 12, 13, 14, 15, 18, 19, 23, ) -> Converged :)
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 6 Node(s) (24, 25, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+
+[Feb 23 14:04:11] DEBUG (EventScheduler.java:78) - Scheduling an event: (16000.0, 44)
+[Feb 23 14:04:11] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 15020.0
+[Feb 23 14:04:11] DEBUG (EventScheduler.java:78) - Scheduling an event: (16020.0, 45)
+[Feb 23 14:04:11] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 12, maxEpoch: 12
+[Feb 23 14:04:11] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 15020.0
+[Feb 23 14:04:11] DEBUG (EventScheduler.java:78) - Scheduling an event: (16020.0, 46)
+[Feb 23 14:04:11] INFO  (SFINAAgent.java:237) - --------------> time_14 <--------------
+[Feb 23 14:04:11] INFO  (SFINAAgent.java:357) - executing all events at time_14
+[Feb 23 14:04:11] INFO  (SFINAAgent.java:408) - ..deactivating link 37
+[Feb 23 14:04:11] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:11] INFO  (CascadeAgent.java:93) - treating island with 12 nodes
+[Feb 23 14:04:11] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:12] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:215) - --------------> 6 final island(s):
+    - 12 Node(s) (1, 2, 3, 4, 5, 12, 13, 14, 15, 18, 19, 23, ) -> Converged :)
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 6 Node(s) (24, 25, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+
+[Feb 23 14:04:12] DEBUG (EventScheduler.java:78) - Scheduling an event: (17000.0, 47)
+[Feb 23 14:04:12] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 16020.0
+[Feb 23 14:04:12] DEBUG (EventScheduler.java:78) - Scheduling an event: (17020.0, 48)
+[Feb 23 14:04:12] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 13, maxEpoch: 13
+[Feb 23 14:04:12] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 16020.0
+[Feb 23 14:04:12] DEBUG (EventScheduler.java:78) - Scheduling an event: (17020.0, 49)
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:237) - --------------> time_15 <--------------
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:357) - executing all events at time_15
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:408) - ..deactivating link 16
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:12] INFO  (CascadeAgent.java:93) - treating island with 11 nodes
+[Feb 23 14:04:12] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:13] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:13] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:13] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:13] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:215) - --------------> 7 final island(s):
+    - 11 Node(s) (1, 2, 3, 4, 5, 12, 14, 15, 18, 19, 23, ) -> Converged :)
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 6 Node(s) (24, 25, 27, 28, 29, 30, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+
+[Feb 23 14:04:14] DEBUG (EventScheduler.java:78) - Scheduling an event: (18000.0, 50)
+[Feb 23 14:04:14] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 17020.0
+[Feb 23 14:04:14] DEBUG (EventScheduler.java:78) - Scheduling an event: (18020.0, 51)
+[Feb 23 14:04:14] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 14, maxEpoch: 14
+[Feb 23 14:04:14] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 17020.0
+[Feb 23 14:04:14] DEBUG (EventScheduler.java:78) - Scheduling an event: (18020.0, 52)
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:237) - --------------> time_16 <--------------
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:357) - executing all events at time_16
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:408) - ..deactivating link 39
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 11 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:14] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:215) - --------------> 8 final island(s):
+    - 11 Node(s) (1, 2, 3, 4, 5, 12, 14, 15, 18, 19, 23, ) -> Converged :)
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 5 Node(s) (24, 25, 27, 28, 30, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+
+[Feb 23 14:04:14] DEBUG (EventScheduler.java:78) - Scheduling an event: (19000.0, 53)
+[Feb 23 14:04:14] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 18020.0
+[Feb 23 14:04:14] DEBUG (EventScheduler.java:78) - Scheduling an event: (19020.0, 54)
+[Feb 23 14:04:14] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 15, maxEpoch: 15
+[Feb 23 14:04:14] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 18020.0
+[Feb 23 14:04:14] DEBUG (EventScheduler.java:78) - Scheduling an event: (19020.0, 55)
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:237) - --------------> time_17 <--------------
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:357) - executing all events at time_17
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:408) - ..deactivating link 2
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:14] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:14] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:15] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:215) - --------------> 9 final island(s):
+    - 3 Node(s) (1, 2, 5, ) -> Converged :)
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 5 Node(s) (24, 25, 27, 28, 30, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+
+[Feb 23 14:04:15] DEBUG (EventScheduler.java:78) - Scheduling an event: (20000.0, 56)
+[Feb 23 14:04:15] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 19020.0
+[Feb 23 14:04:15] DEBUG (EventScheduler.java:78) - Scheduling an event: (20020.0, 57)
+[Feb 23 14:04:15] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 16, maxEpoch: 16
+[Feb 23 14:04:15] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 19020.0
+[Feb 23 14:04:15] DEBUG (EventScheduler.java:78) - Scheduling an event: (20020.0, 58)
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:237) - --------------> time_18 <--------------
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:357) - executing all events at time_18
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:408) - ..deactivating link 38
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:15] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:15] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:16] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:16] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:16] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:16] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:16] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:16] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:16] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:16] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:16] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:16] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:215) - --------------> 10 final island(s):
+    - 3 Node(s) (1, 2, 5, ) -> Converged :)
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:17] DEBUG (EventScheduler.java:78) - Scheduling an event: (21000.0, 59)
+[Feb 23 14:04:17] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 20020.0
+[Feb 23 14:04:17] DEBUG (EventScheduler.java:78) - Scheduling an event: (21020.0, 60)
+[Feb 23 14:04:17] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 17, maxEpoch: 17
+[Feb 23 14:04:17] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 20020.0
+[Feb 23 14:04:17] DEBUG (EventScheduler.java:78) - Scheduling an event: (21020.0, 61)
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:237) - --------------> time_19 <--------------
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:357) - executing all events at time_19
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:408) - ..deactivating link 28
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:17] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:17] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:17] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:215) - --------------> 10 final island(s):
+    - 3 Node(s) (1, 2, 5, ) -> Converged :)
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:18] DEBUG (EventScheduler.java:78) - Scheduling an event: (22000.0, 62)
+[Feb 23 14:04:18] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 21020.0
+[Feb 23 14:04:18] DEBUG (EventScheduler.java:78) - Scheduling an event: (22020.0, 63)
+[Feb 23 14:04:18] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 18, maxEpoch: 18
+[Feb 23 14:04:18] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 21020.0
+[Feb 23 14:04:18] DEBUG (EventScheduler.java:78) - Scheduling an event: (22020.0, 64)
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:237) - --------------> time_20 <--------------
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:357) - executing all events at time_20
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:408) - ..deactivating link 1
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 2 nodes
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:18] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:18] INFO  (CascadeAgent.java:93) - treating island with 9 nodes
+[Feb 23 14:04:18] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:215) - --------------> 11 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 2 Node(s) (2, 5, ) -> Converged :)
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 9 Node(s) (6, 7, 9, 10, 11, 17, 20, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:19] DEBUG (EventScheduler.java:78) - Scheduling an event: (23000.0, 65)
+[Feb 23 14:04:19] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 22020.0
+[Feb 23 14:04:19] DEBUG (EventScheduler.java:78) - Scheduling an event: (23020.0, 66)
+[Feb 23 14:04:19] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 19, maxEpoch: 19
+[Feb 23 14:04:19] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 22020.0
+[Feb 23 14:04:19] DEBUG (EventScheduler.java:78) - Scheduling an event: (23020.0, 67)
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:237) - --------------> time_21 <--------------
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:357) - executing all events at time_21
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:408) - ..deactivating link 25
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 2 nodes
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:19] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:19] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:19] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 22
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:215) - --------------> 12 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 2 Node(s) (2, 5, ) -> Converged :)
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 8 Node(s) (6, 7, 9, 10, 11, 17, 21, 22, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:20] DEBUG (EventScheduler.java:78) - Scheduling an event: (24000.0, 68)
+[Feb 23 14:04:20] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 23020.0
+[Feb 23 14:04:20] DEBUG (EventScheduler.java:78) - Scheduling an event: (24020.0, 69)
+[Feb 23 14:04:20] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 20, maxEpoch: 20
+[Feb 23 14:04:20] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 23020.0
+[Feb 23 14:04:20] DEBUG (EventScheduler.java:78) - Scheduling an event: (24020.0, 70)
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:237) - --------------> time_22 <--------------
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:357) - executing all events at time_22
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:408) - ..deactivating link 26
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 2 nodes
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:20] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:20] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:20] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 7 nodes
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:168) - ..violating link 29 limit: 46.712770670411714 > 32.0
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:357) - executing all events at time_22
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:408) - ..deactivating link 29
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:21] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:89) - ----> Iteration 2 <----
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:297) - doing output at iteration 2
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:215) - --------------> 14 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 2 Node(s) (2, 5, ) -> Converged :)
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+    - 6 Node(s) (6, 7, 9, 10, 11, 21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+
+[Feb 23 14:04:21] DEBUG (EventScheduler.java:78) - Scheduling an event: (25000.0, 71)
+[Feb 23 14:04:21] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 24020.0
+[Feb 23 14:04:21] DEBUG (EventScheduler.java:78) - Scheduling an event: (25020.0, 72)
+[Feb 23 14:04:21] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 21, maxEpoch: 21
+[Feb 23 14:04:21] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 24020.0
+[Feb 23 14:04:21] DEBUG (EventScheduler.java:78) - Scheduling an event: (25020.0, 73)
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:237) - --------------> time_23 <--------------
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:357) - executing all events at time_23
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:408) - ..deactivating link 5
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:21] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:21] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:215) - --------------> 15 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 6 Node(s) (6, 7, 9, 10, 11, 21, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:22] DEBUG (EventScheduler.java:78) - Scheduling an event: (26000.0, 74)
+[Feb 23 14:04:22] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 25020.0
+[Feb 23 14:04:22] DEBUG (EventScheduler.java:78) - Scheduling an event: (26020.0, 75)
+[Feb 23 14:04:22] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 22, maxEpoch: 22
+[Feb 23 14:04:22] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 25020.0
+[Feb 23 14:04:22] DEBUG (EventScheduler.java:78) - Scheduling an event: (26020.0, 76)
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:237) - --------------> time_24 <--------------
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:357) - executing all events at time_24
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:408) - ..deactivating link 27
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 8 nodes
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:22] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:215) - --------------> 16 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 8 Node(s) (3, 4, 12, 14, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 5 Node(s) (6, 7, 9, 10, 11, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:22] DEBUG (EventScheduler.java:78) - Scheduling an event: (27000.0, 77)
+[Feb 23 14:04:22] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 26020.0
+[Feb 23 14:04:22] DEBUG (EventScheduler.java:78) - Scheduling an event: (27020.0, 78)
+[Feb 23 14:04:22] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 23, maxEpoch: 23
+[Feb 23 14:04:22] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 26020.0
+[Feb 23 14:04:22] DEBUG (EventScheduler.java:78) - Scheduling an event: (27020.0, 79)
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:237) - --------------> time_25 <--------------
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:357) - executing all events at time_25
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:408) - ..deactivating link 17
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:22] INFO  (CascadeAgent.java:93) - treating island with 7 nodes
+[Feb 23 14:04:22] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:215) - --------------> 17 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 7 Node(s) (3, 4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 5 Node(s) (6, 7, 9, 10, 11, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:23] DEBUG (EventScheduler.java:78) - Scheduling an event: (28000.0, 80)
+[Feb 23 14:04:23] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 27020.0
+[Feb 23 14:04:23] DEBUG (EventScheduler.java:78) - Scheduling an event: (28020.0, 81)
+[Feb 23 14:04:23] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 24, maxEpoch: 24
+[Feb 23 14:04:23] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 27020.0
+[Feb 23 14:04:23] DEBUG (EventScheduler.java:78) - Scheduling an event: (28020.0, 82)
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:237) - --------------> time_26 <--------------
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:357) - executing all events at time_26
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:408) - ..deactivating link 4
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:23] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:215) - --------------> 18 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 5 Node(s) (6, 7, 9, 10, 11, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:23] DEBUG (EventScheduler.java:78) - Scheduling an event: (29000.0, 83)
+[Feb 23 14:04:23] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 28020.0
+[Feb 23 14:04:23] DEBUG (EventScheduler.java:78) - Scheduling an event: (29020.0, 84)
+[Feb 23 14:04:23] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 25, maxEpoch: 25
+[Feb 23 14:04:23] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 28020.0
+[Feb 23 14:04:23] DEBUG (EventScheduler.java:78) - Scheduling an event: (29020.0, 85)
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:237) - --------------> time_27 <--------------
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:357) - executing all events at time_27
+[Feb 23 14:04:23] DEBUG (SFINAAgent.java:406) - Link status same, not changed by event.
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:408) - ..deactivating link 29
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:23] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:23] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:215) - --------------> 18 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 5 Node(s) (6, 7, 9, 10, 11, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:24] DEBUG (EventScheduler.java:78) - Scheduling an event: (30000.0, 86)
+[Feb 23 14:04:24] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 29020.0
+[Feb 23 14:04:24] DEBUG (EventScheduler.java:78) - Scheduling an event: (30020.0, 87)
+[Feb 23 14:04:24] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 26, maxEpoch: 26
+[Feb 23 14:04:24] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 29020.0
+[Feb 23 14:04:24] DEBUG (EventScheduler.java:78) - Scheduling an event: (30020.0, 88)
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:237) - --------------> time_28 <--------------
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:357) - executing all events at time_28
+[Feb 23 14:04:24] DEBUG (SFINAAgent.java:406) - Link status same, not changed by event.
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:408) - ..deactivating link 19
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 5 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:24] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:215) - --------------> 18 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 5 Node(s) (6, 7, 9, 10, 11, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:24] DEBUG (EventScheduler.java:78) - Scheduling an event: (31000.0, 89)
+[Feb 23 14:04:24] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 30020.0
+[Feb 23 14:04:24] DEBUG (EventScheduler.java:78) - Scheduling an event: (31020.0, 90)
+[Feb 23 14:04:24] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 27, maxEpoch: 27
+[Feb 23 14:04:24] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 30020.0
+[Feb 23 14:04:24] DEBUG (EventScheduler.java:78) - Scheduling an event: (31020.0, 91)
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:237) - --------------> time_29 <--------------
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:357) - executing all events at time_29
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:408) - ..deactivating link 9
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:24] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:24] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:215) - --------------> 19 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 4 Node(s) (6, 9, 10, 11, ) -> Blackout
+    - 1 Node(s) (7, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:25] DEBUG (EventScheduler.java:78) - Scheduling an event: (32000.0, 92)
+[Feb 23 14:04:25] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 31020.0
+[Feb 23 14:04:25] DEBUG (EventScheduler.java:78) - Scheduling an event: (32020.0, 93)
+[Feb 23 14:04:25] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 28, maxEpoch: 28
+[Feb 23 14:04:25] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 31020.0
+[Feb 23 14:04:25] DEBUG (EventScheduler.java:78) - Scheduling an event: (32020.0, 94)
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:237) - --------------> time_30 <--------------
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:357) - executing all events at time_30
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:408) - ..deactivating link 12
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:25] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:25] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:25] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:215) - --------------> 20 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 3 Node(s) (6, 9, 11, ) -> Blackout
+    - 1 Node(s) (7, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (10, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:26] DEBUG (EventScheduler.java:78) - Scheduling an event: (33000.0, 95)
+[Feb 23 14:04:26] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 32020.0
+[Feb 23 14:04:26] DEBUG (EventScheduler.java:78) - Scheduling an event: (33020.0, 96)
+[Feb 23 14:04:26] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 29, maxEpoch: 29
+[Feb 23 14:04:26] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 32020.0
+[Feb 23 14:04:26] DEBUG (EventScheduler.java:78) - Scheduling an event: (33020.0, 97)
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:237) - --------------> time_31 <--------------
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:357) - executing all events at time_31
+[Feb 23 14:04:26] DEBUG (SFINAAgent.java:406) - Link status same, not changed by event.
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:408) - ..deactivating link 21
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 4 nodes
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:233) - ....no generator limit violated
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:215) - --------------> 20 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 3 Node(s) (6, 9, 11, ) -> Blackout
+    - 1 Node(s) (7, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (10, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 4 Node(s) (24, 25, 27, 28, ) -> Converged :)
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:26] DEBUG (EventScheduler.java:78) - Scheduling an event: (34000.0, 98)
+[Feb 23 14:04:26] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 33020.0
+[Feb 23 14:04:26] DEBUG (EventScheduler.java:78) - Scheduling an event: (34020.0, 99)
+[Feb 23 14:04:26] DEBUG (MeasurementFileDumper.java:36) - Dumping the sublog, minEpoch: 30, maxEpoch: 30
+[Feb 23 14:04:26] DEBUG (MeasurementLogger.java:54) - measurement logging epochEndTimer fired: 33020.0
+[Feb 23 14:04:26] DEBUG (EventScheduler.java:78) - Scheduling an event: (34020.0, 100)
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:237) - --------------> time_32 <--------------
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:357) - executing all events at time_32
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:408) - ..deactivating link 33
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:89) - ----> Iteration 1 <----
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 6 nodes
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 23
+[Feb 23 14:04:26] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:26] INFO  (CascadeAgent.java:93) - treating island with 3 nodes
+[Feb 23 14:04:26] INFO  (SFINAAgent.java:480) - executing INTERPSS backend
+[Feb 23 14:04:27] INFO  (PowerCascadeAgent.java:175) - ....converged true
+[Feb 23 14:04:27] INFO  (PowerCascadeAgent.java:231) - ....generator limit violated at node 27
+[Feb 23 14:04:27] INFO  (PowerCascadeAgent.java:191) - ....no more generators
+[Feb 23 14:04:27] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:27] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:27] INFO  (CascadeAgent.java:93) - treating island with 1 nodes
+[Feb 23 14:04:27] INFO  (SFINAAgent.java:297) - doing output at iteration 1
+[Feb 23 14:04:27] INFO  (CascadeAgent.java:215) - --------------> 21 final island(s):
+    - 1 Node(s) (1, ) -> Blackout
+    - 1 Node(s) (2, ) -> Blackout
+    - 1 Node(s) (3, ) -> Blackout
+    - 6 Node(s) (4, 12, 15, 18, 19, 23, ) -> Blackout
+    - 1 Node(s) (5, ) -> Blackout
+    - 3 Node(s) (6, 9, 11, ) -> Blackout
+    - 1 Node(s) (7, ) -> Blackout
+    - 1 Node(s) (8, ) -> Blackout
+    - 1 Node(s) (10, ) -> Blackout
+    - 1 Node(s) (13, ) -> Blackout
+    - 1 Node(s) (14, ) -> Blackout
+    - 1 Node(s) (16, ) -> Blackout
+    - 1 Node(s) (17, ) -> Blackout
+    - 1 Node(s) (20, ) -> Blackout
+    - 1 Node(s) (21, ) -> Blackout
+    - 1 Node(s) (22, ) -> Blackout
+    - 1 Node(s) (24, ) -> Blackout
+    - 3 Node(s) (25, 27, 28, ) -> Blackout
+    - 1 Node(s) (26, ) -> Blackout
+    - 1 Node(s) (29, ) -> Blackout
+    - 1 Node(s) (30, ) -> Blackout
+
+[Feb 23 14:04:27] DEBUG (EventScheduler.java:78) - Scheduling an event: (35000.0, 101)

@@ -17,16 +17,13 @@
  */
 package testing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import network.FlowNetwork;
 import network.Link;
-import network.Node;
 import power.PowerFlowType;
-import power.PowerNodeType;
-import power.flow_analysis.MATPOWERFlowBackend;
+import power.backend.MATPOWERFlowBackend;
+import power.backend.PowerBackendParameter;
 import power.input.PowerLinkState;
-import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;
 
 /**
@@ -36,15 +33,17 @@ import power.output.PowerConsoleOutput;
 public class testMatpower {
     
     static FlowNetwork net = new FlowNetwork();
-    static PowerFlowType FlowType = PowerFlowType.DC;
-    
+    private static HashMap<Enum,Object> backendParameters = new HashMap();
+
     public static void main(String[] args){
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.DC);
+        
         testLoader loader = new testLoader();
         PowerConsoleOutput printer = new PowerConsoleOutput();
         
         loader.load("case30", net);
         
-        MATPOWERFlowBackend algo = new MATPOWERFlowBackend();
+        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(backendParameters);
         //resetLfData(net);
         algo.flowAnalysis(net);
         printer.printLfResults(net);

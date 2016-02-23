@@ -9,9 +9,9 @@ package input;
  *
  * @author evangelospournaras
  */
-public enum SystemParameter {
+public enum SfinaParameter {
     DOMAIN,
     BACKEND,
-    CAPACITY_CHANGE_LINK,
-    CAPACITY_CHANGE_NODE
+//    CAPACITY_CHANGE_LINK,
+//    CAPACITY_CHANGE_NODE
 }

@@ -20,12 +20,15 @@ package experiments;
 import core.SFINAAgent;
 import input.Backend;
 import input.Domain;
-import input.SystemParameter;
+import input.SfinaParameter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import org.apache.log4j.Logger;
+import power.PowerFlowType;
+import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -37,6 +40,8 @@ import protopeer.util.quantities.Time;
  * @author evangelospournaras
  */
 public class TestSFINAAgent extends SimulatedExperiment{
+    
+    private static final Logger logger = Logger.getLogger(TestSFINAAgent.class);
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -69,18 +74,13 @@ public class TestSFINAAgent extends SimulatedExperiment{
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
-        HashMap<SystemParameter,Object> systemParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
-        System.out.println(systemParameters);
-//        // Necessary
-//        systemParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-//        systemParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-//        systemParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
-//        
-//        // Optional, not yet implemented to afffect anything
-//        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-//        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, 0.0);
+        HashMap<SfinaParameter,Object> sfinaParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
+        HashMap<Enum, Object> backendParameters = new HashMap();
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
         
-        System.out.println("Experiment "+expSeqNum+"\n");
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
+        logger.info(sfinaParameters);
+        
         Experiment.initEnvironment();
         TestSFINAAgent test = new TestSFINAAgent();
         test.init();
@@ -108,7 +108,8 @@ public class TestSFINAAgent extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        systemParameters));
+                        sfinaParameters,
+                        backendParameters));
                 return newPeer;
             }
         };
@@ -132,8 +133,8 @@ public class TestSFINAAgent extends SimulatedExperiment{
         experiment.delete();
     }
     
-    public final static HashMap<SystemParameter,Object> loadSystemParameters(String location, String separator){
-        HashMap<SystemParameter,Object> systemParameters = new HashMap();
+    public final static HashMap<SfinaParameter,Object> loadSystemParameters(String location, String separator){
+        HashMap<SfinaParameter,Object> systemParameters = new HashMap();
         File file = new File(location);
         Scanner scr = null;
         try {
@@ -160,22 +161,22 @@ public class TestSFINAAgent extends SimulatedExperiment{
                             default:
                                 logger.debug("This domain is not supported or cannot be recognized");
                         }
-                        systemParameters.put(SystemParameter.DOMAIN, domain);
+                        systemParameters.put(SfinaParameter.DOMAIN, domain);
                         break;
                     case "backend":
                         Backend backend=null;
                         String backendType=st.nextToken();
                         switch(backendType){
-                            case "MATPOWER":
+                            case "matpower":
                                 backend=Backend.MATPOWER;
                                 break;
-                            case "InterPSS":
+                            case "interpss":
                                 backend=Backend.INTERPSS;
                                 break;
                             default:
                                 logger.debug("This backend is not supported or cannot be recognized");
                         }
-                        systemParameters.put(SystemParameter.BACKEND, backend);
+                        systemParameters.put(SfinaParameter.BACKEND, backend);
                         break;
                     default:
                         logger.debug("This system parameter is not supported or cannot be recognized");

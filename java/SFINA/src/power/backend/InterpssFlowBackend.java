@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package power.flow_analysis;
+package power.backend;
 
 import com.interpss.CoreObjectFactory;
 import com.interpss.common.exp.InterpssException;
@@ -16,8 +16,9 @@ import com.interpss.core.aclf.AclfNetwork;
 import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
-import flow_analysis.FlowBackendInterface;
+import backend.FlowBackendInterface;
 import static java.lang.Math.PI;
+import java.util.HashMap;
 import java.util.logging.Level;
 import network.FlowNetwork;
 import network.Link;
@@ -35,7 +36,6 @@ import org.interpss.numeric.exp.IpssNumericException;
 import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
-import power.input.PowerNetworkParameter;
 import power.input.PowerNodeState;
 
 /**
@@ -50,19 +50,28 @@ public class InterpssFlowBackend implements FlowBackendInterface{
     private boolean converged;
     private static final Logger logger = Logger.getLogger(InterpssFlowBackend.class);
     
-    public InterpssFlowBackend(){
+    public InterpssFlowBackend(HashMap<Enum,Object> backendParameters){
         this.converged=false;
-        IpssCorePlugin.init(Level.OFF);
+        IpssCorePlugin.init();
+        IpssCorePlugin.setLoggerLevel(Level.SEVERE);
+        setBackendParameters(backendParameters);
+    }
+
+    @Override
+    public void setBackendParameters(HashMap<Enum,Object> backendParameters){
+        this.powerFlowType = (PowerFlowType)backendParameters.get(PowerBackendParameter.FLOW_TYPE);
     }
     
+    @Override
+    public boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters){
+        setBackendParameters(backendParameters);
+        return flowAnalysis(net);
+    }
     
     @Override
     public boolean flowAnalysis(FlowNetwork net){
         
         this.SfinaNet = net;
-        this.powerFlowType = (PowerFlowType)net.getNetworkParameter(PowerNetworkParameter.FLOW_TYPE);
-        if(powerFlowType.equals(null))
-            this.powerFlowType = PowerFlowType.AC;
         
         try{
             switch(powerFlowType){

@@ -17,12 +17,16 @@
  */
 package experiments;
 
+import applications.BenchmarkLogReplayer;
 import applications.BenchmarkSFINAAgent;
 import input.Backend;
 import input.Domain;
-import input.SystemParameter;
+import input.SfinaParameter;
 import java.io.File;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
+import power.PowerFlowType;
+import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -35,6 +39,8 @@ import protopeer.util.quantities.Time;
  */
 public class TestBenchmarkAgent extends SimulatedExperiment{
     
+    private static final Logger logger = Logger.getLogger(TestBenchmarkAgent.class);
+    
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
@@ -42,11 +48,13 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=16;
+    private final static int runDuration=10;
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SystemParameter,Object> simulationParameters = new HashMap();
+    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
+    private final static HashMap<Enum,Object> backendParameters = new HashMap();
+
 
     private final static String columnSeparator=",";
     private final static String missingValue="-";
@@ -68,10 +76,13 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     
     public static void main(String[] args) {
         // Necessary
-        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
+        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
+        sfinaParameters.put(SfinaParameter.BACKEND, Backend.INTERPSS);
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
         
-        System.out.println("Experiment "+expSeqNum+"\n");
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
+        logger.info(sfinaParameters);
+        
         Experiment.initEnvironment();
         final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
@@ -96,7 +107,8 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters));
+                        sfinaParameters,
+                        backendParameters));
                 return newPeer;
             }
         };
@@ -104,6 +116,7 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
         test.startPeers(0,N);
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
     }
     
     public final static void clearExperimentFile(File experiment){

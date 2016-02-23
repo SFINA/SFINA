@@ -21,7 +21,7 @@ import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
-import input.SystemParameter;
+import input.SfinaParameter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,7 +29,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 import power.PowerFlowType;
+import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -42,6 +44,8 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveLineRemoval extends SimulatedExperiment{
     
+    private static final Logger logger = Logger.getLogger(SuccessiveLineRemoval.class);
+    
     private static String expSeqNum="Case30LineRemovalRandomConsistent";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
@@ -53,7 +57,8 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SystemParameter,Object> simulationParameters = new HashMap();
+    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
+    private final static HashMap<Enum,Object> backendParameters = new HashMap();    
 
     private final static String columnSeparator=",";
     private final static String missingValue="-";
@@ -97,12 +102,6 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
             Collections.shuffle(links);
             attackLinks.add(links);
         }
-        // Manish ranking
-//        int[] manishLinks = new int[]{30,34,41,40,38,21,31,27,23,20,28,6,32,33,22,15,39,24,25,3,12,36,26,37,8,17,1,19,5,11,14,4,9,2,29,13,16,18,35,7,10};
-//        for(int i=0; i<manishLinks.length; i++)
-//            attackLinks.add(manishLinks[i]);
-//        Collections.reverse(attackLinks);
-        
         for(Backend backend : backends){
             for(PowerFlowType flowType : flowTypes){
                 for(int i=0; i<iterations; i++){
@@ -115,12 +114,14 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     }
     
     public static void run(Backend backend, PowerFlowType flowType) {
-        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, backend);
+        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
+        sfinaParameters.put(SfinaParameter.BACKEND, backend);
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, flowType);
         double toleranceParameter = 2.0;
-        //simulationParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, 1.0);
         
-        System.out.println("Experiment "+expSeqNum+"\n");
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
+        logger.info(sfinaParameters);
+        
         Experiment.initEnvironment();
         final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
@@ -149,8 +150,8 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters,
-                        flowType,
+                        sfinaParameters,
+                        backendParameters,
                         toleranceParameter));
                 return newPeer;
             }

@@ -46,7 +46,8 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
             String eventsLocation, 
             String columnSeparator, 
             String missingValue,
-            HashMap systemParameters){
+            HashMap systemParameters,
+            HashMap backendParameters){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -61,7 +62,8 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
                 eventsLocation,
                 columnSeparator,
                 missingValue,
-                systemParameters);
+                systemParameters,
+                backendParameters);
     }
         
     public void calculateTotalLines(){
@@ -99,13 +101,18 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
     
     private long simulationStartTime;
 
-    private void saveStartTime(){
+    public void saveStartTime(){
         this.simulationStartTime = System.currentTimeMillis();
     }
     
-    private void saveSimuTime(){
+    public void saveSimuTime(){
         double totSimuTime = System.currentTimeMillis() - simulationStartTime;
         this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.TOT_SIMU_TIME, totSimuTime);
+    }
+    
+    public void saveIterationNumber(){
+        int iter = getIteration()-1;
+        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.NEEDED_ITERATIONS, iter);
     }
     
     @Override
@@ -120,6 +127,7 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
         this.calculateUtilization();
         this.calculateTotalLines();
         this.saveSimuTime();
+        this.saveIterationNumber();
     }
     
     //****************** MEASUREMENTS ******************
@@ -145,6 +153,7 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
                     }
                     HashMap<Metrics,Object> sysMetrics=getTemporalSystemMetrics().get(simulationTime);
                     log.log(simulationTime, Metrics.TOT_SIMU_TIME, ((Double)sysMetrics.get(Metrics.TOT_SIMU_TIME)));
+                    log.log(simulationTime, Metrics.NEEDED_ITERATIONS, ((Integer)sysMetrics.get(Metrics.NEEDED_ITERATIONS)));
                 }
                 getMeasurementDumper().measurementEpochEnded(log, simulationTime);
                 log.shrink(simulationTime, simulationTime+1);

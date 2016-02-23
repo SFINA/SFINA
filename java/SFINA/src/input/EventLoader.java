@@ -24,13 +24,11 @@ import event.EventType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.LinkState;
 import network.NodeState;
 import org.apache.log4j.Logger;
-import power.PowerFlowType;
 import power.PowerNodeType;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
@@ -288,7 +286,7 @@ public class EventLoader {
                         }
                         break;
                     case SYSTEM:
-                        value=this.getActualSystemValue((SystemParameter)parameter, values.get(5));
+                        value=this.getActualSystemValue((SfinaParameter)parameter, values.get(5));
                         break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
@@ -449,16 +447,16 @@ public class EventLoader {
         }
     }
     
-    private SystemParameter lookupPowerSystemParameterState(String powerParameterState){
+    private SfinaParameter lookupPowerSystemParameterState(String powerParameterState){
         switch(powerParameterState){
             case "domain":
-                return SystemParameter.DOMAIN;
+                return SfinaParameter.DOMAIN;
             case "backend":
-                return SystemParameter.BACKEND;
-            case "capacity_change_link":
-                return SystemParameter.CAPACITY_CHANGE_LINK;
-            case "capacity_change_node":
-                return SystemParameter.CAPACITY_CHANGE_NODE;
+                return SfinaParameter.BACKEND;
+//            case "capacity_change_link":
+//                return SfinaParameter.CAPACITY_CHANGE_LINK;
+//            case "capacity_change_node":
+//                return SfinaParameter.CAPACITY_CHANGE_NODE;
             default:
                 logger.debug(("System parameter state is not recognized."));
                 return null;
@@ -669,7 +667,7 @@ public class EventLoader {
         }
     }
     
-    private Object getActualSystemValue(SystemParameter systemParameter, String rawValue){
+    private Object getActualSystemValue(SfinaParameter systemParameter, String rawValue){
         switch(systemParameter){
             case DOMAIN:
                 switch(rawValue){
@@ -694,10 +692,10 @@ public class EventLoader {
                     default:
                         logger.debug("Backend not regognized.");
                 }
-            case CAPACITY_CHANGE_LINK:
-                return Double.parseDouble(rawValue);
-            case CAPACITY_CHANGE_NODE:
-                return Double.parseDouble(rawValue);
+//            case CAPACITY_CHANGE_LINK:
+//                return Double.parseDouble(rawValue);
+//            case CAPACITY_CHANGE_NODE:
+//                return Double.parseDouble(rawValue);
             default:
                 logger.debug("Parameter value is not recognized.");
                 return null;

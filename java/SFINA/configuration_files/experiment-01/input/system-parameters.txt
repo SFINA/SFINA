@@ -1,5 +1,2 @@
 domain,power
-backend,MATPOWER
-flow_type,AC
-tolerance_parameter,2.0
-capacity_change,0.0
+backend,interpss
