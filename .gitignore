@@ -4,11 +4,9 @@ project.properties
 private.properties
 SFINA.jar
 build/
-
 java/Interface_Mat_Java/InterMaJa/nbproject/private/
 java/InterMaJa/nbproject/private/
 java/InterMaJa/build/
-
 java/SFINA/dist/lib/*.jar
 java/SFINA/nbproject/private/private.xml
-java/SFINA/configuration_files/**/output/**
+java/SFINA/configuration_files/**/output/
