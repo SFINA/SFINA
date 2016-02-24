@@ -17,13 +17,16 @@
  */
 package experiments;
 
+import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
-import input.SystemParameter;
+import input.SfinaParameter;
 import java.io.File;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 import power.PowerFlowType;
+import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -36,6 +39,8 @@ import protopeer.util.quantities.Time;
  */
 public class TestPowerCascadeAgent extends SimulatedExperiment{
     
+    private static final Logger logger = Logger.getLogger(TestPowerCascadeAgent.class);
+    
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
@@ -47,7 +52,8 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SystemParameter,Object> simulationParameters = new HashMap();
+    private final static HashMap<SfinaParameter,Object> sinfaParameters = new HashMap();
+    private final static HashMap<Enum,Object> backendParameters = new HashMap();
 
     private final static String columnSeparator=",";
     private final static String missingValue="-";
@@ -70,12 +76,14 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
     
     public static void main(String[] args) {
         // Necessary
-        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-        PowerFlowType flowType = PowerFlowType.AC;
+        sinfaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
+        sinfaParameters.put(SfinaParameter.BACKEND, Backend.MATPOWER);
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
         double toleranceParameter = 2.0;
         
-        System.out.println("Experiment "+expSeqNum+"\n");
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
+        logger.info(sinfaParameters);
+        
         Experiment.initEnvironment();
         final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
@@ -100,8 +108,8 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters,
-                        flowType,
+                        sinfaParameters,
+                        backendParameters,
                         toleranceParameter));
                 return newPeer;
             }
@@ -110,6 +118,7 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
         test.startPeers(0,N);
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
     }
     
     public final static void clearExperimentFile(File experiment){

@@ -18,14 +18,16 @@
 package testing;
 
 import com.interpss.common.exp.InterpssException;
+import java.util.HashMap;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import output.TopologyWriter;
 import power.PowerFlowType;
 import power.PowerNodeType;
-import power.flow_analysis.InterpssFlowBackend;
-import power.flow_analysis.MATPOWERFlowBackend;
+import power.backend.InterpssFlowBackend;
+import power.backend.MATPOWERFlowBackend;
+import power.backend.PowerBackendParameter;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;
@@ -36,10 +38,11 @@ import power.output.PowerFlowWriter;
  * @author Ben
  */
 public class testInterpss {
-    static PowerFlowType FlowType = PowerFlowType.AC;
-    static String caseName = "case30";
+    private static HashMap<Enum,Object> backendParameters = new HashMap();
+    private static String caseName = "case30";
     
     public static void main(String[] args){
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
         testLoader loader = new testLoader();
         PowerConsoleOutput printer = new PowerConsoleOutput();
         
@@ -94,7 +97,7 @@ public class testInterpss {
     }
     
     private static void getIpssData(FlowNetwork net){
-        InterpssFlowBackend IpssObject = new InterpssFlowBackend();
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(backendParameters);
         IpssObject.getIpssData(net, caseName);
     }
     
@@ -113,14 +116,14 @@ public class testInterpss {
     
     private static void runInterpssOurData(FlowNetwork net){
         System.out.println("\n--------------------------------------------------\n    INTERPSS, SFINA DATA\n--------------------------------------------------");
-        InterpssFlowBackend IpssObject = new InterpssFlowBackend();
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(backendParameters);
         boolean converged = IpssObject.flowAnalysis(net);
         System.out.println("Ipss our data converged = " + converged);
     }
 
     private static void runInterpssTheirLoader(FlowNetwork net){
         System.out.println("\n--------------------------------------------------\n    INTERPSS, DATA LOADED BY INTERPSS' LOADERS\n--------------------------------------------------");        
-        InterpssFlowBackend IpssObject = new InterpssFlowBackend();
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(backendParameters);
         boolean converged = IpssObject.flowAnalysisIpssDataLoader(net, caseName);    
         System.out.println("Ipss their loader converged = " + converged);
     }    
@@ -130,7 +133,7 @@ public class testInterpss {
 //        FlowNetwork net = new FlowNetwork();
 //        testLoader loader = new testLoader();
 //        loader.load(caseName, net);
-        InterpssFlowBackend IpssObject = new InterpssFlowBackend();
+        InterpssFlowBackend IpssObject = new InterpssFlowBackend(backendParameters);
         try{
             IpssObject.compareDataToCaseLoaded(net, caseName);
         }
@@ -141,7 +144,7 @@ public class testInterpss {
     
     private static void runMatlabSimu(FlowNetwork net){
         System.out.println("\n--------------------------------------------------\n    MATPOWER, SFINA DATA\n--------------------------------------------------");
-        MATPOWERFlowBackend algo = new MATPOWERFlowBackend();
+        MATPOWERFlowBackend algo = new MATPOWERFlowBackend(backendParameters);
         boolean converged = algo.flowAnalysis(net);
         System.out.println("Matpwr our data converged = " + converged);
     }

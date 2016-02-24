@@ -54,7 +54,8 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
             String eventsLocation, 
             String columnSeparator, 
             String missingValue,
-            HashMap systemParameters){
+            HashMap systemParameters,
+            HashMap backendParameters){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -69,7 +70,8 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                 eventsLocation,
                 columnSeparator,
                 missingValue,
-                systemParameters);
+                systemParameters,
+                backendParameters);
     }
     
     /**
@@ -84,13 +86,12 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
         ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
         islandBuffer.add(getFlowNetwork().computeIslands());
         while(!islandBuffer.get(iter).isEmpty()){
-            if(this.getIfConsoleOutput()) System.out.println("---------------------\n---- Iteration " + (iter+1) + " ----");
+            logger.info("----> Iteration " + (iter+1) + " <----");
             islandBuffer.add(new ArrayList<>()); // List of islands for next iteration (iter+1)
             for(int i=0; i < islandBuffer.get(iter).size(); i++){ // go through islands at current iteration
                 FlowNetwork currentIsland = islandBuffer.get(iter).get(i);
-                if(this.getIfConsoleOutput()) System.out.println("---> Treating island with " + currentIsland.getNodes().size() + " nodes.");
+                logger.info("treating island with " + currentIsland.getNodes().size() + " nodes");
                 boolean converged = flowConvergenceStrategy(currentIsland); // do flow analysis
-                if(this.getIfConsoleOutput()) System.out.println("=> converged " + converged);
                 
                 if(converged){
                     
@@ -99,7 +100,6 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                     
                     boolean linkOverloaded = linkOverload(currentIsland);
                     //boolean nodeOverloaded = nodeOverload(currentIsland);
-                    if(this.getIfConsoleOutput()) System.out.println("=> overloaded " + linkOverloaded);
                     if(linkOverloaded){
                         // add islands of the current island to next iteration
                         for (FlowNetwork net : currentIsland.computeIslands())
@@ -119,8 +119,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
             iter++;
         }
         
-        if(this.getIfConsoleOutput()) 
-            printFinalIslands();
+        logFinalIslands();
     }
     
     
@@ -166,7 +165,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
         boolean overloaded = false;
         for (Link link : flowNetwork.getLinks()){
             if(link.isActivated() && link.getFlow() > link.getCapacity()){
-                if(this.getIfConsoleOutput()) System.out.println("..violating link " + link.getIndex() + ": " + link.getFlow() + " > " + link.getCapacity());
+                logger.info("..violating link " + link.getIndex() + " limit: " + link.getFlow() + " > " + link.getCapacity());
                 Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
                 this.getEvents().add(event);
                 overloaded = true;
@@ -186,7 +185,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
         boolean overloaded = false;
         for (Node node : flowNetwork.getNodes()){
             if(node.isActivated() && node.getFlow() > node.getCapacity()){
-                if(this.getIfConsoleOutput()) System.out.println("..violating node " + node.getIndex() + ": " + node.getFlow() + " > " + node.getCapacity());
+                logger.info("..violating node " + node.getIndex() + " limit: " + node.getFlow() + " > " + node.getCapacity());
                 Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.NODE,node.getIndex(),NodeState.STATUS,false);
                 this.getEvents().add(event);
                 overloaded = true;
@@ -200,18 +199,19 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     /**
      * Prints final islands in each time step to console
      */
-    private void printFinalIslands(){
-        System.out.println("--------------------------------------\n" + temporalIslandStatus.get(getSimulationTime()).size() + " final islands:");
+    private void logFinalIslands(){
+        String log = "--------------> " + temporalIslandStatus.get(getSimulationTime()).size() + " final island(s):\n";
         String nodesInIsland;
         for (FlowNetwork net : temporalIslandStatus.get(getSimulationTime()).keySet()){
             nodesInIsland = "";
             for (Node node : net.getNodes())
                 nodesInIsland += node.getIndex() + ", ";
-            System.out.print(net.getNodes().size() + " Node(s) (" + nodesInIsland + ")");
+            log += "    - " + net.getNodes().size() + " Node(s) (" + nodesInIsland + ")";
             if(temporalIslandStatus.get(getSimulationTime()).get(net))
-                System.out.print(" -> Converged :)\n");
+                log += " -> Converged :)\n";
             if(!temporalIslandStatus.get(getSimulationTime()).get(net))
-                System.out.print(" -> Blackout\n");
+                log += " -> Blackout\n";
         }
+        logger.info(log);
     }    
 }

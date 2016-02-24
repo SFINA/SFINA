@@ -21,14 +21,16 @@ import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
 import input.Backend;
 import input.Domain;
-import input.SystemParameter;
+import input.SfinaParameter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 import power.PowerFlowType;
+import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -41,6 +43,8 @@ import protopeer.util.quantities.Time;
  */
 public class SuccessiveRateReduction extends SimulatedExperiment{
     
+    private static final Logger logger = Logger.getLogger(SuccessiveRateReduction.class);
+    
     private final static String expSeqNum="Case30RateReduction";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
@@ -52,7 +56,8 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SystemParameter,Object> simulationParameters = new HashMap();
+    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
+    private final static HashMap<Enum,Object> backendParameters = new HashMap();
 
     private final static String columnSeparator=",";
     private final static String missingValue="-";
@@ -98,11 +103,14 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     }
     
     private static void run(Backend backend, PowerFlowType flowType) {
-        simulationParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-        simulationParameters.put(SystemParameter.BACKEND, backend);
+        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
+        sfinaParameters.put(SfinaParameter.BACKEND, backend);
+        backendParameters.put(PowerBackendParameter.FLOW_TYPE, flowType);
         double toleranceParameter = 2.0;
         
-        System.out.println("Experiment "+expSeqNum+"\n");
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
+        logger.info(sfinaParameters);
+        
         Experiment.initEnvironment();
         final TestBenchmarkAgent test = new TestBenchmarkAgent();
         test.init();
@@ -134,8 +142,8 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
                         eventsLocation,
                         columnSeparator,
                         missingValue,
-                        simulationParameters,
-                        flowType,
+                        sfinaParameters,
+                        backendParameters,
                         toleranceParameter));
                 return newPeer;
             }

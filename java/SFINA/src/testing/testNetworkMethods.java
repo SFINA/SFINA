@@ -22,10 +22,9 @@ import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import power.PowerNodeType;
-import power.flow_analysis.InterpssFlowBackend;
+import power.backend.InterpssFlowBackend;
 import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;
-import static testing.testInterpss.FlowType;
 
 /**
  *

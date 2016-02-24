@@ -33,7 +33,6 @@ public class BenchmarkLogReplayer {
     private PrintWriter utilizationOut;
     private PrintWriter epochPowerLossOut;
     private PrintWriter totalPowerLossOut;
-    private PrintWriter flowTimeOut;
     private PrintWriter totalTimeOut;
     private PrintWriter iterations;
     private PrintWriter islandNum;
@@ -93,7 +92,6 @@ public class BenchmarkLogReplayer {
             utilizationOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"utilization.txt", true)));
             epochPowerLossOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"epochPowLoss.txt", true)));
             totalPowerLossOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totPowLoss.txt", true)));
-            flowTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"flowTime.txt", true)));
             totalTimeOut = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"totalTime.txt", true)));
             iterations  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"iterations.txt", true)));
             islandNum  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"islands.txt", true)));
@@ -111,7 +109,6 @@ public class BenchmarkLogReplayer {
         utilizationOut.print("\n");
         epochPowerLossOut.print("\n");
         totalPowerLossOut.print("\n");
-        flowTimeOut.print("\n");
         totalTimeOut.print("\n");
         iterations.print("\n");
         islandNum.print("\n");
@@ -122,7 +119,6 @@ public class BenchmarkLogReplayer {
         utilizationOut.close();
         epochPowerLossOut.close();
         totalPowerLossOut.close();
-        flowTimeOut.close();
         totalTimeOut.close();
         iterations.close();
         islandNum.close();
@@ -151,7 +147,6 @@ public class BenchmarkLogReplayer {
         double avgUtilizationPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.LINE_UTILIZATION).getAverage();
         double relPowerLossBetweenEpochs = 1.0-log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_FINAL_LOADING).getSum()/log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_INIT_LOADING).getSum();
         double relPowerLossSinceEpoch1 = 1.0-log.getAggregateByEpochNumber(epochNumber, Metrics.NODE_FINAL_LOADING).getSum()/log.getAggregateByEpochNumber(1, Metrics.NODE_INIT_LOADING).getSum();
-        double avgflowSimuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.FLOW_SIMU_TIME).getAverage();
         double simuTimePerEpoch = log.getAggregateByEpochNumber(epochNumber, Metrics.TOT_SIMU_TIME).getMax();
         double neededIterations = log.getAggregateByEpochNumber(epochNumber, Metrics.NEEDED_ITERATIONS).getMax();
         double islands = log.getAggregateByEpochNumber(epochNumber, Metrics.ISLANDS).getMax();
@@ -163,13 +158,12 @@ public class BenchmarkLogReplayer {
             utilizationOut.print(avgUtilizationPerEpoch + coma);
             epochPowerLossOut.print(relPowerLossBetweenEpochs + coma);
             totalPowerLossOut.print(relPowerLossSinceEpoch1 + coma);
-            flowTimeOut.print(avgflowSimuTimePerEpoch + coma);
             totalTimeOut.print(simuTimePerEpoch + coma);
             iterations.print(neededIterations + coma);
             islandNum.print(islands + coma);
             isolatedNodes.print(isolNodes + coma);
         }
-        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.4f%20.4f%20.0f%20.0f%20.0f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, avgflowSimuTimePerEpoch, simuTimePerEpoch, neededIterations, islands, isolNodes);
+        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes);
         
     }
 
@@ -183,7 +177,7 @@ public class BenchmarkLogReplayer {
 
     public void printLocalMetricsTags(){
         System.out.println("*** RESULTS PER EPOCH ***\n");
-        System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization", "Pow Loss this epoch", "Pow Loss since ep1", "Avg Flow Simu Time", "Total Simu Time", "Nr of iterations", "Nr of islands", "Nr of isol. nodes");
+        System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Simu Time [ms]", "Nr of iterations", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes");
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

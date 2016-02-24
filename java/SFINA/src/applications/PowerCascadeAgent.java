@@ -28,7 +28,7 @@ import network.Node;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.PowerNodeType;
-import power.input.PowerNetworkParameter;
+import power.backend.PowerBackendParameter;
 import power.input.PowerNodeState;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
@@ -42,8 +42,8 @@ import protopeer.util.quantities.Time;
 public class PowerCascadeAgent extends CascadeAgent{
     
     private static final Logger logger = Logger.getLogger(PowerCascadeAgent.class);
-    private PowerFlowType flowType;
     private double toleranceParameter;
+    private PowerFlowType flowType;
     
     public PowerCascadeAgent(String experimentID, 
             String peersLogDirectory, 
@@ -60,7 +60,7 @@ public class PowerCascadeAgent extends CascadeAgent{
             String columnSeparator, 
             String missingValue,
             HashMap systemParameters,
-            PowerFlowType flowType,
+            HashMap backendParameters,
             Double toleranceParameter){
         super(experimentID,
                 peersLogDirectory,
@@ -76,16 +76,19 @@ public class PowerCascadeAgent extends CascadeAgent{
                 eventsLocation,
                 columnSeparator,
                 missingValue,
-                systemParameters);
-        this.flowType = flowType;
+                systemParameters,
+                backendParameters);
         this.toleranceParameter = toleranceParameter;
-        getFlowNetwork().putNetworkParameter(PowerNetworkParameter.FLOW_TYPE, flowType);
+        this.flowType = (PowerFlowType) backendParameters.get(PowerBackendParameter.FLOW_TYPE);
     }
     
     @Override
     public void performInitialStateOperations(){
         this.adjustCapacityByToleranceParameter();
         this.calculateInitialLoad();
+        
+        // inherited from BenchmarkSFINAAgent
+        this.saveStartTime();
     }
     
     @Override
@@ -98,6 +101,9 @@ public class PowerCascadeAgent extends CascadeAgent{
         this.calculateFlow();
         this.calculateUtilization();
         this.calculateTotalLines();
+        this.saveSimuTime();
+        this.saveIterationNumber();
+
     }
     
     /**
@@ -166,12 +172,12 @@ public class PowerCascadeAgent extends CascadeAgent{
                 boolean limViolation = true;
                 while(limViolation){
                     converged = callBackend(flowNetwork);
-                    if(this.getIfConsoleOutput()) System.out.println("....converged " + converged);
+                    logger.info("....converged " + converged);
                     if (converged){
                         limViolation = GenerationBalancing(flowNetwork, slack);
                         
                         // Without the following line big cases (like polish) even DC doesn't converge..
-                        if(getFlowType().equals(PowerFlowType.DC))
+                        if(flowType.equals(PowerFlowType.DC))
                             limViolation=false;
                         
                         if (limViolation){
@@ -182,7 +188,7 @@ public class PowerCascadeAgent extends CascadeAgent{
                                 generators.remove(0);
                             }
                             else{
-                                if(this.getIfConsoleOutput()) System.out.println("....no more generators");
+                                logger.info("....no more generators");
                                 return false; // all generator limits were hit -> blackout
                             }
                         }
@@ -222,9 +228,9 @@ public class PowerCascadeAgent extends CascadeAgent{
         }
         slack.replacePropertyElement(PowerNodeState.TYPE, PowerNodeType.GENERATOR);
         if (limViolation)
-            if(this.getIfConsoleOutput()) System.out.println("....generator limit violated at node " + slack.getIndex());
+            logger.info("....generator limit violated at node " + slack.getIndex());
         else
-            if(this.getIfConsoleOutput()) System.out.println("....no generator limit violated");
+            logger.info("....no generator limit violated");
         return limViolation;
     }
     
@@ -234,7 +240,7 @@ public class PowerCascadeAgent extends CascadeAgent{
         int maxLoadShedIterations = 15; // according to paper
         double loadReductionFactor = 0.05; // 5%, according to paper
         while (!converged && loadIter < maxLoadShedIterations){
-            if(this.getIfConsoleOutput()) System.out.println("....Doing load shedding at iteration " + loadIter);
+            logger.info("....Doing load shedding at iteration " + loadIter);
             for (Node node : flowNetwork.getNodes()){
                 node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REAL, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REAL)*(1.0-loadReductionFactor));
                 node.replacePropertyElement(PowerNodeState.POWER_DEMAND_REACTIVE, (Double)node.getProperty(PowerNodeState.POWER_DEMAND_REACTIVE)*(1.0-loadReductionFactor));
@@ -248,20 +254,6 @@ public class PowerCascadeAgent extends CascadeAgent{
     @Override
     public void mitigateOverload(FlowNetwork flowNetwork){
         // Implement mitigation strategy here
-    }
-
-    /**
-     * @return the flowType
-     */
-    public PowerFlowType getFlowType() {
-        return flowType;
-    }
-
-    /**
-     * @param flowType the flowType to set
-     */
-    public void setFlowType(PowerFlowType flowType) {
-        this.flowType = flowType;
     }
 
     /**
@@ -305,7 +297,6 @@ public class PowerCascadeAgent extends CascadeAgent{
     }
     
     private void calculateCascadeMetrics(){
-        int iterations = this.getIteration();
         ArrayList<FlowNetwork> finalIslands = getFlowNetwork().computeIslands();
         int nrIslands = finalIslands.size();
         int nrIsolatedNodes = 0;
@@ -313,7 +304,6 @@ public class PowerCascadeAgent extends CascadeAgent{
             if(net.getNodes().size()==1)
                 nrIsolatedNodes++;
         
-        this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.NEEDED_ITERATIONS, iterations);
         this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISLANDS, nrIslands);
         this.getTemporalSystemMetrics().get(this.getSimulationTime()).put(Metrics.ISOLATED_NODES, nrIsolatedNodes);
     }
