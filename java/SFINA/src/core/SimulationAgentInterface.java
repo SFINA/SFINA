@@ -20,6 +20,8 @@ public interface SimulationAgentInterface {
     
     public void runActiveState();
     
+    public void setFlowParameters();
+    
     public void runPassiveState(Message message);
     
     public void executeEvent(FlowNetwork flowNetwork, Event event);

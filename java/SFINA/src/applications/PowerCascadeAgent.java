@@ -44,6 +44,7 @@ public class PowerCascadeAgent extends CascadeAgent{
     private static final Logger logger = Logger.getLogger(PowerCascadeAgent.class);
     private double toleranceParameter;
     private PowerFlowType flowType;
+    private Double relRateChangePerEpoch;
     
     public PowerCascadeAgent(String experimentID, 
             String peersLogDirectory, 
@@ -61,7 +62,8 @@ public class PowerCascadeAgent extends CascadeAgent{
             String missingValue,
             HashMap systemParameters,
             HashMap backendParameters,
-            Double toleranceParameter){
+            Double toleranceParameter,
+            Double relRateChangePerEpoch){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -80,11 +82,14 @@ public class PowerCascadeAgent extends CascadeAgent{
                 backendParameters);
         this.toleranceParameter = toleranceParameter;
         this.flowType = (PowerFlowType) backendParameters.get(PowerBackendParameter.FLOW_TYPE);
+        this.relRateChangePerEpoch = relRateChangePerEpoch;
     }
     
     @Override
     public void performInitialStateOperations(){
-        this.adjustCapacityByToleranceParameter();
+        this.setCapacityByToleranceParameter();
+        if(getSimulationTime()>1)
+            this.performRelativeCapacityChange();
         this.calculateInitialLoad();
         
         // inherited from BenchmarkSFINAAgent
@@ -103,13 +108,12 @@ public class PowerCascadeAgent extends CascadeAgent{
         this.calculateTotalLines();
         this.saveSimuTime();
         this.saveIterationNumber();
-
     }
     
     /**
      * Set Capacity by Tolerance Parameter. If no line ratings are given by data.
      */
-    public void adjustCapacityByToleranceParameter(){
+    private void setCapacityByToleranceParameter(){
         boolean capacityNotSet = false;
         for (Link link : getFlowNetwork().getLinks()){
             if (link.getCapacity() == 0.0){
@@ -122,6 +126,16 @@ public class PowerCascadeAgent extends CascadeAgent{
             for (Link link : getFlowNetwork().getLinks()){
                 link.setCapacity(toleranceParameter*link.getFlow());
             }
+        }
+    }
+    
+    /**
+     * Change capacity of links. Relative to former capacity. 1.0 = no change.
+     */
+    private void performRelativeCapacityChange(){
+        logger.info("reducing link capacities by " + relRateChangePerEpoch);
+        for(Link link : getFlowNetwork().getLinks()){
+            link.setCapacity(link.getCapacity()*relRateChangePerEpoch);
         }
     }
     

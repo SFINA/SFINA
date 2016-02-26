@@ -23,9 +23,6 @@ import input.Backend;
 import input.Domain;
 import input.SfinaParameter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
@@ -38,12 +35,12 @@ import protopeer.SimulatedExperiment;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Reduces capacity of Links successively in each time step. Up to a total of 50% reduction. Goal is to trigger cascades.
  * @author Ben
  */
-public class SuccessiveRateReduction extends SimulatedExperiment{
+public class LinkCapacityReductionExperiment extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(SuccessiveRateReduction.class);
+    private static final Logger logger = Logger.getLogger(LinkCapacityReductionExperiment.class);
     
     private final static String expSeqNum="Case30RateReduction";
     private final static String peersLogDirectory="peerlets-log/";
@@ -77,10 +74,6 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
-    public SuccessiveRateReduction(Backend backend, PowerFlowType flowType){
-        run(backend, flowType);
-    }
-    
     public static void main(String args[]){
         int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
@@ -90,7 +83,7 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
         flowTypes.add(PowerFlowType.AC);
         //flowTypes.add(PowerFlowType.DC);
         
-        createRateReductionEvents();
+//        createRateReductionEvents();
         
         for(Backend backend : backends){
             for(PowerFlowType flowType : flowTypes){
@@ -107,12 +100,16 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
         sfinaParameters.put(SfinaParameter.BACKEND, backend);
         backendParameters.put(PowerBackendParameter.FLOW_TYPE, flowType);
         double toleranceParameter = 2.0;
+        double totCapacityChange = 0.5;
+        double steps = runDuration-bootstrapTime/runTime;
+        double relCapacityChangePerStep = Math.pow(totCapacityChange, 1/steps);
+        
         
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
         logger.info(sfinaParameters);
         
         Experiment.initEnvironment();
-        final TestBenchmarkAgent test = new TestBenchmarkAgent();
+        final LinkCapacityReductionExperiment test = new LinkCapacityReductionExperiment();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -144,7 +141,8 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
                         missingValue,
                         sfinaParameters,
                         backendParameters,
-                        toleranceParameter));
+                        toleranceParameter,
+                        relCapacityChangePerStep));
                 return newPeer;
             }
         };
@@ -154,29 +152,29 @@ public class SuccessiveRateReduction extends SimulatedExperiment{
         test.runSimulation(Time.inSeconds(runDuration));
     }
     
-    private static void createRateReductionEvents(){
-        // Goal: Reduce rating in n steps, s.t. at the end we're at 0.5 times the initial value
-        int n = runDuration-4;
-        double factor = 1d-Math.pow(0.5, 1./n);
-        int rmLinkId = 50;
-        try{
-            File file = new File(eventsLocation);
-            file.createNewFile();
-            PrintWriter writer = new PrintWriter(new FileWriter(file,false));
-            writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
-            int time = 2;
-            for (int i=0;i<n;i++){
-                //writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + rmLinkId + columnSeparator + "status" + columnSeparator + "0");
-                //writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + factor);
-                writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + (1d-Math.pow((1d-factor), i+1)));
-                time++;
-            }
-            writer.close();
-        }
-        catch(IOException ex){
-            ex.printStackTrace();
-        }   
-    }
+//    private static void createRateReductionEvents(){
+//        // Goal: Reduce rating in n steps, s.t. at the end we're at 0.5 times the initial value
+//        int n = runDuration-4;
+//        double factor = 1d-Math.pow(0.5, 1./n);
+//        int rmLinkId = 50;
+//        try{
+//            File file = new File(eventsLocation);
+//            file.createNewFile();
+//            PrintWriter writer = new PrintWriter(new FileWriter(file,false));
+//            writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
+//            int time = 2;
+//            for (int i=0;i<n;i++){
+//                //writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + rmLinkId + columnSeparator + "status" + columnSeparator + "0");
+//                //writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + factor);
+//                writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + (1d-Math.pow((1d-factor), i+1)));
+//                time++;
+//            }
+//            writer.close();
+//        }
+//        catch(IOException ex){
+//            ex.printStackTrace();
+//        }   
+//    }
     
     public final static void clearExperimentFile(File experiment){
         File[] files = experiment.listFiles();

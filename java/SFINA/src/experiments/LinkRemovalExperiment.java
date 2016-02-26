@@ -39,12 +39,12 @@ import protopeer.SimulatedExperiment;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Remove links successively in each time step to trigger cascade. Which links to remove is determined randomly. 
  * @author Ben
  */
-public class SuccessiveLineRemoval extends SimulatedExperiment{
+public class LinkRemovalExperiment extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(SuccessiveLineRemoval.class);
+    private static final Logger logger = Logger.getLogger(LinkRemovalExperiment.class);
     
     private static String expSeqNum="Case30LineRemovalRandomConsistent";
     private final static String peersLogDirectory="peerlets-log/";
@@ -80,10 +80,6 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
     
     private static ArrayList<ArrayList<Integer>> attackLinks = new ArrayList();
     
-    public SuccessiveLineRemoval(Backend backend, PowerFlowType flowType){
-        run(backend, flowType);
-    }
-    
     public static void main(String args[]){
         int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
@@ -118,12 +114,13 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
         sfinaParameters.put(SfinaParameter.BACKEND, backend);
         backendParameters.put(PowerBackendParameter.FLOW_TYPE, flowType);
         double toleranceParameter = 2.0;
+        double relCapacityChange = 1.0;
         
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
         logger.info(sfinaParameters);
         
         Experiment.initEnvironment();
-        final TestBenchmarkAgent test = new TestBenchmarkAgent();
+        final LinkRemovalExperiment test = new LinkRemovalExperiment();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -152,7 +149,8 @@ public class SuccessiveLineRemoval extends SimulatedExperiment{
                         missingValue,
                         sfinaParameters,
                         backendParameters,
-                        toleranceParameter));
+                        toleranceParameter,
+                        relCapacityChange));
                 return newPeer;
             }
         };

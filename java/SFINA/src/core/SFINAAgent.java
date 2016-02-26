@@ -188,7 +188,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     setBackend((Backend)sfinaParameters.get(SfinaParameter.BACKEND));
                 else
                     logger.debug("Backend not specified.");
-                loadInputData();
+                loadData();
                 eventLoader=new EventLoader(domain,columnSeparator,missingValue);
                 events=eventLoader.loadEvents(eventsLocation);
                 clearOutputFiles(new File(experimentOutputFilesLocation));
@@ -203,7 +203,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * 
      * @param experiment 
      */
-    private final static void clearOutputFiles(File experiment){
+    private static void clearOutputFiles(File experiment){
         File[] files = experiment.listFiles();
         if(files!=null) { //some JVMs return null for empty dirs
             for(File f: files) {
@@ -232,12 +232,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                timeToken=timeTokenName+(getSimulationTime());
+                timeToken = timeTokenName + getSimulationTime();
                 logger.info("--------------> " + timeToken + " <--------------");
                 
                 resetIteration();
                 
-                loadInputData();
+                loadData();
                 
                 initMeasurements();
                 performInitialStateOperations();
@@ -257,7 +257,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
     
-    private void loadInputData(){
+    private void loadData(){
         File file = new File(experimentConfigurationFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
             logger.info("loading data at time " + timeToken);
@@ -268,11 +268,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
                     flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
                     flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
-                    // make seperate method:
-                    flowNetwork.setLinkFlowType(PowerLinkState.POWER_FLOW_FROM_REAL);
-                    flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
-                    flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
-                    flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");
@@ -286,13 +281,37 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 default:
                     logger.debug("This domain is not supported at this moment");
             }
+            setFlowParameters();
+        }
+    }
+    
+    @Override
+    public void setFlowParameters(){
+        switch(domain){
+            case POWER:
+                flowNetwork.setLinkFlowType(PowerLinkState.POWER_FLOW_FROM_REAL);
+                flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
+                flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
+                flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
+                break;
+            case GAS:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            case WATER:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            case TRANSPORTATION:
+                logger.debug("This domain is not supported at this moment");
+                break;
+            default:
+                logger.debug("This domain is not supported at this moment");
         }
     }
     
     /**
-     * Outputs txt files in same format as input. Automatically creates incremental iterations starting at 1 for each output as long as the current epoch is running. 
+     * Outputs txt files in same format as input. Creates new folder for every iteration.
      */
-    private void outputNetworkData(){
+    private void outputData(){
         logger.info("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
@@ -334,21 +353,21 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     @Override
     public void initMeasurements(){
-        HashMap<String,HashMap<Metrics,Object>> linkMetrics=new HashMap<String,HashMap<Metrics,Object>>();
+        HashMap<String,HashMap<Metrics,Object>> linkMetrics=new HashMap<>();
         for(Link link:this.getFlowNetwork().getLinks()){
-            HashMap<Metrics,Object> metrics=new HashMap<Metrics,Object>();
+            HashMap<Metrics,Object> metrics=new HashMap<>();
             linkMetrics.put(link.getIndex(), metrics);
         }
         this.getTemporalLinkMetrics().put(this.getSimulationTime(), linkMetrics);
         
-        HashMap<String,HashMap<Metrics,Object>> nodeMetrics=new HashMap<String,HashMap<Metrics,Object>>();
+        HashMap<String,HashMap<Metrics,Object>> nodeMetrics=new HashMap<>();
         for(Node node:this.getFlowNetwork().getNodes()){
-            HashMap<Metrics,Object> metrics=new HashMap<Metrics,Object>();
+            HashMap<Metrics,Object> metrics=new HashMap<>();
             nodeMetrics.put(node.getIndex(), metrics);
         }
         this.getTemporalNodeMetrics().put(this.getSimulationTime(), nodeMetrics);
         
-        this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<Metrics,Object>());
+        this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<>());
     }
     
     
@@ -379,7 +398,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 if(node.isActivated() == (Boolean)event.getValue())
                                     logger.debug("Node status same, not changed by event.");
                                 node.setActivated((Boolean)event.getValue()); 
-                                logger.info("..deactivating node " + node.getIndex());
+                                logger.info("..changing status of node " + node.getIndex());
                                 break;
                             default:
                                 logger.debug("Node state cannot be recognised");
@@ -402,7 +421,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                                 if(link.isActivated() == (Boolean)event.getValue())
                                     logger.debug("Link status same, not changed by event.");
                                 link.setActivated((Boolean)event.getValue()); 
-                                logger.info("..deactivating link " + link.getIndex());
+                                logger.info("..changing status of link " + link.getIndex());
                                 break;
                             default:
                                 logger.debug("Link state cannot be recognised");
@@ -447,7 +466,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
 //                            node.setCapacity(node.getCapacity()*(1.0-(Double)sfinaParameters.get(SfinaParameter.CAPACITY_CHANGE_LINK)));
 //                        break;
                     default:
-                        logger.debug("SFINA parameter cannot be recognized.");
+                        logger.debug("System parameter cannot be recognized.");
                 }
             default:
                 logger.debug("Event type cannot be recognised");
@@ -553,7 +572,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * Has to be called at the end of the iteration.
      */
     public void nextIteration(){
-        this.outputNetworkData();
+        this.outputData();
         this.iteration++;
     }
     

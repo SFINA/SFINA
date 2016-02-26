@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import org.apache.log4j.Logger;
 import protopeer.measurement.LogReplayer;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
@@ -21,6 +22,8 @@ import protopeer.measurement.MeasurementLoggerListener;
  */
 public class BenchmarkLogReplayer {
 
+    private static final Logger logger = Logger.getLogger(BenchmarkLogReplayer.class);
+    
     private String expSeqNum;
     private String expID;
     private String resultID;
@@ -45,7 +48,7 @@ public class BenchmarkLogReplayer {
         this.expID="experiment-"+expSeqNum+"/";
         this.resultID="results/"+expSeqNum+"/";
         this.replayer=new LogReplayer();
-        System.out.println(expID);
+        logger.info(expID);
         this.loadLogs("peerlets-log/"+expID, minLoad, maxLoad);
         if(writeToFile)
             this.prepareResultOutput();
@@ -55,7 +58,7 @@ public class BenchmarkLogReplayer {
     }
 
     public static void main(String args[]){
-        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("Case30LineRemovalRandomConsistent", 0, 1000);
+        //BenchmarkLogReplayer replayer=new BenchmarkLogReplayer("Case30LineRemovalRandomConsistent", 0, 1000);
     }
 
     public void loadLogs(String directory, int minLoad, int maxLoad){
@@ -163,8 +166,7 @@ public class BenchmarkLogReplayer {
             islandNum.print(islands + coma);
             isolatedNodes.print(isolNodes + coma);
         }
-        System.out.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes);
-        
+        logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
     }
 
     private MeasurementLog getMemorySupportedLog(MeasurementLog log, int minLoad, int maxLoad){
@@ -172,12 +174,12 @@ public class BenchmarkLogReplayer {
     }
 
     public void printGlobalMetricsTags(){
-       System.out.println("*** RESULTS PER PEER ***\n");
+       logger.info("*** RESULTS PER PEER ***\n");
     }
 
     public void printLocalMetricsTags(){
-        System.out.println("*** RESULTS PER EPOCH ***\n");
-        System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Simu Time [ms]", "Nr of iterations", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes");
+        logger.info("*** RESULTS PER EPOCH ***\n");
+        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Simu Time [ms]", "Nr of iterations", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

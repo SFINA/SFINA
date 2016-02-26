@@ -48,7 +48,7 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=4;
+    private final static int runDuration=6;
     private final static int N=1;
     
     // SFINA parameters
@@ -77,15 +77,16 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
     public static void main(String[] args) {
         // Necessary
         sinfaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
-        sinfaParameters.put(SfinaParameter.BACKEND, Backend.MATPOWER);
+        sinfaParameters.put(SfinaParameter.BACKEND, Backend.INTERPSS);
         backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
         double toleranceParameter = 2.0;
+        double relCapacityChange = 1.0;
         
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
         logger.info(sinfaParameters);
         
         Experiment.initEnvironment();
-        final TestBenchmarkAgent test = new TestBenchmarkAgent();
+        final TestPowerCascadeAgent test = new TestPowerCascadeAgent();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -110,7 +111,8 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
                         missingValue,
                         sinfaParameters,
                         backendParameters,
-                        toleranceParameter));
+                        toleranceParameter,
+                        relCapacityChange));
                 return newPeer;
             }
         };

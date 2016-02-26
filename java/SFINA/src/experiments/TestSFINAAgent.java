@@ -74,24 +74,12 @@ public class TestSFINAAgent extends SimulatedExperiment{
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
-<<<<<<< HEAD
-        HashMap<SystemParameter,Object> systemParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
-//        // Necessary
-//        systemParameters.put(SystemParameter.DOMAIN, Domain.POWER);
-//        systemParameters.put(SystemParameter.BACKEND, Backend.MATPOWER);
-//        systemParameters.put(SystemParameter.FLOW_TYPE, PowerFlowType.AC);
-//        
-//        // Optional, not yet implemented to afffect anything
-//        systemParameters.put(SystemParameter.TOLERANCE_PARAMETER, 2.0);
-//        systemParameters.put(SystemParameter.CAPACITY_CHANGE_LINK, 0.0);
-=======
         HashMap<SfinaParameter,Object> sfinaParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
         HashMap<Enum, Object> backendParameters = new HashMap();
         backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
         
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
         logger.info(sfinaParameters);
->>>>>>> 9cd3af8686d1a24415970008a7c93ace65e547c3
         
         Experiment.initEnvironment();
         TestSFINAAgent test = new TestSFINAAgent();
