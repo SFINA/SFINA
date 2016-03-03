@@ -150,8 +150,10 @@ public class PowerCascadeAgent extends CascadeAgent{
         switch(getDomain()){
             case POWER: 
                 // blackout if isolated node
-                if(flowNetwork.getNodes().size() == 1)
+                if(flowNetwork.getNodes().size() == 1){
+                    logger.info("....not enough nodes");
                     return converged;
+                }
                 
                 // or for example to get all generators and the slack bus if it exists
                 ArrayList<Node> generators = new ArrayList();
@@ -173,8 +175,10 @@ public class PowerCascadeAgent extends CascadeAgent{
                 
                 // check if there's a slack in the island, if not make the generator with biggest power output to a slack bus
                 if (slack == null){
-                    if (generators.size() == 0)
+                    if (generators.size() == 0){
+                        logger.info("....no generator");
                         return converged; // blackout if no generator in island
+                    }
                     else{
                         slack = generators.get(0);
                         // this is how one changes node/link properties

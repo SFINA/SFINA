@@ -99,8 +99,8 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                     mitigateOverload(currentIsland);
                     
                     boolean linkOverloaded = linkOverload(currentIsland);
-                    //boolean nodeOverloaded = nodeOverload(currentIsland);
-                    if(linkOverloaded){
+                    boolean nodeOverloaded = nodeOverload(currentIsland);
+                    if(linkOverloaded || nodeOverloaded){
                         // add islands of the current island to next iteration
                         for (FlowNetwork net : currentIsland.computeIslands())
                             islandBuffer.get(iter+1).add(net);
@@ -183,16 +183,6 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
      */
     public boolean nodeOverload(FlowNetwork flowNetwork){
         boolean overloaded = false;
-        for (Node node : flowNetwork.getNodes()){
-            if(node.isActivated() && node.getFlow() > node.getCapacity()){
-                logger.info("..violating node " + node.getIndex() + " limit: " + node.getFlow() + " > " + node.getCapacity());
-                Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.NODE,node.getIndex(),NodeState.STATUS,false);
-                this.getEvents().add(event);
-                overloaded = true;
-            }
-        }
-        if (overloaded)
-            this.executeAllEvents(getSimulationTime());
         return overloaded;
     }
     
