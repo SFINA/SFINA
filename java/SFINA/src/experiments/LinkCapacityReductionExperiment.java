@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import power.PowerFlowType;
 import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
@@ -75,6 +76,7 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String args[]){
+        PropertyConfigurator.configure("conf/log4j.properties");
         int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
         //backends.add(Backend.MATPOWER);

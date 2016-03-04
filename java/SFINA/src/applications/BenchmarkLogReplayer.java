@@ -174,7 +174,7 @@ public class BenchmarkLogReplayer {
     }
 
     public void printGlobalMetricsTags(){
-       logger.info("*** RESULTS PER PEER ***\n");
+        logger.info("*** RESULTS PER PEER ***\n");
     }
 
     public void printLocalMetricsTags(){

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import power.PowerFlowType;
 import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
@@ -81,6 +82,7 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     private static ArrayList<ArrayList<Integer>> attackLinks = new ArrayList();
     
     public static void main(String args[]){
+        PropertyConfigurator.configure("conf/log4j.properties");
         int iterations = 1;
         ArrayList<Backend> backends = new ArrayList();
         //backends.add(Backend.MATPOWER);

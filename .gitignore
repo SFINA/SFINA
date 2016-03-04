@@ -1,6 +1,6 @@
 .DS_Store
 *.class
-debug.log
+java/SFINA/log/*
 project.properties
 private.properties
 SFINA.jar
