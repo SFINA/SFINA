@@ -29,9 +29,7 @@ public interface SimulationAgentInterface {
     public void performInitialStateOperations();
     
     public void performFinalStateOperations();
-    
-    public void initMeasurements();
-    
+        
     public void runFlowAnalysis();
         
     public boolean callBackend(FlowNetwork flowNetwork);

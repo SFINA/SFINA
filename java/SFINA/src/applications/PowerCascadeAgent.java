@@ -87,13 +87,14 @@ public class PowerCascadeAgent extends CascadeAgent{
     
     @Override
     public void performInitialStateOperations(){
+        // inherited from BenchmarkSFINAAgent
+        this.initMeasurementVariables();
+        this.saveStartTime();
+        
         this.setCapacityByToleranceParameter();
         if(getSimulationTime()>1)
             this.performRelativeCapacityChange();
         this.calculateInitialLoad();
-        
-        // inherited from BenchmarkSFINAAgent
-        this.saveStartTime();
     }
     
     @Override

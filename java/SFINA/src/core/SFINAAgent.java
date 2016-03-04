@@ -17,7 +17,6 @@
  */
 package core;
 
-import applications.Metrics;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
 import input.Backend;
@@ -94,11 +93,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private Backend backend;
     private ArrayList<Event> events;
     
-    // Measurement variables
-    private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
-    private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
-    private HashMap<Integer,HashMap<Metrics,Object>> temporalSystemMetrics;
-    
     public SFINAAgent(
             String experimentID, 
             String peersLogDirectory, 
@@ -133,9 +127,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.missingValue=missingValue;
         this.sfinaParameters=sfinaParameters;
         this.backendParameters=backendParameters;
-        this.temporalLinkMetrics=new HashMap();
-        this.temporalNodeMetrics=new HashMap();
-        this.temporalSystemMetrics=new HashMap();
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
@@ -180,12 +171,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 timeToken=timeTokenName+(getSimulationTime());
-                if (sfinaParameters.containsKey(SfinaParameter.DOMAIN))
-                    setDomain((Domain)sfinaParameters.get(SfinaParameter.DOMAIN));
+                if (getSfinaParameters().containsKey(SfinaParameter.DOMAIN))
+                    setDomain((Domain)getSfinaParameters().get(SfinaParameter.DOMAIN));
                 else 
                     logger.debug("Domain not specified.");
-                if (sfinaParameters.containsKey(SfinaParameter.BACKEND))
-                    setBackend((Backend)sfinaParameters.get(SfinaParameter.BACKEND));
+                if (getSfinaParameters().containsKey(SfinaParameter.BACKEND))
+                    setBackend((Backend)getSfinaParameters().get(SfinaParameter.BACKEND));
                 else
                     logger.debug("Backend not specified.");
                 loadData();
@@ -239,7 +230,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 
                 loadData();
                 
-                initMeasurements();
                 performInitialStateOperations();
                 
                 executeAllEvents(getSimulationTime());
@@ -343,33 +333,13 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     @Override
     public void performInitialStateOperations(){
-        
+
     }
     
     @Override
     public void performFinalStateOperations(){
         
     }
-    
-    @Override
-    public void initMeasurements(){
-        HashMap<String,HashMap<Metrics,Object>> linkMetrics=new HashMap<>();
-        for(Link link:this.getFlowNetwork().getLinks()){
-            HashMap<Metrics,Object> metrics=new HashMap<>();
-            linkMetrics.put(link.getIndex(), metrics);
-        }
-        this.getTemporalLinkMetrics().put(this.getSimulationTime(), linkMetrics);
-        
-        HashMap<String,HashMap<Metrics,Object>> nodeMetrics=new HashMap<>();
-        for(Node node:this.getFlowNetwork().getNodes()){
-            HashMap<Metrics,Object> metrics=new HashMap<>();
-            nodeMetrics.put(node.getIndex(), metrics);
-        }
-        this.getTemporalNodeMetrics().put(this.getSimulationTime(), nodeMetrics);
-        
-        this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<>());
-    }
-    
     
     public void executeAllEvents(int time){
         logger.info("executing all events at time_" + time);
@@ -449,11 +419,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 logger.info("..changing/setting system param: " + (SfinaParameter)event.getParameter());
                 switch((SfinaParameter)event.getParameter()){
                     case DOMAIN:
-                        sfinaParameters.put(SfinaParameter.DOMAIN, (Domain)event.getValue());
+                        getSfinaParameters().put(SfinaParameter.DOMAIN, (Domain)event.getValue());
                         setDomain((Domain)event.getValue());
                         break;
                     case BACKEND:
-                        sfinaParameters.put(SfinaParameter.BACKEND, (Backend)event.getValue());
+                        getSfinaParameters().put(SfinaParameter.BACKEND, (Backend)event.getValue());
                         setBackend((Backend)event.getValue());
                         break;
 //                    case CAPACITY_CHANGE_LINK:
@@ -498,11 +468,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             case POWER:
                 switch(backend){
                     case MATPOWER:
-                        flowBackend=new MATPOWERFlowBackend(backendParameters);
+                        flowBackend=new MATPOWERFlowBackend(getBackendParameters());
                         converged=flowBackend.flowAnalysis(flowNetwork);
                         break;
                     case INTERPSS:
-                        flowBackend=new InterpssFlowBackend(backendParameters);
+                        flowBackend=new InterpssFlowBackend(getBackendParameters());
                         converged=flowBackend.flowAnalysis(flowNetwork);
                         break;
                     default:
@@ -576,6 +546,10 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.iteration++;
     }
     
+    /**
+     * 
+     * @return the current iteration
+     */
     public int getIteration(){
         return this.iteration;
     }
@@ -587,8 +561,32 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return events;
     }
     
-    public HashMap<SfinaParameter,Object> getSfinaParameters(){
+    /**
+     * @return the sfinaParameters
+     */
+    public HashMap<SfinaParameter,Object> getSfinaParameters() {
         return sfinaParameters;
+    }
+
+    /**
+     * @param sfinaParameters the sfinaParameters to set
+     */
+    public void setSfinaParameters(HashMap<SfinaParameter,Object> sfinaParameters) {
+        this.sfinaParameters = sfinaParameters;
+    }
+
+    /**
+     * @return the backendParameters
+     */
+    public HashMap<Enum,Object> getBackendParameters() {
+        return backendParameters;
+    }
+
+    /**
+     * @param backendParameters the backendParameters to set
+     */
+    public void setBackendParameters(HashMap<Enum,Object> backendParameters) {
+        this.backendParameters = backendParameters;
     }
     
     //****************** MEASUREMENTS ******************
@@ -628,29 +626,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     public MeasurementFileDumper getMeasurementDumper() {
         return measurementDumper;
     }
-
-    /**
-     * @return the temporalLinkMetrics
-     */
-    public HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> getTemporalLinkMetrics() {
-        return temporalLinkMetrics;
-    }
-
-    /**
-     * @return the temporalNodeMetrics
-     */
-    public HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> getTemporalNodeMetrics() {
-        return temporalNodeMetrics;
-    }
-    
-    /**
-     * 
-     * @return the temporalSystemMetrics
-     */
-    public HashMap<Integer,HashMap<Metrics,Object>> getTemporalSystemMetrics() {
-        return temporalSystemMetrics;
-    }
-
     
     /**
      * @param measurementDumper the measurementDumper to set

@@ -21,6 +21,7 @@ import core.SFINAAgent;
 import java.util.HashMap;
 import java.util.HashSet;
 import network.Link;
+import network.Node;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
@@ -31,6 +32,11 @@ import protopeer.util.quantities.Time;
  * @author evangelospournaras
  */
 public class BenchmarkSFINAAgent extends SFINAAgent{
+    
+    private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
+    private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
+    private HashMap<Integer,HashMap<Metrics,Object>> temporalSystemMetrics;
+    private long simulationStartTime;
     
     public BenchmarkSFINAAgent(String experimentID, 
             String peersLogDirectory, 
@@ -64,8 +70,29 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
                 missingValue,
                 systemParameters,
                 backendParameters);
+        this.temporalLinkMetrics=new HashMap();
+        this.temporalNodeMetrics=new HashMap();
+        this.temporalSystemMetrics=new HashMap();
     }
+    
+    public void initMeasurementVariables(){
+        HashMap<String,HashMap<Metrics,Object>> linkMetrics=new HashMap<>();
+        for(Link link:this.getFlowNetwork().getLinks()){
+            HashMap<Metrics,Object> metrics=new HashMap<>();
+            linkMetrics.put(link.getIndex(), metrics);
+        }
+        this.getTemporalLinkMetrics().put(this.getSimulationTime(), linkMetrics);
         
+        HashMap<String,HashMap<Metrics,Object>> nodeMetrics=new HashMap<>();
+        for(Node node:this.getFlowNetwork().getNodes()){
+            HashMap<Metrics,Object> metrics=new HashMap<>();
+            nodeMetrics.put(node.getIndex(), metrics);
+        }
+        this.getTemporalNodeMetrics().put(this.getSimulationTime(), nodeMetrics);
+        
+        this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<>());
+    }
+    
     public void calculateTotalLines(){
         for(Link link:this.getFlowNetwork().getLinks()){
             HashMap<Metrics,Object> metrics=this.getTemporalLinkMetrics().get(this.getSimulationTime()).get(link.getIndex());
@@ -99,8 +126,6 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
         }
     }
     
-    private long simulationStartTime;
-
     public void saveStartTime(){
         this.simulationStartTime = System.currentTimeMillis();
     }
@@ -117,6 +142,7 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
     
     @Override
     public void performInitialStateOperations(){
+        this.initMeasurementVariables();
         this.saveStartTime();
     }
     
@@ -128,6 +154,28 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
         this.calculateTotalLines();
         this.saveSimuTime();
         this.saveIterationNumber();
+    }
+        
+    /**
+     * @return the temporalLinkMetrics
+     */
+    public HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> getTemporalLinkMetrics() {
+        return temporalLinkMetrics;
+    }
+
+    /**
+     * @return the temporalNodeMetrics
+     */
+    public HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> getTemporalNodeMetrics() {
+        return temporalNodeMetrics;
+    }
+    
+    /**
+     * 
+     * @return the temporalSystemMetrics
+     */
+    public HashMap<Integer,HashMap<Metrics,Object>> getTemporalSystemMetrics() {
+        return temporalSystemMetrics;
     }
     
     //****************** MEASUREMENTS ******************
