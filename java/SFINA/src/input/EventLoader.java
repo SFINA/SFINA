@@ -130,6 +130,7 @@ public class EventLoader {
                         break;
                     case "system":
                         networkFeature=EventType.SYSTEM;
+                        break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
                 }

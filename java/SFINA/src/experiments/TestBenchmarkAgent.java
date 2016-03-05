@@ -19,14 +19,8 @@ package experiments;
 
 import applications.BenchmarkLogReplayer;
 import applications.BenchmarkSFINAAgent;
-import input.Backend;
-import input.Domain;
-import input.SfinaParameter;
 import java.io.File;
-import java.util.HashMap;
 import org.apache.log4j.Logger;
-import power.PowerFlowType;
-import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -51,15 +45,10 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     private final static int runDuration=10;
     private final static int N=1;
     
-    // SFINA parameters
-    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
-    private final static HashMap<Enum,Object> backendParameters = new HashMap();
-
-
     private final static String columnSeparator=",";
     private final static String missingValue="-";
     
-    private final static String configurationFilesLocation = "configuration_files/";
+    private final static String configurationFilesLocation = "experiments/";
     private final static String timeTokenName="time_";
     private final static String inputDirectoryName="input";
     private final static String outputDirectoryName="output";
@@ -68,20 +57,16 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
     private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
+    private final static String eventsLocation=experimentConfigurationFilesLocation+"events.txt";
+    private final static String sfinaParamLocation=experimentConfigurationFilesLocation+"sfinaParameters.txt";
+    private final static String backendParamLocation=experimentConfigurationFilesLocation+"backendParameters.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
     private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
-        // Necessary
-        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
-        sfinaParameters.put(SfinaParameter.BACKEND, Backend.INTERPSS);
-        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
-        
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
-        logger.info(sfinaParameters);
         
         Experiment.initEnvironment();
         final TestBenchmarkAgent test = new TestBenchmarkAgent();
@@ -105,10 +90,10 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
                         nodesFlowLocation,
                         linksFlowLocation,
                         eventsLocation,
+                        sfinaParamLocation,
+                        backendParamLocation,
                         columnSeparator,
-                        missingValue,
-                        sfinaParameters,
-                        backendParameters));
+                        missingValue));
                 return newPeer;
             }
         };

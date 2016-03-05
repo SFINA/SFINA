@@ -1,16 +1,25 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 SFINA Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 package input;
 
-import event.EventState;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.FlowNetwork;
@@ -19,7 +28,6 @@ import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
-import power.input.PowerLinkState;
 
 /**
  *
@@ -39,34 +47,6 @@ public class TopologyLoader {
         emptyNetwork();
     }
     
-//    public ArrayList<Link> loadAttackedLinks(String location, List<Link> links){
-//        ArrayList<Link> attackedLinks=new ArrayList<Link>();
-//        File file = new File(location);
-//        Scanner scr = null;
-//        try {
-//            scr = new Scanner(file);
-//            while(scr.hasNext()){
-//                String attackedLinkIndex=scr.next();
-//                Link attackedLink=null;
-//                for(Link link:links){
-//                    if(attackedLinkIndex.equals(link.getIndex())){
-//                        attackedLink=link;
-//                    }
-//                }
-//                if(attackedLink!=null){
-//                    attackedLinks.add(attackedLink);
-//                }
-//                else{
-//                    logger.debug("Something is wrong with the index of the links.");
-//                }
-//            }
-//        }
-//        catch (FileNotFoundException ex) {
-//            ex.printStackTrace();
-//        }
-//        return attackedLinks;
-//    }
-    
     private void emptyNetwork(){
         if (net.getLinks().size() != 0){
             ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
@@ -81,9 +61,6 @@ public class TopologyLoader {
     }
     
     public void loadNodes(String location){
-        // empty network if it has nodes and links, not sure if needed
-        //emptyNetwork();
-        
         ArrayList<NodeState> nodeStates=new ArrayList<NodeState>();
         File file = new File(location);
         Scanner scr = null;

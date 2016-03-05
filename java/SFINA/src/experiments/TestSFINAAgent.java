@@ -18,17 +18,9 @@
 package experiments;
 
 import core.SFINAAgent;
-import input.Backend;
-import input.Domain;
-import input.SfinaParameter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
-import power.PowerFlowType;
-import power.backend.PowerBackendParameter;
+import org.apache.log4j.PropertyConfigurator;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -57,7 +49,7 @@ public class TestSFINAAgent extends SimulatedExperiment{
     private final static String columnSeparator=",";
     private final static String missingValue="-";
     
-    private final static String configurationFilesLocation = "configuration_files/";
+    private final static String configurationFilesLocation = "experiments/";
     private final static String timeTokenName="time_";
     private final static String inputDirectoryName="input";
     private final static String outputDirectoryName="output";
@@ -66,20 +58,17 @@ public class TestSFINAAgent extends SimulatedExperiment{
     
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
     private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
-    private final static String systemParametersLocation=experimentConfigurationFilesLocation+"/system-parameters.txt";
+    private final static String eventsLocation=experimentConfigurationFilesLocation+"events.txt";
+    private final static String sfinaParamLocation=experimentConfigurationFilesLocation+"sfinaParameters.txt";
+    private final static String backendParamLocation=experimentConfigurationFilesLocation+"backendParameters.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
     private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
     private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
     
     public static void main(String[] args) {
-        HashMap<SfinaParameter,Object> sfinaParameters=loadSystemParameters(systemParametersLocation,columnSeparator);
-        HashMap<Enum, Object> backendParameters = new HashMap();
-        backendParameters.put(PowerBackendParameter.FLOW_TYPE, PowerFlowType.AC);
-        
+        PropertyConfigurator.configure("conf/log4j.properties");
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
-        logger.info(sfinaParameters);
         
         Experiment.initEnvironment();
         TestSFINAAgent test = new TestSFINAAgent();
@@ -106,10 +95,10 @@ public class TestSFINAAgent extends SimulatedExperiment{
                         nodesFlowLocation,
                         linksFlowLocation,
                         eventsLocation,
+                        sfinaParamLocation,
+                        backendParamLocation,
                         columnSeparator,
-                        missingValue,
-                        sfinaParameters,
-                        backendParameters));
+                        missingValue));
                 return newPeer;
             }
         };
@@ -131,61 +120,5 @@ public class TestSFINAAgent extends SimulatedExperiment{
             }
         }
         experiment.delete();
-    }
-    
-    public final static HashMap<SfinaParameter,Object> loadSystemParameters(String location, String separator){
-        HashMap<SfinaParameter,Object> systemParameters = new HashMap();
-        File file = new File(location);
-        Scanner scr = null;
-        try {
-            scr = new Scanner(file);
-            while(scr.hasNext()){
-                StringTokenizer st = new StringTokenizer(scr.next(), separator);
-                switch(st.nextToken()){
-                    case "domain":
-                        Domain domain=null;
-                        String domainType=st.nextToken();
-                        switch(domainType){
-                            case "power":
-                                domain=Domain.POWER;
-                                break;
-                            case "gas":
-                                domain=Domain.GAS;
-                                break;
-                            case "water":
-                                domain=Domain.WATER;
-                                break;
-                            case "transportation":
-                                domain=Domain.TRANSPORTATION;
-                                break;
-                            default:
-                                logger.debug("This domain is not supported or cannot be recognized");
-                        }
-                        systemParameters.put(SfinaParameter.DOMAIN, domain);
-                        break;
-                    case "backend":
-                        Backend backend=null;
-                        String backendType=st.nextToken();
-                        switch(backendType){
-                            case "matpower":
-                                backend=Backend.MATPOWER;
-                                break;
-                            case "interpss":
-                                backend=Backend.INTERPSS;
-                                break;
-                            default:
-                                logger.debug("This backend is not supported or cannot be recognized");
-                        }
-                        systemParameters.put(SfinaParameter.BACKEND, backend);
-                        break;
-                    default:
-                        logger.debug("This system parameter is not supported or cannot be recognized");
-                }
-            }
-        }
-        catch (FileNotFoundException ex){
-            ex.printStackTrace();
-        }
-        return systemParameters;
     }
 }

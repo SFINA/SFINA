@@ -104,7 +104,7 @@ public class PowerFlowLoader {
             for(int i=0;i<rawValues.size();i++){
                 PowerNodeState state = powerNodeStates.get(i);
                 String rawValue = rawValues.get(i);
-                if(!rawValue.equals(this.missingValue))
+                if(!rawValue.equals(this.missingValue) && !state.equals(PowerNodeState.ID))
                     node.addProperty(state, this.getActualNodeValue(state, rawValues.get(i)));
             }
         }
@@ -116,7 +116,8 @@ public class PowerFlowLoader {
             for(int i=0;i<rawValues.size();i++){
                 PowerLinkState state = powerLinkStates.get(i);
                 String rawValue = rawValues.get(i);
-                link.addProperty(state, this.getActualLinkValue(state, rawValue));
+                if(!state.equals(PowerLinkState.ID))
+                    link.addProperty(state, this.getActualLinkValue(state, rawValue));
             }
         }
     }
@@ -242,7 +243,7 @@ public class PowerFlowLoader {
             case "angmax":
                 return PowerLinkState.ANGLE_DIFFERENCE_MAX;
             default:
-                logger.debug("Power link state is not recognized.");
+                logger.debug("Power link state is not recognized: " + powerLinkState);
                 return null;
         }
     }
@@ -377,7 +378,7 @@ public class PowerFlowLoader {
             case ANGLE_DIFFERENCE_MAX:
                 return Double.parseDouble(rawValue);
             default:
-                logger.debug("Power link state is not recognized.");
+                logger.debug("Power link state is not recognized: " + powerLinkState);
                 return null;
                 
         }

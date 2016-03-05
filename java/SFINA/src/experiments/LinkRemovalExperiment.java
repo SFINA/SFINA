@@ -47,7 +47,7 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     
     private static final Logger logger = Logger.getLogger(LinkRemovalExperiment.class);
     
-    private static String expSeqNum="Case30LineRemovalRandomConsistent";
+    private static String expSeqNum="Case30LinkRemovalRandom";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum+"/";
     
@@ -58,13 +58,10 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
-    private final static HashMap<Enum,Object> backendParameters = new HashMap();    
-
     private final static String columnSeparator=",";
     private final static String missingValue="-";
     
-    private final static String configurationFilesLocation = "configuration_files/";
+    private final static String configurationFilesLocation = "experiments/";
     private final static String timeTokenName="time_";
     private final static String inputDirectoryName="input";
     private final static String outputDirectoryName="output";
@@ -73,7 +70,9 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
     private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
+    private final static String eventsLocation=experimentConfigurationFilesLocation+"events.txt";
+    private final static String sfinaParamLocation=experimentConfigurationFilesLocation+"sfinaParameters.txt";
+    private final static String backendParamLocation=experimentConfigurationFilesLocation+"backendParameters.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
     private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
@@ -83,13 +82,8 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     
     public static void main(String args[]){
         PropertyConfigurator.configure("conf/log4j.properties");
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
         int iterations = 1;
-        ArrayList<Backend> backends = new ArrayList();
-        //backends.add(Backend.MATPOWER);
-        backends.add(Backend.INTERPSS);
-        ArrayList<PowerFlowType> flowTypes = new ArrayList();
-        flowTypes.add(PowerFlowType.AC);
-        //flowTypes.add(PowerFlowType.DC);
         
         // Random
         int linkNr = 41;
@@ -100,26 +94,16 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
             Collections.shuffle(links);
             attackLinks.add(links);
         }
-        for(Backend backend : backends){
-            for(PowerFlowType flowType : flowTypes){
-                for(int i=0; i<iterations; i++){
-                    createLinkAttackEvents(i);
-                    run(backend, flowType);
-                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
-                }
-            }
-        }
+        //createLinkAttackEvents();
+        
+        run();
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
     }
     
-    public static void run(Backend backend, PowerFlowType flowType) {
-        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
-        sfinaParameters.put(SfinaParameter.BACKEND, backend);
-        backendParameters.put(PowerBackendParameter.FLOW_TYPE, flowType);
-        double toleranceParameter = 2.0;
+    public static void run() {
         double relCapacityChange = 1.0;
         
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
-        logger.info(sfinaParameters);
         
         Experiment.initEnvironment();
         final LinkRemovalExperiment test = new LinkRemovalExperiment();
@@ -127,7 +111,6 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
         folder.mkdir();
-        //createLinkAttackEvents();
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
@@ -147,11 +130,10 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
                         nodesFlowLocation,
                         linksFlowLocation,
                         eventsLocation,
+                        sfinaParamLocation,
+                        backendParamLocation,
                         columnSeparator,
                         missingValue,
-                        sfinaParameters,
-                        backendParameters,
-                        toleranceParameter,
                         relCapacityChange));
                 return newPeer;
             }

@@ -27,7 +27,6 @@ import network.FlowNetwork;
 import network.Link;
 import network.LinkState;
 import network.Node;
-import network.NodeState;
 import org.apache.log4j.Logger;
 import protopeer.util.quantities.Time;
 
@@ -51,11 +50,11 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
             String linksLocation, 
             String nodesFlowLocation, 
             String linksFlowLocation, 
-            String eventsLocation, 
+            String eventsLocation,
+            String sfinaParamLocation,
+            String backendParamLocation,
             String columnSeparator, 
-            String missingValue,
-            HashMap systemParameters,
-            HashMap backendParameters){
+            String missingValue){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -68,10 +67,10 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                 nodesFlowLocation,
                 linksFlowLocation,
                 eventsLocation,
+                sfinaParamLocation,
+                backendParamLocation,
                 columnSeparator,
-                missingValue,
-                systemParameters,
-                backendParameters);
+                missingValue);
     }
     
     /**

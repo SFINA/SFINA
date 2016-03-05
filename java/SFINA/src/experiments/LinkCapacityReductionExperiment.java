@@ -19,16 +19,9 @@ package experiments;
 
 import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
-import input.Backend;
-import input.Domain;
-import input.SfinaParameter;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import power.PowerFlowType;
-import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -54,13 +47,10 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
     private final static int N=1;
     
     // SFINA parameters
-    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
-    private final static HashMap<Enum,Object> backendParameters = new HashMap();
-
     private final static String columnSeparator=",";
     private final static String missingValue="-";
     
-    private final static String configurationFilesLocation = "configuration_files/";
+    private final static String configurationFilesLocation = "experiments/";
     private final static String timeTokenName="time_";
     private final static String inputDirectoryName="input";
     private final static String outputDirectoryName="output";
@@ -69,7 +59,9 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
     
     private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
     private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
+    private final static String eventsLocation=experimentConfigurationFilesLocation+"events.txt";
+    private final static String sfinaParamLocation=experimentConfigurationFilesLocation+"sfinaParameters.txt";
+    private final static String backendParamLocation=experimentConfigurationFilesLocation+"backendParameters.txt";
     private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
     private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
     private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
@@ -77,38 +69,17 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
     
     public static void main(String args[]){
         PropertyConfigurator.configure("conf/log4j.properties");
-        int iterations = 1;
-        ArrayList<Backend> backends = new ArrayList();
-        //backends.add(Backend.MATPOWER);
-        backends.add(Backend.INTERPSS);
-        ArrayList<PowerFlowType> flowTypes = new ArrayList();
-        flowTypes.add(PowerFlowType.AC);
-        //flowTypes.add(PowerFlowType.DC);
-        
-//        createRateReductionEvents();
-        
-        for(Backend backend : backends){
-            for(PowerFlowType flowType : flowTypes){
-                for(int i=0; i<iterations; i++){
-                    run(backend, flowType);
-                    BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
-                }
-            }
-        }
+        logger.info("### EXPERIMENT "+expSeqNum+" ###");
+        run();
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
     }
     
-    private static void run(Backend backend, PowerFlowType flowType) {
-        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.POWER);
-        sfinaParameters.put(SfinaParameter.BACKEND, backend);
-        backendParameters.put(PowerBackendParameter.FLOW_TYPE, flowType);
-        double toleranceParameter = 2.0;
+    private static void run() {
         double totCapacityChange = 0.5;
         double steps = runDuration-bootstrapTime/runTime;
         double relCapacityChangePerStep = Math.pow(totCapacityChange, 1/steps);
         
-        
         logger.info("### EXPERIMENT "+expSeqNum+" ###");
-        logger.info(sfinaParameters);
         
         Experiment.initEnvironment();
         final LinkCapacityReductionExperiment test = new LinkCapacityReductionExperiment();
@@ -116,10 +87,7 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
         folder.mkdir();
-        
-        //createRateReductionEvents();
-        //ReplicateFirstInputFolder createTimeFolders = new ReplicateFirstInputFolder(runDuration, configurationFilesLocation, timeTokenName);
-        
+   
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
@@ -139,11 +107,10 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
                         nodesFlowLocation,
                         linksFlowLocation,
                         eventsLocation,
+                        sfinaParamLocation,
+                        backendParamLocation,
                         columnSeparator,
                         missingValue,
-                        sfinaParameters,
-                        backendParameters,
-                        toleranceParameter,
                         relCapacityChangePerStep));
                 return newPeer;
             }
@@ -153,31 +120,7 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
     }
-    
-//    private static void createRateReductionEvents(){
-//        // Goal: Reduce rating in n steps, s.t. at the end we're at 0.5 times the initial value
-//        int n = runDuration-4;
-//        double factor = 1d-Math.pow(0.5, 1./n);
-//        int rmLinkId = 50;
-//        try{
-//            File file = new File(eventsLocation);
-//            file.createNewFile();
-//            PrintWriter writer = new PrintWriter(new FileWriter(file,false));
-//            writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
-//            int time = 2;
-//            for (int i=0;i<n;i++){
-//                //writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + rmLinkId + columnSeparator + "status" + columnSeparator + "0");
-//                //writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + factor);
-//                writer.println(time + columnSeparator + "system" + columnSeparator + "-" + columnSeparator + "-" + columnSeparator + "line_rate_change_factor" + columnSeparator + (1d-Math.pow((1d-factor), i+1)));
-//                time++;
-//            }
-//            writer.close();
-//        }
-//        catch(IOException ex){
-//            ex.printStackTrace();
-//        }   
-//    }
-    
+
     public final static void clearExperimentFile(File experiment){
         File[] files = experiment.listFiles();
         if(files!=null) { //some JVMs return null for empty dirs

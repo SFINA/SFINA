@@ -42,8 +42,6 @@ import protopeer.util.quantities.Time;
 public class PowerCascadeAgent extends CascadeAgent{
     
     private static final Logger logger = Logger.getLogger(PowerCascadeAgent.class);
-    private double toleranceParameter;
-    private PowerFlowType flowType;
     private Double relRateChangePerEpoch;
     
     public PowerCascadeAgent(String experimentID, 
@@ -58,11 +56,10 @@ public class PowerCascadeAgent extends CascadeAgent{
             String nodesFlowLocation, 
             String linksFlowLocation, 
             String eventsLocation, 
+            String sfinaParamLocation,
+            String backendParamLocation,
             String columnSeparator, 
             String missingValue,
-            HashMap systemParameters,
-            HashMap backendParameters,
-            Double toleranceParameter,
             Double relRateChangePerEpoch){
         super(experimentID,
                 peersLogDirectory,
@@ -76,12 +73,11 @@ public class PowerCascadeAgent extends CascadeAgent{
                 nodesFlowLocation,
                 linksFlowLocation,
                 eventsLocation,
+                sfinaParamLocation,
+                backendParamLocation,
                 columnSeparator,
-                missingValue,
-                systemParameters,
-                backendParameters);
-        this.toleranceParameter = toleranceParameter;
-        this.flowType = (PowerFlowType) backendParameters.get(PowerBackendParameter.FLOW_TYPE);
+                missingValue);
+        
         this.relRateChangePerEpoch = relRateChangePerEpoch;
     }
     
@@ -115,6 +111,7 @@ public class PowerCascadeAgent extends CascadeAgent{
      * Set Capacity by Tolerance Parameter. If no line ratings are given by data.
      */
     private void setCapacityByToleranceParameter(){
+        double toleranceParameter = getToleranceParameter();
         boolean capacityNotSet = false;
         for (Link link : getFlowNetwork().getLinks()){
             if (link.getCapacity() == 0.0){
@@ -196,6 +193,7 @@ public class PowerCascadeAgent extends CascadeAgent{
                         limViolation = GenerationBalancing(flowNetwork, slack);
                         
                         // Without the following line big cases (like polish) even DC doesn't converge..
+                        PowerFlowType flowType = (PowerFlowType) getBackendParameters().get(PowerBackendParameter.FLOW_TYPE);
                         if(flowType.equals(PowerFlowType.DC))
                             limViolation=false;
                         
@@ -279,14 +277,14 @@ public class PowerCascadeAgent extends CascadeAgent{
      * @return the toleranceParameter
      */
     public double getToleranceParameter() {
-        return toleranceParameter;
+        return (Double)this.getBackendParameters().get(PowerBackendParameter.TOLERANCE_PARAMETER);
     }
 
     /**
      * @param toleranceParameter the toleranceParameter to set
      */
     public void setToleranceParameter(double toleranceParameter) {
-        this.toleranceParameter = toleranceParameter;
+        this.getBackendParameters().put(PowerBackendParameter.TOLERANCE_PARAMETER, toleranceParameter);
     }
     
     

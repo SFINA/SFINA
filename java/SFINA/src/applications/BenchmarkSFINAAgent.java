@@ -50,10 +50,10 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
             String nodesFlowLocation, 
             String linksFlowLocation, 
             String eventsLocation, 
+            String sfinaParamLocation,
+            String backendParamLocation,
             String columnSeparator, 
-            String missingValue,
-            HashMap systemParameters,
-            HashMap backendParameters){
+            String missingValue){
         super(experimentID,
                 peersLogDirectory,
                 bootstrapTime,
@@ -66,10 +66,10 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
                 nodesFlowLocation,
                 linksFlowLocation,
                 eventsLocation,
+                sfinaParamLocation,
+                backendParamLocation,
                 columnSeparator,
-                missingValue,
-                systemParameters,
-                backendParameters);
+                missingValue);
         this.temporalLinkMetrics=new HashMap();
         this.temporalNodeMetrics=new HashMap();
         this.temporalSystemMetrics=new HashMap();
