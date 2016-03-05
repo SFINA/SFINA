@@ -21,7 +21,6 @@ import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
 import java.io.File;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -38,7 +37,7 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
-    private static String experimentID="experiment-"+expSeqNum+"/";
+    private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
@@ -46,29 +45,7 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
     private final static int runDuration=6;
     private final static int N=1;
     
-    private final static String columnSeparator=",";
-    private final static String missingValue="-";
-    
-    private final static String configurationFilesLocation = "experiments/";
-    private final static String timeTokenName="time_";
-    private final static String inputDirectoryName="input";
-    private final static String outputDirectoryName="output";
-    private final static String topologyDirectoryName="topology";
-    private final static String flowDirectoryName="flow";
-    
-    private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
-    private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"events.txt";
-    private final static String sfinaParamLocation=experimentConfigurationFilesLocation+"sfinaParameters.txt";
-    private final static String backendParamLocation=experimentConfigurationFilesLocation+"backendParameters.txt";
-    private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
-    private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
-    private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
-    private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
-    
     public static void main(String[] args) {
-        PropertyConfigurator.configure("conf/log4j.properties");
-        logger.info("### EXPERIMENT "+expSeqNum+" ###");
         double relCapacityChange = 1.0;
         
         Experiment.initEnvironment();
@@ -82,21 +59,8 @@ public class TestPowerCascadeAgent extends SimulatedExperiment{
                 Peer newPeer = new Peer(peerIndex);
                 newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
-                        peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime),                        
-                        timeTokenName,
-                        experimentConfigurationFilesLocation,
-                        experimentOutputFilesLocation,
-                        nodesLocation,
-                        linksLocation,
-                        nodesFlowLocation,
-                        linksFlowLocation,
-                        eventsLocation,
-                        sfinaParamLocation,
-                        backendParamLocation,
-                        columnSeparator,
-                        missingValue,
+                        Time.inMilliseconds(runTime),
                         relCapacityChange));
                 return newPeer;
             }

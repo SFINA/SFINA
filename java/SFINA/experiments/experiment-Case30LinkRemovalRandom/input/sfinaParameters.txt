@@ -1,2 +1,2 @@
-domain,power
-backend,interpss
+domain=power
+backend=interpss

@@ -19,20 +19,13 @@ package experiments;
 
 import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
-import input.Backend;
-import input.Domain;
-import input.SfinaParameter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import power.PowerFlowType;
-import power.backend.PowerBackendParameter;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -49,7 +42,7 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     
     private static String expSeqNum="Case30LinkRemovalRandom";
     private final static String peersLogDirectory="peerlets-log/";
-    private static String experimentID="experiment-"+expSeqNum+"/";
+    private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
@@ -57,32 +50,9 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     private final static int runDuration=34;
     private final static int N=1;
     
-    // SFINA parameters
-    private final static String columnSeparator=",";
-    private final static String missingValue="-";
-    
-    private final static String configurationFilesLocation = "experiments/";
-    private final static String timeTokenName="time_";
-    private final static String inputDirectoryName="input";
-    private final static String outputDirectoryName="output";
-    private final static String topologyDirectoryName="topology";
-    private final static String flowDirectoryName="flow";
-    
-    private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
-    private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"events.txt";
-    private final static String sfinaParamLocation=experimentConfigurationFilesLocation+"sfinaParameters.txt";
-    private final static String backendParamLocation=experimentConfigurationFilesLocation+"backendParameters.txt";
-    private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
-    private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
-    private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
-    private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
-    
     private static ArrayList<ArrayList<Integer>> attackLinks = new ArrayList();
     
     public static void main(String args[]){
-        PropertyConfigurator.configure("conf/log4j.properties");
-        logger.info("### EXPERIMENT "+expSeqNum+" ###");
         int iterations = 1;
         
         // Random
@@ -103,8 +73,6 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     public static void run() {
         double relCapacityChange = 1.0;
         
-        logger.info("### EXPERIMENT "+expSeqNum+" ###");
-        
         Experiment.initEnvironment();
         final LinkRemovalExperiment test = new LinkRemovalExperiment();
         test.init();
@@ -119,21 +87,8 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
 //                }
                 newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
-                        peersLogDirectory, 
                         Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime),                        
-                        timeTokenName,
-                        experimentConfigurationFilesLocation,
-                        experimentOutputFilesLocation,
-                        nodesLocation,
-                        linksLocation,
-                        nodesFlowLocation,
-                        linksFlowLocation,
-                        eventsLocation,
-                        sfinaParamLocation,
-                        backendParamLocation,
-                        columnSeparator,
-                        missingValue,
+                        Time.inMilliseconds(runTime),
                         relCapacityChange));
                 return newPeer;
             }
@@ -146,10 +101,10 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
     
     private static void createLinkAttackEvents(int iteration){
         try{
-            File file = new File(eventsLocation);
+            File file = new File("experiments/" + experimentID + "/input/events.txt");
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
-            writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
+            writer.println("time,feature,component,id,parameter,value");
             int time = 2;
 //            for (int i=0; i<30; i++){
 //                for (int j=0; j<18; j++){
@@ -159,7 +114,7 @@ public class LinkRemovalExperiment extends SimulatedExperiment{
 //                time++;
 //            }
             for(int i=0; i<attackLinks.get(iteration).size(); i++){
-                writer.println(time + columnSeparator + "topology" + columnSeparator + "link" + columnSeparator + attackLinks.get(iteration).get(i) + columnSeparator + "status" + columnSeparator + "0");
+                writer.println("time,feature,component,id,parameter,value");
                 time++;
             }
             writer.close();

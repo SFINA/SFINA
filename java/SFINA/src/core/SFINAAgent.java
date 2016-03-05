@@ -34,9 +34,12 @@ import input.SfinaParameter;
 import input.SfinaParameterLoader;
 import input.TopologyLoader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 import network.FlowNetwork;
 import network.Link;
 import network.LinkState;
@@ -71,11 +74,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private String experimentID;
     private Time bootstrapTime;
     private Time runTime;
-    private int iteration;    
+    private int iteration;
+    private String fileSystemParameterLocation;
     private String peersLogDirectory;
     private String timeToken;
     private String timeTokenName;
-    private String experimentConfigurationFilesLocation;
+    private String experimentInputFilesLocation;
     private String experimentOutputFilesLocation;
     private String nodesLocation;
     private String linksLocation;
@@ -85,6 +89,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private String sfinaParamLocation;
     private String backendParamLocation;
     private String columnSeparator;
+    private String parameterColumnSeparator;
     private String missingValue;
     private HashMap<SfinaParameter,Object> sfinaParameters;
     private HashMap<Enum,Object> backendParameters;
@@ -100,42 +105,17 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private ArrayList<Event> events;
     
     public SFINAAgent(
-            String experimentID, 
-            String peersLogDirectory, 
+            String experimentID,
             Time bootstrapTime, 
-            Time runTime, 
-            String timeTokenName, 
-            String experimentConfigurationFilesLocation, 
-            String experimentOutputFilesLocation,
-            String nodesLocation, 
-            String linksLocation, 
-            String nodesFlowLocation, 
-            String linksFlowLocation, 
-            String eventsLocation,
-            String sfinaParamLocation,
-            String backendParamLocation,
-            String columnSeparator, 
-            String missingValue){
+            Time runTime){
         this.experimentID=experimentID;
-        this.peersLogDirectory=peersLogDirectory;
         this.bootstrapTime=bootstrapTime;
         this.runTime=runTime;
-        this.timeTokenName=timeTokenName;
-        this.experimentConfigurationFilesLocation=experimentConfigurationFilesLocation;
-        this.experimentOutputFilesLocation=experimentOutputFilesLocation;
-        this.iteration=1;
-        this.nodesLocation=nodesLocation;
-        this.linksLocation=linksLocation;
-        this.nodesFlowLocation=nodesFlowLocation;
-        this.linksFlowLocation=linksFlowLocation;
-        this.eventsLocation=eventsLocation;
-        this.sfinaParamLocation=sfinaParamLocation;
-        this.backendParamLocation=backendParamLocation;
-        this.columnSeparator=columnSeparator;
-        this.missingValue=missingValue;
+        this.parameterColumnSeparator="=";
+        this.fileSystemParameterLocation="conf/fileSystem.conf";
+        this.loadFileSystemParameters();
         this.flowNetwork=new FlowNetwork();
         this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
-        this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
     }
     
     /**
@@ -176,8 +156,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                timeToken=timeTokenName+(getSimulationTime());
-                loadParametersFromFiles();                
+                logger.info("### "+experimentID+" ###");
+                loadExperimentParametersFromFiles();                
                 eventLoader=new EventLoader(domain,columnSeparator,missingValue);
                 events=eventLoader.loadEvents(eventsLocation);
                 clearOutputFiles(new File(experimentOutputFilesLocation));
@@ -187,10 +167,96 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.schedule(this.bootstrapTime);
     }
     
-    private void loadParametersFromFiles(){
+    /**
+     * Load parameters determining file system structure from conf/fileSystem.conf
+     */
+    private void loadFileSystemParameters(){
+        String inputDirectoryName=null;
+        String outputDirectoryName=null;
+        String topologyDirectoryName=null;
+        String flowDirectoryName=null;
+        String configurationFilesLocation=null;
+        String eventsFileName=null;
+        String sfinaParamFileName=null;
+        String backendParamFileName=null;
+        String nodesFileName=null;
+        String linksFileName=null;
+        File file = new File(fileSystemParameterLocation);
+        Scanner scr = null;
+        try {
+            scr = new Scanner(file);
+            while(scr.hasNext()){
+                StringTokenizer st = new StringTokenizer(scr.next(), parameterColumnSeparator);
+                switch(st.nextToken()){
+                    case "columnSeparator":
+                        this.columnSeparator=st.nextToken();
+                        break;
+                    case "missingValue":
+                        this.missingValue=st.nextToken();
+                        break;
+                    case "peersLogDirectory":
+                        this.peersLogDirectory=st.nextToken();
+                        break;
+                    case "timeTokenName":
+                        this.timeTokenName=st.nextToken();
+                        break;
+                    case "inputDirectoryName":
+                        inputDirectoryName=st.nextToken();
+                        break;
+                    case "outputDirectoryName":
+                        outputDirectoryName=st.nextToken();
+                        break;
+                    case "topologyDirectoryName":
+                        topologyDirectoryName=st.nextToken();
+                        break;
+                    case "flowDirectoryName":
+                        flowDirectoryName=st.nextToken();
+                        break;
+                    case "configurationFilesLocation":
+                        configurationFilesLocation=st.nextToken();
+                        break;
+                    case "eventsFileName":
+                        eventsFileName=st.nextToken();
+                        break;
+                    case "sfinaParamFileName":
+                        sfinaParamFileName=st.nextToken();
+                        break;
+                    case "backendParamFileName":
+                        backendParamFileName=st.nextToken();
+                        break;
+                    case "nodesFileName":
+                        nodesFileName=st.nextToken();
+                        break;
+                    case "linksFileName":
+                        linksFileName=st.nextToken();
+                        break;
+                    default:
+                        logger.debug("File system parameter couldn't be recognized.");
+                }
+            }
+        }
+        catch (FileNotFoundException ex){
+            ex.printStackTrace();
+        }
+        this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
+        this.experimentInputFilesLocation=configurationFilesLocation+experimentID+"/"+inputDirectoryName;
+        this.experimentOutputFilesLocation=configurationFilesLocation+experimentID+"/"+outputDirectoryName;
+        this.eventsLocation=experimentInputFilesLocation+eventsFileName;
+        this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
+        this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
+        this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
+        this.linksLocation="/"+topologyDirectoryName+linksFileName;
+        this.nodesFlowLocation="/"+flowDirectoryName+nodesFileName;
+        this.linksFlowLocation="/"+flowDirectoryName+linksFileName;
+    }
+    
+    /**
+     * Loads general SFINA parameters from file.
+     */
+    private void loadExperimentParametersFromFiles(){
         File file = new File(sfinaParamLocation);
         if (file.exists()) {
-            sfinaParameterLoader = new SfinaParameterLoader(columnSeparator);
+            sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
             sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
             logger.debug("Loaded sfinaParameters: " + sfinaParameters);
         }
@@ -207,7 +273,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         
         file = new File(backendParamLocation);
         if (file.exists()) {
-            backendParameterLoader = new BackendParameterLoader(getDomain(),columnSeparator);
+            backendParameterLoader = new BackendParameterLoader(getDomain(),parameterColumnSeparator);
             backendParameters = backendParameterLoader.loadBackendParameters(backendParamLocation);
             logger.debug("Loaded backendParameters: " + backendParameters);
         }
@@ -274,17 +340,20 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
     
+    /**
+     * Loads network data from input files at current time if folder is provided.
+     */
     private void loadData(){
-        File file = new File(experimentConfigurationFilesLocation+timeToken);
+        File file = new File(experimentInputFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
             logger.info("loading data at time " + timeToken);
-            topologyLoader.loadNodes(experimentConfigurationFilesLocation+timeToken+nodesLocation);
-            topologyLoader.loadLinks(experimentConfigurationFilesLocation+timeToken+linksLocation);
+            topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
+            topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
             switch(domain){
                 case POWER:
                     PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
-                    flowLoader.loadNodeFlowData(experimentConfigurationFilesLocation+timeToken+nodesFlowLocation);
-                    flowLoader.loadLinkFlowData(experimentConfigurationFilesLocation+timeToken+linksFlowLocation);
+                    flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
+                    flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");

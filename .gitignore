@@ -10,4 +10,4 @@ java/InterMaJa/nbproject/private/
 java/InterMaJa/build/
 java/SFINA/dist/lib/*.jar
 java/SFINA/nbproject/private/private.xml
-java/SFINA/configuration_files/**/output/
+java/SFINA/experiments/**/output/

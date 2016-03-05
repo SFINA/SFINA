@@ -39,37 +39,11 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
     private long simulationStartTime;
     
     public BenchmarkSFINAAgent(String experimentID, 
-            String peersLogDirectory, 
             Time bootstrapTime, 
-            Time runTime, 
-            String timeTokenName, 
-            String experimentConfigurationFilesLocation, 
-            String experimentOutputFilesLocation,
-            String nodesLocation, 
-            String linksLocation, 
-            String nodesFlowLocation, 
-            String linksFlowLocation, 
-            String eventsLocation, 
-            String sfinaParamLocation,
-            String backendParamLocation,
-            String columnSeparator, 
-            String missingValue){
+            Time runTime){
         super(experimentID,
-                peersLogDirectory,
                 bootstrapTime,
-                runTime,
-                timeTokenName,
-                experimentConfigurationFilesLocation,
-                experimentOutputFilesLocation,
-                nodesLocation,
-                linksLocation,
-                nodesFlowLocation,
-                linksFlowLocation,
-                eventsLocation,
-                sfinaParamLocation,
-                backendParamLocation,
-                columnSeparator,
-                missingValue);
+                runTime);
         this.temporalLinkMetrics=new HashMap();
         this.temporalNodeMetrics=new HashMap();
         this.temporalSystemMetrics=new HashMap();
@@ -185,7 +159,7 @@ public class BenchmarkSFINAAgent extends SFINAAgent{
      */
     @Override
     public void scheduleMeasurements(){
-        setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
+        setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"/peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
                 int simulationTime=getSimulationTime();

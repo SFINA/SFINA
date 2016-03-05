@@ -40,37 +40,11 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
     
     public CascadeAgent(String experimentID, 
-            String peersLogDirectory, 
             Time bootstrapTime, 
-            Time runTime, 
-            String timeTokenName, 
-            String experimentConfigurationFilesLocation, 
-            String experimentOutputFilesLocation,
-            String nodesLocation, 
-            String linksLocation, 
-            String nodesFlowLocation, 
-            String linksFlowLocation, 
-            String eventsLocation,
-            String sfinaParamLocation,
-            String backendParamLocation,
-            String columnSeparator, 
-            String missingValue){
-        super(experimentID,
-                peersLogDirectory,
+            Time runTime){
+            super(experimentID,
                 bootstrapTime,
-                runTime,
-                timeTokenName,
-                experimentConfigurationFilesLocation,
-                experimentOutputFilesLocation,
-                nodesLocation,
-                linksLocation,
-                nodesFlowLocation,
-                linksFlowLocation,
-                eventsLocation,
-                sfinaParamLocation,
-                backendParamLocation,
-                columnSeparator,
-                missingValue);
+                runTime);
     }
     
     /**

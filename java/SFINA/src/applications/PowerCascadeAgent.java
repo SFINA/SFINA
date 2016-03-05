@@ -45,39 +45,12 @@ public class PowerCascadeAgent extends CascadeAgent{
     private Double relRateChangePerEpoch;
     
     public PowerCascadeAgent(String experimentID, 
-            String peersLogDirectory, 
             Time bootstrapTime, 
-            Time runTime, 
-            String timeTokenName, 
-            String experimentConfigurationFilesLocation, 
-            String experimentOutputFilesLocation,
-            String nodesLocation, 
-            String linksLocation, 
-            String nodesFlowLocation, 
-            String linksFlowLocation, 
-            String eventsLocation, 
-            String sfinaParamLocation,
-            String backendParamLocation,
-            String columnSeparator, 
-            String missingValue,
+            Time runTime,
             Double relRateChangePerEpoch){
-        super(experimentID,
-                peersLogDirectory,
+            super(experimentID,
                 bootstrapTime,
-                runTime,
-                timeTokenName,
-                experimentConfigurationFilesLocation,
-                experimentOutputFilesLocation,
-                nodesLocation,
-                linksLocation,
-                nodesFlowLocation,
-                linksFlowLocation,
-                eventsLocation,
-                sfinaParamLocation,
-                backendParamLocation,
-                columnSeparator,
-                missingValue);
-        
+                runTime);
         this.relRateChangePerEpoch = relRateChangePerEpoch;
     }
     
