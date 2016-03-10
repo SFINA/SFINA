@@ -77,7 +77,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private int iteration;
     private final static String parameterColumnSeparator="=";
     private final static String fileSystemSchema="conf/fileSystem.conf";
-    private String peersLogDirectory;
+    private final static String peersLogDirectory="peerlets-log/";
     private String timeToken;
     private String timeTokenName;
     private String experimentInputFilesLocation;
@@ -131,9 +131,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     */
     @Override
     public void start(){
-        loadFileSystem(fileSystemSchema);
-        this.runBootstraping();
         scheduleMeasurements();
+        this.runBootstraping();
     }
 
     /**
@@ -162,8 +161,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 logger.info("### "+experimentID+" ###");
+                loadFileSystem(fileSystemSchema);
                 topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
-                loadExperimentParameters(sfinaParamLocation);                
+                loadExperimentParameters(sfinaParamLocation);
                 eventLoader=new EventLoader(domain,columnSeparator,missingValue);
                 events=eventLoader.loadEvents(eventsLocation);
                 clearOutputFiles(new File(experimentOutputFilesLocation));
@@ -200,9 +200,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         break;
                     case "missingValue":
                         this.missingValue=st.nextToken();
-                        break;
-                    case "peersLogDirectory":
-                        this.peersLogDirectory=st.nextToken();
                         break;
                     case "timeTokenName":
                         this.timeTokenName=st.nextToken();
