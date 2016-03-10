@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import network.Link;
 import network.Node;
+import org.apache.log4j.Logger;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
@@ -32,6 +33,8 @@ import protopeer.util.quantities.Time;
  * @author evangelospournaras
  */
 public class BenchmarkSFINAAgent extends SFINAAgent{
+    
+    private static final Logger logger = Logger.getLogger(BenchmarkSFINAAgent.class);
     
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;

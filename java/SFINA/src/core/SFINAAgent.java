@@ -131,8 +131,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     */
     @Override
     public void start(){
-        scheduleMeasurements();
+        loadFileSystem(fileSystemSchema);
         this.runBootstraping();
+        scheduleMeasurements();
     }
 
     /**
@@ -161,7 +162,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 logger.info("### "+experimentID+" ###");
-                loadFileSystem(fileSystemSchema);
                 topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
                 loadExperimentParameters(sfinaParamLocation);                
                 eventLoader=new EventLoader(domain,columnSeparator,missingValue);
