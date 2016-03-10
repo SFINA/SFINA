@@ -12,6 +12,5 @@ package input;
 public enum SfinaParameter {
     DOMAIN,
     BACKEND,
-//    CAPACITY_CHANGE_LINK,
-//    CAPACITY_CHANGE_NODE
+    RELOAD
 }

@@ -454,10 +454,8 @@ public class EventLoader {
                 return SfinaParameter.DOMAIN;
             case "backend":
                 return SfinaParameter.BACKEND;
-//            case "capacity_change_link":
-//                return SfinaParameter.CAPACITY_CHANGE_LINK;
-//            case "capacity_change_node":
-//                return SfinaParameter.CAPACITY_CHANGE_NODE;
+            case "reload":
+                return SfinaParameter.RELOAD;
             default:
                 logger.debug(("System parameter state is not recognized."));
                 return null;
@@ -693,10 +691,8 @@ public class EventLoader {
                     default:
                         logger.debug("Backend not regognized.");
                 }
-//            case CAPACITY_CHANGE_LINK:
-//                return Double.parseDouble(rawValue);
-//            case CAPACITY_CHANGE_NODE:
-//                return Double.parseDouble(rawValue);
+            case RELOAD:
+                return rawValue;
             default:
                 logger.debug("Parameter value is not recognized.");
                 return null;

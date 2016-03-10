@@ -377,6 +377,18 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             }
             setFlowParameters();
         }
+        else
+            logger.debug("No input data provided at " + timeToken + ". Continue to use data from before.");
+    }
+    
+    /**
+     * Loads network data from input files at given time.
+     * @param time defines the input folder from where data is loaded. Given x it loads from time_x.
+     */
+    public void loadData(String time){
+        timeToken = timeTokenName + time;
+        loadData();
+        timeToken = timeTokenName + getSimulationTime();
     }
     
     @Override
@@ -459,7 +471,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     @Override
     public void executeEvent(FlowNetwork flowNetwork, Event event){
-            switch(event.getEventType()){
+        if(event.getTime() != getSimulationTime())
+            logger.debug("Event executed at different time than it was initialized for.");
+        switch(event.getEventType()){
             case TOPOLOGY:
                 switch(event.getNetworkComponent()){
                     case NODE:
@@ -520,7 +534,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 }
                 break;
             case SYSTEM:
-                logger.info("..changing/setting system param: " + (SfinaParameter)event.getParameter());
+                logger.info("..executing system parameter event: " + (SfinaParameter)event.getParameter());
                 switch((SfinaParameter)event.getParameter()){
                     case DOMAIN:
                         getSfinaParameters().put(SfinaParameter.DOMAIN, (Domain)event.getValue());
@@ -529,6 +543,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                     case BACKEND:
                         getSfinaParameters().put(SfinaParameter.BACKEND, (Backend)event.getValue());
                         setBackend((Backend)event.getValue());
+                        break;
+                    case RELOAD:
+                        this.loadData((String)event.getValue());
                         break;
                     default:
                         logger.debug("System parameter cannot be recognized.");
@@ -692,7 +709,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      */
     @Override
     public void scheduleMeasurements(){
-        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
+        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"/peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
                 

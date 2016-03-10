@@ -21,7 +21,6 @@ import applications.BenchmarkLogReplayer;
 import applications.PowerCascadeAgent;
 import java.io.File;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -47,11 +46,6 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
     private final static int N=1;
     
     public static void main(String args[]){
-        run();
-        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
-    }
-    
-    private static void run() {
         double totCapacityChange = 0.5;
         double steps = runDuration-bootstrapTime/runTime;
         double relCapacityChangePerStep = Math.pow(totCapacityChange, 1/steps);
@@ -81,6 +75,9 @@ public class LinkCapacityReductionExperiment extends SimulatedExperiment{
         test.startPeers(0,N);
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
+        
+        // Get and display results
+        BenchmarkLogReplayer replayer=new BenchmarkLogReplayer(expSeqNum, 0, 1000);
     }
 
     public final static void clearExperimentFile(File experiment){

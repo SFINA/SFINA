@@ -104,7 +104,7 @@ public class PowerCascadeAgent extends CascadeAgent{
      * Change capacity of links. Relative to former capacity. 1.0 = no change.
      */
     private void performRelativeCapacityChange(){
-        logger.info("reducing link capacities by " + relRateChangePerEpoch);
+        logger.info("changing link capacities by " + relRateChangePerEpoch);
         for(Link link : getFlowNetwork().getLinks()){
             link.setCapacity(link.getCapacity()*relRateChangePerEpoch);
         }
@@ -303,7 +303,7 @@ public class PowerCascadeAgent extends CascadeAgent{
      */
     @Override
     public void scheduleMeasurements(){
-        setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"peer-"+getPeer().getIndexNumber()));
+        setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"/peer-"+getPeer().getIndexNumber()));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
                 int simulationTime=getSimulationTime();
