@@ -36,6 +36,8 @@ public class TestSFINAAgent extends SimulatedExperiment{
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
+    private final static String fileSystemSchema="conf/fileSystem.conf";
+    
     private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters

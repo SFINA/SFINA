@@ -36,4 +36,9 @@ public interface SimulationAgentInterface {
 
     public void scheduleMeasurements();
     
+    public void loadFileSystem(String schema);
+    
+    public void loadExperimentParameters(String location);                
+
+    
 }

@@ -75,7 +75,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private Time bootstrapTime;
     private Time runTime;
     private int iteration;
-    private String fileSystemParameterLocation;
+    private final static String parameterColumnSeparator="=";
+    private final static String fileSystemSchema="conf/fileSystem.conf";
     private String peersLogDirectory;
     private String timeToken;
     private String timeTokenName;
@@ -89,7 +90,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private String sfinaParamLocation;
     private String backendParamLocation;
     private String columnSeparator;
-    private String parameterColumnSeparator;
     private String missingValue;
     private HashMap<SfinaParameter,Object> sfinaParameters;
     private HashMap<Enum,Object> backendParameters;
@@ -111,11 +111,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         this.experimentID=experimentID;
         this.bootstrapTime=bootstrapTime;
         this.runTime=runTime;
-        this.parameterColumnSeparator="=";
-        this.fileSystemParameterLocation="conf/fileSystem.conf";
-        this.loadFileSystemParameters();
         this.flowNetwork=new FlowNetwork();
-        this.topologyLoader=new TopologyLoader(flowNetwork, this.columnSeparator);
     }
     
     /**
@@ -150,6 +146,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     /**
      * The scheduling of system bootstrapping. It loads system parameters, 
      * network and event data. At the end, it triggers the active state. 
+     * 
+     * Simulation is initialized as follows:
+     * 
+     * 1. Loading the file system
+     * 2. Creating a topology loader
+     * 3. Creating an event loader
+     * 4. Loading static events
+     * 5. Clearing up the output files 
      */
     @Override
     public void runBootstraping(){
@@ -157,7 +161,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 logger.info("### "+experimentID+" ###");
-                loadExperimentParametersFromFiles();                
+                loadFileSystem(fileSystemSchema);
+                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
+                loadExperimentParameters(sfinaParamLocation);                
                 eventLoader=new EventLoader(domain,columnSeparator,missingValue);
                 events=eventLoader.loadEvents(eventsLocation);
                 clearOutputFiles(new File(experimentOutputFilesLocation));
@@ -170,7 +176,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     /**
      * Load parameters determining file system structure from conf/fileSystem.conf
      */
-    private void loadFileSystemParameters(){
+    @Override
+    public void loadFileSystem(String schema){
         String inputDirectoryName=null;
         String outputDirectoryName=null;
         String topologyDirectoryName=null;
@@ -181,7 +188,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         String backendParamFileName=null;
         String nodesFileName=null;
         String linksFileName=null;
-        File file = new File(fileSystemParameterLocation);
+        File file = new File(schema);
         Scanner scr = null;
         try {
             scr = new Scanner(file);
@@ -253,7 +260,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     /**
      * Loads general SFINA parameters from file.
      */
-    private void loadExperimentParametersFromFiles(){
+    @Override
+    public void loadExperimentParameters(String sfinaParamLocation){
         File file = new File(sfinaParamLocation);
         if (file.exists()) {
             sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);

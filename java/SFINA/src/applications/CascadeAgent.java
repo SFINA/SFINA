@@ -39,7 +39,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     private static final Logger logger = Logger.getLogger(CascadeAgent.class);
     private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
     
-    public CascadeAgent(String experimentID, 
+    public CascadeAgent(String experimentID,
             Time bootstrapTime, 
             Time runTime){
             super(experimentID,
