@@ -17,7 +17,7 @@ if results_casc.gen(slack_index,PG) > results_casc.gen(slack_index,PMAX)
     mpc_casc.gen(slack_index,PG) = mpc_casc.gen(slack_index,PMAX);
     mpc_casc.gen(slack_index,QG) = mpc_casc.gen(slack_index,QMAX);
     visited_gen(slack_index)=1;
-    if ~all(visited_gen)
+    if ~all(visited_gen) && ~isempty(max(mpc_casc.gen((mpc_casc.gen(:,PMAX).*~visited_gen'>0),PMAX)))
         
         new_slack=find(mpc_casc.gen(:,PMAX).*~visited_gen'== max(mpc_casc.gen((mpc_casc.gen(:,PMAX).*~visited_gen'>0),PMAX)));
         if ~isempty(new_slack)
@@ -25,10 +25,10 @@ if results_casc.gen(slack_index,PG) > results_casc.gen(slack_index,PMAX)
             mpc_casc.bus(ismember(mpc_casc.bus_name, sprintf('bus %d', mpc_casc.gen(new_slack(1),BUS_I))),BUS_TYPE)=3;
         else
             mpc_casc.bus(:,PD)=mpc_casc.bus(:,PD)*0.95;
-            visited_gen(:)=0;
+            visited_gen(:)=1;
         end
     else
-        visited_gen(:)=0;
+        visited_gen(:)=1;
         mpc_casc.bus(:,PD)=mpc_casc.bus(:,PD)*0.95;
     end
 
@@ -36,11 +36,17 @@ elseif results_casc.gen(slack_index,PG) < results_casc.gen(slack_index,PMIN)
     mpc_casc.gen(slack_index,PG) = mpc_casc.gen(slack_index,PMIN);
     mpc_casc.gen(slack_index,QG) = mpc_casc.gen(slack_index,QMIN);
     visited_gen(slack_index)=1;
-    new_slack=find(-mpc_casc.gen(:,PMAX).*~visited_gen'== max(-mpc_casc.gen((mpc_casc.gen(:,PMAX).*~visited_gen'>0),PMAX)));
-    if ~isempty(new_slack)
-        mpc_casc.bus(slack_bus,BUS_TYPE)=2;
-        mpc_casc.bus(ismember(mpc_casc.bus_name, sprintf('bus %d', mpc_casc.gen(new_slack(1),BUS_I))),BUS_TYPE)=3;
+    if ~all(visited_gen) && ~isempty(max(-mpc_casc.gen((mpc_casc.gen(:,PMAX).*~visited_gen'>0),PMAX)))
+        new_slack=find(-mpc_casc.gen(:,PMAX).*~visited_gen'== max(-mpc_casc.gen((mpc_casc.gen(:,PMAX).*~visited_gen'>0),PMAX)));
+        if ~isempty(new_slack)
+            mpc_casc.bus(slack_bus,BUS_TYPE)=2;
+            mpc_casc.bus(ismember(mpc_casc.bus_name, sprintf('bus %d', mpc_casc.gen(new_slack(1),BUS_I))),BUS_TYPE)=3;
+        else
+            mpc_casc.bus(:,PD)=mpc_casc.bus(:,PD)*0.95;
+            visited_gen(:)=1;
+        end
     else
+        visited_gen(:)=1;
         mpc_casc.bus(:,PD)=mpc_casc.bus(:,PD)*0.95;
     end
 end
