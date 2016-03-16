@@ -159,9 +159,9 @@ while (1)
             % Model 1 correspond to AC Power Flow with generation,
             % voltage limits and shedding algorithm
             
-            if model == 1
+            if model == 1 || model == 1.5
                 
-                while (1)
+                while (all(voltage_limit))
                     % Start Cascade algorith in each island
                     
                     [results_casc,success]=runpf(mpc_casc{i},opt);
@@ -178,8 +178,11 @@ while (1)
                         [mpc,mpc_casc{i},visited_gen] = check_limits(mpc,mpc_casc{i},results_casc,visited_gen);
                         % All genertions are in the limits
                         if old_visited==visited_gen
-                            % check for voltage limits and save flag
-                            [mpc,mpc_casc{i},voltage_limit(i)] =  check_voltage(mpc,mpc_casc{i},results_casc);
+                            % check for voltage limits and save flag for
+                            % model 1
+                            if model == 1
+                                [mpc,mpc_casc{i},voltage_limit(i)] =  check_voltage(mpc,mpc_casc{i},results_casc);
+                            end
                             break                                
                             
                         end
@@ -230,7 +233,7 @@ while (1)
                         end
                     end
                 end
-            % Model 4 correspond to load shedding according to PD=PG
+            % Model 4 correspond to AC with load shedding according to PD=PG
             elseif model == 4
                 
                 [mpc,mpc_casc{i},shedding] = load_shedding(mpc,mpc_casc{i});
