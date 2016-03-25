@@ -162,10 +162,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             public void timerExpired(Timer timer){
                 logger.info("### "+experimentID+" ###");
                 loadFileSystem(fileSystemSchema);
+                loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsLocation);
                 topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
-                loadExperimentParameters(sfinaParamLocation);
-                eventLoader=new EventLoader(domain,columnSeparator,missingValue);
-                events=eventLoader.loadEvents(eventsLocation);
                 clearOutputFiles(new File(experimentOutputFilesLocation));
                 runActiveState();
             }
@@ -255,18 +253,20 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     /**
-     * Loads general SFINA parameters from file.
+     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise. Backend parameters and events are optional.
+     * @param sfinaParamLocation path to sfinaParameters.txt
+     * @param backendParamLocation path to backendParameters.txt
+     * @param eventsLocation path to events.txt
      */
     @Override
-    public void loadExperimentParameters(String sfinaParamLocation){
+    public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation){
+        // Sfina Parameters
         File file = new File(sfinaParamLocation);
-        if (file.exists()) {
-            sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
-            sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
-            logger.debug("Loaded sfinaParameters: " + sfinaParameters);
-        }
-        else
-            logger.debug("SfinaParameter file not found. This will give problems. Path to file " + sfinaParamLocation);
+        if (!file.exists())
+            logger.debug("sfinaParameters.txt file not found. This will give problems. Should be here: " + sfinaParamLocation);
+        sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
+        sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
+        logger.debug("Loaded sfinaParameters: " + sfinaParameters);
         if (getSfinaParameters().containsKey(SfinaParameter.DOMAIN))
             setDomain((Domain)getSfinaParameters().get(SfinaParameter.DOMAIN));
         else 
@@ -276,6 +276,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         else
             logger.debug("Backend not specified.");
         
+        // Backend Parameters
         file = new File(backendParamLocation);
         if (file.exists()) {
             backendParameterLoader = new BackendParameterLoader(getDomain(),parameterColumnSeparator);
@@ -283,7 +284,16 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             logger.debug("Loaded backendParameters: " + backendParameters);
         }
         else
-            logger.debug("No BackendParameter file provided");
+            logger.debug("No backendParameters.txt file provided.");
+        
+        // Events
+        file = new File(eventsLocation);
+        if (file.exists()) {
+            eventLoader=new EventLoader(domain,columnSeparator,missingValue);
+            events=eventLoader.loadEvents(eventsLocation);
+        }
+        else
+            logger.debug("No events.txt file provided.");
     }
     
     /**
@@ -357,8 +367,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             switch(domain){
                 case POWER:
                     PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
-                    flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
-                    flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+                    if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
+                        flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
+                    else
+                        logger.debug("No flow data provided for nodes at " + timeToken + ".");
+                    if (new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
+                        flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+                    else
+                        logger.debug("No flow data provided for links at " + timeToken + ".");
                     break;
                 case GAS:
                     logger.debug("This domain is not supported at this moment");

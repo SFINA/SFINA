@@ -38,7 +38,7 @@ public interface SimulationAgentInterface {
     
     public void loadFileSystem(String schema);
     
-    public void loadExperimentParameters(String location);                
+    public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation);                
 
     
 }
