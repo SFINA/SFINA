@@ -171,6 +171,51 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         loadAgentTimer.schedule(this.bootstrapTime);
     }
     
+    
+    /**
+     * The scheduling of the active state.  It is executed periodically. 
+     * 
+     * This is the fundamental prototype of the simulation runtime. It should
+     * stay generic. At this moment, the runtime concerns the following:
+     * 
+     * 1. Counting simulation time.
+     * 2. Checking and loading new data from files.
+     * 3. Triggering event execution at the current time step
+     * 4. Calling three methods, which can be used to implement the actual simulation:
+     *    - performInitialStateOperations()
+     *    - runFlowAnalysis()
+     *    - performFinalStateOperations()
+     */
+    @Override
+    public void runActiveState(){
+        Timer loadAgentTimer=getPeer().getClock().createNewTimer();
+        loadAgentTimer.addTimerListener(new TimerListener(){
+            public void timerExpired(Timer timer){
+                timeToken = timeTokenName + getSimulationTime();
+                logger.info("--------------> " + timeToken + " <--------------");
+                
+                resetIteration();
+                
+                loadData();
+                
+                performInitialStateOperations();
+                
+                executeAllEvents(getSimulationTime());
+                
+                runFlowAnalysis();
+                
+                performFinalStateOperations();
+                
+                runActiveState(); 
+            }
+        });
+        loadAgentTimer.schedule(this.runTime);
+    }
+    
+    public int getSimulationTime(){
+        return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
+    }
+    
     /**
      * Load parameters determining file system structure from conf/fileSystem.conf
      */
@@ -313,46 +358,6 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
             }
         }
         experiment.delete();
-    }
-    
-    /**
-     * The scheduling of the active state.  It is executed periodically. 
-     * 
-     * This is the fundamental prototype of the simulation runtime. It should
-     * stay generic. At this moment, the runtime concerns the following:
-     * 
-     * 1. Counting simulation time.
-     * 2. Checking and loading new data from files.
-     * 
-     */
-    @Override
-    public void runActiveState(){
-        Timer loadAgentTimer=getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
-                timeToken = timeTokenName + getSimulationTime();
-                logger.info("--------------> " + timeToken + " <--------------");
-                
-                resetIteration();
-                
-                loadData();
-                
-                performInitialStateOperations();
-                
-                executeAllEvents(getSimulationTime());
-                
-                runFlowAnalysis();
-                
-                performFinalStateOperations();
-                
-                runActiveState(); 
-            }
-        });
-        loadAgentTimer.schedule(this.runTime);
-    }
-    
-    public int getSimulationTime(){
-        return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
     
     /**
