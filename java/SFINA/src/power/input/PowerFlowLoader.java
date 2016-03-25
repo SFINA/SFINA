@@ -116,7 +116,7 @@ public class PowerFlowLoader {
             for(int i=0;i<rawValues.size();i++){
                 PowerLinkState state = powerLinkStates.get(i);
                 String rawValue = rawValues.get(i);
-                if(!state.equals(PowerLinkState.ID))
+                if(!rawValue.equals(this.missingValue) && !state.equals(PowerLinkState.ID))
                     link.addProperty(state, this.getActualLinkValue(state, rawValue));
             }
         }
