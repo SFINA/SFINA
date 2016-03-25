@@ -103,21 +103,6 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
      * @return true if flow analysis finally converged, else false
      */ 
     public boolean flowConvergenceStrategy(FlowNetwork flowNetwork){
-        switch(this.getDomain()){
-            case POWER:
-                break;
-            case GAS:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case WATER:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case TRANSPORTATION:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            default:
-                logger.debug("This domain is not supported at this moment");
-        }
         return callBackend(flowNetwork);
     }
     
@@ -145,7 +130,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
             }
         }
         if (overloaded)
-            this.executeAllEvents(getSimulationTime());
+            this.executeAllEvents();
         return overloaded;
     }
     

@@ -199,7 +199,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 
                 performInitialStateOperations();
                 
-                executeAllEvents(getSimulationTime());
+                executeAllEvents();
                 
                 runFlowAnalysis();
                 
@@ -474,7 +474,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         
     }
     
-    public void executeAllEvents(int time){
+    public void executeAllEvents(){
+        int time = getSimulationTime();
         logger.info("executing all events at time_" + time);
         Iterator<Event> i = getEvents().iterator();
         while (i.hasNext()){
