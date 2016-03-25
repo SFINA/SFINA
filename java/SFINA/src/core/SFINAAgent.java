@@ -149,10 +149,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * 
      * Simulation is initialized as follows:
      * 
-     * 1. Loading the file system
-     * 2. Creating a topology loader
-     * 3. Creating an event loader
-     * 4. Loading static events
+     * 1. Loading the file system parameters
+     * 2. Loading SFINA and backend configuration files and static event files
+     * 3. Creating a topology loader
      * 5. Clearing up the output files 
      */
     @Override
