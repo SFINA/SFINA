@@ -33,8 +33,7 @@ import org.interpss.display.impl.AclfOut_BusStyle;
 import org.interpss.fadapter.IpssFileAdapter;
 import org.interpss.numeric.datatype.Unit.UnitType;
 import org.interpss.numeric.exp.IpssNumericException;
-import power.PowerFlowType;
-import power.PowerNodeType;
+import power.input.PowerNodeType;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 

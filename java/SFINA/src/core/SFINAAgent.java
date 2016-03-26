@@ -19,9 +19,9 @@ package core;
 
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import power.input.PowerBackend;
-import static power.input.PowerBackend.INTERPSS;
-import static power.input.PowerBackend.MATPOWER;
+import power.backend.PowerBackend;
+import static power.backend.PowerBackend.INTERPSS;
+import static power.backend.PowerBackend.MATPOWER;
 import backend.FlowBackendInterface;
 import power.input.PowerBackendParameterLoader;
 import input.Domain;

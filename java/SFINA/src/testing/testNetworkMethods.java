@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
-import power.PowerNodeType;
+import power.input.PowerNodeType;
 import power.backend.InterpssFlowBackend;
 import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;

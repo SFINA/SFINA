@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
-import power.input.PowerBackend;
+import power.backend.PowerBackend;
 
 /**
  *

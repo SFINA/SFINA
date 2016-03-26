@@ -28,7 +28,7 @@ import network.FlowNetwork;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
-import power.PowerNodeType;
+import power.input.PowerNodeType;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 

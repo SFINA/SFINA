@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
-import power.PowerFlowType;
-import power.input.PowerBackendParameter;
+import power.backend.PowerFlowType;
+import power.backend.PowerBackendParameter;
 
 /**
  *

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
-import power.PowerNodeType;
+import power.input.PowerNodeType;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 import static protopeer.time.EventScheduler.logger;
