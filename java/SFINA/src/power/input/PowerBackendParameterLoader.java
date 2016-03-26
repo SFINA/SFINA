@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package input;
+package power.input;
 
+import input.Domain;
+import input.SfinaParameterLoader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -24,19 +26,19 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
-import power.backend.PowerBackendParameter;
+import power.input.PowerBackendParameter;
 
 /**
  *
  * @author Ben
  */
-public class BackendParameterLoader {
+public class PowerBackendParameterLoader {
     
     private Domain domain;
     private String columnSeparator;
     private static final Logger logger = Logger.getLogger(SfinaParameterLoader.class);
     
-    public BackendParameterLoader(Domain domain, String columnSeparator){
+    public PowerBackendParameterLoader(Domain domain, String columnSeparator){
         this.domain=domain;
         this.columnSeparator=columnSeparator;
     }

@@ -28,7 +28,7 @@ import network.Node;
 import org.apache.log4j.Logger;
 import power.PowerFlowType;
 import power.PowerNodeType;
-import power.backend.PowerBackendParameter;
+import power.input.PowerBackendParameter;
 import power.input.PowerNodeState;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;

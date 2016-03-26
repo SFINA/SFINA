@@ -27,7 +27,7 @@ import power.PowerFlowType;
 import power.PowerNodeType;
 import power.backend.InterpssFlowBackend;
 import power.backend.MATPOWERFlowBackend;
-import power.backend.PowerBackendParameter;
+import power.input.PowerBackendParameter;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 import power.output.PowerConsoleOutput;

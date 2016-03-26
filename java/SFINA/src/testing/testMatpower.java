@@ -22,7 +22,7 @@ import network.FlowNetwork;
 import network.Link;
 import power.PowerFlowType;
 import power.backend.MATPOWERFlowBackend;
-import power.backend.PowerBackendParameter;
+import power.input.PowerBackendParameter;
 import power.input.PowerLinkState;
 import power.output.PowerConsoleOutput;
 

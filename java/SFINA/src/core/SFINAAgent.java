@@ -19,11 +19,11 @@ package core;
 
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import input.Backend;
-import static input.Backend.INTERPSS;
-import static input.Backend.MATPOWER;
+import power.input.PowerBackend;
+import static power.input.PowerBackend.INTERPSS;
+import static power.input.PowerBackend.MATPOWER;
 import backend.FlowBackendInterface;
-import input.BackendParameterLoader;
+import power.input.PowerBackendParameterLoader;
 import input.Domain;
 import static input.Domain.GAS;
 import static input.Domain.POWER;
@@ -96,12 +96,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private FlowNetwork flowNetwork;
     private TopologyLoader topologyLoader;
     private SfinaParameterLoader sfinaParameterLoader;
-    private BackendParameterLoader backendParameterLoader;
+    private PowerBackendParameterLoader backendParameterLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
     private Domain domain;
-    private Backend backend;
+    private PowerBackend backend;
     private ArrayList<Event> events;
     
     public SFINAAgent(
@@ -173,17 +173,17 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     /**
      * The scheduling of the active state.  It is executed periodically. 
-     * 
-     * This is the fundamental prototype of the simulation runtime. It should
-     * stay generic. At this moment, the runtime concerns the following:
-     * 
-     * 1. Counting simulation time.
-     * 2. Checking and loading new data from files.
-     * 3. Triggering event execution at the current time step
-     * 4. Calling three methods, which can be used to implement the actual simulation:
-     *    - performInitialStateOperations()
-     *    - runFlowAnalysis()
-     *    - performFinalStateOperations()
+ 
+    This is the fundamental prototype of the simulation runtime. It should
+    stay generic. At this moment, the runtime concerns the following:
+
+    1. Counting simulation time.
+    2. Checking and loading new data from files.
+    3. Triggering event execution at the current time step
+    4. Calling three methods, which can be used to implement the actual simulation:
+        - performInitialStateOperations()
+        - runFlowAnalysis()
+        - performFinalStateOperations()
      */
     @Override
     public void runActiveState(){
@@ -297,7 +297,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     /**
-     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise. Backend parameters and events are optional.
+     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise. PowerBackend parameters and events are optional.
      * @param sfinaParamLocation path to sfinaParameters.txt
      * @param backendParamLocation path to backendParameters.txt
      * @param eventsLocation path to events.txt
@@ -316,14 +316,14 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
         else 
             logger.debug("Domain not specified.");
         if (getSfinaParameters().containsKey(SfinaParameter.BACKEND))
-            setBackend((Backend)getSfinaParameters().get(SfinaParameter.BACKEND));
+            setBackend((PowerBackend)getSfinaParameters().get(SfinaParameter.BACKEND));
         else
             logger.debug("Backend not specified.");
         
-        // Backend Parameters
+        // PowerBackend Parameters
         file = new File(backendParamLocation);
         if (file.exists()) {
-            backendParameterLoader = new BackendParameterLoader(getDomain(),parameterColumnSeparator);
+            backendParameterLoader = new PowerBackendParameterLoader(getDomain(),parameterColumnSeparator);
             backendParameters = backendParameterLoader.loadBackendParameters(backendParamLocation);
             logger.debug("Loaded backendParameters: " + backendParameters);
         }
@@ -559,8 +559,8 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                         setDomain((Domain)event.getValue());
                         break;
                     case BACKEND:
-                        getSfinaParameters().put(SfinaParameter.BACKEND, (Backend)event.getValue());
-                        setBackend((Backend)event.getValue());
+                        getSfinaParameters().put(SfinaParameter.BACKEND, (PowerBackend)event.getValue());
+                        setBackend((PowerBackend)event.getValue());
                         break;
                     case RELOAD:
                         this.loadData((String)event.getValue());
@@ -653,11 +653,11 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
      * 
      * @return the simulation backend
      */
-    public Backend getBackend(){
+    public PowerBackend getBackend(){
         return backend;
     }
     
-    public void setBackend(Backend backend){
+    public void setBackend(PowerBackend backend){
         this.backend=backend;
     }
     

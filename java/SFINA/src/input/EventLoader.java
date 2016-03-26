@@ -30,6 +30,7 @@ import network.LinkState;
 import network.NodeState;
 import org.apache.log4j.Logger;
 import power.PowerNodeType;
+import power.input.PowerBackend;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 import static power.input.PowerNodeState.AREA;
@@ -685,9 +686,9 @@ public class EventLoader {
             case BACKEND:
                 switch(rawValue){
                     case "matpower":
-                        return Backend.MATPOWER;
+                        return PowerBackend.MATPOWER;
                     case "interpss":
-                        return Backend.INTERPSS;
+                        return PowerBackend.INTERPSS;
                     default:
                         logger.debug("Backend not regognized.");
                 }

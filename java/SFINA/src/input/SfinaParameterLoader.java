@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
+import power.input.PowerBackend;
 
 /**
  *
@@ -68,14 +69,14 @@ public class SfinaParameterLoader {
                         systemParameters.put(SfinaParameter.DOMAIN, domain);
                         break;
                     case "backend":
-                        Backend backend=null;
+                        PowerBackend backend=null;
                         String backendType=st.nextToken();
                         switch(backendType){
                             case "matpower":
-                                backend=Backend.MATPOWER;
+                                backend=PowerBackend.MATPOWER;
                                 break;
                             case "interpss":
-                                backend=Backend.INTERPSS;
+                                backend=PowerBackend.INTERPSS;
                                 break;
                             default:
                                 logger.debug("This backend is not supported or cannot be recognized");
