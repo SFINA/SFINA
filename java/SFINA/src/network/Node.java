@@ -273,6 +273,7 @@ public class Node extends State{
             }
         }
         else{
+            this.setFlow(0.0);
             for(Link link:this.getIncomingLinks()){
                 link.setActivated(false);
             }

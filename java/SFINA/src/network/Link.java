@@ -255,6 +255,7 @@ public class Link extends State{
             this.getEndNode().addLink(this);
         }
         else{
+            this.setFlow(0.0);
             this.getStartNode().removeLink(this);
             this.getEndNode().removeLink(this);
         }
