@@ -48,35 +48,41 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     }
     
     /**
-     * Implements cascade as a result of overloaded links. Continues until system stabilizes, i.e. no more link overloads occur. Calls mitigateOverload method before finally calling linkOverload method, therefore mitigation strategies can be implemented.
+     * Implements cascade as a result of overloaded links. 
+     * Continues until system stabilizes, i.e. no more link overloads occur. 
+     * Calls mitigateOverload method before finally calling linkOverload method, 
+     * therefore mitigation strategies can be implemented by overwriting the method mitigateOverload.
      * Variable int iter = getIteration()-1
      */
     @Override
     public void runFlowAnalysis(){
-        int iter = 0;
         temporalIslandStatus.put(getSimulationTime(), new LinkedHashMap());
         
-        ArrayList<ArrayList<FlowNetwork>> islandBuffer = new ArrayList<>(); // row index is iteration, each entry is island to be treated at this iteration
-        islandBuffer.add(getFlowNetwork().computeIslands());
-        while(!islandBuffer.get(iter).isEmpty()){
-            logger.info("----> Iteration " + (iter+1) + " <----");
-            islandBuffer.add(new ArrayList<>()); // List of islands for next iteration (iter+1)
-            for(int i=0; i < islandBuffer.get(iter).size(); i++){ // go through islands at current iteration
-                FlowNetwork currentIsland = islandBuffer.get(iter).get(i);
+        // This list keeps track of islands where overloads happened
+        ArrayList<FlowNetwork> islandBuffer = new ArrayList<>();
+        islandBuffer.add(getFlowNetwork());
+        
+        while(!islandBuffer.isEmpty()){
+            logger.info("----> Iteration " + (getIteration()) + " <----");
+            
+            // Extract islands from the networks where link/node overloads happened
+            ArrayList<FlowNetwork> currentIterationIslands = new ArrayList<>();
+            for(FlowNetwork net : islandBuffer){
+                for(FlowNetwork subnet : net.computeIslands())
+                    currentIterationIslands.add(subnet);
+            }
+            islandBuffer.clear();
+            
+            // Go through all disconnected components (i.e. islands) of current iteration and perform flow analysis
+            for(FlowNetwork currentIsland : currentIterationIslands){
                 logger.info("treating island with " + currentIsland.getNodes().size() + " nodes");
-                boolean converged = flowConvergenceStrategy(currentIsland); // do flow analysis
-                
+                boolean converged = flowConvergenceStrategy(currentIsland); 
                 if(converged){
-                    
-                    // mitigation strategy if implemented
                     mitigateOverload(currentIsland);
-                    
                     boolean linkOverloaded = linkOverload(currentIsland);
                     boolean nodeOverloaded = nodeOverload(currentIsland);
                     if(linkOverloaded || nodeOverloaded){
-                        // add islands of the current island to next iteration
-                        for (FlowNetwork net : currentIsland.computeIslands())
-                            islandBuffer.get(iter+1).add(net);
+                        islandBuffer.add(currentIsland);
                     }
                     else
                         temporalIslandStatus.get(getSimulationTime()).put(currentIsland, true);
@@ -87,11 +93,10 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
             
             // Output data at current iteration and go to next one
             nextIteration();
-            
-            // Go to next iteration if there were islands added to it
-            iter++;
+   
+            // deactivate all overloaded nodes/links
+            this.executeAllEvents();
         }
-        
         logFinalIslands();
     }
     
@@ -115,7 +120,8 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
     }
     
     /**
-     * Checks link limits. If a limit is violated, an event is executed which deactivates the link.
+     * Checks link limits. If a limit is violated, an event 
+     * for deactivating the link at the current simulation time is created.
      * @param flowNetwork
      * @return if overload happened
      */
@@ -129,13 +135,12 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                 overloaded = true;
             }
         }
-        if (overloaded)
-            this.executeAllEvents();
         return overloaded;
     }
     
     /**
-     * Checks node limits. If a limit is violated, an event is executed which deactivates the node.
+     * Checks node limits. If a limit is violated, an event 
+     * for deactivating the node at the current simulation time is created.
      * @param flowNetwork
      * @return if overload happened
      */
