@@ -87,8 +87,13 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                     else
                         temporalIslandStatus.get(getSimulationTime()).put(currentIsland, true);
                 }
-                else
+                else{
                     temporalIslandStatus.get(getSimulationTime()).put(currentIsland, false);
+                    for(Link link : currentIsland.getLinks()){
+                        Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
+                        this.executeEvent(currentIsland, event);
+                    }
+                }
             }
             
             // Output data at current iteration and go to next one
