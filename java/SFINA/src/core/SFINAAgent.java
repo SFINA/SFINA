@@ -489,89 +489,91 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     
     @Override
     public void executeEvent(FlowNetwork flowNetwork, Event event){
-        if(event.getTime() != getSimulationTime())
-            logger.debug("Event executed at different time than it was initialized for.");
-        switch(event.getEventType()){
-            case TOPOLOGY:
-                switch(event.getNetworkComponent()){
-                    case NODE:
-                        Node node=flowNetwork.getNode(event.getComponentID());
-                        switch((NodeState)event.getParameter()){
-                            case ID:
-                                node.setIndex((String)event.getValue());
-                                break;
-                            case STATUS:
-                                if(node.isActivated() == (Boolean)event.getValue())
-                                    logger.debug("Node status same, not changed by event.");
-                                node.setActivated((Boolean)event.getValue()); 
-                                logger.info("..changing status of node " + node.getIndex());
-                                break;
-                            default:
-                                logger.debug("Node state cannot be recognised");
-                        }
-                        break;
-                    case LINK:
-                        Link link=flowNetwork.getLink(event.getComponentID());
-                        link.replacePropertyElement(event.getParameter(), event.getValue());
-                        switch((LinkState)event.getParameter()){
-                            case ID:
-                                link.setIndex((String)event.getValue());
-                                break;
-                            case FROM_NODE:
-                                link.setStartNode(flowNetwork.getNode((String)event.getValue()));
-                                break;
-                            case TO_NODE:
-                                link.setEndNode(flowNetwork.getNode((String)event.getValue()));
-                                break;
-                            case STATUS:
-                                if(link.isActivated() == (Boolean)event.getValue())
-                                    logger.debug("Link status same, not changed by event.");
-                                link.setActivated((Boolean)event.getValue()); 
-                                logger.info("..changing status of link " + link.getIndex());
-                                break;
-                            default:
-                                logger.debug("Link state cannot be recognised");
-                        }
-                        break;
-                    default:
-                        logger.debug("Network component cannot be recognised");
-                }
-                break;
-            case FLOW:
-                switch(event.getNetworkComponent()){
-                    case NODE:
-                        Node node=flowNetwork.getNode(event.getComponentID());
-                        node.replacePropertyElement(event.getParameter(), event.getValue());
-                        break;
-                    case LINK:
-                        Link link=flowNetwork.getLink(event.getComponentID());
-                        link.replacePropertyElement(event.getParameter(), event.getValue());
-                        break;
-                    default:
-                        logger.debug("Network component cannot be recognised");
-                }
-                break;
-            case SYSTEM:
-                logger.info("..executing system parameter event: " + (SfinaParameter)event.getParameter());
-                switch((SfinaParameter)event.getParameter()){
-                    case DOMAIN:
-                        getSfinaParameters().put(SfinaParameter.DOMAIN, (Domain)event.getValue());
-                        setDomain((Domain)event.getValue());
-                        break;
-                    case BACKEND:
-                        getSfinaParameters().put(SfinaParameter.BACKEND, (PowerBackend)event.getValue());
-                        setBackend((PowerBackend)event.getValue());
-                        break;
-                    case RELOAD:
-                        this.loadData((String)event.getValue());
-                        break;
-                    default:
-                        logger.debug("System parameter cannot be recognized.");
-                }
-                break;
-            default:
-                logger.debug("Event type cannot be recognised");
+        if(event.getTime() == getSimulationTime()){
+            switch(event.getEventType()){
+                case TOPOLOGY:
+                    switch(event.getNetworkComponent()){
+                        case NODE:
+                            Node node=flowNetwork.getNode(event.getComponentID());
+                            switch((NodeState)event.getParameter()){
+                                case ID:
+                                    node.setIndex((String)event.getValue());
+                                    break;
+                                case STATUS:
+                                    if(node.isActivated() == (Boolean)event.getValue())
+                                        logger.debug("Node status same, not changed by event.");
+                                    node.setActivated((Boolean)event.getValue()); 
+                                    logger.info("..changing status of node " + node.getIndex());
+                                    break;
+                                default:
+                                    logger.debug("Node state cannot be recognised");
+                            }
+                            break;
+                        case LINK:
+                            Link link=flowNetwork.getLink(event.getComponentID());
+                            link.replacePropertyElement(event.getParameter(), event.getValue());
+                            switch((LinkState)event.getParameter()){
+                                case ID:
+                                    link.setIndex((String)event.getValue());
+                                    break;
+                                case FROM_NODE:
+                                    link.setStartNode(flowNetwork.getNode((String)event.getValue()));
+                                    break;
+                                case TO_NODE:
+                                    link.setEndNode(flowNetwork.getNode((String)event.getValue()));
+                                    break;
+                                case STATUS:
+                                    if(link.isActivated() == (Boolean)event.getValue())
+                                        logger.debug("Link status same, not changed by event.");
+                                    link.setActivated((Boolean)event.getValue()); 
+                                    logger.info("..changing status of link " + link.getIndex());
+                                    break;
+                                default:
+                                    logger.debug("Link state cannot be recognised");
+                            }
+                            break;
+                        default:
+                            logger.debug("Network component cannot be recognised");
+                    }
+                    break;
+                case FLOW:
+                    switch(event.getNetworkComponent()){
+                        case NODE:
+                            Node node=flowNetwork.getNode(event.getComponentID());
+                            node.replacePropertyElement(event.getParameter(), event.getValue());
+                            break;
+                        case LINK:
+                            Link link=flowNetwork.getLink(event.getComponentID());
+                            link.replacePropertyElement(event.getParameter(), event.getValue());
+                            break;
+                        default:
+                            logger.debug("Network component cannot be recognised");
+                    }
+                    break;
+                case SYSTEM:
+                    logger.info("..executing system parameter event: " + (SfinaParameter)event.getParameter());
+                    switch((SfinaParameter)event.getParameter()){
+                        case DOMAIN:
+                            getSfinaParameters().put(SfinaParameter.DOMAIN, (Domain)event.getValue());
+                            setDomain((Domain)event.getValue());
+                            break;
+                        case BACKEND:
+                            getSfinaParameters().put(SfinaParameter.BACKEND, (PowerBackend)event.getValue());
+                            setBackend((PowerBackend)event.getValue());
+                            break;
+                        case RELOAD:
+                            this.loadData((String)event.getValue());
+                            break;
+                        default:
+                            logger.debug("System parameter cannot be recognized.");
+                    }
+                    break;
+                default:
+                    logger.debug("Event type cannot be recognised");
+            }
         }
+        else
+            logger.debug("Event not executed because defined for different time step.");
     }
      
     /**
