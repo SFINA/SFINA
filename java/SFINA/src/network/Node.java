@@ -243,6 +243,7 @@ public class Node extends State{
         }
         else{
             this.connected=false;
+            this.setFlow(0.0);
         }
     }
 
