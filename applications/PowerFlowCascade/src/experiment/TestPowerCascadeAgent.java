@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,10 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package experiments;
+package experiment;
 
-import applications.BenchmarkLogReplayer;
-import applications.BenchmarkSFINAAgent;
+import replayer.BenchmarkLogReplayer;
+import agent.PowerCascadeAgent;
 import java.io.File;
 import org.apache.log4j.Logger;
 import protopeer.Experiment;
@@ -29,11 +29,11 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author evangelospournaras
+ * @author Ben
  */
-public class TestBenchmarkAgent extends SimulatedExperiment{
+public class TestPowerCascadeAgent extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(TestBenchmarkAgent.class);
+    private static final Logger logger = Logger.getLogger(TestPowerCascadeAgent.class);
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -42,13 +42,14 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=10;
+    private final static int runDuration=6;
     private final static int N=1;
     
     public static void main(String[] args) {
+        double relCapacityChange = 1.0;
         
         Experiment.initEnvironment();
-        final TestBenchmarkAgent test = new TestBenchmarkAgent();
+        final TestPowerCascadeAgent test = new TestPowerCascadeAgent();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -56,10 +57,11 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                newPeer.addPeerlet(new BenchmarkSFINAAgent(
+                newPeer.addPeerlet(new PowerCascadeAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime)));
+                        Time.inMilliseconds(runTime),
+                        relCapacityChange));
                 return newPeer;
             }
         };

@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package applications;
+package replayer;
 
+import utilities.Metrics;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
