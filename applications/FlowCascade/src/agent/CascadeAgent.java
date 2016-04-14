@@ -89,11 +89,8 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
                         temporalIslandStatus.get(getSimulationTime()).put(currentIsland, true);
                 }
                 else{
+                    treatNonConvergedIsland(currentIsland);
                     temporalIslandStatus.get(getSimulationTime()).put(currentIsland, false);
-                    for(Link link : currentIsland.getLinks()){
-                        Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
-                        this.executeEvent(currentIsland, event);
-                    }
                 }
             }
             
@@ -136,12 +133,20 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
         for (Link link : flowNetwork.getLinks()){
             if(link.isActivated() && link.getFlow() > link.getCapacity()){
                 logger.info("..violating link " + link.getIndex() + " limit: " + link.getFlow() + " > " + link.getCapacity());
-                Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
-                this.getEvents().add(event);
+                treatOverloadLink(link);
                 overloaded = true;
             }
         }
         return overloaded;
+    }
+    
+    /**
+     * Changes the parameters of the link after an overload happened.
+     * @param link which is overloaded
+     */
+    public void treatOverloadLink(Link link){
+        Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
+        this.getEvents().add(event);
     }
     
     /**
@@ -152,7 +157,30 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
      */
     public boolean nodeOverload(FlowNetwork flowNetwork){
         boolean overloaded = false;
+        for (Node node : flowNetwork.getNodes()){
+            if(node.isActivated() && node.getFlow() > node.getCapacity()){
+                logger.info("..violating node " + node.getIndex() + " limit: " + node.getFlow() + " > " + node.getCapacity());
+                treatOverloadNode(node);
+                overloaded = true;
+            }
+        }
         return overloaded;
+    }
+    
+    /**
+     * Changes the parameters of the node after an overload happened.
+     * @param node which is overloaded
+     */
+    public void treatOverloadNode(Node node){
+        logger.info("..doing nothing to overloaded node.");
+    }
+    
+    /**
+     * Adjust the network part which didn't converge.
+     * @param flowNetwork 
+     */
+    public void treatNonConvergedIsland(FlowNetwork flowNetwork){
+        logger.info("..not changing anything in non-converged part of the network.")
     }
     
     /**
