@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.SFINAAgent;
+import core.SimulationAgent;
 import java.io.File;
 import org.apache.log4j.Logger;
 import protopeer.Experiment;
@@ -52,7 +52,7 @@ public class TestSFINAAgent extends SimulatedExperiment{
         TestSFINAAgent test = new TestSFINAAgent();
         test.init();
         
-        // Can move these three lines to SFINAAgent also? Reason: loading peersLogDirectory name from the config file.
+        // Can move these three lines to SimulationAgent also? Reason: loading peersLogDirectory name from the config file.
         File folder = new File(peersLogDirectory+experimentID+"/");
         clearExperimentFile(folder);
         folder.mkdir();
@@ -63,7 +63,7 @@ public class TestSFINAAgent extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new SFINAAgent(
+                newPeer.addPeerlet(new SimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));

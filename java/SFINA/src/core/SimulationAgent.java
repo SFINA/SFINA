@@ -67,9 +67,9 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
+public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface{
     
-    private static final Logger logger = Logger.getLogger(SFINAAgent.class);
+    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
     
     private String experimentID;
     private Time bootstrapTime;
@@ -104,7 +104,7 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     private PowerBackend backend;
     private ArrayList<Event> events;
     
-    public SFINAAgent(
+    public SimulationAgent(
             String experimentID,
             Time bootstrapTime, 
             Time runTime){
@@ -181,9 +181,9 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     2. Checking and loading new data from files.
     3. Triggering event execution at the current time step
     4. Calling three methods, which can be used to implement the actual simulation:
-        - performInitialStateOperations()
+        - initialOperations()
         - runFlowAnalysis()
-        - performFinalStateOperations()
+        - finalOperations()
      */
     @Override
     public void runActiveState(){
@@ -197,13 +197,13 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
                 
                 loadData();
                 
-                performInitialStateOperations();
+                initialOperations();
                 
                 executeAllEvents();
                 
                 runFlowAnalysis();
                 
-                performFinalStateOperations();
+                finalOperations();
                 
                 runActiveState(); 
             }
@@ -465,12 +465,12 @@ public class SFINAAgent extends BasePeerlet implements SimulationAgentInterface{
     }
     
     @Override
-    public void performInitialStateOperations(){
+    public void initialOperations(){
 
     }
     
     @Override
-    public void performFinalStateOperations(){
+    public void finalOperations(){
         
     }
     
