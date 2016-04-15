@@ -4,6 +4,4 @@
 **/nbproject/**
 **/build/**
 **/peerlets-log/**
-*.xml
 **/experiment/**/output/**
-*.mf
