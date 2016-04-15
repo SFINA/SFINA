@@ -1,7 +1,0 @@
-reducing line rating successively.
-
-
-1-5 	Matpower	AC	
-6-10 	Matpower	DC	
-11-15 	Interpss	AC	
-16-20 	Interpss	DC	
