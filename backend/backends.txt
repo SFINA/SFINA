@@ -1,0 +1,5 @@
+# Explanation
+
+Our own backends will go in this folder.
+
+The integration of this backend into SFINA then happens in the backend part of the simulation agent.
