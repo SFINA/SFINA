@@ -695,6 +695,14 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
     
     /**
+     * 
+     * @param event 
+     */
+    public void addEventToQueue(Event event){
+        this.getEvents().add(event);
+    }
+    
+    /**
      * @return the sfinaParameters
      */
     public HashMap<SfinaParameter,Object> getSfinaParameters() {
