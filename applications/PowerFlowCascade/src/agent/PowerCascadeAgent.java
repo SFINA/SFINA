@@ -57,7 +57,7 @@ public class PowerCascadeAgent extends CascadeAgent{
     }
     
     @Override
-    public void performInitialStateOperations(){
+    public void initialOperations(){
         // inherited from BenchmarkSFINAAgent
         this.initMeasurementVariables();
         this.saveStartTime();
@@ -69,7 +69,7 @@ public class PowerCascadeAgent extends CascadeAgent{
     }
     
     @Override
-    public void performFinalStateOperations(){
+    public void finalOperations(){
         this.calculateFinalLoad();
         this.calculateCascadeMetrics();
         

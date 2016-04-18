@@ -1,8 +1,8 @@
 .DS_Store
 *.class
 **/log/*
-**/nbproject/**
+**/nbproject/private/**
 **/build/**
+**/dist/**
 **/peerlets-log/**
-**/experiment/**/output/**
-/SFINA/dist/
+**/output/**/*.txt

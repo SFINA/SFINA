@@ -18,7 +18,7 @@
 package experiment;
 
 import replayer.BenchmarkLogReplayer;
-import agent.BenchmarkSFINAAgent;
+import agent.BenchmarkSimulationAgent;
 import java.io.File;
 import org.apache.log4j.Logger;
 import protopeer.Experiment;
@@ -56,7 +56,7 @@ public class TestBenchmarkAgent extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                newPeer.addPeerlet(new BenchmarkSFINAAgent(
+                newPeer.addPeerlet(new BenchmarkSimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));

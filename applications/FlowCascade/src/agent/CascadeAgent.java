@@ -17,7 +17,7 @@
  */
 package agent;
 
-import agent.BenchmarkSFINAAgent;
+import agent.BenchmarkSimulationAgent;
 import event.Event;
 import event.EventType;
 import event.NetworkComponent;
@@ -35,7 +35,7 @@ import protopeer.util.quantities.Time;
  * Cascade if link limits violated. Domain independent.
  * @author Ben
  */
-public class CascadeAgent extends BenchmarkSFINAAgent{
+public class CascadeAgent extends BenchmarkSimulationAgent{
     
     private static final Logger logger = Logger.getLogger(CascadeAgent.class);
     private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
@@ -180,7 +180,7 @@ public class CascadeAgent extends BenchmarkSFINAAgent{
      * @param flowNetwork 
      */
     public void treatNonConvergedIsland(FlowNetwork flowNetwork){
-        logger.info("..not changing anything in non-converged part of the network.")
+        logger.info("..not changing anything in non-converged part of the network.");
     }
     
     /**
