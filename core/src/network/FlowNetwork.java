@@ -116,11 +116,9 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void removeNode(Node node){
         for(Link link:node.getIncomingLinks()){
             link.setEndNode(null);
-            deactivateLink(link.getIndex());
         }
         for(Link link:node.getOutgoingLinks()){
             link.setStartNode(null);
-            deactivateLink(link.getIndex());
         }
         this.nodes.remove(node.getIndex());
     }
@@ -229,19 +227,6 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void activateNode(String index){
         Node activatedNode=nodes.get(index);
         activatedNode.setActivated(true);
-        // the following is handled in node class
-//        List<Link> incomingLinks=activatedNode.getIncomingLinks();
-//        for(Link incomingLink:incomingLinks){
-//            //incomingLink.setEndNode(activatedNode); // see deactivateNode for explanations
-//            if(incomingLink.getStartNode() != null && incomingLink.getStartNode().isActivated()) // link should be activated if it has nodes at both ends and if both nodes are activated
-//                activateLink(incomingLink.getIndex());
-//        }
-//        List<Link> outgoingLinks=activatedNode.getOutgoingLinks();
-//        for(Link outgoingLink:outgoingLinks){
-//            //outgoingLink.setStartNode(activatedNode);
-//            if(outgoingLink.getEndNode() != null && outgoingLink.getEndNode().isActivated()) 
-//                activateLink(outgoingLink.getIndex());
-//        }
     }
     
     @Override
@@ -253,8 +238,6 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public void activateLink(String index){
         Link activatedLink=links.get(index);
         activatedLink.setActivated(true);
-        //activatedLink.getStartNode().addLink(activatedLink); // handled in link object to ensure, that both methods can be used
-        //activatedLink.getEndNode().addLink(activatedLink);
     }
     
     @Override
@@ -289,7 +272,8 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         ArrayList<FlowNetwork> islands = new ArrayList<>();
         ArrayList leftNodes = new ArrayList();
         for (Node node : this.nodes.values())
-            leftNodes.add(node);
+            if(node.isActivated())
+                leftNodes.add(node);
         while (leftNodes.size() > 0){
             ArrayList<Node> newIslandNodes = new ArrayList();
             ArrayList<Link> newIslandLinks = new ArrayList();
@@ -321,13 +305,13 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private void iterateIsland(Node currentNode, ArrayList<Node> currentIslandNodes, ArrayList<Link> currentIslandLinks, ArrayList leftNodes){
         if (currentIslandNodes.contains(currentNode)){
-            System.out.println("Island iterator was called even though node is already in Island, which should not happen! Check algorithm!");
+            logger.debug("Attention: Island iterator was called even though node is already in island, which should not happen! Check algorithm!");
             return;
         }
         currentIslandNodes.add(currentNode);
         
         if (!leftNodes.contains(currentNode)){
-            System.out.println("Attention: Node " + currentNode.getIndex() + " not in array of Nodes not assigned to island, which should not happen! Check algorithm!");
+            logger.debug("Attention: Node " + currentNode.getIndex() + " not in array of nodes not assigned to island, which should not happen! Check algorithm!");
             return;            
         }    
         leftNodes.remove(currentNode);

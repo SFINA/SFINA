@@ -243,7 +243,6 @@ public class Node extends State{
         }
         else{
             this.connected=false;
-            this.setFlow(0.0);
         }
     }
 
@@ -265,21 +264,19 @@ public class Node extends State{
         this.activated = activated;
         if(activated){
             for(Link link : this.getIncomingLinks()){
-                if(link.getStartNode() != null && link.getStartNode().isActivated()) // link should be activated if it has nodes at both ends and if both nodes are activated
-                    link.setActivated(true);
+                link.setEndNode(this);
             }
             for(Link link : this.getOutgoingLinks()){
-                if(link.getEndNode() != null && link.getEndNode().isActivated()) 
-                    link.setActivated(true);
+                link.setStartNode(this);
             }
         }
         else{
             this.setFlow(0.0);
             for(Link link:this.getIncomingLinks()){
-                link.setActivated(false);
+                link.setEndNode(null);
             }
             for(Link link : this.getOutgoingLinks()){
-                link.setActivated(false);
+                link.setStartNode(null);
             }
         }
     }
