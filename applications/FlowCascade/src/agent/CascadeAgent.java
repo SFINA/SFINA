@@ -89,7 +89,7 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
                         temporalIslandStatus.get(getSimulationTime()).put(currentIsland, true);
                 }
                 else{
-                    treatNonConvergedIsland(currentIsland);
+                    updateNonConvergedIsland(currentIsland);
                     temporalIslandStatus.get(getSimulationTime()).put(currentIsland, false);
                 }
             }
@@ -119,7 +119,7 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
      * @param flowNetwork 
      */
     public void mitigateOverload(FlowNetwork flowNetwork){
-        
+        logger.info("..no overload mitigation strategy implemented.");
     }
     
     /**
@@ -133,7 +133,7 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
         for (Link link : flowNetwork.getLinks()){
             if(link.isActivated() && link.getFlow() > link.getCapacity()){
                 logger.info("..violating link " + link.getIndex() + " limit: " + link.getFlow() + " > " + link.getCapacity());
-                treatOverloadLink(link);
+                updateOverloadLink(link);
                 overloaded = true;
             }
         }
@@ -144,7 +144,7 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
      * Changes the parameters of the link after an overload happened.
      * @param link which is overloaded
      */
-    public void treatOverloadLink(Link link){
+    public void updateOverloadLink(Link link){
         Event event = new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,link.getIndex(),LinkState.STATUS,false);
         this.getEvents().add(event);
     }
@@ -160,8 +160,9 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
         for (Node node : flowNetwork.getNodes()){
             if(node.isActivated() && node.getFlow() > node.getCapacity()){
                 logger.info("..violating node " + node.getIndex() + " limit: " + node.getFlow() + " > " + node.getCapacity());
-                treatOverloadNode(node);
-                overloaded = true;
+                updateOverloadNode(node);
+                // Uncomment if node overload should be included
+                // overloaded = true;
             }
         }
         return overloaded;
@@ -171,7 +172,7 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
      * Changes the parameters of the node after an overload happened.
      * @param node which is overloaded
      */
-    public void treatOverloadNode(Node node){
+    public void updateOverloadNode(Node node){
         logger.info("..doing nothing to overloaded node.");
     }
     
@@ -179,7 +180,7 @@ public class CascadeAgent extends BenchmarkSimulationAgent{
      * Adjust the network part which didn't converge.
      * @param flowNetwork 
      */
-    public void treatNonConvergedIsland(FlowNetwork flowNetwork){
+    public void updateNonConvergedIsland(FlowNetwork flowNetwork){
         logger.info("..not changing anything in non-converged part of the network.");
     }
     
