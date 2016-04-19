@@ -119,13 +119,13 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
     }
     
     @Override
-    public void initialOperations(){
+    public void runInitialOperations(){
         this.initMeasurementVariables();
         this.saveStartTime();
     }
     
     @Override
-    public void finalOperations(){
+    public void runFinalOperations(){
         this.calculateActivationStatus();
         this.calculateFlow();
         this.calculateUtilization();

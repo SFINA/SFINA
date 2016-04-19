@@ -195,15 +195,15 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 
                 resetIteration();
                 
-                loadData();
+                loadInputData();
                 
-                initialOperations();
+                runInitialOperations();
                 
                 executeAllEvents();
                 
                 runFlowAnalysis();
                 
-                finalOperations();
+                runFinalOperations();
                 
                 runActiveState(); 
             }
@@ -211,6 +211,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         loadAgentTimer.schedule(this.runTime);
     }
     
+    @Override
     public int getSimulationTime(){
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
@@ -362,7 +363,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     /**
      * Loads network data from input files at current time if folder is provided.
      */
-    private void loadData(){
+    private void loadInputData(){
         File file = new File(experimentInputFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
             logger.info("loading data at time " + timeToken);
@@ -404,7 +405,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      */
     public void loadData(String time){
         timeToken = timeTokenName + time;
-        loadData();
+        loadInputData();
         timeToken = timeTokenName + getSimulationTime();
     }
     
@@ -434,7 +435,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     /**
      * Outputs txt files in same format as input. Creates new folder for every iteration.
      */
-    private void outputData(){
+    @Override
+    public void saveOutputData(){
         logger.info("doing output at iteration " + iteration);
         TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
@@ -465,15 +467,16 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
     
     @Override
-    public void initialOperations(){
+    public void runInitialOperations(){
 
     }
     
     @Override
-    public void finalOperations(){
+    public void runFinalOperations(){
         
     }
     
+    @Override
     public void executeAllEvents(){
         int time = getSimulationTime();
         logger.info("executing all events at time_" + time);
@@ -675,7 +678,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * Has to be called at the end of the iteration.
      */
     public void nextIteration(){
-        this.outputData();
+        this.saveOutputData();
         this.iteration++;
     }
     
@@ -683,6 +686,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * 
      * @return the current iteration
      */
+    @Override
     public int getIteration(){
         return this.iteration;
     }
@@ -698,7 +702,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * 
      * @param event 
      */
-    public void addEventToQueue(Event event){
+    @Override
+    public void queueEvent(Event event){
         this.getEvents().add(event);
     }
     
@@ -719,6 +724,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     /**
      * @return the backendParameters
      */
+    @Override
     public HashMap<Enum,Object> getBackendParameters() {
         return backendParameters;
     }

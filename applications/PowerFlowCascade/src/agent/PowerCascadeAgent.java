@@ -64,7 +64,7 @@ public class PowerCascadeAgent extends CascadeAgent {
     }
 
     @Override
-    public void initialOperations() {
+    public void runInitialOperations() {
         // inherited from BenchmarkSFINAAgent
         this.initMeasurementVariables();
         this.saveStartTime();
@@ -77,7 +77,7 @@ public class PowerCascadeAgent extends CascadeAgent {
     }
 
     @Override
-    public void finalOperations() {
+    public void runFinalOperations() {
         this.calculateFinalLoad();
         this.calculateCascadeMetrics();
 
@@ -263,14 +263,14 @@ public class PowerCascadeAgent extends CascadeAgent {
 
     @Override
     public void updateOverloadLink(Link link) {
-        this.addEventToQueue(new Event(getSimulationTime(), EventType.TOPOLOGY, NetworkComponent.LINK, link.getIndex(), LinkState.STATUS, false));
+        this.queueEvent(new Event(getSimulationTime(), EventType.TOPOLOGY, NetworkComponent.LINK, link.getIndex(), LinkState.STATUS, false));
 
         // Power specific adjustments:
-        this.addEventToQueue(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.CURRENT, 0.0));
-        this.addEventToQueue(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_FROM_REAL, 0.0));
-        this.addEventToQueue(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_FROM_REACTIVE, 0.0));
-        this.addEventToQueue(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_TO_REAL, 0.0));
-        this.addEventToQueue(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_TO_REACTIVE, 0.0));
+        this.queueEvent(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.CURRENT, 0.0));
+        this.queueEvent(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_FROM_REAL, 0.0));
+        this.queueEvent(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_FROM_REACTIVE, 0.0));
+        this.queueEvent(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_TO_REAL, 0.0));
+        this.queueEvent(new Event(getSimulationTime(), EventType.FLOW, NetworkComponent.LINK, link.getIndex(), PowerLinkState.POWER_FLOW_TO_REACTIVE, 0.0));
     }
     
     @Override
