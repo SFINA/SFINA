@@ -23,7 +23,7 @@ import power.backend.PowerBackend;
 import static power.backend.PowerBackend.INTERPSS;
 import static power.backend.PowerBackend.MATPOWER;
 import backend.FlowBackendInterface;
-import power.input.PowerBackendParameterLoader;
+import power.input.BackendParameterLoader;
 import input.Domain;
 import static input.Domain.GAS;
 import static input.Domain.POWER;
@@ -96,7 +96,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private FlowNetwork flowNetwork;
     private TopologyLoader topologyLoader;
     private SfinaParameterLoader sfinaParameterLoader;
-    private PowerBackendParameterLoader backendParameterLoader;
+    private BackendParameterLoader backendParameterLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
@@ -195,7 +195,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 
                 resetIteration();
                 
-                loadInputData();
+                loadInputData(timeToken);
                 
                 runInitialOperations();
                 
@@ -324,7 +324,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         // PowerBackend Parameters
         file = new File(backendParamLocation);
         if (file.exists()) {
-            backendParameterLoader = new PowerBackendParameterLoader(getDomain(),parameterColumnSeparator);
+            backendParameterLoader = new BackendParameterLoader(getDomain(),parameterColumnSeparator);
             backendParameters = backendParameterLoader.loadBackendParameters(backendParamLocation);
             logger.debug("Loaded backendParameters: " + backendParameters);
         }
@@ -363,7 +363,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     /**
      * Loads network data from input files at current time if folder is provided.
      */
-    private void loadInputData(){
+    public void loadInputData(String timeToken){
         File file = new File(experimentInputFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
             logger.info("loading data at time " + timeToken);
@@ -397,16 +397,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         }
         else
             logger.debug("No input data provided at " + timeToken + ". Continue to use data from before.");
-    }
-    
-    /**
-     * Loads network data from input files at given time.
-     * @param time defines the input folder from where data is loaded. Given x it loads from time_x.
-     */
-    public void loadData(String time){
-        timeToken = timeTokenName + time;
-        loadInputData();
-        timeToken = timeTokenName + getSimulationTime();
     }
     
     @Override
@@ -565,7 +555,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                             setBackend((PowerBackend)event.getValue());
                             break;
                         case RELOAD:
-                            this.loadData((String)event.getValue());
+                            loadInputData("time_" + (String)event.getValue());
                             break;
                         default:
                             logger.debug("System parameter cannot be recognized.");

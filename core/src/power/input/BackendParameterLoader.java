@@ -32,13 +32,13 @@ import power.backend.PowerBackendParameter;
  *
  * @author Ben
  */
-public class PowerBackendParameterLoader {
+public class BackendParameterLoader {
     
     private Domain domain;
     private String columnSeparator;
     private static final Logger logger = Logger.getLogger(SfinaParameterLoader.class);
     
-    public PowerBackendParameterLoader(Domain domain, String columnSeparator){
+    public BackendParameterLoader(Domain domain, String columnSeparator){
         this.domain=domain;
         this.columnSeparator=columnSeparator;
     }
