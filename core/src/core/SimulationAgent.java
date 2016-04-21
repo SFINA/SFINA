@@ -286,8 +286,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             ex.printStackTrace();
         }
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
-        this.experimentInputFilesLocation=configurationFilesLocation+experimentID+"/"+inputDirectoryName;
-        this.experimentOutputFilesLocation=configurationFilesLocation+experimentID+"/"+outputDirectoryName;
+        String peerToken = "/peer-"+getPeer().getIndexNumber()+"/";
+        this.experimentInputFilesLocation=configurationFilesLocation+experimentID+peerToken+inputDirectoryName;
+        this.experimentOutputFilesLocation=configurationFilesLocation+experimentID+peerToken+outputDirectoryName;
         this.eventsLocation=experimentInputFilesLocation+eventsFileName;
         this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
         this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
@@ -361,7 +362,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
     
     /**
-     * Loads network data from input files at current time if folder is provided.
+     * Loads network data from input files at given time if folder is provided.
+     * @param timeToken String "time_x" for time x
      */
     public void loadInputData(String timeToken){
         File file = new File(experimentInputFilesLocation+timeToken);
