@@ -4,5 +4,6 @@ _DS_Store
 **/log/*
 **/nbproject/private/**
 **/build/**
+**/dist/lib/*
 **/peerlets-log/*/peer-*
 **/output/**/*.txt
