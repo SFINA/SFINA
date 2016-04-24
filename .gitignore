@@ -7,3 +7,5 @@ _DS_Store
 **/dist/lib/*
 **/peerlets-log/*/peer-*
 **/output/**/*.txt
+/applications/FlowVisualization/sfina2gephi/dist/
+/applications/FlowVisualization/SfinaVisualization/dist/

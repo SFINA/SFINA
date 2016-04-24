@@ -13,5 +13,6 @@ public enum Domain {
     POWER,
     GAS,
     WATER,
-    TRANSPORTATION
+    TRANSPORTATION,
+    DISEASESPREAD
 }

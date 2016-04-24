@@ -11,5 +11,6 @@ package power.backend;
  */
 public enum PowerBackend {
     MATPOWER,
-    INTERPSS
+    INTERPSS,
+    DISEASESPREAD_JAVA
 }
