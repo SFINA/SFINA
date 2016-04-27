@@ -728,6 +728,20 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.backendParameters = backendParameters;
     }
     
+    /**
+     * @return the experimentInputFilesLocation
+     */
+    public String getExperimentInputFilesLocation() {
+        return experimentInputFilesLocation;
+    }
+    
+    /**
+     * @return the time token, i.e. time_x for current time x
+     */
+    public String getTimeToken() {
+        return timeToken;
+    }
+    
     //****************** MEASUREMENTS ******************
     
     /**
