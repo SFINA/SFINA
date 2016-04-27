@@ -1,0 +1,2 @@
+domain=disease_spread
+backend=disease_spread_java
