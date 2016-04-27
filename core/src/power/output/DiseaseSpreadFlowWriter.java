@@ -15,10 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package diseasespread;
+package power.output;
 
-import disease.spread.input.DiseaseSpreadLinkState;
-import disease.spread.input.DiseaseSpreadNodeState;
+import diseasespread.input.DiseaseSpreadLinkState;
+import diseasespread.input.DiseaseSpreadNodeState;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -63,7 +63,6 @@ public class DiseaseSpreadFlowWriter {
                     necessaryStates.add(state);
                     stateStrings.add(stateString);
                 }
-                
             }
             
             for(int i=0; i<stateStrings.size();i++){

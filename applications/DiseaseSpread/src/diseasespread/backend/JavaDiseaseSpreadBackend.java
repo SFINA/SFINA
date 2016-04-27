@@ -18,9 +18,9 @@
 package diseasespread.backend;
 
 import backend.FlowBackendInterface;
-import disease.spread.input.DiseaseSpreadLinkState;
-import disease.spread.input.DiseaseSpreadNodeState;
-import diseasespread.DiseaseSpreadBackendParameter;
+import diseasespread.input.DiseaseSpreadLinkState;
+import diseasespread.input.DiseaseSpreadNodeState;
+import diseasespread.input.DiseaseSpreadBackendParameter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import matlabcontrol.MatlabProxy;
-import matlabcontrol.MatlabProxyFactory;
-import matlabcontrol.MatlabProxyFactoryOptions;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
@@ -46,9 +43,11 @@ public class JavaDiseaseSpreadBackend implements FlowBackendInterface{
     private final double a1 = 10;//530;
     private final double b1 = 1;//.6;
     private final double c1 = 0.01;//.2;
+    
     // network parameters from paper (assumed to be constants)
     private final double a = 4;
     private final double b = 3;
+    
     // strategy constants from paper
     private final double q=0.15;
     private final double k=0.8;
@@ -56,6 +55,7 @@ public class JavaDiseaseSpreadBackend implements FlowBackendInterface{
     // simulation parameters
     private boolean converged;
     private double timeStep = 1;
+    private final int strategy = 0;
     
     private FlowNetwork net;
     private HashMap<Enum,Object> backendParameters;
@@ -137,7 +137,7 @@ public class JavaDiseaseSpreadBackend implements FlowBackendInterface{
         double alpha2 = 0.58;
         double beta2 = .2;
         int time = (int)(this.backendParameters).get(DiseaseSpreadBackendParameter.TIME);
-        int strategy = (int)(this.backendParameters).get(DiseaseSpreadBackendParameter.STRATEGY);
+        //int strategy = (int)(this.backendParameters).get(DiseaseSpreadBackendParameter.STRATEGY);
         return (rStart - beta2)*Math.exp(-alpha2*externalResource(node, time, strategy))+beta2;
     }
     

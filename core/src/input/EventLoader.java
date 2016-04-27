@@ -72,6 +72,8 @@ import static power.input.PowerNodeState.VOLTAGE_MAX;
 import static power.input.PowerNodeState.VOLTAGE_MIN;
 import static power.input.PowerNodeState.VOLTAGE_SETPOINT;
 import static power.input.PowerNodeState.ZONE;
+import diseasespread.input.DiseaseSpreadLinkState;
+import diseasespread.input.DiseaseSpreadNodeState;
 
 /**
  *
@@ -183,6 +185,9 @@ public class EventLoader {
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
                                         break;
+                                    case DISEASESPREAD:
+                                        parameter=this.lookupHealthNodeState(values.get(4));
+                                        break;
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
@@ -200,6 +205,9 @@ public class EventLoader {
                                         break;
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
+                                        break;
+                                    case DISEASESPREAD:
+                                        parameter=this.lookupHealthLinkState(values.get(4));
                                         break;
                                     default:
                                         logger.debug("Wrong backend detected.");
@@ -261,6 +269,9 @@ public class EventLoader {
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
                                         break;
+                                    case DISEASESPREAD:
+                                        value=this.getActualHealthNodeValue((DiseaseSpreadNodeState)parameter,values.get(5));
+                                        break;
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
@@ -278,6 +289,9 @@ public class EventLoader {
                                         break;
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
+                                        break;
+                                    case DISEASESPREAD:
+                                        value=this.getActualHealthLinkValue((DiseaseSpreadLinkState)parameter,values.get(5));
                                         break;
                                     default:
                                         logger.debug("Wrong backend detected.");
@@ -679,6 +693,8 @@ public class EventLoader {
                         return Domain.WATER;
                     case "transportation":
                         return Domain.TRANSPORTATION;
+                    case "disease_spread":
+                        return Domain.DISEASESPREAD;
                     default:
                         logger.debug("Domain not regognized.");
                         return null;
@@ -689,6 +705,8 @@ public class EventLoader {
                         return PowerBackend.MATPOWER;
                     case "interpss":
                         return PowerBackend.INTERPSS;
+                    case "disease_spread_java":
+                        return PowerBackend.DISEASESPREAD_JAVA;
                     default:
                         logger.debug("Backend not regognized.");
                 }
@@ -705,5 +723,96 @@ public class EventLoader {
      */
     public ArrayList<Event> getEvents() {
         return events;
+    }
+    
+    
+            // Methods for HEALTH EVENTS
+    private SfinaParameter lookupHealthSystemParameterState(String powerParameterState){
+        switch(powerParameterState){
+            case "domain":
+                return SfinaParameter.DOMAIN;
+            case "backend":
+                return SfinaParameter.BACKEND;
+//            case "flow_type":
+//                return SfinaParameter.FLOW_TYPE;
+//            case "tolerance_parameter":
+//                return SfinaParameter.TOLERANCE_PARAMETER;
+//            case "attack_strategy":
+//                return SfinaParameter.ATTACK_STRATEGY;
+//            case "line_rate_change_factor":
+//                return SfinaParameter.CAPACITY_CHANGE;
+            default:
+                logger.debug(("System parameter state is not recognized."));
+                return null;
+        }
+    }
+    
+    private DiseaseSpreadNodeState lookupHealthNodeState(String healthNodeState){
+        switch(healthNodeState){
+            case "id": 
+                return DiseaseSpreadNodeState.ID;
+            case "health":
+                return DiseaseSpreadNodeState.HEALTH;
+            case "alpha":
+                return DiseaseSpreadNodeState.ALPHA;
+            case "beta":
+                return DiseaseSpreadNodeState.BETA;
+            case "resistance_threshold":
+                return DiseaseSpreadNodeState.RESISTANCETHRESHOLD;
+            case "recovery_rate":
+                return DiseaseSpreadNodeState.RECOVERYRATE;
+            default:
+                logger.debug("Health node state is not recognized.");
+                return null;
+        }
+    }
+   
+    private DiseaseSpreadLinkState lookupHealthLinkState(String healthLinkState){
+        switch(healthLinkState){
+            case "id":
+                return DiseaseSpreadLinkState.ID;
+            case "connection_strength":
+                return DiseaseSpreadLinkState.CONNECTION_STRENGTH;
+            case "time_delay":
+                return DiseaseSpreadLinkState.TIME_DELAY;
+            default:
+                logger.debug("Health link state is not recognized.");
+                return null;
+        }
+    }
+    
+    private Object getActualHealthNodeValue(DiseaseSpreadNodeState healthNodeState, String rawValue){
+        switch(healthNodeState){
+            case ID:
+                return Double.parseDouble(rawValue);
+            case HEALTH:
+                return Double.parseDouble(rawValue);
+            case ALPHA:
+                return Double.parseDouble(rawValue);
+            case BETA:
+                return Double.parseDouble(rawValue);
+            case RESISTANCETHRESHOLD:
+                return Double.parseDouble(rawValue);
+            case RECOVERYRATE:
+                return Double.parseDouble(rawValue);
+            default:
+                logger.debug("Health node state is not recognized.");
+                return null;
+        }    
+    }  
+    
+    private Object getActualHealthLinkValue(DiseaseSpreadLinkState healthLinkState, String rawValue){
+        switch(healthLinkState){
+            case ID:
+                return Double.parseDouble(rawValue);
+            case TIME_DELAY:
+                return Double.parseDouble(rawValue);
+            case CONNECTION_STRENGTH:
+                return Double.parseDouble(rawValue);
+            default:
+                logger.debug("Health link state is not recognized.");
+                return null;
+                
+        }
     }
 }

@@ -23,6 +23,7 @@ import power.backend.PowerBackend;
 import static power.backend.PowerBackend.INTERPSS;
 import static power.backend.PowerBackend.MATPOWER;
 import backend.FlowBackendInterface;
+import diseasespread.input.DiseaseSpreadFlowLoader;
 import power.input.BackendParameterLoader;
 import input.Domain;
 import static input.Domain.GAS;
@@ -52,6 +53,7 @@ import power.backend.MATPOWERFlowBackend;
 import power.input.PowerFlowLoader;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
+import power.output.DiseaseSpreadFlowWriter;
 import power.output.PowerFlowWriter;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
@@ -392,6 +394,17 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 case TRANSPORTATION:
                     logger.debug("This domain is not supported at this moment");
                     break;
+                case DISEASESPREAD:
+                    DiseaseSpreadFlowLoader dFL=new DiseaseSpreadFlowLoader(flowNetwork, columnSeparator, missingValue);
+                    if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
+                        dFL.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
+                    else
+                        logger.debug("No flow data provided for nodes at " + timeToken + ".");
+                    if (new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
+                        dFL.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+                    else
+                        logger.debug("No flow data provided for links at " + timeToken + ".");
+                    break;
                 default:
                     logger.debug("This domain is not supported at this moment");
             }
@@ -418,6 +431,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 break;
             case TRANSPORTATION:
                 logger.debug("This domain is not supported at this moment");
+                break;
+            case DISEASESPREAD:
+                // Nothing to log and nothing to execute
                 break;
             default:
                 logger.debug("This domain is not supported at this moment");
@@ -447,6 +463,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                     break;
                 case TRANSPORTATION:
                     logger.debug("This domain is not supported at this moment");
+                    break;
+                case DISEASESPREAD:
+                    DiseaseSpreadFlowWriter hFW=new DiseaseSpreadFlowWriter(flowNetwork, columnSeparator, missingValue);
+                    hFW.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
+                    hFW.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
                     break;
                 default:
                     logger.debug("This domain is not supported at this moment");

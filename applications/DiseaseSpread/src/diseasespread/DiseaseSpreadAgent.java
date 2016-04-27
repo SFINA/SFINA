@@ -21,6 +21,7 @@ import core.SimulationAgent;
 import diseasespread.input.DiseaseSpreadNodeState;
 import diseasespread.input.DiseaseSpreadLinkState;
 import diseasespread.backend.JavaDiseaseSpreadBackend;
+import diseasespread.input.DiseaseSpreadBackendParameter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,14 +31,6 @@ import network.Node;
 import org.apache.log4j.Logger;
 import protopeer.util.quantities.Time;
 import backend.FlowBackendInterface;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashSet;
-import protopeer.measurement.MeasurementFileDumper;
-import protopeer.measurement.MeasurementLog;
-import protopeer.measurement.MeasurementLoggerListener;
 /**
  *
  * @author dinesh
@@ -50,37 +43,11 @@ public class DiseaseSpreadAgent extends SimulationAgent{
     private int maxIterations = 100;
     
     public DiseaseSpreadAgent(String experimentID,
-            String peersLogDirectory, 
             Time bootstrapTime, 
-            Time runTime, 
-            String timeTokenName, 
-            String experimentConfigurationFilesLocation, 
-            String experimentOutputFilesLocation,
-            String nodesLocation, 
-            String linksLocation, 
-            String nodesFlowLocation, 
-            String linksFlowLocation, 
-            String eventsLocation, 
-            String columnSeparator, 
-            String missingValue,
-            HashMap systemParameters,
-            HashMap backendParameters){
+            Time runTime){
         super(experimentID,
-                peersLogDirectory,
                 bootstrapTime,
-                runTime,
-                timeTokenName,
-                experimentConfigurationFilesLocation,
-                experimentOutputFilesLocation,
-                nodesLocation,
-                linksLocation,
-                nodesFlowLocation,
-                linksFlowLocation,
-                eventsLocation,
-                columnSeparator,
-                missingValue,
-                systemParameters,
-                backendParameters);
+                runTime);
     }
     
     @Override
@@ -93,6 +60,8 @@ public class DiseaseSpreadAgent extends SimulationAgent{
         for(Node node:getFlowNetwork().getNodes()){
             nodeHealthHistory.get(node.getIndex()).add(0, (Double)node.getProperty(DiseaseSpreadNodeState.HEALTH));
         }
+        
+        // This is a crappy work around the situation that I cannot set backend parameters from file.
         
         // set nodeHealthHistory as backend parameter.
         getBackendParameters().put(DiseaseSpreadBackendParameter.NodeHealthHistory, nodeHealthHistory);
@@ -137,7 +106,7 @@ public class DiseaseSpreadAgent extends SimulationAgent{
                         logger.debug("This flow backend is not supported at this moment.");
                 }
                 break;
-            default:
+                default:
                 logger.debug("Domain and corresponding Application (Agent) do not match.");
         }
         return converged;
@@ -152,6 +121,4 @@ public class DiseaseSpreadAgent extends SimulationAgent{
         }
         return (int)Math.ceil(maxConnectionDelay/timeStep);
     }
-    
-    
 }

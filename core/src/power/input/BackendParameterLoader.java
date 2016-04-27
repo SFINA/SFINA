@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import power.backend.PowerFlowType;
 import power.backend.PowerBackendParameter;
+import diseasespread.input.DiseaseSpreadBackendParameter;
 
 /**
  *
@@ -85,6 +86,22 @@ public class BackendParameterLoader {
                         break;
                     case TRANSPORTATION:
                         logger.debug("This domain is not supported or cannot be recognized");
+                        break;
+                    case DISEASESPREAD:
+                        switch(st.nextToken()){
+                            case "strategy":
+                                param = DiseaseSpreadBackendParameter.STRATEGY;
+                                value = Integer.parseInt(st.nextToken());
+                                break;
+                            case "nodeHealthHistory":
+                                param = DiseaseSpreadBackendParameter.NodeHealthHistory;
+                                // read and disregard the token
+                                st.nextToken();
+                                value = new HashMap();
+                                break;
+                            default:
+                                logger.debug("This backend parameter is not supported or cannot be recognized");
+                        }
                         break;
                     default:
                         logger.debug("This domain is not supported or cannot be recognized");

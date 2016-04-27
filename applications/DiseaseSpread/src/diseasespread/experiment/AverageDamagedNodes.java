@@ -18,15 +18,13 @@
 package diseasespread.experiment;
 
 import diseasespread.DiseaseSpreadAgent;
-import diseasespread.DiseaseSpreadBackendParameter;
-import diseasespread.testDiseaseSpreadBenchmarkAgent;
+import diseasespread.input.DiseaseSpreadBackendParameter;
 import input.Domain;
 import input.SfinaParameter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.log4j.Logger;
 import power.backend.PowerBackend;
@@ -44,53 +42,27 @@ import replayer.BenchmarkLogReplayer;
 public class AverageDamagedNodes extends SimulatedExperiment{
     private static final Logger logger = Logger.getLogger(AverageDamagedNodes.class);
     
-    private static String expSeqNum="Case500Grid_AverageDamagedNodes";
+    private static String expSeqNum="Case100Grid_AverageDamagedNodes";
     private final static String peersLogDirectory="peerlets-log/";
-    private static String experimentID="experiment-"+expSeqNum+"/";
+    private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
     private final static int runDuration=3;
     private final static int N=1;
-    
-    // SFINA parameters
-    private final static HashMap<SfinaParameter,Object> sfinaParameters = new HashMap();
-    private final static HashMap<Enum,Object> backendParameters = new HashMap();    
-    
-    private final static String columnSeparator=",";
-    private final static String missingValue="-";
-    
-    private final static String configurationFilesLocation = "configuration_files/";
-    private final static String timeTokenName="time_";
-    private final static String inputDirectoryName="input";
-    private final static String outputDirectoryName="output";
-    private final static String topologyDirectoryName="topology";
-    private final static String flowDirectoryName="flow";
-    
-    private final static String experimentConfigurationFilesLocation=configurationFilesLocation+experimentID+inputDirectoryName+"/";
-    private final static String experimentOutputFilesLocation=configurationFilesLocation+experimentID+outputDirectoryName+"/";
-    private final static String eventsLocation=experimentConfigurationFilesLocation+"/events.txt";
-    private final static String nodesLocation="/"+topologyDirectoryName+"/nodes.txt";
-    private final static String linksLocation = "/"+topologyDirectoryName+"/links.txt";
-    private final static String nodesFlowLocation ="/"+flowDirectoryName+"/nodes.txt";
-    private final static String linksFlowLocation ="/"+flowDirectoryName+"/links.txt";
+    private final static String columnSeparator = ",";
     
     public static void main(String arfs[]){
-        int networkSize = 30;
-        createNodeInfectionEvents(networkSize);
+        //int networkSize = 30;
+        //createNodeInfectionEvents();
         run();
         BenchmarkLogReplayer replayer = new BenchmarkLogReplayer(expSeqNum, 0, 1000);
     }
     
     public static void run() {
-        sfinaParameters.put(SfinaParameter.DOMAIN, Domain.DISEASESPREAD);
-        sfinaParameters.put(SfinaParameter.BACKEND, PowerBackend.DISEASESPREAD_JAVA);
-        backendParameters.put(DiseaseSpreadBackendParameter.STRATEGY, 0);
-        
-        System.out.println("Experiment "+expSeqNum+"\n");
         Experiment.initEnvironment();
-        final testDiseaseSpreadBenchmarkAgent test = new testDiseaseSpreadBenchmarkAgent();
+        final AverageDamagedNodes test = new AverageDamagedNodes();
         test.init();
         final File folder = new File(peersLogDirectory+experimentID);
         clearExperimentFile(folder);
@@ -103,22 +75,9 @@ public class AverageDamagedNodes extends SimulatedExperiment{
 //                   newPeer.addPeerlet(null);
 //                }
                 newPeer.addPeerlet(new DiseaseSpreadAgent(
-                        experimentID, 
-                        peersLogDirectory, 
+                        experimentID,
                         Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime),
-                        timeTokenName,
-                        experimentConfigurationFilesLocation,
-                        experimentOutputFilesLocation,
-                        nodesLocation,
-                        linksLocation,
-                        nodesFlowLocation,
-                        linksFlowLocation,
-                        eventsLocation,
-                        columnSeparator,
-                        missingValue,
-                        sfinaParameters,
-                        backendParameters));
+                        Time.inMilliseconds(runTime)));
                 return newPeer;
             }
         };
@@ -127,25 +86,21 @@ public class AverageDamagedNodes extends SimulatedExperiment{
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
     }
-    
-    private static void createNodeInfectionEvents(int networkSize){
+    /*
+    private static void createNodeInfectionEvents(){
         try{
-            File file = new File(eventsLocation);
+            File file = new File("experiments/" + experimentID + "/input/events.txt");
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("time" + columnSeparator + "feature" + columnSeparator + "component" + columnSeparator + "id" + columnSeparator + "parameter" + columnSeparator + "value");
-            // Infect a (several) node(s)
             writer.println(1 + columnSeparator + "flow" + columnSeparator + "node" + columnSeparator + 1 + columnSeparator + "health" + columnSeparator + "1");
-            //writer.println(1 + columnSeparator + "flow" + columnSeparator + "node" + columnSeparator + 5 + columnSeparator + "health" + columnSeparator + "5");
-            //writer.println(1 + columnSeparator + "flow" + columnSeparator + "node" + columnSeparator + 30 + columnSeparator + "health" + columnSeparator + "10");
-            
             writer.close();
         }
         catch(IOException ex){
             ex.printStackTrace();
         }
     }
-    
+    */
     /*
     public final static void createNetwork(NetworkTypes ntype, File experiment){
         // create/open file

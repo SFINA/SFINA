@@ -63,6 +63,9 @@ public class SfinaParameterLoader {
                             case "transportation":
                                 domain=Domain.TRANSPORTATION;
                                 break;
+                            case "disease_spread":
+                                domain=Domain.DISEASESPREAD;
+                                break;
                             default:
                                 logger.debug("This domain is not supported or cannot be recognized");
                         }
@@ -77,6 +80,9 @@ public class SfinaParameterLoader {
                                 break;
                             case "interpss":
                                 backend=PowerBackend.INTERPSS;
+                                break;
+                            case "disease_spread_java":
+                                backend=PowerBackend.DISEASESPREAD_JAVA;
                                 break;
                             default:
                                 logger.debug("This backend is not supported or cannot be recognized");
