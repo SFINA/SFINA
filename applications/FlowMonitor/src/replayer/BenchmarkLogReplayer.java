@@ -42,6 +42,8 @@ public class BenchmarkLogReplayer {
     private PrintWriter islandNum;
     private PrintWriter isolatedNodes;
     private PrintWriter spectralRadius;
+    private PrintWriter topologicalTrace;
+    private PrintWriter topologicalRank;
     
     static boolean writeToFile=false;
 
@@ -102,6 +104,8 @@ public class BenchmarkLogReplayer {
             islandNum  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"islands.txt", true)));
             isolatedNodes  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"isolatedNodes.txt", true)));
             spectralRadius  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"spectralRadius.txt", true)));
+            topologicalTrace  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"topologicalTrace.txt", true)));
+            topologicalRank  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"topologicalRank.txt", true)));
         }
         catch (IOException e) {
                 //exception handling left as an exercise for the reader
@@ -120,6 +124,8 @@ public class BenchmarkLogReplayer {
         islandNum.print("\n");
         isolatedNodes.print("\n");
         spectralRadius.print("\n");
+        topologicalTrace.print("\n");
+        topologicalRank.print("\n");
         
         lineLossOut.close();
         flowOut.close();
@@ -131,6 +137,8 @@ public class BenchmarkLogReplayer {
         islandNum.close();
         isolatedNodes.close();
         spectralRadius.close();
+        topologicalTrace.print("\n");
+        topologicalRank.print("\n");
     }
 
     public void replayResults(){
@@ -160,6 +168,8 @@ public class BenchmarkLogReplayer {
         double islands = log.getAggregateByEpochNumber(epochNumber, Metrics.ISLANDS).getMax();
         double isolNodes = log.getAggregateByEpochNumber(epochNumber, Metrics.ISOLATED_NODES).getMax();
         double spectralRadiusPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.SPECTRAL_RADIUS).getMax();
+        double topologicalRankPerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.RANK).getMax();
+        double topologicalTracePerEpoch=log.getAggregateByEpochNumber(epochNumber, Metrics.TRACE).getMax();
         
         if(writeToFile){
             lineLossOut.print(avgLineLossesPerEpoch + coma);
@@ -173,7 +183,7 @@ public class BenchmarkLogReplayer {
             isolatedNodes.print(isolNodes + coma);
             spectralRadius.print(spectralRadiusPerEpoch + coma);
         }
-        logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch,spectralRadiusPerEpoch,simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
+        logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch,spectralRadiusPerEpoch,topologicalRankPerEpoch,topologicalTracePerEpoch,simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
     }
 
     private MeasurementLog getMemorySupportedLog(MeasurementLog log, int minLoad, int maxLoad){
@@ -186,7 +196,7 @@ public class BenchmarkLogReplayer {
 
     public void printLocalMetricsTags(){
         logger.info("*** RESULTS PER EPOCH ***\n");
-        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Spectral Radius","Simu Time [ms]", "Nr of iterations", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
+        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Spectral Radius","Rank","Trace","Simu Time [ms]", "Nr of iterations", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

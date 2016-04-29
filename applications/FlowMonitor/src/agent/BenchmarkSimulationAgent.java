@@ -112,7 +112,10 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
         }
     }
     
-    public void calculateSpectralRadius(){
+    //Spectral Metrics Implementation
+    //This method returns adjacency matrix
+    public Matrix calculateAdjacencyMatrix(){
+        
         
         List<Integer> fromNode = new ArrayList<Integer>();
         List<Integer> toNode = new ArrayList<Integer>();
@@ -129,7 +132,7 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
                
     
         //final int n = 30;
-        final int N = getFlowNetwork().getNodes().size();
+         final int N = getFlowNetwork().getNodes().size();
      
         // adjacency matrix initialized
         int[][] adjacencyMatrix = new int[N][N];
@@ -155,11 +158,27 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
      
          Matrix M = new Matrix(doubleAdjacencyMatrix);
          
+         return M;
+    }
+    
+    public void calculateSpectralRadius(){
+        final int N = getFlowNetwork().getNodes().size();
          EigenvalueDecomposition E =
-            new EigenvalueDecomposition(M.plus(M.transpose()).times(0.5));
+            new EigenvalueDecomposition(calculateAdjacencyMatrix().plus(calculateAdjacencyMatrix().transpose()).times(0.5));
          double[] d = E.getRealEigenvalues();
          double maxEigen = d[N-1];
          this.getSpectralMetrics().get(this.getSimulationTime()).put(Metrics.SPECTRAL_RADIUS, maxEigen);
+    }
+    
+    public void calculateRank(){
+        
+        int rank = calculateAdjacencyMatrix().rank();
+        this.getSpectralMetrics().get(this.getSimulationTime()).put(Metrics.RANK, rank);
+    }
+    
+    public void calculateTrace(){
+        int trace = (int) calculateAdjacencyMatrix().trace();
+        this.getSpectralMetrics().get(this.getSimulationTime()).put(Metrics.TRACE, trace);
     }
     
     public void saveStartTime(){
@@ -191,6 +210,8 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
         this.saveSimuTime();
         this.saveIterationNumber();
         this.calculateSpectralRadius();
+        this.calculateRank();
+        this.calculateTrace();
     }
         
     /**
@@ -246,6 +267,8 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
                     
                     HashMap<Metrics,Object> spectralMetrics=getSpectralMetrics().get(simulationTime);
                     log.log(simulationTime, Metrics.SPECTRAL_RADIUS, ((Double)spectralMetrics.get(Metrics.SPECTRAL_RADIUS)));
+                    log.log(simulationTime, Metrics.TRACE, ((Integer)spectralMetrics.get(Metrics.TRACE)));
+                    log.log(simulationTime, Metrics.RANK, ((Integer)spectralMetrics.get(Metrics.RANK)));
                 }
                 getMeasurementDumper().measurementEpochEnded(log, simulationTime);
                 log.shrink(simulationTime, simulationTime+1);
