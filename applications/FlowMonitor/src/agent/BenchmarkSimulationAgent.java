@@ -28,6 +28,10 @@ import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
 import protopeer.util.quantities.Time;
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * General domain independent measurements.
@@ -40,6 +44,7 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalLinkMetrics;
     private HashMap<Integer,HashMap<String,HashMap<Metrics,Object>>> temporalNodeMetrics;
     private HashMap<Integer,HashMap<Metrics,Object>> temporalSystemMetrics;
+    private HashMap<Integer,HashMap<Metrics,Object>> spectralMetrics;
     private long simulationStartTime;
     
     public BenchmarkSimulationAgent(String experimentID, 
@@ -51,6 +56,7 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
         this.temporalLinkMetrics=new HashMap();
         this.temporalNodeMetrics=new HashMap();
         this.temporalSystemMetrics=new HashMap();
+        this.spectralMetrics = new HashMap();
     }
     
     public void initMeasurementVariables(){
@@ -69,6 +75,8 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
         this.getTemporalNodeMetrics().put(this.getSimulationTime(), nodeMetrics);
         
         this.getTemporalSystemMetrics().put(this.getSimulationTime(), new HashMap<>());
+        
+         this.getSpectralMetrics().put(this.getSimulationTime(), new HashMap<>());
     }
     
     public void calculateTotalLines(){
@@ -104,6 +112,56 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
         }
     }
     
+    public void calculateSpectralRadius(){
+        
+        List<Integer> fromNode = new ArrayList<Integer>();
+        List<Integer> toNode = new ArrayList<Integer>();
+        
+        for(Link link:this.getFlowNetwork().getLinks()){
+            if (link.isActivated()==true){
+                fromNode.add(Integer.parseInt(link.getStartNode().getIndex())-1);
+                toNode.add(Integer.parseInt(link.getEndNode().getIndex())-1);
+                
+            }
+        }
+        int[] fromNodeArray=toIntegerArray(fromNode);
+        int[] toNodeArray=toIntegerArray(toNode);
+               
+    
+        //final int n = 30;
+        final int N = getFlowNetwork().getNodes().size();
+     
+        // adjacency matrix initialized
+        int[][] adjacencyMatrix = new int[N][N];
+     
+        // create symmetric adjacency matrix by exploring the topology of the outputted flowNetwork
+        int fromNodeLength = fromNodeArray.length;
+        for(int i=0; i<fromNodeLength; i++){
+            int u_axis = fromNodeArray[i];
+            int v_axis = toNodeArray[i];
+            adjacencyMatrix[u_axis][v_axis] = 1;
+            adjacencyMatrix[v_axis][u_axis] = 1; //to make it symmetric
+        }
+        
+        //converting into a type suitable for Jama
+        double[][] doubleAdjacencyMatrix = new double[adjacencyMatrix.length][adjacencyMatrix[0].length];
+
+        for(int i = 0; i < adjacencyMatrix.length; i++)
+        {
+            for(int j = 0; j < adjacencyMatrix[0].length; j++)
+                doubleAdjacencyMatrix[i][j] = (double) adjacencyMatrix[i][j];
+        }
+    
+     
+         Matrix M = new Matrix(doubleAdjacencyMatrix);
+         
+         EigenvalueDecomposition E =
+            new EigenvalueDecomposition(M.plus(M.transpose()).times(0.5));
+         double[] d = E.getRealEigenvalues();
+         double maxEigen = d[N-1];
+         this.getSpectralMetrics().get(this.getSimulationTime()).put(Metrics.SPECTRAL_RADIUS, maxEigen);
+    }
+    
     public void saveStartTime(){
         this.simulationStartTime = System.currentTimeMillis();
     }
@@ -132,6 +190,7 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
         this.calculateTotalLines();
         this.saveSimuTime();
         this.saveIterationNumber();
+        this.calculateSpectralRadius();
     }
         
     /**
@@ -154,6 +213,10 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
      */
     public HashMap<Integer,HashMap<Metrics,Object>> getTemporalSystemMetrics() {
         return temporalSystemMetrics;
+    }
+    
+     public HashMap<Integer,HashMap<Metrics,Object>> getSpectralMetrics() {
+        return spectralMetrics;
     }
     
     //****************** MEASUREMENTS ******************
@@ -180,10 +243,21 @@ public class BenchmarkSimulationAgent extends SimulationAgent{
                     HashMap<Metrics,Object> sysMetrics=getTemporalSystemMetrics().get(simulationTime);
                     log.log(simulationTime, Metrics.TOT_SIMU_TIME, ((Double)sysMetrics.get(Metrics.TOT_SIMU_TIME)));
                     log.log(simulationTime, Metrics.NEEDED_ITERATIONS, ((Integer)sysMetrics.get(Metrics.NEEDED_ITERATIONS)));
+                    
+                    HashMap<Metrics,Object> spectralMetrics=getSpectralMetrics().get(simulationTime);
+                    log.log(simulationTime, Metrics.SPECTRAL_RADIUS, ((Double)spectralMetrics.get(Metrics.SPECTRAL_RADIUS)));
                 }
                 getMeasurementDumper().measurementEpochEnded(log, simulationTime);
                 log.shrink(simulationTime, simulationTime+1);
             }
         });
+    }
+    
+    //**ARRAY CONVERSION FOR MATRIX OPERATIONS**
+     public int[] toIntegerArray(List<Integer> list){
+  int[] ret = new int[list.size()];
+  for(int i = 0;i < ret.length;i++)
+    ret[i] = list.get(i);
+  return ret;
     }
 }
