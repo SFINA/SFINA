@@ -32,5 +32,6 @@ public enum Metrics {
     TOT_SIMU_TIME,
     NEEDED_ITERATIONS,
     ISLANDS,
-    ISOLATED_NODES
+    ISOLATED_NODES,
+    SPECTRAL_RADIUS
 }
