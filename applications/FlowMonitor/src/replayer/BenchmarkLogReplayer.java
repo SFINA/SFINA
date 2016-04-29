@@ -137,8 +137,8 @@ public class BenchmarkLogReplayer {
         islandNum.close();
         isolatedNodes.close();
         spectralRadius.close();
-        topologicalTrace.print("\n");
-        topologicalRank.print("\n");
+        topologicalTrace.close();
+        topologicalRank.close();
     }
 
     public void replayResults(){
@@ -182,6 +182,8 @@ public class BenchmarkLogReplayer {
             islandNum.print(islands + coma);
             isolatedNodes.print(isolNodes + coma);
             spectralRadius.print(spectralRadiusPerEpoch + coma);
+            topologicalRank.print(topologicalRankPerEpoch + coma);
+            topologicalTrace.print(topologicalTracePerEpoch + coma);
         }
         logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch,spectralRadiusPerEpoch,topologicalRankPerEpoch,topologicalTracePerEpoch,simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
     }
