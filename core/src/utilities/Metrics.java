@@ -33,5 +33,7 @@ public enum Metrics {
     NEEDED_ITERATIONS,
     ISLANDS,
     ISOLATED_NODES,
-    SPECTRAL_RADIUS
+    SPECTRAL_RADIUS,
+    RANK,
+    TRACE
 }
