@@ -55,14 +55,14 @@ public class BenchmarkEvolution extends BenchmarkAnalysis{
     }
     
     @Override
-    public void performInitialStateOperations(){
+    public void runInitialOperations(){
         // inherited from BenchmarkSFINAAgent
         this.initMeasurementVariables();
         this.saveStartTime();
     }
     
     @Override
-    public void performFinalStateOperations(){
+    public void runFinalOperations(){
         //registers link-removed corresponding to iterations (In the replayer table, it is named as "Link Removed")
         for (int i=0; i<getFlowNetwork().getLinks().size();i++){
             for (int j=0; j<macroCount.get(i);j++){
@@ -225,6 +225,7 @@ public class BenchmarkEvolution extends BenchmarkAnalysis{
                         log.log(simulationTime, Metrics.TOTAL_LINES, ((Double)linkMetrics.get(Metrics.TOTAL_LINES)));
                      }
                     log.log(simulationTime, "linkremoved"+Integer.toString(i), ((Integer)linktoIterations.get(i)));
+                    log.log(simulationTime, "spectralRadius"+Integer.toString(i), ((Double)spectralRadius.get(i)));
                     }
                     HashMap<Metrics,Object> sysMetrics=getTemporalSystemMetrics().get(simulationTime);
                     log.log(simulationTime, Metrics.TOT_SIMU_TIME, ((Double)sysMetrics.get(Metrics.TOT_SIMU_TIME)));

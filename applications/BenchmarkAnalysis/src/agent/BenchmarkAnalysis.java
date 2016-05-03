@@ -17,7 +17,7 @@
  */
 package agent;
 
-import agent.BenchmarkSFINAAgent;
+import agent.BenchmarkSimulationAgent;
 import event.Event;
 import event.EventType;
 import event.NetworkComponent;
@@ -32,17 +32,21 @@ import network.Node;
 import org.apache.log4j.Logger;
 import power.input.PowerNodeState;
 import protopeer.util.quantities.Time;
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
+
 
 
 /**
  * Cascade if link limits violated. Domain independent.
  * @author Ben
  */
-public class BenchmarkAnalysis extends BenchmarkSFINAAgent{
+public class BenchmarkAnalysis extends BenchmarkSimulationAgent{
     
     private static final Logger logger = Logger.getLogger(BenchmarkAnalysis.class);
     private HashMap<Integer,LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
     public ArrayList<ArrayList<Double>> powerPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power per iteration
+    public ArrayList<Double> spectralRadius = new ArrayList<Double>();
     public ArrayList<Integer> macroCount = new ArrayList<Integer>(); //registers number of iterations particular line removal proceeds to
     
     public BenchmarkAnalysis(String experimentID, 
@@ -104,6 +108,10 @@ public class BenchmarkAnalysis extends BenchmarkSFINAAgent{
             
             for (Link lin : getFlowNetwork().getLinks()){
             powerPerIteration.get(globalCount).add(lin.getFlow());
+            
+            //store spectral radius in each iteration
+            spectralRadius.add(getSpectralRadius());
+            
             }
             //scheduleMeasurements();
             globalCount++;
@@ -120,9 +128,17 @@ public class BenchmarkAnalysis extends BenchmarkSFINAAgent{
         
         logFinalIslands();
         
-        ////adds number of iterations particular line removal proceeds to
+        //adds number of iterations particular line removal proceeds to
         macroCount.add(iter);
         
+        //restoring the network
+        restoreNetwork();
+        
+      }
+     
+    }
+    
+    public void restoreNetwork(){
         //restoring the links
         for (Link linkNew : getFlowNetwork().getLinks()){
           linkNew.setActivated(true);
@@ -134,9 +150,17 @@ public class BenchmarkAnalysis extends BenchmarkSFINAAgent{
           nodeNew.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE,1.0);
           
         }
-     
-      }
-     
+    }
+    
+    
+    public double getSpectralRadius(){
+        final int N = getFlowNetwork().getNodes().size();
+         EigenvalueDecomposition E =
+            new EigenvalueDecomposition(calculateAdjacencyMatrix().plus(calculateAdjacencyMatrix().transpose()).times(0.5));
+         double[] d = E.getRealEigenvalues();
+         double maxEigen = d[N-1];
+         return maxEigen;
+         //this.getSpectralMetrics().get(this.getSimulationTime()).put(Metrics.SPECTRAL_RADIUS, maxEigen);
     }
   
     /**
