@@ -108,11 +108,11 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent{
             
             for (Link lin : getFlowNetwork().getLinks()){
             powerPerIteration.get(globalCount).add(lin.getFlow());
+            }
             
             //store spectral radius in each iteration
             spectralRadius.add(getSpectralRadius());
             
-            }
             //scheduleMeasurements();
             globalCount++;
             // Output data at current iteration and go to next one

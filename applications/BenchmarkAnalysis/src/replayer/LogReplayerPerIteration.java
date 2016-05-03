@@ -197,7 +197,7 @@ public class LogReplayerPerIteration {
             iterations.print(neededIterations + coma);
             islandNum.print(islands + coma);
             isolatedNodes.print(isolNodes + coma);
-            spectralRadius.print(isolNodes + coma);
+            spectralRadius.print(spectralRadiusPerIteration + coma);
             
         }
         logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, spectralRadiusPerIteration, simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
