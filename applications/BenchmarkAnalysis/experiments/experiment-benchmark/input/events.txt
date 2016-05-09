@@ -1,2 +1,0 @@
-time,feature,component,id,parameter,value
-1,topology,link,1,status,0
