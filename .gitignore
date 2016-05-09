@@ -7,3 +7,5 @@ _DS_Store
 **/dist/lib/*
 **/peerlets-log/*/peer-*
 **/output/**/*.txt
+/applications/PowerFlowCascade/dist/
+/applications/FlowCascade/dist/
