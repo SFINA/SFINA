@@ -17,7 +17,6 @@
  */
 package agent;
 
-import agent.BenchmarkSimulationAgent;
 import event.Event;
 import event.EventType;
 import event.NetworkComponent;
@@ -34,7 +33,7 @@ import network.Node;
 import org.apache.log4j.Logger;
 import power.input.PowerFlowLoader;
 import protopeer.util.quantities.Time;
-import testing.testLoader;
+
 
 
 /**
@@ -71,8 +70,9 @@ public class Interdependent extends BenchmarkSimulationAgent{
         //File inputpathLinks = new File(getExperimentInputFilesLocation()+"/experiment-interdep/input/time_1/topology/links.txt");
         
         TopologyLoader topologyLoader = new TopologyLoader(net, ",");
-        topologyLoader.loadNodes("/experiments/experiment-standard/input/experiment-interdep/input/time_1/topology/nodes.txt");
-        topologyLoader.loadLinks("/experiments/experiment-standard/input/experiment-interdep/input/time_1/topology/links.txt");
+              
+        topologyLoader.loadNodes("experiments/experiment-standard/peer-0/input/experiment-interdep/nodes.txt");
+        topologyLoader.loadLinks("experiments/experiment-standard/peer-0/input/experiment-interdep/links.txt");
 
         nodeRemovedA = new ArrayList<String>();
         nodeRemovedB = new ArrayList<String>();
