@@ -271,7 +271,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public ArrayList<FlowNetwork> computeIslands(){
         ArrayList<FlowNetwork> islands = new ArrayList<>();
         ArrayList leftNodes = new ArrayList();
-        for (Node node : this.nodes.values())
+        for (Node node : this.getNodes())
             if(node.isActivated())
                 leftNodes.add(node);
         while (leftNodes.size() > 0){
@@ -322,15 +322,17 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
             for (Link link : currentLinks){
                 if (!currentIslandLinks.contains(link))
                     currentIslandLinks.add(link);
-                // Restart Iteration with EndNode of current Link
-                currentNode = link.getEndNode();
-                if (!currentIslandNodes.contains(currentNode)){
-                    iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
-                }
-                // Restart Iteration with StartNode of current Link
-                currentNode = link.getStartNode();
-                if (!currentIslandNodes.contains(currentNode)){
-                    iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
+                // Restart Iteration with EndNode of current Link if it is connected (i.e. has node on other end.
+                if (link.isConnected()){
+                    currentNode = link.getEndNode();
+                    if (!currentIslandNodes.contains(currentNode)){
+                        iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
+                    }
+                    // Restart Iteration with StartNode of current Link
+                    currentNode = link.getStartNode();
+                    if (!currentIslandNodes.contains(currentNode)){
+                        iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
+                    }
                 }
             }
         }
