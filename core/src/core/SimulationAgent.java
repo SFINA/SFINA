@@ -190,12 +190,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                timeToken = timeTokenName + getSimulationTime();
-                logger.info("--------------> " + timeToken + " <--------------");
                 
-                resetIteration();
-                
-                loadInputData(timeToken);
+                initActiveState();
                 
                 runInitialOperations();
                 
@@ -359,6 +355,16 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             }
         }
         experiment.delete();
+    }
+    
+    /**
+     * Initializes the active state by setting iteration = 1 and loading data.
+     */
+    private void initActiveState(){
+        timeToken = timeTokenName + getSimulationTime();
+        logger.info("--------------> " + timeToken + " <--------------");
+        resetIteration();        
+        loadInputData(timeToken);
     }
     
     /**
