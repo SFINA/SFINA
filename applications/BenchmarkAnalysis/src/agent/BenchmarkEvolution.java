@@ -17,6 +17,9 @@
  */
 package agent;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import utilities.Metrics;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +29,8 @@ import java.util.HashSet;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.log4j.Logger;
 import power.input.PowerNodeType;
 import power.backend.PowerFlowType;
@@ -62,13 +67,13 @@ public class BenchmarkEvolution extends BenchmarkAnalysis{
     }
     
     @Override
-    public void runFinalOperations(){
+    public void runFinalOperations() {
         //registers link-removed corresponding to iterations (In the replayer table, it is named as "Link Removed")
-        for (int i=0; i<getFlowNetwork().getLinks().size();i++){
-            for (int j=0; j<macroCount.get(i);j++){
-            linktoIterations.add(i+1);              
-    }             
-  }   
+        for (int i = 0; i < getFlowNetwork().getLinks().size(); i++) {
+            for (int j = 0; j < macroCount.get(i); j++) {
+                linktoIterations.add(i + 1);
+            }
+        }
         // inherited from BenchmarkSFINAAgent
         this.calculateActivationStatus();
         this.calculateFlow();
@@ -76,6 +81,45 @@ public class BenchmarkEvolution extends BenchmarkAnalysis{
         this.calculateTotalLines();
         this.saveSimuTime();
         this.saveIterationNumber();
+        
+        //calculates correlation coefficient and stores in a file
+//        double[][] ei = new double[linkStatusPerContingency.size()][];
+//
+//        for (int i = 0; i < linkStatusPerContingency.size(); i++) {
+//            ArrayList<Double> row = linkStatusPerContingency.get(i);
+//
+//            // Perform equivalent `toArray` operation
+//            double[] copy = new double[row.size()];
+//            for (int j = 0; j < row.size(); j++) {
+//                // Manually loop and set individually
+//                copy[j] = row.get(j);
+//            }
+//
+//            ei[i] = copy;
+//        }
+//
+//        PearsonsCorrelation pearson = new PearsonsCorrelation();
+//        RealMatrix corrDouble = pearson.computeCorrelationMatrix(ei);
+//        System.out.println(corrDouble);
+//
+//        try (
+//                PrintStream outPearson = new PrintStream(new File("output_pearson.txt"));) {
+//
+//            for (int m = 0; m < corrDouble.getRowDimension(); m++) {
+//                String sc = "";
+//                for (int j = 0; j < corrDouble.getRow(m).length; j++) {
+//                    sc += corrDouble.getEntry(m, j) + " ";
+//                }
+//
+//                outPearson.println(sc);
+//            }
+//            outPearson.close();
+//
+//        } catch (FileNotFoundException p) {
+//
+//            p.printStackTrace();
+//        }
+
     }
     
     

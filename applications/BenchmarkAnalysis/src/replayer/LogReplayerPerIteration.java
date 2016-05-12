@@ -215,7 +215,7 @@ public class LogReplayerPerIteration {
 
     public void printLocalMetricsTags(){
         logger.info("*** RESULTS PER EPOCH ***\n");
-        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Spectral Radisu", "Simu Time [ms]", "Link Removed", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
+        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Spectral Radius", "Simu Time [ms]", "Link Removed", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

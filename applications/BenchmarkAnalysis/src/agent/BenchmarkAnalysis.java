@@ -48,6 +48,8 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent{
     public ArrayList<ArrayList<Double>> powerPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power per iteration
     public ArrayList<Double> spectralRadius = new ArrayList<Double>();
     public ArrayList<Integer> macroCount = new ArrayList<Integer>(); //registers number of iterations particular line removal proceeds to
+    public ArrayList<ArrayList<Double>> linkStatusPerContingency = new ArrayList<ArrayList<Double>>();
+    public ArrayList<ArrayList<Boolean>> linkStatusPerContingencyBool = new ArrayList<ArrayList<Boolean>>();
     
     public BenchmarkAnalysis(String experimentID, 
             Time bootstrapTime, 
@@ -123,7 +125,9 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent{
             //deactivatedLinkTimeStep.add();
         }
         
-       
+       //get link sttaus
+        getLinkStatus(localCount);
+        
         localCount++;
         
         logFinalIslands();
@@ -161,6 +165,18 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent{
          double maxEigen = d[N-1];
          return maxEigen;
          //this.getSpectralMetrics().get(this.getSimulationTime()).put(Metrics.SPECTRAL_RADIUS, maxEigen);
+    }
+    
+    public void getLinkStatus(int index){
+        linkStatusPerContingencyBool.add(new ArrayList<Boolean>());
+        linkStatusPerContingency.add(new ArrayList<Double>());
+        
+        for (Link lin : getFlowNetwork().getLinks()){
+            
+            linkStatusPerContingencyBool.get(index).add(lin.isActivated());
+            linkStatusPerContingency.get(index).add((lin.isActivated())?1.0:0.0);
+            }
+        
     }
   
     /**
