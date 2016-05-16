@@ -174,7 +174,7 @@ public class LogReplayerPerIteration {
         //BenchmarkAnalysis smh = new BenchmarkAnalysis(expID, 0, 1000);
         //smh.powerPerIteration;
                 
-        for (int i=0;i<42;i++){ //42 is the total number of iterations, 41 is total number of lines
+        for (int i=0;i<42;i++){ //42 or 114 is the total number of iterations, 41 is total number of lines
         double epochNum=epochNumber;
         double avgLineLossesPerEpoch=1-(log.getAggregateByEpochNumber(epochNumber, Metrics.ACTIVATED_LINES).getSum()/log.getAggregateByEpochNumber(epochNumber, Metrics.TOTAL_LINES).getSum());
         double avgFlowPerEpoch=log.getAggregateByEpochNumber(epochNumber, "power"+Integer.toString(i)).getAverage();
