@@ -1,0 +1,5 @@
+# Explanation
+
+The measurement values during simulation are saved in this folder and can be reloaded later for processing.
+
+This folder has to exist in order for the simulation to work properly.
