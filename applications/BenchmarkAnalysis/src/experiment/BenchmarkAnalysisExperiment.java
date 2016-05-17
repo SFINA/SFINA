@@ -43,7 +43,7 @@ public class BenchmarkAnalysisExperiment extends SimulatedExperiment{
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=5; //before 5, here it should be 3 for full iteration
+    private final static int runDuration=3; //before 5, here it should be 3 for full iteration
     private final static int N=1;
     
      public static void main(String args[]){

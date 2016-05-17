@@ -137,9 +137,8 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
                 //store spectral radius in each iteration
                 spectralRadius.add(getSpectralRadius());
 
-                
                 globalCount++;
-                
+
                 // Output data at current iteration and go to next one
                 nextIteration();
 
@@ -148,7 +147,7 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
 
                 // deactivate all overloaded nodes/links
                 this.executeAllEvents();
-                
+
             }
 
             //get link sttaus
@@ -161,10 +160,11 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             macroCount.add(iter);
 
             //restoring the network
-            restoreNetwork();
-            //loadData();
-            //setFlowNetwork(net);
+            //restoreNetwork();
+            loadInputData("time_1");
 
+            //setFlowNetwork(net);
+            //setFlowParameters();
         }
 
     }

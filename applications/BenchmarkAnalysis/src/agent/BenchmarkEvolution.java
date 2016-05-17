@@ -72,7 +72,7 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
     @Override
     public void runFinalOperations() {
 
-        //storeCorrelationCoefficient();
+        storeCorrelationCoefficient();
 
         //registers link-removed corresponding to iterations (In the replayer table, it is named as "Link Removed")
         for (int i = 0; i < getFlowNetwork().getLinks().size(); i++) {
@@ -90,43 +90,43 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
 
     }
 
-//    private void storeCorrelationCoefficient() {
-//        //calculates correlation coefficient and stores in a file
-//        double[][] ei = new double[linkStatusPerContingency.size()][];
-//
-//        for (int i = 0; i < linkStatusPerContingency.size(); i++) {
-//            ArrayList<Double> row = linkStatusPerContingency.get(i);
-//
-//            double[] copy = new double[row.size()];
-//            for (int j = 0; j < row.size(); j++) {
-//
-//                copy[j] = row.get(j);
-//            }
-//
-//            ei[i] = copy;
-//        }
-//
-//        PearsonsCorrelation pearson = new PearsonsCorrelation();
-//        RealMatrix corrDouble = pearson.computeCorrelationMatrix(ei);
-//
-//        try (
-//                PrintStream outPearson = new PrintStream(new File("output_pearson.txt"));) {
-//
-//            for (int m = 0; m < corrDouble.getRowDimension(); m++) {
-//                String sc = "";
-//                for (int j = 0; j < corrDouble.getRow(m).length; j++) {
-//                    sc += corrDouble.getEntry(m, j) + " ";
-//                }
-//
-//                outPearson.println(sc);
-//            }
-//            outPearson.close();
-//
-//        } catch (FileNotFoundException p) {
-//
-//            p.printStackTrace();
-//        }
-//    }
+    private void storeCorrelationCoefficient() {
+        //calculates correlation coefficient and stores in a file
+        double[][] ei = new double[linkStatusPerContingency.size()][];
+
+        for (int i = 0; i < linkStatusPerContingency.size(); i++) {
+            ArrayList<Double> row = linkStatusPerContingency.get(i);
+
+            double[] copy = new double[row.size()];
+            for (int j = 0; j < row.size(); j++) {
+
+                copy[j] = row.get(j);
+            }
+
+            ei[i] = copy;
+        }
+
+        PearsonsCorrelation pearson = new PearsonsCorrelation();
+        RealMatrix corrDouble = pearson.computeCorrelationMatrix(ei);
+
+        try (
+                PrintStream outPearson = new PrintStream(new File("output_pearson.txt"));) {
+
+            for (int m = 0; m < corrDouble.getRowDimension(); m++) {
+                String sc = "";
+                for (int j = 0; j < corrDouble.getRow(m).length; j++) {
+                    sc += corrDouble.getEntry(m, j) + " ";
+                }
+
+                outPearson.println(sc);
+            }
+            outPearson.close();
+
+        } catch (FileNotFoundException p) {
+
+            p.printStackTrace();
+        }
+    }
 
     private void setCapacityByToleranceParameter() {
         double toleranceParameter = getToleranceParameter();
