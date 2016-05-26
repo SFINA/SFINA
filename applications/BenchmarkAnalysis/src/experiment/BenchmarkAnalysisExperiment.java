@@ -36,7 +36,7 @@ public class BenchmarkAnalysisExperiment extends SimulatedExperiment{
     
     private static final Logger logger = Logger.getLogger(BenchmarkAnalysisExperiment.class);
     
-    private static String expSeqNum="benchmark";
+    private static String expSeqNum="case57";
     private final static String peersLogDirectory="peerlets-log/";
     private static String experimentID="experiment-"+expSeqNum;
     

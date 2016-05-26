@@ -35,6 +35,7 @@ import protopeer.util.quantities.Time;
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import input.TopologyLoader;
+import power.backend.PowerBackendParameter;
 import power.input.PowerFlowLoader;
 
 /**
@@ -47,11 +48,11 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
     private static final Logger logger = Logger.getLogger(BenchmarkAnalysis.class);
     private HashMap<Integer, LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
     public ArrayList<ArrayList<Double>> powerPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power per iteration
+    public ArrayList<ArrayList<Double>> linkPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power per iteration
     public ArrayList<Double> spectralRadius = new ArrayList<Double>();
     public ArrayList<Integer> macroCount = new ArrayList<Integer>(); //registers number of iterations particular line removal proceeds to
     public ArrayList<ArrayList<Double>> linkStatusPerContingency = new ArrayList<ArrayList<Double>>();
     public ArrayList<ArrayList<Boolean>> linkStatusPerContingencyBool = new ArrayList<ArrayList<Boolean>>();
-    static FlowNetwork net;
 
     public BenchmarkAnalysis(String experimentID,
             Time bootstrapTime,
@@ -71,21 +72,14 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
     @Override
     public void runFlowAnalysis() {
 
-        net = new FlowNetwork();
-
-        TopologyLoader topologyLoader = new TopologyLoader(net, ",");
-
-        topologyLoader.loadNodes("experiments/experiment-benchmark/peer-0/input/time_1/topology/nodes.txt");
-        topologyLoader.loadLinks("experiments/experiment-benchmark/peer-0/input/time_1/topology/links.txt");
-
-        PowerFlowLoader flowDataLoader = new PowerFlowLoader(net, ",", "-");
-        flowDataLoader.loadNodeFlowData("experiments/experiment-benchmark/peer-0/input/time_1/flow/nodes.txt");
-        flowDataLoader.loadLinkFlowData("experiments/experiment-benchmark/peer-0/input/time_1/flow/links.txt");
-
         int globalCount = 0;
         int localCount = 0;
 
         for (int j = 1; j < getFlowNetwork().getLinks().size() + 1; j++) {
+
+            //Sets the capacity before executing simulation
+            this.setCapacityByToleranceParameter();
+
             getFlowNetwork().deactivateLink(Integer.toString(j));
 
             //ArrayList<ArrayList<FlowNetwork>> flownetworkBuffer = new ArrayList<>();
@@ -131,7 +125,20 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
                 powerPerIteration.add(new ArrayList<Double>());
 
                 for (Link lin : getFlowNetwork().getLinks()) {
-                    powerPerIteration.get(globalCount).add(lin.getFlow());
+                    if (lin.getFlow() > lin.getCapacity()) {
+                        powerPerIteration.get(globalCount).add(lin.getCapacity());
+                    } else {
+                        powerPerIteration.get(globalCount).add(lin.getFlow());
+                    }
+                }
+
+                //add new array to store link for next iteration
+                linkPerIteration.add(new ArrayList<Double>());
+
+                for (Link lin : getFlowNetwork().getLinks()) {
+
+                    linkPerIteration.get(globalCount).add((lin.isActivated()) ? 1.0 : 0.0);
+
                 }
 
                 //store spectral radius in each iteration
@@ -151,7 +158,20 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             }
 
             //get link sttaus
-            getLinkStatus(localCount);
+            //getLinkStatus(localCount);
+            
+            linkStatusPerContingency.add(new ArrayList<Double>());
+
+            for (Link lin : getFlowNetwork().getLinks()) {
+                if (lin.isActivated()==false) {
+                
+                linkStatusPerContingency.get(localCount).add(1.0);
+                }else{
+                    linkStatusPerContingency.get(localCount).add(lin.getFlow() / lin.getCapacity());
+            //linkStatusPerContingency.get(index).add((lin.isActivated()) ? 1.0 : 0.0);
+
+                }
+            }
 
             localCount++;
 
@@ -160,12 +180,10 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             macroCount.add(iter);
 
             //restoring the network
-            //restoreNetwork();
             loadInputData("time_1");
 
-            //setFlowNetwork(net);
-            //setFlowParameters();
         }
+        System.out.print("Length of Spectral Radius...." + spectralRadius.size() + "..");
 
     }
 
@@ -200,7 +218,9 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
         for (Link lin : getFlowNetwork().getLinks()) {
 
             linkStatusPerContingencyBool.get(index).add(lin.isActivated());
-            linkStatusPerContingency.get(index).add((lin.isActivated()) ? 1.0 : 0.0);
+            linkStatusPerContingency.get(index).add(lin.getFlow() / lin.getCapacity());
+            //linkStatusPerContingency.get(index).add((lin.isActivated()) ? 1.0 : 0.0);
+
         }
 
     }
@@ -329,6 +349,28 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             }
         }
         logger.info(log);
+    }
+
+    private void setCapacityByToleranceParameter() {
+        double toleranceParameter = getToleranceParameter();
+        boolean capacityNotSet = false;
+        for (Link link : getFlowNetwork().getLinks()) {
+            if (link.getCapacity() == 0.0) {
+                capacityNotSet = true;
+            } else {
+                capacityNotSet = false; //true when alpha needed
+            }
+        }
+        if (capacityNotSet) {
+            callBackend(getFlowNetwork());
+            for (Link link : getFlowNetwork().getLinks()) {
+                link.setCapacity(toleranceParameter * link.getFlow());
+            }
+        }
+    }
+
+    public double getToleranceParameter() {
+        return (Double) this.getBackendParameters().get(PowerBackendParameter.TOLERANCE_PARAMETER);
     }
 
 }

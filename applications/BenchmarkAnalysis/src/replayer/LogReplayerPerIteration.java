@@ -42,6 +42,7 @@ public class LogReplayerPerIteration {
     private PrintWriter islandNum;
     private PrintWriter isolatedNodes;
     private PrintWriter spectralRadius;
+    private PrintWriter linkStatus;
     
     
     static boolean writeToFile=true;
@@ -105,6 +106,7 @@ public class LogReplayerPerIteration {
             islandNum  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"islands.txt", true)));
             isolatedNodes  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"isolatedNodes.txt", true)));
             spectralRadius  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"spectralRadius.txt", true)));
+            linkStatus  = new PrintWriter(new BufferedWriter(new FileWriter(resultID+"linkStatus.txt", true)));
             
         }
         catch (IOException e) {
@@ -138,6 +140,7 @@ public class LogReplayerPerIteration {
         islandNum.print("\n");
         isolatedNodes.print("\n");
         spectralRadius.print("\n");
+        linkStatus.print("\n");
         
         
         lineLossOut.close();
@@ -150,6 +153,7 @@ public class LogReplayerPerIteration {
         islandNum.close();
         isolatedNodes.close();
         spectralRadius.close();
+        linkStatus.close();
         
     }
 
@@ -174,7 +178,7 @@ public class LogReplayerPerIteration {
         //BenchmarkAnalysis smh = new BenchmarkAnalysis(expID, 0, 1000);
         //smh.powerPerIteration;
                 
-        for (int i=0;i<42;i++){ //42 or 114 is the total number of iterations, 41 is total number of lines
+        for (int i=0;i<203;i++){ //42 or 114 is the total number of iterations, 41 is total number of lines
         double epochNum=epochNumber;
         double avgLineLossesPerEpoch=1-(log.getAggregateByEpochNumber(epochNumber, Metrics.ACTIVATED_LINES).getSum()/log.getAggregateByEpochNumber(epochNumber, Metrics.TOTAL_LINES).getSum());
         double avgFlowPerEpoch=log.getAggregateByEpochNumber(epochNumber, "power"+Integer.toString(i)).getAverage();
@@ -186,6 +190,7 @@ public class LogReplayerPerIteration {
         double spectralRadiusPerIteration = log.getAggregateByEpochNumber(epochNumber, "spectralRadius"+Integer.toString(i)).getMax();
         double islands = log.getAggregateByEpochNumber(epochNumber, Metrics.ISLANDS).getMax();
         double isolNodes = log.getAggregateByEpochNumber(epochNumber, Metrics.ISOLATED_NODES).getMax();
+        double linkStatusPerIteration = log.getAggregateByEpochNumber(epochNumber, "link"+Integer.toString(i)).getAverage();
         
         if(writeToFile){
             lineLossOut.print(avgLineLossesPerEpoch + coma);
@@ -198,9 +203,10 @@ public class LogReplayerPerIteration {
             islandNum.print(islands + coma);
             isolatedNodes.print(isolNodes + coma);
             spectralRadius.print(spectralRadiusPerIteration + coma);
+            linkStatus.print(linkStatusPerIteration + coma);
             
         }
-        logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, spectralRadiusPerIteration, simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
+        logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgLineLossesPerEpoch, avgFlowPerEpoch, avgUtilizationPerEpoch, spectralRadiusPerIteration, linkStatusPerIteration,simuTimePerEpoch, neededIterations, relPowerLossBetweenEpochs, relPowerLossSinceEpoch1, islands, isolNodes));
           //logger.info(String.format("%20.0f%20.2f%20.2f%20.2f%20.0f%20.0f%20.4f%20.4f%20.0f%20.0f\n",epochNum, avgFlowPerEpoch));
 
     }
@@ -215,7 +221,7 @@ public class LogReplayerPerIteration {
 
     public void printLocalMetricsTags(){
         logger.info("*** RESULTS PER EPOCH ***\n");
-        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Spectral Radius", "Simu Time [ms]", "Link Removed", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
+        logger.info(String.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "# of Epoch","AVG lines failed","AVG Flow","AVG Utilization","Spectral Radius", "Avg Link Survived", "Simu Time [ms]", "Link Removed", "Pow Loss this epoch", "Pow Loss since ep1", "Nr of islands", "Nr of isol. nodes"));
     }
 
     public double roundDecimals(double decimal, int decimalPlace) {

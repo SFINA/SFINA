@@ -66,7 +66,6 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
         this.initMeasurementVariables();
         this.saveStartTime();
 
-        this.setCapacityByToleranceParameter();
     }
 
     @Override
@@ -87,6 +86,46 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
         this.calculateTotalLines();
         this.saveSimuTime();
         this.saveIterationNumber();
+        
+        //rough output link
+        try (
+                PrintStream outPearson = new PrintStream(new File("output_link_status.txt"));) {
+
+            //for (int m = 0; m < linkPerIteration.size(); m++) {
+            for (int m = 0; m < linkStatusPerContingency.size(); m++) {
+                String sc = "";
+                for (int j = 0; j < linkStatusPerContingency.get(m).size(); j++) {
+                    sc += linkStatusPerContingency.get(m).get(j) + " ";
+                }
+
+                outPearson.println(sc);
+            }
+            outPearson.close();
+
+        } catch (FileNotFoundException p) {
+
+            p.printStackTrace();
+        }
+//        
+//        //rough output power
+//        try (
+//                PrintStream outPearson = new PrintStream(new File("output_power.txt"));) {
+//
+//            for (int m = 0; m < powerPerIteration.size(); m++) {
+//                String sc = "";
+//                for (int j = 0; j < powerPerIteration.get(m).size(); j++) {
+//                    sc += powerPerIteration.get(m).get(j) + " ";
+//                }
+//
+//                outPearson.println(sc);
+//            }
+//            outPearson.close();
+//
+//        } catch (FileNotFoundException p) {
+//
+//            p.printStackTrace();
+//        }
+        
 
     }
 
@@ -126,28 +165,6 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
 
             p.printStackTrace();
         }
-    }
-
-    private void setCapacityByToleranceParameter() {
-        double toleranceParameter = getToleranceParameter();
-        boolean capacityNotSet = false;
-        for (Link link : getFlowNetwork().getLinks()) {
-            if (link.getCapacity() == 0.0) {
-                capacityNotSet = true;
-            } else {
-                capacityNotSet = false; //true when alpha needed
-            }
-        }
-        if (capacityNotSet) {
-            callBackend(getFlowNetwork());
-            for (Link link : getFlowNetwork().getLinks()) {
-                link.setCapacity(toleranceParameter * link.getFlow());
-            }
-        }
-    }
-
-    public double getToleranceParameter() {
-        return (Double) this.getBackendParameters().get(PowerBackendParameter.TOLERANCE_PARAMETER);
     }
 
     @Override
@@ -286,11 +303,12 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
                 if (simulationTime >= 1) {
                     log.logTagSet(simulationTime, new HashSet(getFlowNetwork().getLinks()), simulationTime);
                     //before 0 to 42 or 114
-                    for (int i = 0; i < 42; i++) { //hardcoded because there is problem in time step for logreplayer
+                    for (int i = 0; i < 203; i++) { //hardcoded because there is problem in time step for logreplayer
                         for (Link link : getFlowNetwork().getLinks()) {
                             HashMap<Metrics, Object> linkMetrics = getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
                             log.log(simulationTime, "utilization" + Integer.toString(i), ((Double) powerPerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)) / link.getCapacity());
                             log.log(simulationTime, "power" + Integer.toString(i), ((Double) powerPerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)));
+                            log.log(simulationTime, "link" + Integer.toString(i), ((Double) linkPerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)));
                             log.log(simulationTime, Metrics.TOTAL_LINES, ((Double) linkMetrics.get(Metrics.TOTAL_LINES)));
                         }
                         log.log(simulationTime, "linkremoved" + Integer.toString(i), ((Integer) linktoIterations.get(i)));

@@ -45,7 +45,7 @@ public class BenchmarkLogReplayer {
     private PrintWriter topologicalTrace;
     private PrintWriter topologicalRank;
     
-    static boolean writeToFile=false;
+    static boolean writeToFile=true;
 
     public BenchmarkLogReplayer(String experimentSequenceNumber, int minLoad, int maxLoad){
         this.expSeqNum=experimentSequenceNumber;
