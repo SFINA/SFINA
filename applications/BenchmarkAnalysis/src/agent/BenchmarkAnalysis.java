@@ -358,7 +358,7 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             if (link.getCapacity() == 0.0) {
                 capacityNotSet = true;
             } else {
-                capacityNotSet = false; //true when alpha needed
+                capacityNotSet = true; //true when alpha needed 27/05/16
             }
         }
         if (capacityNotSet) {
