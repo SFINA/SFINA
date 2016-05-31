@@ -71,7 +71,9 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
     @Override
     public void runFinalOperations() {
 
-        storeCorrelationCoefficient();
+        //storeCorrelationCoefficient();
+        //storeCorrelationCoefficientAvgFlow();
+        //storeCorrelationCoefficientFlowIncrease();
 
         //registers link-removed corresponding to iterations (In the replayer table, it is named as "Link Removed")
         for (int i = 0; i < getFlowNetwork().getLinks().size(); i++) {
@@ -164,6 +166,84 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
         } catch (FileNotFoundException p) {
 
             p.printStackTrace();
+        }
+    }
+    
+    
+    
+    private void storeCorrelationCoefficientAvgFlow() {
+        //calculates correlation coefficient and stores in a file
+        double[][] ei_avg_flow = new double[avgflowStatusPerContingency.size()][];
+
+        for (int i = 0; i < avgflowStatusPerContingency.size(); i++) {
+            ArrayList<Double> row_flow = avgflowStatusPerContingency.get(i);
+
+            double[] copy_flow = new double[row_flow.size()];
+            for (int j = 0; j < row_flow.size(); j++) {
+
+                copy_flow[j] = row_flow.get(j);
+            }
+
+            ei_avg_flow[i] = copy_flow;
+        }
+
+        PearsonsCorrelation pearson_avg_flow = new PearsonsCorrelation();
+        RealMatrix corrDouble_avg_flow = pearson_avg_flow.computeCorrelationMatrix(ei_avg_flow);
+
+        try (
+                PrintStream outPearson_avg_flow = new PrintStream(new File("output_pearson_avg_flow.txt"));) {
+
+            for (int m = 0; m < corrDouble_avg_flow.getRowDimension(); m++) {
+                String sc_avg_flow = "";
+                for (int j = 0; j < corrDouble_avg_flow.getRow(m).length; j++) {
+                    sc_avg_flow += corrDouble_avg_flow.getEntry(m, j) + " ";
+                }
+
+                outPearson_avg_flow.println(sc_avg_flow);
+            }
+            outPearson_avg_flow.close();
+
+        } catch (FileNotFoundException q) {
+
+            q.printStackTrace();
+        }
+    }
+    
+        private void storeCorrelationCoefficientFlowIncrease() {
+        //calculates correlation coefficient and stores in a file
+        double[][] ei_avg_flow_increase = new double[avgflowIncreaseStatusPerContingency.size()][];
+
+        for (int i = 0; i < avgflowIncreaseStatusPerContingency.size(); i++) {
+            ArrayList<Double> row_increase = avgflowIncreaseStatusPerContingency.get(i);
+
+            double[] copy_increase = new double[row_increase.size()];
+            for (int j = 0; j < row_increase.size(); j++) {
+
+                copy_increase[j] = row_increase.get(j);
+            }
+
+            ei_avg_flow_increase[i] = copy_increase;
+        }
+
+        PearsonsCorrelation pearson_avg_flow_increase = new PearsonsCorrelation();
+        RealMatrix corrDouble_avg_flow_increase = pearson_avg_flow_increase.computeCorrelationMatrix(ei_avg_flow_increase);
+
+        try (
+                PrintStream outPearson_avg_flow_increase = new PrintStream(new File("output_pearson_avg_flow.txt"));) {
+
+            for (int m = 0; m < corrDouble_avg_flow_increase.getRowDimension(); m++) {
+                String sc_avg_flow_increase = "";
+                for (int j = 0; j < corrDouble_avg_flow_increase.getRow(m).length; j++) {
+                    sc_avg_flow_increase += corrDouble_avg_flow_increase.getEntry(m, j) + " ";
+                }
+
+                outPearson_avg_flow_increase.println(sc_avg_flow_increase);
+            }
+            outPearson_avg_flow_increase.close();
+
+        } catch (FileNotFoundException r) {
+
+            r.printStackTrace();
         }
     }
 
@@ -308,6 +388,7 @@ public class BenchmarkEvolution extends BenchmarkAnalysis {
                             HashMap<Metrics, Object> linkMetrics = getTemporalLinkMetrics().get(simulationTime).get(link.getIndex());
                             log.log(simulationTime, "utilization" + Integer.toString(i), ((Double) powerPerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)) / link.getCapacity());
                             log.log(simulationTime, "power" + Integer.toString(i), ((Double) powerPerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)));
+                            log.log(simulationTime, "powerincrease" + Integer.toString(i), ((Double) powerIncreasePerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)));
                             log.log(simulationTime, "link" + Integer.toString(i), ((Double) linkPerIteration.get(i).get(Integer.parseInt(link.getIndex()) - 1)));
                             log.log(simulationTime, Metrics.TOTAL_LINES, ((Double) linkMetrics.get(Metrics.TOTAL_LINES)));
                         }

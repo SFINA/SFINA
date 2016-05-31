@@ -37,6 +37,7 @@ import Jama.Matrix;
 import input.TopologyLoader;
 import power.backend.PowerBackendParameter;
 import power.input.PowerFlowLoader;
+import org.apache.commons.math3.stat.descriptive.rank.Max;
 
 /**
  * Cascade if link limits violated. Domain independent.
@@ -48,11 +49,17 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
     private static final Logger logger = Logger.getLogger(BenchmarkAnalysis.class);
     private HashMap<Integer, LinkedHashMap<FlowNetwork, Boolean>> temporalIslandStatus = new HashMap();
     public ArrayList<ArrayList<Double>> powerPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power per iteration
-    public ArrayList<ArrayList<Double>> linkPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power per iteration
+    public ArrayList<ArrayList<Double>> linkPerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register link per iteration
+    public ArrayList<ArrayList<Double>> powerIncreasePerIteration = new ArrayList<ArrayList<Double>>(); //2D array to register power increase per iteration
     public ArrayList<Double> spectralRadius = new ArrayList<Double>();
     public ArrayList<Integer> macroCount = new ArrayList<Integer>(); //registers number of iterations particular line removal proceeds to
+
     public ArrayList<ArrayList<Double>> linkStatusPerContingency = new ArrayList<ArrayList<Double>>();
     public ArrayList<ArrayList<Boolean>> linkStatusPerContingencyBool = new ArrayList<ArrayList<Boolean>>();
+    public ArrayList<ArrayList<Double>> avgflowStatusPerContingency = new ArrayList<ArrayList<Double>>();
+    public ArrayList<ArrayList<Double>> avgflowIncreaseStatusPerContingency = new ArrayList<ArrayList<Double>>();
+
+    public ArrayList<Double> originalFlow = new ArrayList<Double>();
 
     public BenchmarkAnalysis(String experimentID,
             Time bootstrapTime,
@@ -132,6 +139,17 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
                     }
                 }
 
+                //add new array to store power increase for the next iteration
+                powerIncreasePerIteration.add(new ArrayList<Double>());
+
+                for (Link lin : getFlowNetwork().getLinks()) {
+                    if (lin.getFlow() > lin.getCapacity()) {
+                        powerIncreasePerIteration.get(globalCount).add(1.0);
+                    } else {
+                        powerIncreasePerIteration.get(globalCount).add((lin.getFlow() - originalFlow.get(Integer.parseInt(lin.getIndex()) - 1)) / (lin.getCapacity() - originalFlow.get(Integer.parseInt(lin.getIndex()) - 1)));
+                    }
+                }
+
                 //add new array to store link for next iteration
                 linkPerIteration.add(new ArrayList<Double>());
 
@@ -158,20 +176,7 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             }
 
             //get link sttaus
-            //getLinkStatus(localCount);
-            
-            linkStatusPerContingency.add(new ArrayList<Double>());
-
-            for (Link lin : getFlowNetwork().getLinks()) {
-                if (lin.isActivated()==false) {
-                
-                linkStatusPerContingency.get(localCount).add(1.0);
-                }else{
-                    linkStatusPerContingency.get(localCount).add(lin.getFlow() / lin.getCapacity());
-            //linkStatusPerContingency.get(index).add((lin.isActivated()) ? 1.0 : 0.0);
-
-                }
-            }
+            getLinkStatus(localCount);
 
             localCount++;
 
@@ -187,42 +192,40 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
 
     }
 
-    public void restoreNetwork() {
-        //restoring the links
-        for (Link linkNew : getFlowNetwork().getLinks()) {
-            linkNew.setActivated(true);
-        }
-        //restoring nodes, and its properties (... more properties also needs to be restored!)
-        for (Node nodeNew : getFlowNetwork().getNodes()) {
-            nodeNew.setActivated(true);
-            nodeNew.replacePropertyElement(PowerNodeState.VOLTAGE_ANGLE, 0.0);
-            nodeNew.replacePropertyElement(PowerNodeState.VOLTAGE_MAGNITUDE, 1.0);
-
-        }
-    }
-
     public double getSpectralRadius() {
         final int N = getFlowNetwork().getNodes().size();
+        //EigenvalueDecomposition E
+        //        = new EigenvalueDecomposition(calculateAdjacencyMatrix().plus(calculateAdjacencyMatrix().transpose()).times(0.5));
         EigenvalueDecomposition E
-                = new EigenvalueDecomposition(calculateAdjacencyMatrix().plus(calculateAdjacencyMatrix().transpose()).times(0.5));
+                = new EigenvalueDecomposition(calculateAdjacencyMatrix());
         double[] d = E.getRealEigenvalues();
-        double maxEigen = d[N - 1];
-        return maxEigen;
 
+        Max maximum = new Max();
+        double maxEigen = maximum.evaluate(d, 0, d.length);
+        //double maxEigen = d[N - 1];
+        return maxEigen;
     }
 
-    public void getLinkStatus(int index) {
-        linkStatusPerContingencyBool.add(new ArrayList<Boolean>());
+    public void getLinkStatus(int total_it) {
+        //linkStatusPerContingencyBool.add(new ArrayList<Boolean>());
         linkStatusPerContingency.add(new ArrayList<Double>());
+        avgflowStatusPerContingency.add(new ArrayList<Double>());
+        avgflowIncreaseStatusPerContingency.add(new ArrayList<Double>());
 
         for (Link lin : getFlowNetwork().getLinks()) {
+            //linkStatusPerContingencyBool.get(index).add(lin.isActivated());
+            linkStatusPerContingency.get(total_it).add((lin.isActivated()) ? 1.0 : 0.0);
+            if (lin.isActivated() == false) {
 
-            linkStatusPerContingencyBool.get(index).add(lin.isActivated());
-            linkStatusPerContingency.get(index).add(lin.getFlow() / lin.getCapacity());
-            //linkStatusPerContingency.get(index).add((lin.isActivated()) ? 1.0 : 0.0);
+                avgflowStatusPerContingency.get(total_it).add(1.0);
+                avgflowIncreaseStatusPerContingency.get(total_it).add(1.0);
+            } else {
+                avgflowStatusPerContingency.get(total_it).add(lin.getFlow() / lin.getCapacity());
+                avgflowIncreaseStatusPerContingency.get(total_it).add((lin.getFlow() - originalFlow.get(Integer.parseInt(lin.getIndex()) - 1)) / (lin.getCapacity() - originalFlow.get(Integer.parseInt(lin.getIndex()) - 1)));
+
+            }
 
         }
-
     }
 
     /**
@@ -358,13 +361,15 @@ public class BenchmarkAnalysis extends BenchmarkSimulationAgent {
             if (link.getCapacity() == 0.0) {
                 capacityNotSet = true;
             } else {
-                capacityNotSet = true; //true when alpha needed 27/05/16
+                capacityNotSet = false; //true when alpha needed 27/05/16
             }
         }
         if (capacityNotSet) {
             callBackend(getFlowNetwork());
             for (Link link : getFlowNetwork().getLinks()) {
                 link.setCapacity(toleranceParameter * link.getFlow());
+                originalFlow.add(link.getFlow());
+
             }
         }
     }
