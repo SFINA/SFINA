@@ -1,2 +1,0 @@
-flowType=AC
-toleranceParameter=2.0

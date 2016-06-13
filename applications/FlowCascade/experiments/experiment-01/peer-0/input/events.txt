@@ -1,8 +1,0 @@
-time,feature,component,id,parameter,value
-2,system,-,-,reload,1
-2,topology,link,30,status,0
-3,system,-,-,reload,1
-3,topology,link,31,status,0
-4,system,-,-,reload,1
-4,topology,link,32,status,0
-7,system,-,-,backend,interpss
