@@ -17,7 +17,6 @@
  */
 package power.backend;
 
-import backend.FlowBackendInterface;
 import backend.FlowDomainAgent;
 import com.interpss.CoreObjectFactory;
 import com.interpss.common.exp.InterpssException;
@@ -46,16 +45,19 @@ import org.interpss.display.impl.AclfOut_BusStyle;
 import org.interpss.fadapter.IpssFileAdapter;
 import org.interpss.numeric.datatype.Unit;
 import org.interpss.numeric.exp.IpssNumericException;
+import power.input.BackendParameterLoader;
+import power.input.PowerFlowLoader;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
 import power.input.PowerNodeType;
+import power.output.PowerFlowWriter;
 import protopeer.util.quantities.Time;
 
 /**
  *
  * @author evangelospournaras
  */
-public class InterpssFlowDomainAgent extends FlowDomainAgent implements FlowBackendInterface{
+public class InterpssFlowDomainAgent extends FlowDomainAgent{
     
     private PowerFlowType powerFlowType;
     private FlowNetwork SfinaNet;
@@ -65,11 +67,11 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent implements FlowBack
     
     public InterpssFlowDomainAgent(String experimentID,
             Time bootstrapTime, 
-            Time runTime,
-            HashMap<Enum,Object> backendParameters){
-        super(experimentID, bootstrapTime, runTime, backendParameters);
+            Time runTime){
+        super(experimentID, bootstrapTime, runTime);
     }
     
+    @Override
     public boolean flowAnalysis(FlowNetwork net){
         this.SfinaNet = net;
         
@@ -109,14 +111,52 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent implements FlowBack
         return converged;
     }
     
+    @Override
+    public void saveFlowNetwork(FlowNetwork flowNetwork, String columnSeparator, String missingValue, String nodeFlowData, String linkFlowData){
+        PowerFlowWriter flowLoader=new PowerFlowWriter(flowNetwork, columnSeparator, missingValue);
+        flowLoader.writeNodeFlowData(nodeFlowData);
+        flowLoader.writeLinkFlowData(linkFlowData);
+    }
+    
+    @Override
+    public void setFlowParameters(FlowNetwork flowNetwork){
+        flowNetwork.setLinkFlowType(PowerLinkState.POWER_FLOW_FROM_REAL);
+        flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
+        flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
+        flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
+    }
+    
+    @Override
+    public void loadFlowNetwork(FlowNetwork flowNetwork, String columnSeparator, String missingValue, String nodeFlowData, String linkFlowData){
+        PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
+        flowLoader.loadNodeFlowData(nodeFlowData);
+        flowLoader.loadLinkFlowData(linkFlowData);
+    }
+    
+    @Override
     public boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters){
         setBackendParameters(backendParameters);
         return flowAnalysis(net);
     }
     
+    @Override
     public void setBackendParameters(HashMap<Enum,Object> backendParameters){
         this.powerFlowType = (PowerFlowType)backendParameters.get(PowerBackendParameter.FLOW_TYPE);
     }
+    
+    /**
+     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise. PowerBackend parameters and events are optional.
+     * @param sfinaParamLocation path to sfinaParameters.txt
+     * @param backendParamLocation path to backendParameters.txt
+     * @param eventsLocation path to events.txt
+     */
+    @Override
+    public void loadDomainParameters(String sfinaParamLocation, String backendParamLocation, String eventsLocation){
+        BackendParameterLoader backendParameterLoader = new BackendParameterLoader(getDomain(),parameterColumnSeparator);
+        this.setBackendParameters(backendParameterLoader.loadBackendParameters(backendParamLocation));
+    }   
+    
+    
     
     /**
      * Transfrom SFINA to IPSS network

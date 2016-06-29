@@ -17,8 +17,10 @@
  */
 package backend;
 
-import backend.FlowBackendInterface;
+import event.FlowNetworkDataTypesInterface;
+import input.Domain;
 import java.util.HashMap;
+import network.FlowNetwork;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -33,24 +35,26 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class FlowDomainAgent extends BasePeerlet{
-    
+public abstract class FlowDomainAgent extends BasePeerlet{
+
     private String experimentID;
     private Time bootstrapTime;
     private Time runTime;
     
-    private final static String parameterColumnSeparator="=";
-    private final static String fileSystemSchema="conf/fileSystem.conf";
-    private final static String peersLogDirectory="peerlets-log/";
+    public final String parameterColumnSeparator="=";
+    public final String fileSystemSchema="conf/fileSystem.conf";
+    public final String peersLogDirectory="peerlets-log/";
+    
+    private FlowNetworkDataTypesInterface flowNetworkDataTypes;
     
     private MeasurementFileDumper measurementDumper;
     
+    private Domain domain;
     private HashMap<Enum,Object> backendParameters;
     
     public FlowDomainAgent(String experimentID,
             Time bootstrapTime, 
-            Time runTime,
-            HashMap<Enum,Object> backendParameters){
+            Time runTime){
         
     }
     
@@ -111,6 +115,20 @@ public class FlowDomainAgent extends BasePeerlet{
         loadAgentTimer.schedule(this.runTime);
     }
     
+    public abstract boolean flowAnalysis(FlowNetwork net);
+    
+    public abstract boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters);
+    
+    public abstract void setBackendParameters(HashMap<Enum,Object> backendParameters);
+    
+    public abstract void loadFlowNetwork(FlowNetwork flowNetwork, String columnSeparator, String missingValue, String nodeFlowData, String linkFlowData);
+    
+    public abstract void setFlowParameters(FlowNetwork flowNetwork);
+    
+    public abstract void saveFlowNetwork(FlowNetwork flowNetwork, String columnSeparator, String missingValue, String nodeFlowData, String linkFlowData);
+    
+    public abstract void loadDomainParameters(String sfinaParamLocation, String backendParamLocation, String eventsLocation);
+    
     /**
      * Scheduling the measurements for the simulation agent
      */
@@ -151,6 +169,41 @@ public class FlowDomainAgent extends BasePeerlet{
      */
     public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
         this.measurementDumper = measurementDumper;
+    }
+
+    /**
+     * @return the domain
+     */
+    public Domain getDomain() {
+        return domain;
+    }
+
+    /**
+     * @param domain the domain to set
+     */
+    public void setDomain(Domain domain) {
+        this.domain = domain;
+    }
+
+    /**
+     * @return the backendParameters
+     */
+    public HashMap<Enum,Object> getBackendParameters() {
+        return backendParameters;
+    }
+
+    /**
+     * @return the flowNetworkDataTypes
+     */
+    public FlowNetworkDataTypesInterface getFlowNetworkDataTypes() {
+        return flowNetworkDataTypes;
+    }
+
+    /**
+     * @param flowNetworkDataTypes the flowNetworkDataTypes to set
+     */
+    public void setFlowNetworkDataTypes(FlowNetworkDataTypesInterface flowNetworkDataTypes) {
+        this.flowNetworkDataTypes = flowNetworkDataTypes;
     }
     
 }
