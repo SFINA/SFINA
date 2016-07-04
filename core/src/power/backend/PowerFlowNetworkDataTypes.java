@@ -18,6 +18,10 @@
 package power.backend;
 
 import event.FlowNetworkDataTypesInterface;
+import java.util.ArrayList;
+import java.util.Collection;
+import network.Link;
+import network.Node;
 import org.apache.log4j.Logger;
 import power.input.PowerLinkState;
 import power.input.PowerNodeState;
@@ -36,7 +40,17 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     }
     
     @Override
-    public PowerNodeState getNodeStateType(String powerNodeState){
+    public Enum[] getNodeStates(){
+        return PowerNodeState.values();
+    }
+    
+    @Override
+    public Enum[] getLinkStates(){
+        return PowerLinkState.values();
+    }
+    
+    @Override
+    public PowerNodeState parseNodeStateTypeFromString(String powerNodeState){
         switch(powerNodeState){
             case "id": 
                 return PowerNodeState.ID;
@@ -123,7 +137,7 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     }
     
     @Override
-    public PowerLinkState getLinkStateType(String powerLinkState){
+    public PowerLinkState parseLinkStateTypeFromString(String powerLinkState){
         switch(powerLinkState){
             case "id":
                 return PowerLinkState.ID;
@@ -164,7 +178,7 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     }
     
     @Override
-    public Object getNodeStateValue(Enum nodeState, String rawValue){
+    public Object parseNodeValuefromString(Enum nodeState, String rawValue){
         PowerNodeState powerNodeState=(PowerNodeState)nodeState;
         switch(powerNodeState){
             case ID:
@@ -263,7 +277,7 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     }  
     
     @Override
-    public Object getLinkStateValue(Enum linkState, String rawValue){
+    public Object parseLinkValueFromString(Enum linkState, String rawValue){
         PowerLinkState powerLinkState=(PowerLinkState)linkState;
         switch(powerLinkState){
             case CURRENT:
@@ -302,4 +316,163 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
         }
     }
     
+    @Override
+    public String castNodeStateTypeToString(Enum nodeState){
+        PowerNodeState powerNodeState = (PowerNodeState)nodeState;
+        switch(powerNodeState){
+            case ID: 
+                return null;
+            case TYPE:
+                return "type";
+            case POWER_DEMAND_REAL:
+                return "real_power";
+            case POWER_DEMAND_REACTIVE:
+                return "reactive_power";
+            case SHUNT_CONDUCT:
+                return "Gs";
+            case SHUNT_SUSCEPT:
+                return "Bs";
+            case AREA:
+                return "area";
+            case VOLTAGE_MAGNITUDE:
+                return "volt_mag";
+            case VOLTAGE_ANGLE:
+                return "volt_ang";
+            case BASE_VOLTAGE:
+                return "baseKV";
+            case ZONE:
+                return "zone";
+            case VOLTAGE_MAX:
+                return "volt_max";
+            case VOLTAGE_MIN:
+                return "volt_min";
+            case POWER_GENERATION_REAL:
+                return "real_gen";
+            case POWER_GENERATION_REACTIVE:
+                return "reactive_gen";
+            case POWER_MAX_REACTIVE:
+                return "Qmax";
+            case POWER_MIN_REACTIVE:
+                return "Qmin";
+            case VOLTAGE_SETPOINT:
+                return "Vg";
+            case MVA_BASE_TOTAL:
+                return "mBase";
+            case POWER_MAX_REAL:
+                return "power_max";
+            case POWER_MIN_REAL:
+                return "power_min";
+            case PC1:
+                return "Pc1";
+            case PC2:
+                return "Pc2";
+            case QC1_MIN:
+                return "Qc1min";
+            case QC1_MAX:
+                return "Qc1max";
+            case QC2_MIN:
+                return "Qc2min";
+            case QC2_MAX:
+                return "Qc2max";
+            case RAMP_AGC:
+                return "ramp_agc";
+            case RAMP_10:
+                return "ramp_10";
+            case RAMP_30:
+                return "ramp_30";
+            case RAMP_REACTIVE_POWER:
+                return "ramp_q";
+            case AREA_PART_FACTOR:
+                return "apf"; 
+            case MODEL:
+                return "model";
+            case STARTUP:
+                return "startup";
+            case SHUTDOWN:
+                return "shutdown";
+            case N_COST:
+                return "n_cost";
+            case COST_PARAM_1:
+                return "cost_coeff_1";
+            case COST_PARAM_2:
+                return "cost_coeff_2";
+            case COST_PARAM_3:
+                return "cost_coeff_3";
+            default:
+                logger.debug("Power node state is not recognized.");
+                return null;
+        }
+    }
+    
+    @Override
+    public String castLinkStateTypeToString(Enum linkState){
+        PowerLinkState powerLinkState = (PowerLinkState)linkState;
+        switch(powerLinkState){
+            case ID:
+                return null;
+            case CURRENT:
+                return "current";
+            case POWER_FLOW_FROM_REAL:
+                return "real_power_from";
+            case POWER_FLOW_FROM_REACTIVE:
+                return "reactive_power_from";
+            case POWER_FLOW_TO_REAL:
+                return "real_power_to";
+            case POWER_FLOW_TO_REACTIVE:
+                return "reactive_power_to";
+            case RESISTANCE:
+                return "resistance";
+            case REACTANCE:
+                return "reactance";
+            case SUSCEPTANCE:
+                return "susceptance";
+            case RATE_A:
+                return "rateA";
+            case RATE_B:
+                return "rateB";
+            case RATE_C:
+                return "rateC";
+            case TAP_RATIO:
+                return "ratio";
+            case ANGLE_SHIFT:
+                return "angle";
+            case ANGLE_DIFFERENCE_MIN:
+                return "angmin";
+            case ANGLE_DIFFERENCE_MAX:
+                return "angmax";
+            case LOSS_REAL:
+                return null;
+            case LOSS_REACTIVE:
+                return null;
+            default:
+                logger.debug("Power link state is not recognized.");
+                return null;
+        }
+    }    
+    
+    @Override
+    public String castNodeStateValueToString(Enum nodeState, Node node, String missingValue){
+        PowerNodeState powerNodeState = (PowerNodeState)nodeState;
+        switch(powerNodeState){
+            case TYPE:
+                switch((PowerNodeType)node.getProperty(powerNodeState)){
+                    case BUS:
+                        return "BUS";
+                    case GENERATOR:
+                        return "GEN";
+                    case SLACK_BUS:
+                        return "SLACK_BUS";
+                }
+                break;    
+        }
+        if (node.getProperty(powerNodeState) == null)
+            return missingValue;
+        
+        return String.valueOf(node.getProperty(powerNodeState));
+    }
+    
+    @Override
+    public String castLinkStateValueToString(Enum linkState, Link link, String missingValue){
+        return String.valueOf(link.getProperty(linkState));
+    }
 }

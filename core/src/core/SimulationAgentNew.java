@@ -38,6 +38,8 @@ import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
 import output.TopologyWriter;
+import power.input.FlowLoaderNew;
+import power.output.FlowWriterNew;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -77,9 +79,11 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     private String columnSeparator;
     private String missingValue;
     private HashMap<SfinaParameter,Object> sfinaParameters;
-    private HashMap<Enum,Object> backendParameters;
     private FlowNetwork flowNetwork;
     private TopologyLoader topologyLoader;
+    private FlowLoaderNew flowLoader;
+    private TopologyWriter topologyWriter;
+    private FlowWriterNew flowWriter;
     private SfinaParameterLoader sfinaParameterLoader;
     private EventLoaderNew eventLoader;
     private FingerDescriptor myAgentDescriptor;
@@ -145,6 +149,9 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                 loadFileSystem(fileSystemSchema);
                 loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsLocation);
                 topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
+                flowLoader=new FlowLoaderNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
+                flowWriter = new FlowWriterNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                 clearOutputFiles(new File(experimentOutputFilesLocation));
                 runActiveState();
             }
@@ -180,7 +187,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                 executeAllEvents();
                 
                 runFlowAnalysis();
-                
+
                 runFinalOperations();
                 
                 runActiveState(); 
@@ -201,9 +208,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     
     /**
      * Load parameters determining file system structure from conf/fileSystem.conf
+     * @param location
      */
     @Override
-    public void loadFileSystem(String schema){
+    public void loadFileSystem(String location){
         String inputDirectoryName=null;
         String outputDirectoryName=null;
         String topologyDirectoryName=null;
@@ -214,7 +222,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         String backendParamFileName=null;
         String nodesFileName=null;
         String linksFileName=null;
-        File file = new File(schema);
+        File file = new File(location);
         Scanner scr = null;
         try {
             scr = new Scanner(file);
@@ -282,7 +290,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     }
     
     /**
-     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise. PowerBackend parameters and events are optional.
+     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise.
      * @param sfinaParamLocation path to sfinaParameters.txt
      * @param backendParamLocation path to backendParameters.txt
      * @param eventsLocation path to events.txt
@@ -292,14 +300,14 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         // Sfina Parameters
         File file = new File(sfinaParamLocation);
         if (!file.exists())
-            logger.debug("sfinaParameters.txt file not found. This will give problems. Should be here: " + sfinaParamLocation);
+            logger.debug("sfinaParameters.txt file not found. Should be here: " + sfinaParamLocation);
         sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
         sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
         logger.debug("Loaded sfinaParameters: " + sfinaParameters);
         file = new File(backendParamLocation);
         if (file.exists()) {
-            this.getFlowDomainAgent().loadDomainParameters(sfinaParamLocation, backendParamLocation, eventsLocation);
-            logger.debug("Loaded backendParameters: " + backendParameters);
+            this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
+            logger.debug("Loaded backendParameters: " + this.getBackendParameters());
         }
         else
             logger.debug("No backendParameters.txt file provided.");
@@ -353,16 +361,11 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
             logger.info("loading data at time " + timeToken);
             topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
-            if (
-                    new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists() &&
-                    new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
-                this.getFlowDomainAgent().loadFlowNetwork(
-                        flowNetwork, 
-                        columnSeparator, 
-                        missingValue, 
-                        experimentInputFilesLocation+timeToken+nodesFlowLocation, 
-                        experimentInputFilesLocation+timeToken+linksFlowLocation
-                );
+            if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists() &&
+                new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists()){
+                flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+                flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
+            }
             else
                 logger.debug("No flow data provided for nodes and/or links at " + timeToken + ".");
             this.getFlowDomainAgent().setFlowParameters(flowNetwork);
@@ -377,16 +380,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     @Override
     public void saveOutputData(){
         logger.info("doing output at iteration " + iteration);
-        TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
         topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
-        this.getFlowDomainAgent().saveFlowNetwork(
-                flowNetwork, 
-                columnSeparator, 
-                missingValue, 
-                experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation,
-                experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation
-        );
+        flowWriter.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
+        flowWriter.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
     }
     
     @Override
@@ -434,7 +431,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                                     if(node.isActivated() == (Boolean)event.getValue())
                                         logger.debug("Node status same, not changed by event.");
                                     node.setActivated((Boolean)event.getValue()); 
-                                    logger.info("..changing status of node " + node.getIndex());
+                                    logger.info("..setting node " + node.getIndex() + " to activated = " + event.getValue());
                                     break;
                                 default:
                                     logger.debug("Node state cannot be recognised");
@@ -457,7 +454,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                                     if(link.isActivated() == (Boolean)event.getValue())
                                         logger.debug("Link status same, not changed by event.");
                                     link.setActivated((Boolean)event.getValue()); 
-                                    logger.info("..changing status of link " + link.getIndex());
+                                    logger.info("..setting link " + link.getIndex() + " to activated = " + event.getValue());
                                     break;
                                 default:
                                     logger.debug("Link state cannot be recognised");
@@ -582,14 +579,14 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
      */
     @Override
     public HashMap<Enum,Object> getBackendParameters() {
-        return backendParameters;
+        return this.getFlowDomainAgent().getDomainParameters();
     }
 
     /**
      * @param backendParameters the backendParameters to set
      */
     public void setBackendParameters(HashMap<Enum,Object> backendParameters) {
-        this.backendParameters = backendParameters;
+        this.getFlowDomainAgent().setDomainParameters(backendParameters);
     }
     
     /**

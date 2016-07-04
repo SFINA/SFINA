@@ -17,20 +17,43 @@
  */
 package event;
 
+import network.Link;
+import network.Node;
+
 
 
 /**
- *
+ * Translation of data to java variables for input and output.
  * @author evangelospournaras
  */
 public interface FlowNetworkDataTypesInterface {
     
-    public Enum getNodeStateType(String nodeState);
+    /**
+     * 
+     * @return domain specific NodeStates as Enum[].
+     */
+    public Enum[] getNodeStates();
     
-    public Enum getLinkStateType(String linkState);
+    /**
+     * 
+     * @return domain specific LinkStates as Enum[].
+     */
+    public Enum[] getLinkStates();
     
-    public Object getNodeStateValue(Enum nodeState, String rawValue);
+    public Enum parseNodeStateTypeFromString(String nodeState);
     
-    public Object getLinkStateValue(Enum linkState, String rawValue);
+    public Enum parseLinkStateTypeFromString(String linkState);
+    
+    public Object parseNodeValuefromString(Enum nodeState, String rawValue);
+    
+    public Object parseLinkValueFromString(Enum linkState, String rawValue);
+    
+    public String castNodeStateTypeToString(Enum nodeState);
+    
+    public String castLinkStateTypeToString(Enum linkState);
+    
+    public String castNodeStateValueToString(Enum nodeState, Node node, String missingValue);
+    
+    public String castLinkStateValueToString(Enum linkState, Link link, String missingValue);
     
 }

@@ -18,15 +18,14 @@
 package backend;
 
 import event.FlowNetworkDataTypesInterface;
-import input.Domain;
 import java.util.HashMap;
 import network.FlowNetwork;
+import org.apache.log4j.Logger;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
-import static protopeer.time.EventScheduler.logger;
 import protopeer.time.Timer;
 import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
@@ -37,6 +36,8 @@ import protopeer.util.quantities.Time;
  */
 public abstract class FlowDomainAgent extends BasePeerlet{
 
+    private static final Logger logger = Logger.getLogger(FlowDomainAgent.class);
+    
     private String experimentID;
     private Time bootstrapTime;
     private Time runTime;
@@ -49,13 +50,14 @@ public abstract class FlowDomainAgent extends BasePeerlet{
     
     private MeasurementFileDumper measurementDumper;
     
-    private Domain domain;
-    private HashMap<Enum,Object> backendParameters;
+    private HashMap<Enum,Object> domainParameters;
     
     public FlowDomainAgent(String experimentID,
             Time bootstrapTime, 
             Time runTime){
-        
+        this.experimentID=experimentID;
+        this.bootstrapTime=bootstrapTime;
+        this.runTime=runTime;
     }
     
     /**
@@ -67,81 +69,16 @@ public abstract class FlowDomainAgent extends BasePeerlet{
     public void init(Peer peer){
         super.init(peer);
     }
-
-    /**
-    * Starts the flow domain agent by scheduling the epoch measurements and 
-    * bootstrapping the agent
-    */
-    @Override
-    public void start(){
-        scheduleMeasurements();
-        this.runBootstraping();
-    }
-
-    /**
-    * Stops the simulation agent
-    */
-    @Override
-    public void stop(){
-        
-    }
-    
-    /**
-     * The scheduling of system bootstrapping.
-     */
-    public void runBootstraping(){
-        Timer loadAgentTimer= getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
-                logger.info("### "+experimentID+" ###");
-                runActiveState();
-            }
-        });
-        loadAgentTimer.schedule(this.bootstrapTime);
-    }
-    
-    
-    /**
-     * Run active state. 
-     */
-    public void runActiveState(){
-        Timer loadAgentTimer=getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
-                
-                runActiveState(); 
-            }
-        });
-        loadAgentTimer.schedule(this.runTime);
-    }
     
     public abstract boolean flowAnalysis(FlowNetwork net);
     
     public abstract boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters);
-    
-    public abstract void setBackendParameters(HashMap<Enum,Object> backendParameters);
-    
-    public abstract void loadFlowNetwork(FlowNetwork flowNetwork, String columnSeparator, String missingValue, String nodeFlowData, String linkFlowData);
-    
+            
     public abstract void setFlowParameters(FlowNetwork flowNetwork);
-    
-    public abstract void saveFlowNetwork(FlowNetwork flowNetwork, String columnSeparator, String missingValue, String nodeFlowData, String linkFlowData);
-    
-    public abstract void loadDomainParameters(String sfinaParamLocation, String backendParamLocation, String eventsLocation);
-    
-    /**
-     * Scheduling the measurements for the simulation agent
-     */
-    public void scheduleMeasurements(){
-        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"/peer-"+getPeer().getIndexNumber()));
-        getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
-            public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-                
-                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
-                log.shrink(epochNumber, epochNumber+1);
-            }
-        });
-    }
+        
+    public abstract void loadDomainParameters(String backendParamLocation);
+
+    public abstract void extractDomainParameters();
     
     /**
      * @return the experimentID
@@ -151,51 +88,26 @@ public abstract class FlowDomainAgent extends BasePeerlet{
     }
 
     /**
-     * @return the peersLogDirectory
+     * @return the domainParameters
      */
-    public String getPeersLogDirectory() {
-        return peersLogDirectory;
+    public HashMap<Enum,Object> getDomainParameters() {
+        return domainParameters;
     }
     
     /**
-     * @return the measurementDumper
+     * 
      */
-    public MeasurementFileDumper getMeasurementDumper() {
-        return measurementDumper;
+    public void setDomainParameters(HashMap<Enum,Object> backendParameters){
+        this.domainParameters=backendParameters;
+        this.extractDomainParameters();
     }
     
-    /**
-     * @param measurementDumper the measurementDumper to set
-     */
-    public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
-        this.measurementDumper = measurementDumper;
-    }
-
-    /**
-     * @return the domain
-     */
-    public Domain getDomain() {
-        return domain;
-    }
-
-    /**
-     * @param domain the domain to set
-     */
-    public void setDomain(Domain domain) {
-        this.domain = domain;
-    }
-
-    /**
-     * @return the backendParameters
-     */
-    public HashMap<Enum,Object> getBackendParameters() {
-        return backendParameters;
-    }
-
     /**
      * @return the flowNetworkDataTypes
      */
     public FlowNetworkDataTypesInterface getFlowNetworkDataTypes() {
+        if(flowNetworkDataTypes == null)
+            logger.debug("Domain backend has to call setFlowNetworkDataTypes method, but probably didn't.");
         return flowNetworkDataTypes;
     }
 

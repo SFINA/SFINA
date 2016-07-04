@@ -30,20 +30,17 @@ import java.util.StringTokenizer;
 import network.LinkState;
 import network.NodeState;
 import org.apache.log4j.Logger;
-import power.backend.PowerBackend;
-import power.input.PowerLinkState;
-import power.input.PowerNodeState;
 
 /**
  *
  * @author evangelospournaras
  */
 public class EventLoaderNew {
+
+    private static final Logger logger = Logger.getLogger(EventLoaderNew.class);
     
-//    private Domain domain;
     private String columnSeparator;
     private String missingValue;
-    private static final Logger logger = Logger.getLogger(EventLoaderNew.class);
     private ArrayList<Event> events;
     private FlowNetworkDataTypesInterface flowNetworkDataTypes;
     
@@ -76,6 +73,7 @@ public class EventLoaderNew {
                 while (st.hasMoreTokens()) {
                     values.add(st.nextToken());
 		}
+                logger.debug("Loading event: " + values);
                 //Now here we reconstruct all the parameters of an event:
                 // I currently do this manually assuming I know the order of the
                 //columns. However in the future should happen in an automated
@@ -107,8 +105,7 @@ public class EventLoaderNew {
                     case "link":
                         networkComponent=NetworkComponent.LINK;
                         break;
-                    case "-":
-                        logger.debug("Network component not applicable for system parameter event.");
+                    case "-": // Might want to change this, so it corresponds to the variable missingValue
                         break;
                     default:
                         logger.debug("Network component cannot be recognized.");
@@ -133,17 +130,17 @@ public class EventLoaderNew {
                     case FLOW:
                         switch(networkComponent){
                             case NODE:
-                                parameter=this.getFlowNetworkDataTypes().getNodeStateType(values.get(4));
+                                parameter=this.getFlowNetworkDataTypes().parseNodeStateTypeFromString(values.get(4));
                                 break;
                             case LINK:
-                                parameter=this.getFlowNetworkDataTypes().getLinkStateType(values.get(4));
+                                parameter=this.getFlowNetworkDataTypes().parseLinkStateTypeFromString(values.get(4));
                                 break;
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
                         break;
                     case SYSTEM:
-                        parameter=this.lookupPowerSystemParameterState(values.get(4));
+                        parameter=this.lookupSystemParameterState(values.get(4));
                         break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
@@ -166,9 +163,11 @@ public class EventLoaderNew {
                     case FLOW:
                         switch(networkComponent){
                             case NODE:
-                                value=this.getFlowNetworkDataTypes().getNodeStateValue(parameter,values.get(5));
+                                value=this.getFlowNetworkDataTypes().parseNodeValuefromString(parameter,values.get(5));
+                                break;
                             case LINK:
-                                value=this.getFlowNetworkDataTypes().getLinkStateValue(parameter,values.get(5));
+                                value=this.getFlowNetworkDataTypes().parseLinkValueFromString(parameter,values.get(5));
+                                break;
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
@@ -209,12 +208,8 @@ public class EventLoaderNew {
         }
     }
     
-    private SfinaParameter lookupPowerSystemParameterState(String powerParameterState){
-        switch(powerParameterState){
-            case "domain":
-                return SfinaParameter.DOMAIN;
-            case "backend":
-                return SfinaParameter.BACKEND;
+    private SfinaParameter lookupSystemParameterState(String systemParameterState){
+        switch(systemParameterState){
             case "reload":
                 return SfinaParameter.RELOAD;
             default:
@@ -295,29 +290,6 @@ public class EventLoaderNew {
     
     private Object getActualSystemValue(SfinaParameter systemParameter, String rawValue){
         switch(systemParameter){
-            case DOMAIN:
-                switch(rawValue){
-                    case "power":
-                        return Domain.POWER;
-                    case "gas":
-                        return Domain.GAS;
-                    case "water":
-                        return Domain.WATER;
-                    case "transportation":
-                        return Domain.TRANSPORTATION;
-                    default:
-                        logger.debug("Domain not regognized.");
-                        return null;
-                }
-            case BACKEND:
-                switch(rawValue){
-                    case "matpower":
-                        return PowerBackend.MATPOWER;
-                    case "interpss":
-                        return PowerBackend.INTERPSS;
-                    default:
-                        logger.debug("Backend not regognized.");
-                }
             case RELOAD:
                 return rawValue;
             default:
@@ -337,6 +309,8 @@ public class EventLoaderNew {
      * @return the flowNetworkDataTypes
      */
     public FlowNetworkDataTypesInterface getFlowNetworkDataTypes() {
+        if(flowNetworkDataTypes == null)
+            logger.debug("Domain backend has to call setFlowNetworkDataTypes method, but probably didn't.");
         return flowNetworkDataTypes;
     }
 

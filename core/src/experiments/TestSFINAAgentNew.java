@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.SimulationAgent;
+import core.SimulationAgentNew;
 import java.io.File;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
@@ -63,7 +63,7 @@ public class TestSFINAAgentNew extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new SimulationAgent(
+                newPeer.addPeerlet(new SimulationAgentNew(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
