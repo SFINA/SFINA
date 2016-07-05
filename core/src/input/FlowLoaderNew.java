@@ -16,8 +16,6 @@ import network.FlowNetwork;
 import network.Node;
 import network.Link;
 import org.apache.log4j.Logger;
-import power.input.PowerLinkState;
-import power.input.PowerNodeState;
 
 /**
  *
@@ -109,7 +107,7 @@ public class FlowLoaderNew {
             for(int i=0;i<rawValues.size();i++){
                 Enum state = nodeStates.get(i);
                 String rawValue = rawValues.get(i);
-                if(!rawValue.equals(this.missingValue) && !state.equals(PowerNodeState.ID))
+                if(!rawValue.equals(this.missingValue) && state != null)
                     node.addProperty(state, this.getFlowNetworkDataTypes().parseNodeValuefromString(state, rawValue));
             }
         }
@@ -121,7 +119,7 @@ public class FlowLoaderNew {
             for(int i=0;i<rawValues.size();i++){
                 Enum state = linkStates.get(i);
                 String rawValue = rawValues.get(i);
-                if(!rawValue.equals(this.missingValue) && !state.equals(PowerLinkState.ID))
+                if(!rawValue.equals(this.missingValue) &&  state != null)
                     link.addProperty(state, this.getFlowNetworkDataTypes().parseLinkValueFromString(state, rawValue));
             }
         }

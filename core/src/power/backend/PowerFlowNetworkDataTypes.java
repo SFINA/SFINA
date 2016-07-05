@@ -18,8 +18,6 @@
 package power.backend;
 
 import event.FlowNetworkDataTypesInterface;
-import java.util.ArrayList;
-import java.util.Collection;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
@@ -53,7 +51,7 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     public PowerNodeState parseNodeStateTypeFromString(String powerNodeState){
         switch(powerNodeState){
             case "id": 
-                return PowerNodeState.ID;
+                return null;
             case "type":
                 return PowerNodeState.TYPE;
             case "real_power":
@@ -140,7 +138,7 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     public PowerLinkState parseLinkStateTypeFromString(String powerLinkState){
         switch(powerLinkState){
             case "id":
-                return PowerLinkState.ID;
+                return null;
             case "current":
                 return PowerLinkState.CURRENT;
             case "real_power_from":
@@ -280,6 +278,8 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     public Object parseLinkValueFromString(Enum linkState, String rawValue){
         PowerLinkState powerLinkState=(PowerLinkState)linkState;
         switch(powerLinkState){
+            case ID:
+                return rawValue;
             case CURRENT:
                 return Double.parseDouble(rawValue);
             case POWER_FLOW_FROM_REAL:
