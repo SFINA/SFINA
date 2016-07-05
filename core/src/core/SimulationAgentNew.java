@@ -38,8 +38,8 @@ import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
 import output.TopologyWriter;
-import power.input.FlowLoaderNew;
-import power.output.FlowWriterNew;
+import input.FlowLoaderNew;
+import output.FlowWriterNew;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -179,7 +179,6 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                
                 initActiveState();
                 
                 runInitialOperations();
@@ -307,7 +306,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         file = new File(backendParamLocation);
         if (file.exists()) {
             this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
-            logger.debug("Loaded backendParameters: " + this.getBackendParameters());
+            logger.debug("Loaded backendParameters: " + this.getDomainParameters());
         }
         else
             logger.debug("No backendParameters.txt file provided.");
@@ -578,7 +577,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
      * @return the backendParameters
      */
     @Override
-    public HashMap<Enum,Object> getBackendParameters() {
+    public HashMap<Enum,Object> getDomainParameters() {
         return this.getFlowDomainAgent().getDomainParameters();
     }
 

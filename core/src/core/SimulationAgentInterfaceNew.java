@@ -24,7 +24,7 @@ public interface SimulationAgentInterfaceNew {
     
     public int getSimulationTime();
     
-    public HashMap<Enum,Object> getBackendParameters();
+    public HashMap<Enum,Object> getDomainParameters();
     
     public void saveOutputData();
     

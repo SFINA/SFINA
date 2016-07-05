@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package power.input;
+package input;
 
 import event.FlowNetworkDataTypesInterface;
 import java.io.File;
@@ -16,6 +16,8 @@ import network.FlowNetwork;
 import network.Node;
 import network.Link;
 import org.apache.log4j.Logger;
+import power.input.PowerLinkState;
+import power.input.PowerNodeState;
 
 /**
  *

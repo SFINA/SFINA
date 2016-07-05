@@ -21,6 +21,7 @@ import core.SimulationAgentNew;
 import java.io.File;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
+import power.backend.MatpowerFlowDomainAgent;
 import protopeer.Experiment;
 import protopeer.Peer;
 import protopeer.PeerFactory;
@@ -31,9 +32,9 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class TestSFINAAgentNew extends SimulatedExperiment{
+public class TestMatpowerBackend extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(TestSFINAAgentNew.class);
+    private static final Logger logger = Logger.getLogger(TestMatpowerBackend.class);
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -49,7 +50,7 @@ public class TestSFINAAgentNew extends SimulatedExperiment{
     
     public static void main(String[] args) {
         Experiment.initEnvironment();
-        TestSFINAAgentNew test = new TestSFINAAgentNew();
+        TestMatpowerBackend test = new TestMatpowerBackend();
         test.init();
         
         // Can move these three lines to SimulationAgent also? Reason: loading peersLogDirectory name from the config file.
@@ -67,7 +68,7 @@ public class TestSFINAAgentNew extends SimulatedExperiment{
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
-                newPeer.addPeerlet(new InterpssFlowDomainAgent(
+                newPeer.addPeerlet(new MatpowerFlowDomainAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));

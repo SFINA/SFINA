@@ -30,8 +30,6 @@ import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
 import static java.lang.Math.PI;
-import java.util.HashMap;
-import java.util.logging.Level;
 import network.FlowNetwork;
 import network.Link;
 import network.Node;
@@ -66,6 +64,7 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
         super(experimentID, bootstrapTime, runTime);
         // Is there a better way to force initializing the FlowNetworkDataTypes class?
         this.setFlowNetworkDataTypes(new PowerFlowNetworkDataTypes()); 
+        this.converged = false;
         logger.debug("initializing Interpss backend");
         IpssCorePlugin.init();
     }
@@ -74,6 +73,9 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
     public boolean flowAnalysis(FlowNetwork net){
         logger.debug("calculating loadflow in network with Interpss");
         this.SfinaNet = net;
+        
+        if(net.getNodes().size() == 1)
+            return false;
         
         try{
             switch(powerFlowType){
@@ -117,12 +119,6 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
         flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
         flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
         flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
-    }
-    
-    @Override
-    public boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters){
-        setDomainParameters(backendParameters);
-        return flowAnalysis(net);
     }
     
     @Override

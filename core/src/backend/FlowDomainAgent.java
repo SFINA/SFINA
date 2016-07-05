@@ -24,10 +24,6 @@ import org.apache.log4j.Logger;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
-import protopeer.measurement.MeasurementLog;
-import protopeer.measurement.MeasurementLoggerListener;
-import protopeer.time.Timer;
-import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
 
 /**
@@ -70,14 +66,40 @@ public abstract class FlowDomainAgent extends BasePeerlet{
         super.init(peer);
     }
     
+    /**
+     * Calculate the flow in the network.
+     * @param net
+     * @return if calculation converged.
+     */
     public abstract boolean flowAnalysis(FlowNetwork net);
     
-    public abstract boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters);
+    /**
+     * Calculate the flow in the network. With new backend parameters.
+     * @param net
+     * @param backendParameters
+     * @return if calculation converged.
+     */
+    public boolean flowAnalysis(FlowNetwork net, HashMap<Enum,Object> backendParameters){
+        setDomainParameters(backendParameters);
+        return flowAnalysis(net);
+    }
             
+    /**
+     * Set which domain specific quantity is flow and capacity for nodes and links.
+     * @param flowNetwork 
+     */
     public abstract void setFlowParameters(FlowNetwork flowNetwork);
-        
+    
+    /**
+     * Call the domain specific backend parameter loader.
+     * Should call method setDomainParameters at the end.
+     * @param backendParamLocation 
+     */
     public abstract void loadDomainParameters(String backendParamLocation);
 
+    /**
+     * Cast parameters from backend parameter HashMap to domain specific variables.
+     */
     public abstract void extractDomainParameters();
     
     /**
@@ -95,7 +117,8 @@ public abstract class FlowDomainAgent extends BasePeerlet{
     }
     
     /**
-     * 
+     * Set the domain parameters in the current backend.
+     * @param backendParameters
      */
     public void setDomainParameters(HashMap<Enum,Object> backendParameters){
         this.domainParameters=backendParameters;
