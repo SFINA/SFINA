@@ -23,6 +23,8 @@ import power.backend.PowerBackend;
 import static power.backend.PowerBackend.INTERPSS;
 import static power.backend.PowerBackend.MATPOWER;
 import backend.FlowBackendInterface;
+import disasterspread.backend.HelbingEtAlModelBackend;
+import diseasespread.output.DisasterSpreadFlowWriter;
 import power.input.BackendParameterLoader;
 import input.Domain;
 import static input.Domain.GAS;
@@ -454,6 +456,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 case TRANSPORTATION:
                     logger.debug("This domain is not supported at this moment");
                     break;
+                case DISASTERSPREAD:
+                    DisasterSpreadFlowWriter hFW=new DisasterSpreadFlowWriter(flowNetwork, columnSeparator, missingValue);
+                    hFW.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
+                    hFW.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
+                    break;
                 default:
                     logger.debug("This domain is not supported at this moment");
         }
@@ -621,6 +628,16 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 break;
             case TRANSPORTATION:
                 logger.debug("This domain is not supported at this moment");
+                break;
+            case DISASTERSPREAD:
+                switch(getBackend()){
+                    case HELBINGETAL:
+                        flowBackend=new HelbingEtAlModelBackend();
+                        converged=flowBackend.flowAnalysis(flowNetwork, getBackendParameters());
+                        break;
+                    default:
+                        logger.debug("This flow backend is not supported at this moment.");
+                }
                 break;
             default:
                 logger.debug("This domain is not supported at this moment");

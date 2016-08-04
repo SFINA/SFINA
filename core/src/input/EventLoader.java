@@ -72,6 +72,8 @@ import static power.input.PowerNodeState.VOLTAGE_MAX;
 import static power.input.PowerNodeState.VOLTAGE_MIN;
 import static power.input.PowerNodeState.VOLTAGE_SETPOINT;
 import static power.input.PowerNodeState.ZONE;
+import disasterspread.input.DisasterSpreadLinkState;
+import disasterspread.input.DisasterSpreadNodeState;
 
 /**
  *
@@ -183,6 +185,9 @@ public class EventLoader {
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
                                         break;
+                                    case DISASTERSPREAD:
+                                        parameter=this.lookupDisasterNodeState(values.get(4));
+                                        break;
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
@@ -200,6 +205,9 @@ public class EventLoader {
                                         break;
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
+                                        break;
+                                    case DISASTERSPREAD:
+                                        parameter=this.lookupDisasterLinkState(values.get(4));
                                         break;
                                     default:
                                         logger.debug("Wrong backend detected.");
@@ -261,6 +269,9 @@ public class EventLoader {
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
                                         break;
+                                    case DISASTERSPREAD:
+                                        value=this.getActualDisasterNodeValue((DisasterSpreadNodeState)parameter,values.get(5));
+                                        break;
                                     default:
                                         logger.debug("Wrong backend detected.");
                                 }
@@ -278,6 +289,9 @@ public class EventLoader {
                                         break;
                                     case TRANSPORTATION:
                                         logger.debug("This domain is not supported at this moment");
+                                        break;
+                                    case DISASTERSPREAD:
+                                        value=this.getActualDisasterLinkValue((DisasterSpreadLinkState)parameter,values.get(5));
                                         break;
                                     default:
                                         logger.debug("Wrong backend detected.");
@@ -679,6 +693,8 @@ public class EventLoader {
                         return Domain.WATER;
                     case "transportation":
                         return Domain.TRANSPORTATION;
+                    case "disaster_spread":
+                        return Domain.DISASTERSPREAD;
                     default:
                         logger.debug("Domain not regognized.");
                         return null;
@@ -689,6 +705,8 @@ public class EventLoader {
                         return PowerBackend.MATPOWER;
                     case "interpss":
                         return PowerBackend.INTERPSS;
+                    case "helbingetal":
+                        return PowerBackend.HELBINGETAL;
                     default:
                         logger.debug("Backend not regognized.");
                 }
@@ -705,5 +723,100 @@ public class EventLoader {
      */
     public ArrayList<Event> getEvents() {
         return events;
+    }
+    
+    
+            // Methods for DAMAGE EVENTS
+    private SfinaParameter lookupDisasterSystemParameterState(String powerParameterState){
+        switch(powerParameterState){
+            case "domain":
+                return SfinaParameter.DOMAIN;
+            case "backend":
+                return SfinaParameter.BACKEND;
+//            case "flow_type":
+//                return SfinaParameter.FLOW_TYPE;
+//            case "tolerance_parameter":
+//                return SfinaParameter.TOLERANCE_PARAMETER;
+//            case "attack_strategy":
+//                return SfinaParameter.ATTACK_STRATEGY;
+//            case "line_rate_change_factor":
+//                return SfinaParameter.CAPACITY_CHANGE;
+            default:
+                logger.debug(("System parameter state is not recognized."));
+                return null;
+        }
+    }
+    
+    private DisasterSpreadNodeState lookupDisasterNodeState(String disasterNodeState){
+        switch(disasterNodeState){
+            case "id": 
+                return DisasterSpreadNodeState.ID;
+            case "damage":
+                return DisasterSpreadNodeState.DAMAGE;
+            case "alpha":
+                return DisasterSpreadNodeState.ALPHA;
+            case "beta":
+                return DisasterSpreadNodeState.BETA;
+            case "tolerance":
+                return DisasterSpreadNodeState.TOLERANCE;
+            case "recovery_rate":
+                return DisasterSpreadNodeState.RECOVERYRATE;
+            case "init_recovery_rate":
+                return DisasterSpreadNodeState.INITIALRECOVERYRATE;
+            default:
+                logger.debug("Health node state is not recognized.");
+                return null;
+        }
+    }
+   
+    private DisasterSpreadLinkState lookupDisasterLinkState(String disasterLinkState){
+        switch(disasterLinkState){
+            case "id":
+                return DisasterSpreadLinkState.ID;
+            case "connection_strength":
+                return DisasterSpreadLinkState.CONNECTION_STRENGTH;
+            case "time_delay":
+                return DisasterSpreadLinkState.TIME_DELAY;
+            default:
+                logger.debug("Disaster link state is not recognized.");
+                return null;
+        }
+    }
+    
+    private Object getActualDisasterNodeValue(DisasterSpreadNodeState damageNodeState, String rawValue){
+        switch(damageNodeState){
+            case ID:
+                return Double.parseDouble(rawValue);
+            case DAMAGE:
+                return Double.parseDouble(rawValue);
+            case ALPHA:
+                return Double.parseDouble(rawValue);
+            case BETA:
+                return Double.parseDouble(rawValue);
+            case TOLERANCE:
+                return Double.parseDouble(rawValue);
+            case RECOVERYRATE:
+                return Double.parseDouble(rawValue);
+            case INITIALRECOVERYRATE:
+                return Double.parseDouble(rawValue);
+            default:
+                logger.debug("Disaster node state is not recognized.");
+                return null;
+        }    
+    }  
+    
+    private Object getActualDisasterLinkValue(DisasterSpreadLinkState damageLinkState, String rawValue){
+        switch(damageLinkState){
+            case ID:
+                return Double.parseDouble(rawValue);
+            case TIME_DELAY:
+                return Double.parseDouble(rawValue);
+            case CONNECTION_STRENGTH:
+                return Double.parseDouble(rawValue);
+            default:
+                logger.debug("Disaster link state is not recognized.");
+                return null;
+                
+        }
     }
 }
