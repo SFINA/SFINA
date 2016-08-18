@@ -72,7 +72,7 @@ public class Link extends State{
     public double getFlow(){
         if(this.flowType==null)
             logger.debug("Flow type is not defined.");
-        return Math.abs((double)this.getProperty(flowType));
+        return (double)this.getProperty(flowType);
     }
     
     /**
@@ -97,7 +97,7 @@ public class Link extends State{
     public double getCapacity(){
         if(this.capacityType==null)
             logger.debug("Capacity type is not defined.");
-        return Math.abs((double)this.getProperty(capacityType));
+        return (double)this.getProperty(capacityType);
     }
     
     /**
@@ -203,7 +203,7 @@ public class Link extends State{
      * @return if there is a start node
      */
     private boolean hasStartNode(){
-        if(this.startNode!=null){
+        if(this.startNode!=null && this.startNode.isActivated()){
             return true;
         }
         return false;
@@ -215,7 +215,7 @@ public class Link extends State{
      * @return if there is an end node
      */
     private boolean hasEndNode(){
-        if(this.endNode!=null){
+        if(this.endNode!=null && this.endNode.isActivated()){
             return true;
         }
         return false;
@@ -225,7 +225,7 @@ public class Link extends State{
      * Evalautes the connectivity of the link. If the link has both a start and
      * end node, it is connected
      */
-    private void evaluateConnectivity(){
+    public void evaluateConnectivity(){
         if(this.hasStartNode() && this.hasEndNode()){
             this.connected=true;
         }
@@ -250,15 +250,19 @@ public class Link extends State{
      */
     public void setActivated(boolean activated) {
         this.activated = activated;
-        if(activated){
-            this.getStartNode().addLink(this);
-            this.getEndNode().addLink(this);
-        }
-        else{
+        this.getStartNode().evaluateConnectivity();
+        this.getEndNode().evaluateConnectivity();
+        if(!activated)
             this.setFlow(0.0);
-            this.getStartNode().removeLink(this);
-            this.getEndNode().removeLink(this);
-        }
+//        if(activated){
+//            this.getStartNode().addLink(this);
+//            this.getEndNode().addLink(this);
+//        }
+//        else{
+//            this.setFlow(0.0);
+//            this.getStartNode().removeLink(this);
+//            this.getEndNode().removeLink(this);
+//        }
     }
     
 }
