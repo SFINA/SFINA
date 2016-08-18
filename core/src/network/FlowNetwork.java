@@ -18,6 +18,7 @@
 package network;
 
 import dsutil.generic.state.State;
+import interdependent.InterdependentFlowNetwork;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -95,15 +96,20 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     @Override
     /**
-     * Adds a link and makes the connection of the involved nodes
+     * Adds a link and makes the connection of the involved nodes.
+     * Ensuring that for single network computeIsland() and power flow 
+     * analysis only take nodes within the network (same network address) into 
+     * account. For interdependent network, this is ignored.
      * 
      * @param link the added link
      */
     public void addLink(Link link){
         this.links.put(link.getIndex(), link);
-        if(link.isActivated()){
-            link.getStartNode().addLink(link);
-            link.getEndNode().addLink(link);
+        if(link.getStartNode().getNetworkAddress().equals(link.getEndNode().getNetworkAddress())){
+            if(link.isActivated()){
+                link.getStartNode().addLink(link);
+                link.getEndNode().addLink(link);
+            }
         }
     }
     
@@ -130,7 +136,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param link the removed link
      */
     public void removeLink(Link link){
-        for(Node node:nodes.values()){
+        for(Node node:getNodes()){
             node.removeLink(link);
         }
         this.links.remove(link.getIndex());
@@ -320,10 +326,11 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         ArrayList<Link> currentLinks = (ArrayList)currentNode.getLinks();
         if (currentLinks.size() > 0){
             for (Link link : currentLinks){
-                if (!currentIslandLinks.contains(link))
-                    currentIslandLinks.add(link);
-                // Restart Iteration with EndNode of current Link if it is connected (i.e. has node on other end.
-                if (link.isConnected()){
+                // Only consider link, if it is activated (no failure/damage) and connected (has activated start and end node)
+                if (link.isConnected() && link.isActivated()){
+                    if (!currentIslandLinks.contains(link))
+                        currentIslandLinks.add(link);
+                    // Restart Iteration with EndNode of current Link
                     currentNode = link.getEndNode();
                     if (!currentIslandNodes.contains(currentNode)){
                         iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);

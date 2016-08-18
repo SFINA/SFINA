@@ -17,7 +17,7 @@
  */
 package power.backend;
 
-import event.FlowNetworkDataTypesInterface;
+import backend.FlowNetworkDataTypesInterface;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;

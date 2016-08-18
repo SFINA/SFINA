@@ -28,6 +28,7 @@ import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
+import protopeer.network.NetworkAddress;
 
 /**
  *
@@ -38,10 +39,21 @@ public class TopologyLoader {
     private FlowNetwork net;
     private String columnSeparator;
     private static final Logger logger = Logger.getLogger(TopologyLoader.class);
+    private NetworkAddress networkAddress;
     
     public TopologyLoader(FlowNetwork net, String columnSeparator){
         this.net=net;
         this.columnSeparator=columnSeparator;
+        this.networkAddress=null;
+        
+        // empty network if it has nodes and links
+        emptyNetwork();
+    }
+    
+    public TopologyLoader(FlowNetwork net, String columnSeparator, NetworkAddress networkAddress){
+        this.net=net;
+        this.columnSeparator=columnSeparator;
+        this.networkAddress=networkAddress;
         
         // empty network if it has nodes and links
         emptyNetwork();
@@ -61,6 +73,9 @@ public class TopologyLoader {
     }
     
     public void loadNodes(String location){
+        // empty network if it has nodes and links
+        emptyNetwork();
+        
         ArrayList<NodeState> nodeStates=new ArrayList<NodeState>();
         File file = new File(location);
         Scanner scr = null;
@@ -82,7 +97,7 @@ public class TopologyLoader {
                 }
                 String nodeIndex=(String)this.getActualNodeValue(nodeStates.get(0), values.get(0));
                 boolean status=(Boolean)this.getActualNodeValue(nodeStates.get(1), values.get(1));
-                Node node=new Node(nodeIndex, status);
+                Node node = new Node(nodeIndex, status, networkAddress);
                 net.addNode(node);
             }
         }
@@ -208,5 +223,13 @@ public class TopologyLoader {
                 logger.debug("Link state is not recognized.");
                 return null;
         }
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public FlowNetwork getFlowNetwork(){
+        return net;
     }
 }

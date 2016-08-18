@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,17 +15,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package network;
+package interdependent;
+
+import org.apache.log4j.Logger;
+import protopeer.network.Message;
 
 /**
  *
- * @author evangelospournaras
+ * @author Ben
  */
-public enum LinkState {
-    ID,
-    FROM_NODE,
-    TO_NODE,
-    FROM_NET,
-    TO_NET, 
-    STATUS
+public class StatusMessage extends Message{
+    private static final Logger logger = Logger.getLogger(StatusMessage.class);
+    private boolean networkChanged;
+    private int iteration;
+    
+    public StatusMessage(boolean isNetworkChanged, int iteration){
+        this.networkChanged = isNetworkChanged;
+        this.iteration = iteration;
+    }
+
+    /**
+     * @return the networkChanged
+     */
+    public boolean isNetworkChanged() {
+        return networkChanged;
+    }
+
+    /**
+     * @return the iteration
+     */
+    public int getIteration() {
+        return iteration;
+    }    
 }
