@@ -17,7 +17,7 @@
  */
 package output;
 
-import event.FlowNetworkDataTypesInterface;
+import backend.FlowNetworkDataTypesInterface;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

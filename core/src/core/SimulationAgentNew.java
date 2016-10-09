@@ -39,6 +39,7 @@ import network.NodeState;
 import org.apache.log4j.Logger;
 import output.TopologyWriter;
 import input.FlowLoaderNew;
+import output.EventWriter;
 import output.FlowWriterNew;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
@@ -57,7 +58,7 @@ import protopeer.util.quantities.Time;
 public class SimulationAgentNew extends BasePeerlet implements SimulationAgentInterfaceNew{
     
     private static final Logger logger = Logger.getLogger(SimulationAgentNew.class);
-    
+
     private String experimentID;
     private Time bootstrapTime;
     private Time runTime;
@@ -65,15 +66,19 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     private final static String parameterColumnSeparator="=";
     private final static String fileSystemSchema="conf/fileSystem.conf";
     private final static String peersLogDirectory="peerlets-log/";
+    private static String peerToken="peer";
+    private String peerTokenName;
     private String timeToken;
     private String timeTokenName;
+    private String experimentBaseFolderLocation;
     private String experimentInputFilesLocation;
     private String experimentOutputFilesLocation;
     private String nodesLocation;
     private String linksLocation;
     private String nodesFlowLocation;
     private String linksFlowLocation;
-    private String eventsLocation;
+    private String eventsInputLocation;
+    private String eventsOutputLocation;
     private String sfinaParamLocation;
     private String backendParamLocation;
     private String columnSeparator;
@@ -84,6 +89,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     private FlowLoaderNew flowLoader;
     private TopologyWriter topologyWriter;
     private FlowWriterNew flowWriter;
+    private EventWriter eventWriter;
     private SfinaParameterLoader sfinaParameterLoader;
     private EventLoaderNew eventLoader;
     private FingerDescriptor myAgentDescriptor;
@@ -117,7 +123,6 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     */
     @Override
     public void start(){
-        scheduleMeasurements();
         this.runBootstraping();
     }
 
@@ -147,18 +152,27 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
             public void timerExpired(Timer timer){
                 logger.info("### "+experimentID+" ###");
                 loadFileSystem(fileSystemSchema);
-                loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsLocation);
+                loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
+                
+                // Clearing output and peers log files
+                File folder = new File(peersLogDirectory+experimentID+"/");
+                clearOutputFiles(folder);
+                folder.mkdir();
+                clearOutputFiles(new File(experimentOutputFilesLocation));
+                
                 topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
                 flowLoader=new FlowLoaderNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                 topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
                 flowWriter = new FlowWriterNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                clearOutputFiles(new File(experimentOutputFilesLocation));
+                eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+                                
+                scheduleMeasurements();
                 runActiveState();
             }
         });
         loadAgentTimer.schedule(this.bootstrapTime);
     }
-    
+
     
     /**
      * The scheduling of the active state.  It is executed periodically. 
@@ -276,10 +290,12 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
             ex.printStackTrace();
         }
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
-        String peerToken = "/peer-"+getPeer().getIndexNumber()+"/";
-        this.experimentInputFilesLocation=configurationFilesLocation+experimentID+peerToken+inputDirectoryName;
-        this.experimentOutputFilesLocation=configurationFilesLocation+experimentID+peerToken+outputDirectoryName;
-        this.eventsLocation=experimentInputFilesLocation+eventsFileName;
+        this.peerTokenName = "/"+peerToken+"-"+getPeer().getIndexNumber();
+        this.experimentBaseFolderLocation=configurationFilesLocation+experimentID;
+        this.experimentInputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+inputDirectoryName;
+        this.experimentOutputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+outputDirectoryName;
+        this.eventsInputLocation=experimentInputFilesLocation+eventsFileName;
+        this.eventsOutputLocation=experimentOutputFilesLocation+eventsFileName;
         this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
         this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
         this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
@@ -343,11 +359,11 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     /**
      * Initializes the active state by setting iteration = 1 and loading data.
      */
-    private void initActiveState(){
-        timeToken = timeTokenName + getSimulationTime();
-        logger.info("--------------> " + timeToken + " <--------------");
+    public void initActiveState(){
+        this.setTimeToken(this.getTimeTokenName() + this.getSimulationTime());
+        logger.info("\n--------------> " + this.getTimeToken() + " at peer " + getPeer().getNetworkAddress() + " <--------------");
         resetIteration();        
-        loadInputData(timeToken);
+        loadInputData(timeToken);   
     }
     
     /**
@@ -357,16 +373,17 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     public void loadInputData(String timeToken){
         File file = new File(experimentInputFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
-            logger.info("loading data at time " + timeToken);
+            logger.info("loading data at " + timeToken);
             topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
-            if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists() &&
-                new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists()){
-                flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+            if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
                 flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
-            }
             else
-                logger.debug("No flow data provided for nodes and/or links at " + timeToken + ".");
+                logger.debug("No node flow data provided for at " + timeToken + ".");
+            if(new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
+                flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+            else
+                logger.debug("No link flow data provided at " + timeToken + ".");
             this.getFlowDomainAgent().setFlowParameters(flowNetwork);
         }
         else
@@ -414,9 +431,17 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         }
     }
     
+    /**
+     * Executes the event if its time corresponds to the current simulation time.
+     * @param flowNetwork
+     * @param event
+     */
     @Override
     public void executeEvent(FlowNetwork flowNetwork, Event event){
         if(event.getTime() == getSimulationTime()){
+            
+            this.eventWriter.writeEvent(event);
+            
             switch(event.getEventType()){
                 case TOPOLOGY:
                     switch(event.getNetworkComponent()){
@@ -481,7 +506,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                     logger.info("..executing system parameter event: " + (SfinaParameter)event.getParameter());
                     switch((SfinaParameter)event.getParameter()){
                         case RELOAD:
-                            loadInputData("time_" + (String)event.getValue());
+                            loadInputData(timeTokenName + (String)event.getValue());
                             break;
                         default:
                             logger.debug("System parameter cannot be recognized.");
@@ -544,6 +569,14 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     }
     
     /**
+     * 
+     * @param iteration
+     */
+    public void setIteration(int iteration){
+        this.iteration=iteration;
+    }
+    
+    /**
      * @return the events
      */
     public ArrayList<Event> getEvents() {
@@ -591,8 +624,8 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     /**
      * @return the experimentInputFilesLocation
      */
-    public String getExperimentInputFilesLocation() {
-        return experimentInputFilesLocation;
+    public String getExperimentBaseFolderLocation() {
+        return experimentBaseFolderLocation;
     }
     
     /**
@@ -602,6 +635,92 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         return timeToken;
     }
     
+    /**
+     * @param timeToken
+     */
+    public void setTimeToken(String timeToken) {
+        this.timeToken = timeToken;
+    }
+    
+    /**
+     * @return the time token name, i.e. probably "time_"
+     */
+    public String getTimeTokenName() {
+        return timeTokenName;
+    }
+    
+    /**
+     * @return the peerToken
+     */
+    public static String getPeerToken() {
+        return peerToken;
+    }
+
+    /**
+     * @param aPeerToken the peerToken to set
+     */
+    public static void setPeerToken(String aPeerToken) {
+        peerToken = aPeerToken;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public String getMissingValue(){
+        return this.missingValue;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public String getColumnSeparator(){
+        return this.columnSeparator;
+    }
+    
+    /**
+     * @return the linksLocation
+     */
+    public String getLinksLocation() {
+        return linksLocation;
+    }
+
+    /**
+     * @return the linksFlowLocation
+     */
+    public String getLinksFlowLocation() {
+        return linksFlowLocation;
+    }
+    
+    /**
+     * @return the eventWriter
+     */
+    public EventWriter getEventWriter() {
+        return eventWriter;
+    }
+    
+    /**
+     * @param topologyLoader the topologyLoader to set
+     */
+    public void setTopologyLoader(TopologyLoader topologyLoader) {
+        this.topologyLoader = topologyLoader;
+    }
+
+    /**
+     * @param topologyWriter the topologyWriter to set
+     */
+    public void setTopologyWriter(TopologyWriter topologyWriter) {
+        this.topologyWriter = topologyWriter;
+    }
+    
+    /**
+     * @return the runTime
+     */
+    public Time getRunTime() {
+        return runTime;
+    }
+    
     //****************** MEASUREMENTS ******************
     
     /**
@@ -609,10 +728,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
      */
     @Override
     public void scheduleMeasurements(){
-        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"/peer-"+getPeer().getIndexNumber()));
+        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+peerTokenName));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-                
+                logger.debug("---> Measuring peer" + getPeer().getIndexNumber());
                 getMeasurementDumper().measurementEpochEnded(log, epochNumber);
                 log.shrink(epochNumber, epochNumber+1);
             }
