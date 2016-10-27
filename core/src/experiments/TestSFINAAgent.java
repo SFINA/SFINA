@@ -18,6 +18,7 @@
 package experiments;
 
 import core.SimulationAgent;
+import input.Domain;
 import java.io.File;
 import org.apache.log4j.Logger;
 import protopeer.Experiment;
@@ -32,18 +33,21 @@ import protopeer.util.quantities.Time;
  */
 public class TestSFINAAgent extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(TestSFINAAgent.class);
     
+    
+    private static final Logger logger = Logger.getLogger(TestSFINAAgent.class);
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
-    
     private static String experimentID="experiment-"+expSeqNum;
+
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
     private final static int runDuration=4;
     private final static int N=1;
+  
+   
     
     
     public static void main(String[] args) {

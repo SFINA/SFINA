@@ -1,0 +1,8 @@
+backendType=interpss
+expSeqNum=01
+peersLogDirectory=peerlets-log/;
+experimentFolderName=experiment-;   
+bootstrapTime=2000;
+runTime=1000;
+runDuration=6;
+N=1;
