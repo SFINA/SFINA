@@ -71,6 +71,8 @@ public class CommandLineExecutable extends SimulatedExperiment{
     
     /*
         MAIN Function
+        - argument can either have the absolute or the relative path for the 
+        experimentConfig file.
     */
     public static void main(String[] args) {
         
@@ -102,7 +104,8 @@ public class CommandLineExecutable extends SimulatedExperiment{
         /*
             Load the parameters
         */
-        loadExperimentConfiguration(path);
+        if(isValid(path))
+            loadExperimentConfiguration(path);
         
         //Setup
         Experiment.initEnvironment();       
@@ -172,6 +175,9 @@ public class CommandLineExecutable extends SimulatedExperiment{
                 String parameter = st.nextToken();
                 String value = st.nextToken();
                 switch(parameter){
+                    case "backendType":
+                        backendType = getTestedValue(value, backendType);
+                        break;
                     case "expSeqNum":
                         expSeqNum =getTestedValue(value, expSeqNum);
                         experimentID = experimentFolderName + expSeqNum;
@@ -184,16 +190,16 @@ public class CommandLineExecutable extends SimulatedExperiment{
                         experimentID = experimentFolderName +expSeqNum;
                         break;
                     case "bootstrapTime":
-                        bootstrapTime = (int) getTestedValue(Integer.valueOf(value), bootstrapTime);
+                        bootstrapTime = (getTestedValue(Integer.valueOf(value), bootstrapTime));
                         break;
                     case "runTime":
-                        runTime = (int) getTestedValue(Integer.valueOf(value), runTime);
+                        runTime = (getTestedValue(Integer.valueOf(value), runTime));
                         break;
                     case "runDuration":
-                        runDuration = (int) getTestedValue(Integer.valueOf(value), runTime);
+                        runDuration = (getTestedValue(Integer.valueOf(value).intValue(), runTime));
                         break;
                     case "N":
-                        N = (int) getTestedValue(Integer.valueOf(value), N);
+                        N = (getTestedValue(Integer.valueOf(value), N));
                         break;
                     default:
                          logger.debug(parameter + " is as an experiment parameter not supported or cannot be recognized");
@@ -217,7 +223,7 @@ public class CommandLineExecutable extends SimulatedExperiment{
   
     private static <T> boolean isValid(T test){
         if(test instanceof String){
-            return (!((String)test).equals(""));
+            return (((String) test)!= null && !((String)test).equals(""));
         }else if( test instanceof Integer){
             return ((Integer) test) >0;
         }else {
