@@ -230,32 +230,7 @@ public class CommandLineExecutable extends SimulatedExperiment{
             return false;
         }
     }
-    /*
-    private static String getTestedValue(String value, String defaultValue){
-        if(stringIsValid(value)){
-            return value;
-        }else{
-            return defaultValue;
-        }
-    }
-    
-    private static int getTestedValue(int value, int defaultValue){
-        if(intIsValid(value)){
-            return value;
-        }else{
-            return defaultValue;
-        }
-    }
-    
-      
-    private static boolean stringIsValid(String test){
-        return (test!=null && !test.equals(""));
-    }
-    
-    private static boolean intIsValid(int test){
-        return (test>0);
-    }
-*/
+  
    
     
 }
