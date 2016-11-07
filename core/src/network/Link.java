@@ -7,6 +7,7 @@ package network;
 
 import dsutil.generic.state.State;
 import org.apache.log4j.Logger;
+import protopeer.network.NetworkAddress;
 
 /**
  * A link has the following features:
@@ -62,6 +63,16 @@ public class Link extends State{
         this.endNode=endNode;
         this.activated=activated;
         this.evaluateConnectivity();
+    }
+    
+    /**
+     * Check if link is interdependent.
+     * Returns true if StartNode and EndNode of link are in same network.
+     * 
+     * @return if link is interdependent
+     */
+    public boolean isInterdependent(){
+        return this instanceof InterdependentLink;
     }
     
     /**
@@ -198,24 +209,24 @@ public class Link extends State{
     }
     
     /**
-     * Returns if there is a start node
+     * Returns if there is an activated  start node
      * 
-     * @return if there is a start node
+     * @return if there is an activated  start node
      */
     private boolean hasStartNode(){
-        if(this.startNode!=null){
+        if(this.startNode!=null && this.startNode.isActivated()){
             return true;
         }
         return false;
     }
     
     /**
-     * Returns if there is an end node
+     * Returns if there is an activated end node
      * 
-     * @return if there is an end node
+     * @return if there is an activated end node
      */
     private boolean hasEndNode(){
-        if(this.endNode!=null){
+        if(this.endNode!=null && this.endNode.isActivated()){
             return true;
         }
         return false;
@@ -225,7 +236,7 @@ public class Link extends State{
      * Evalautes the connectivity of the link. If the link has both a start and
      * end node, it is connected
      */
-    private void evaluateConnectivity(){
+    protected void evaluateConnectivity(){
         if(this.hasStartNode() && this.hasEndNode()){
             this.connected=true;
         }

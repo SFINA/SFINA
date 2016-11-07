@@ -47,6 +47,7 @@ import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
 import protopeer.network.Message;
+import protopeer.network.NetworkAddress;
 import protopeer.time.Timer;
 import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
@@ -75,8 +76,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     private String experimentOutputFilesLocation;
     private String nodesLocation;
     private String linksLocation;
+    private String interdependentLinksLocation;
     private String nodesFlowLocation;
     private String linksFlowLocation;
+    private String interdependentLinksFlowLocation;
     private String eventsInputLocation;
     private String eventsOutputLocation;
     private String sfinaParamLocation;
@@ -84,6 +87,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     private String columnSeparator;
     private String missingValue;
     private HashMap<SfinaParameter,Object> sfinaParameters;
+    private int networkIndex;
     private FlowNetwork flowNetwork;
     private TopologyLoader topologyLoader;
     private FlowLoaderNew flowLoader;
@@ -115,6 +119,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
     public void init(Peer peer){
         super.init(peer);
         this.myAgentDescriptor=new FingerDescriptor(getPeer().getFinger());
+        this.networkIndex=this.getPeer().getIndexNumber();
     }
 
     /**
@@ -160,7 +165,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                 folder.mkdir();
                 clearOutputFiles(new File(experimentOutputFilesLocation));
                 
-                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
+                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, networkIndex);
                 flowLoader=new FlowLoaderNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                 topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
                 flowWriter = new FlowWriterNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
@@ -235,6 +240,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         String backendParamFileName=null;
         String nodesFileName=null;
         String linksFileName=null;
+        String interdependentLinksFileName=null;
         File file = new File(location);
         Scanner scr = null;
         try {
@@ -281,6 +287,9 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                     case "linksFileName":
                         linksFileName=st.nextToken();
                         break;
+                    case "interdependentLinksFileName":
+                        interdependentLinksFileName=st.nextToken();
+                        break;
                     default:
                         logger.debug("File system parameter couldn't be recognized.");
                 }
@@ -300,8 +309,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
         this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
         this.linksLocation="/"+topologyDirectoryName+linksFileName;
+        this.interdependentLinksLocation="/"+topologyDirectoryName+interdependentLinksFileName;
         this.nodesFlowLocation="/"+flowDirectoryName+nodesFileName;
         this.linksFlowLocation="/"+flowDirectoryName+linksFileName;
+        this.interdependentLinksFlowLocation="/"+flowDirectoryName+interdependentLinksFileName;
     }
     
     /**
@@ -379,11 +390,21 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
             if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
                 flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
             else
-                logger.debug("No node flow data provided for at " + timeToken + ".");
+                logger.debug("No node flow data provided at " + timeToken + ".");
             if(new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
                 flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
             else
                 logger.debug("No link flow data provided at " + timeToken + ".");
+            
+            //Loading interdependent link data if provided. 
+            if (new File(experimentInputFilesLocation+timeToken+interdependentLinksLocation).exists()){
+                topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+interdependentLinksLocation);
+                if(new File(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation).exists())
+                    flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation);
+            }
+            else
+                logger.debug("No interdependent link input files provided at " + timeToken + ".");
+            
             this.getFlowDomainAgent().setFlowParameters(flowNetwork);
         }
         else

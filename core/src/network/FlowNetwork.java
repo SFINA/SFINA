@@ -29,6 +29,7 @@ import org.jgrapht.Graph;
 import static org.jgrapht.alg.DijkstraShortestPath.findPathBetween;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import protopeer.network.NetworkAddress;
 
 /**
  * A flow network facilitates and mandates the topology of a flow network. This

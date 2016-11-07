@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.FlowNetwork;
+import network.InterdependentLink;
 import network.Link;
 import network.LinkState;
 import network.Node;
 import network.NodeState;
+import network.RemoteNode;
 import org.apache.log4j.Logger;
 
 /**
@@ -37,11 +39,13 @@ public class TopologyLoader {
     
     private FlowNetwork net;
     private String columnSeparator;
+    private int networkIndex;
     private static final Logger logger = Logger.getLogger(TopologyLoader.class);
     
-    public TopologyLoader(FlowNetwork net, String columnSeparator){
+    public TopologyLoader(FlowNetwork net, String columnSeparator, int networkIndex){
         this.net=net;
         this.columnSeparator=columnSeparator;
+        this.networkIndex = networkIndex;
         
         // empty network if it has nodes and links
         emptyNetwork();
@@ -96,15 +100,16 @@ public class TopologyLoader {
         ArrayList<LinkState> linkStates=new ArrayList<LinkState>();
         File file = new File(location);
         Scanner scr = null;
+        boolean isInterdependent = false;
         try {
             scr = new Scanner(file);
             if(scr.hasNext()){
                 StringTokenizer st = new StringTokenizer(scr.next(), columnSeparator);
                 while(st.hasMoreTokens()){
-                    // Same as for nodes, here properties like ID, from_node, to_node, etc are added but never used.
                     LinkState linkState=this.lookupLinkState(st.nextToken());
                     linkStates.add(linkState);
                 }
+                isInterdependent = (linkStates.size() == 6);
             }
             while(scr.hasNext()){
                 ArrayList<String> values=new ArrayList<String>();
@@ -112,27 +117,56 @@ public class TopologyLoader {
                 while(st.hasMoreTokens()){
                     values.add(st.nextToken());
                 }
-                String linkIndex=(String)this.getActualLinkValue(linkStates.get(0), values.get(0));
-                String startIndex=(String)this.getActualLinkValue(linkStates.get(1), values.get(1));
-                String endIndex=(String)this.getActualLinkValue(linkStates.get(2), values.get(2));
-                boolean status=(Boolean)this.getActualLinkValue(linkStates.get(3), values.get(3));
-                Node startNode=null;
-                Node endNode=null;
-                for(Node node:nodes){
-                    if(startIndex.equals(node.getIndex())){
-                        startNode=node;
+                if(isInterdependent){
+                    String linkIndex=(String)this.getActualLinkValue(linkStates.get(0), values.get(0));
+                    String startNodeIndex=(String)this.getActualLinkValue(linkStates.get(1), values.get(1));
+                    Integer startNetIndex=(Integer)this.getActualLinkValue(linkStates.get(2), values.get(2));
+                    String endNodeIndex=(String)this.getActualLinkValue(linkStates.get(3), values.get(3));
+                    Integer endNetIndex=(Integer)this.getActualLinkValue(linkStates.get(4), values.get(4));
+                    boolean status=(Boolean)this.getActualLinkValue(linkStates.get(5), values.get(5));
+                    Node startNode=null;
+                    Node endNode=null;
+                    for(Node node:nodes){
+                        if(startNodeIndex.equals(node.getIndex()) && startNetIndex == networkIndex){
+                            startNode=node;
+                            endNode = (Node) new RemoteNode(endNodeIndex, true, endNetIndex); 
+                        }
+                        if(endNodeIndex.equals(node.getIndex()) && endNetIndex == networkIndex){
+                            endNode=node;
+                            startNode = (Node) new RemoteNode(startNodeIndex, true, startNetIndex); 
+                        }
                     }
-                    if(endIndex.equals(node.getIndex())){
-                        endNode=node;
+                    if(startNode!=null || endNode!=null){
+                        Link link=new InterdependentLink(linkIndex,status,startNode,endNode,startNetIndex,endNetIndex);
+                        net.addLink(link);
                     }
-                }
-                if(startNode!=null && endNode!=null){
-                    Link link=new Link(linkIndex,status,startNode,endNode);
-                    net.addLink(link);
+                    else{
+                        logger.debug("Something went wrong with the indices of nodes and links.");
+                    }
                 }
                 else{
-                    logger.debug("Something went wrong with the indices of nodes and links.");
-		}
+                    String linkIndex=(String)this.getActualLinkValue(linkStates.get(0), values.get(0));
+                    String startIndex=(String)this.getActualLinkValue(linkStates.get(1), values.get(1));
+                    String endIndex=(String)this.getActualLinkValue(linkStates.get(2), values.get(2));
+                    boolean status=(Boolean)this.getActualLinkValue(linkStates.get(3), values.get(3));
+                    Node startNode=null;
+                    Node endNode=null;
+                    for(Node node:nodes){
+                        if(startIndex.equals(node.getIndex())){
+                            startNode=node;
+                        }
+                        if(endIndex.equals(node.getIndex())){
+                            endNode=node;
+                        }
+                    }
+                    if(startNode!=null && endNode!=null){
+                        Link link=new Link(linkIndex,status,startNode,endNode);
+                        net.addLink(link);
+                    }
+                    else{
+                        logger.debug("Something went wrong with the indices of nodes and links.");
+                    }
+                }
             }
         }
         catch (FileNotFoundException ex) {
@@ -176,6 +210,10 @@ public class TopologyLoader {
                     default:
                         logger.debug("Something is wrong with status of the links.");
                 }
+            case FROM_NET:
+                return Integer.valueOf(rawValue);
+            case TO_NET:
+                return Integer.valueOf(rawValue);
             default:
                 logger.debug("Link state is not recognized.");
                 return null;
@@ -204,6 +242,10 @@ public class TopologyLoader {
                 return LinkState.TO_NODE;
             case "status":
                 return LinkState.STATUS;
+            case "from_net_id":
+                return LinkState.FROM_NET;
+            case "to_net_id":
+                return LinkState.TO_NET;
             default:
                 logger.debug("Link state is not recognized.");
                 return null;

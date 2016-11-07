@@ -60,9 +60,9 @@ public class testLoader {
         }
         
         // Load topology
-        TopologyLoader topologyLoader = new TopologyLoader(net, col_seperator);
-        topologyLoader.loadNodes(nodeLocation);
-        topologyLoader.loadLinks(linkLocation);
+//        TopologyLoader topologyLoader = new TopologyLoader(net, col_seperator);
+//        topologyLoader.loadNodes(nodeLocation);
+//        topologyLoader.loadLinks(linkLocation);
 
         // Load meta
         PowerFlowLoader flowDataLoader = new PowerFlowLoader(net, col_seperator, missingValue);

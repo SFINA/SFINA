@@ -162,7 +162,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 logger.info("### "+experimentID+" ###");
                 loadFileSystem(fileSystemSchema);
                 loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsLocation);
-                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
+                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, 0);
                 clearOutputFiles(new File(experimentOutputFilesLocation));
                 runActiveState();
             }

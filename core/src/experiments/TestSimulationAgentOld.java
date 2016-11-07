@@ -30,9 +30,9 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class TestSFINAAgent extends SimulatedExperiment{
+public class TestSimulationAgentOld extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(TestSFINAAgent.class);
+    private static final Logger logger = Logger.getLogger(TestSimulationAgentOld.class);
     
     private final static String expSeqNum="01";
     private final static String peersLogDirectory="peerlets-log/";
@@ -48,7 +48,7 @@ public class TestSFINAAgent extends SimulatedExperiment{
     
     public static void main(String[] args) {
         Experiment.initEnvironment();
-        TestSFINAAgent test = new TestSFINAAgent();
+        TestSimulationAgentOld test = new TestSimulationAgentOld();
         test.init();
         
         // Can move these three lines to SimulationAgent also? Reason: loading peersLogDirectory name from the config file.
