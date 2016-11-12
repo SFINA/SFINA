@@ -5,6 +5,7 @@
  */
 package core;
 
+import backend.FlowDomainAgent;
 import event.Event;
 import java.util.HashMap;
 import network.FlowNetwork;
@@ -23,15 +24,13 @@ public interface SimulationAgentInterface {
     
     public int getSimulationTime();
     
-    public HashMap<Enum,Object> getBackendParameters();
+    public HashMap<Enum,Object> getDomainParameters();
     
     public void saveOutputData();
     
     public int getIteration();
     
     public void queueEvent(Event event);
-    
-    public void setFlowParameters();
     
     public void runPassiveState(Message message);
     
@@ -45,7 +44,7 @@ public interface SimulationAgentInterface {
         
     public void runFlowAnalysis();
         
-    public boolean callBackend(FlowNetwork flowNetwork);
+    public FlowDomainAgent getFlowDomainAgent();
 
     public void scheduleMeasurements();
     

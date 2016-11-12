@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class EventWriter {
     
-    private static final Logger logger = Logger.getLogger(FlowWriterNew.class);
+    private static final Logger logger = Logger.getLogger(FlowWriter.class);
     
     private String columnSeparator;
     private String missingValue;

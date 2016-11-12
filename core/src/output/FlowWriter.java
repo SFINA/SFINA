@@ -33,16 +33,16 @@ import org.apache.log4j.Logger;
  *
  * @author Ben
  */
-public class FlowWriterNew {
+public class FlowWriter {
 
-    private static final Logger logger = Logger.getLogger(FlowWriterNew.class);
+    private static final Logger logger = Logger.getLogger(FlowWriter.class);
 
     private FlowNetwork net;
     private String columnSeparator;
     private String missingValue;
     private FlowNetworkDataTypesInterface flowNetworkDataTypes;
     
-    public FlowWriterNew(FlowNetwork net, String columnSeparator, String missingValue, FlowNetworkDataTypesInterface flowNetworkDataTypes){
+    public FlowWriter(FlowNetwork net, String columnSeparator, String missingValue, FlowNetworkDataTypesInterface flowNetworkDataTypes){
         this.net=net;
         this.columnSeparator=columnSeparator;        
         this.missingValue = missingValue;

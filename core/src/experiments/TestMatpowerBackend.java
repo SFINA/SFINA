@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.SimulationAgentNew;
+import core.SimulationAgent;
 import java.io.File;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
@@ -64,7 +64,7 @@ public class TestMatpowerBackend extends SimulatedExperiment{
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new SimulationAgentNew(
+                newPeer.addPeerlet(new SimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));

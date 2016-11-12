@@ -19,16 +19,7 @@ package core;
 
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import power.backend.PowerBackend;
-import static power.backend.PowerBackend.INTERPSS;
-import static power.backend.PowerBackend.MATPOWER;
-import backend.FlowBackendInterface;
-import power.input.BackendParameterLoader;
-import input.Domain;
-import static input.Domain.GAS;
-import static input.Domain.POWER;
-import static input.Domain.TRANSPORTATION;
-import static input.Domain.WATER;
+import backend.FlowDomainAgent;
 import input.EventLoader;
 import input.SfinaParameter;
 import input.SfinaParameterLoader;
@@ -47,18 +38,17 @@ import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
 import output.TopologyWriter;
-import power.backend.InterpssFlowBackend;
-import power.backend.MATPOWERFlowBackend;
-import power.input.PowerFlowLoader;
-import power.input.PowerLinkState;
-import power.input.PowerNodeState;
-import power.output.PowerFlowWriter;
+import input.FlowLoader;
+import network.InterdependentLink;
+import output.EventWriter;
+import output.FlowWriter;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
 import protopeer.network.Message;
+import protopeer.network.NetworkAddress;
 import protopeer.time.Timer;
 import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
@@ -70,7 +60,7 @@ import protopeer.util.quantities.Time;
 public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface{
     
     private static final Logger logger = Logger.getLogger(SimulationAgent.class);
-    
+
     private String experimentID;
     private Time bootstrapTime;
     private Time runTime;
@@ -78,30 +68,37 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private final static String parameterColumnSeparator="=";
     private final static String fileSystemSchema="conf/fileSystem.conf";
     private final static String peersLogDirectory="peerlets-log/";
+    private static String peerToken="peer";
+    private String peerTokenName;
     private String timeToken;
     private String timeTokenName;
+    private String experimentBaseFolderLocation;
     private String experimentInputFilesLocation;
     private String experimentOutputFilesLocation;
     private String nodesLocation;
     private String linksLocation;
+    private String interdependentLinksLocation;
     private String nodesFlowLocation;
     private String linksFlowLocation;
-    private String eventsLocation;
+    private String interdependentLinksFlowLocation;
+    private String eventsInputLocation;
+    private String eventsOutputLocation;
     private String sfinaParamLocation;
     private String backendParamLocation;
     private String columnSeparator;
     private String missingValue;
     private HashMap<SfinaParameter,Object> sfinaParameters;
-    private HashMap<Enum,Object> backendParameters;
+    private int networkIndex;
     private FlowNetwork flowNetwork;
     private TopologyLoader topologyLoader;
+    private FlowLoader flowLoader;
+    private TopologyWriter topologyWriter;
+    private FlowWriter flowWriter;
+    private EventWriter eventWriter;
     private SfinaParameterLoader sfinaParameterLoader;
-    private BackendParameterLoader backendParameterLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
-    private Domain domain;
-    private PowerBackend backend;
     private ArrayList<Event> events;
     
     public SimulationAgent(
@@ -123,6 +120,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     public void init(Peer peer){
         super.init(peer);
         this.myAgentDescriptor=new FingerDescriptor(getPeer().getFinger());
+        this.networkIndex=this.getPeer().getIndexNumber();
     }
 
     /**
@@ -131,7 +129,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     */
     @Override
     public void start(){
-        scheduleMeasurements();
         this.runBootstraping();
     }
 
@@ -161,15 +158,27 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             public void timerExpired(Timer timer){
                 logger.info("### "+experimentID+" ###");
                 loadFileSystem(fileSystemSchema);
-                loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsLocation);
-                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, 0);
+                loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
+                
+                // Clearing output and peers log files
+                File folder = new File(peersLogDirectory+experimentID+"/");
+                clearOutputFiles(folder);
+                folder.mkdir();
                 clearOutputFiles(new File(experimentOutputFilesLocation));
+                
+                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, networkIndex);
+                flowLoader=new FlowLoader(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, networkIndex);
+                flowWriter = new FlowWriter(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+                eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+                                
+                scheduleMeasurements();
                 runActiveState();
             }
         });
         loadAgentTimer.schedule(this.bootstrapTime);
     }
-    
+
     
     /**
      * The scheduling of the active state.  It is executed periodically. 
@@ -190,7 +199,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                
                 initActiveState();
                 
                 runInitialOperations();
@@ -198,7 +206,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 executeAllEvents();
                 
                 runFlowAnalysis();
-                
+
                 runFinalOperations();
                 
                 runActiveState(); 
@@ -212,11 +220,17 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
     }
     
+    @Override
+    public FlowDomainAgent getFlowDomainAgent(){
+        return (FlowDomainAgent)getPeer().getPeerletOfType(FlowDomainAgent.class);
+    }
+    
     /**
      * Load parameters determining file system structure from conf/fileSystem.conf
+     * @param location
      */
     @Override
-    public void loadFileSystem(String schema){
+    public void loadFileSystem(String location){
         String inputDirectoryName=null;
         String outputDirectoryName=null;
         String topologyDirectoryName=null;
@@ -227,7 +241,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         String backendParamFileName=null;
         String nodesFileName=null;
         String linksFileName=null;
-        File file = new File(schema);
+        String interdependentLinksFileName=null;
+        File file = new File(location);
         Scanner scr = null;
         try {
             scr = new Scanner(file);
@@ -273,6 +288,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                     case "linksFileName":
                         linksFileName=st.nextToken();
                         break;
+                    case "interdependentLinksFileName":
+                        interdependentLinksFileName=st.nextToken();
+                        break;
                     default:
                         logger.debug("File system parameter couldn't be recognized.");
                 }
@@ -282,20 +300,24 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             ex.printStackTrace();
         }
         this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
-        String peerToken = "/peer-"+getPeer().getIndexNumber()+"/";
-        this.experimentInputFilesLocation=configurationFilesLocation+experimentID+peerToken+inputDirectoryName;
-        this.experimentOutputFilesLocation=configurationFilesLocation+experimentID+peerToken+outputDirectoryName;
-        this.eventsLocation=experimentInputFilesLocation+eventsFileName;
+        this.peerTokenName = "/"+peerToken+"-"+getPeer().getIndexNumber();
+        this.experimentBaseFolderLocation=configurationFilesLocation+experimentID;
+        this.experimentInputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+inputDirectoryName;
+        this.experimentOutputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+outputDirectoryName;
+        this.eventsInputLocation=experimentInputFilesLocation+eventsFileName;
+        this.eventsOutputLocation=experimentOutputFilesLocation+eventsFileName;
         this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
         this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
         this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
         this.linksLocation="/"+topologyDirectoryName+linksFileName;
+        this.interdependentLinksLocation="/"+topologyDirectoryName+interdependentLinksFileName;
         this.nodesFlowLocation="/"+flowDirectoryName+nodesFileName;
         this.linksFlowLocation="/"+flowDirectoryName+linksFileName;
+        this.interdependentLinksFlowLocation="/"+flowDirectoryName+interdependentLinksFileName;
     }
     
     /**
-     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise. PowerBackend parameters and events are optional.
+     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise.
      * @param sfinaParamLocation path to sfinaParameters.txt
      * @param backendParamLocation path to backendParameters.txt
      * @param eventsLocation path to events.txt
@@ -305,25 +327,14 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         // Sfina Parameters
         File file = new File(sfinaParamLocation);
         if (!file.exists())
-            logger.debug("sfinaParameters.txt file not found. This will give problems. Should be here: " + sfinaParamLocation);
+            logger.debug("sfinaParameters.txt file not found. Should be here: " + sfinaParamLocation);
         sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
         sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
         logger.debug("Loaded sfinaParameters: " + sfinaParameters);
-        if (getSfinaParameters().containsKey(SfinaParameter.DOMAIN))
-            setDomain((Domain)getSfinaParameters().get(SfinaParameter.DOMAIN));
-        else 
-            logger.debug("Domain not specified.");
-        if (getSfinaParameters().containsKey(SfinaParameter.BACKEND))
-            setBackend((PowerBackend)getSfinaParameters().get(SfinaParameter.BACKEND));
-        else
-            logger.debug("Backend not specified.");
-        
-        // PowerBackend Parameters
         file = new File(backendParamLocation);
         if (file.exists()) {
-            backendParameterLoader = new BackendParameterLoader(getDomain(),parameterColumnSeparator);
-            backendParameters = backendParameterLoader.loadBackendParameters(backendParamLocation);
-            logger.debug("Loaded backendParameters: " + backendParameters);
+            this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
+            logger.debug("Loaded backendParameters: " + this.getDomainParameters());
         }
         else
             logger.debug("No backendParameters.txt file provided.");
@@ -331,7 +342,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         // Events
         file = new File(eventsLocation);
         if (file.exists()) {
-            eventLoader=new EventLoader(domain,columnSeparator,missingValue);
+            eventLoader=new EventLoader(columnSeparator,missingValue,this.getFlowDomainAgent().getFlowNetworkDataTypes());
             events=eventLoader.loadEvents(eventsLocation);
         }
         else
@@ -360,11 +371,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     /**
      * Initializes the active state by setting iteration = 1 and loading data.
      */
-    private void initActiveState(){
-        timeToken = timeTokenName + getSimulationTime();
-        logger.info("--------------> " + timeToken + " <--------------");
+    public void initActiveState(){
+        this.setTimeToken(this.getTimeTokenName() + this.getSimulationTime());
+        logger.info("\n--------------> " + this.getTimeToken() + " at peer " + getPeer().getNetworkAddress() + " <--------------");
         resetIteration();        
-        loadInputData(timeToken);
+        loadInputData(timeToken);   
     }
     
     /**
@@ -374,60 +385,33 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     public void loadInputData(String timeToken){
         File file = new File(experimentInputFilesLocation+timeToken);
         if (file.exists() && file.isDirectory()) {
-            logger.info("loading data at time " + timeToken);
+            logger.info("loading data at " + timeToken);
             topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
-            switch(domain){
-                case POWER:
-                    PowerFlowLoader flowLoader=new PowerFlowLoader(flowNetwork, columnSeparator, missingValue);
-                    if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
-                        flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
-                    else
-                        logger.debug("No flow data provided for nodes at " + timeToken + ".");
-                    if (new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
-                        flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
-                    else
-                        logger.debug("No flow data provided for links at " + timeToken + ".");
-                    break;
-                case GAS:
-                    logger.debug("This domain is not supported at this moment");
-                    break;
-                case WATER:
-                    logger.debug("This domain is not supported at this moment");
-                    break;
-                case TRANSPORTATION:
-                    logger.debug("This domain is not supported at this moment");
-                    break;
-                default:
-                    logger.debug("This domain is not supported at this moment");
+            
+            // Load flow data if provided
+            if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
+                flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
+            else
+                logger.debug("No node flow data provided at " + timeToken + ".");
+            if(new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
+                flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+            else
+                logger.debug("No link flow data provided at " + timeToken + ".");
+            
+            // Load interdependent link data if provided. 
+            if (new File(experimentInputFilesLocation+timeToken+interdependentLinksLocation).exists()){
+                topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+interdependentLinksLocation);
+                if(new File(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation).exists())
+                    flowLoader.loadInterdependentLinkFlowData(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation);
             }
-            setFlowParameters();
+            else
+                logger.debug("No interdependent link input files provided at " + timeToken + ".");
+            
+            this.getFlowDomainAgent().setFlowParameters(flowNetwork);
         }
         else
             logger.debug("No input data provided at " + timeToken + ". Continue to use data from before.");
-    }
-    
-    @Override
-    public void setFlowParameters(){
-        switch(domain){
-            case POWER:
-                flowNetwork.setLinkFlowType(PowerLinkState.POWER_FLOW_FROM_REAL);
-                flowNetwork.setNodeFlowType(PowerNodeState.VOLTAGE_MAGNITUDE);
-                flowNetwork.setLinkCapacityType(PowerLinkState.RATE_C);
-                flowNetwork.setNodeCapacityType(PowerNodeState.VOLTAGE_MAX);
-                break;
-            case GAS:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case WATER:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case TRANSPORTATION:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            default:
-                logger.debug("This domain is not supported at this moment");
-        }
     }
     
     /**
@@ -436,27 +420,12 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     @Override
     public void saveOutputData(){
         logger.info("doing output at iteration " + iteration);
-        TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, 0);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
         topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
-        switch(domain){
-                case POWER:
-                    PowerFlowWriter flowLoader=new PowerFlowWriter(flowNetwork, columnSeparator, missingValue);
-                    flowLoader.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
-                    flowLoader.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
-                    break;
-                case GAS:
-                    logger.debug("This domain is not supported at this moment");
-                    break;
-                case WATER:
-                    logger.debug("This domain is not supported at this moment");
-                    break;
-                case TRANSPORTATION:
-                    logger.debug("This domain is not supported at this moment");
-                    break;
-                default:
-                    logger.debug("This domain is not supported at this moment");
-        }
+        topologyWriter.writeInterdependentLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksLocation);
+        flowWriter.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
+        flowWriter.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
+        flowWriter.writeInterdependentLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksFlowLocation);
     }
     
     @Override
@@ -488,9 +457,17 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         }
     }
     
+    /**
+     * Executes the event if its time corresponds to the current simulation time.
+     * @param flowNetwork
+     * @param event
+     */
     @Override
     public void executeEvent(FlowNetwork flowNetwork, Event event){
         if(event.getTime() == getSimulationTime()){
+            
+            this.eventWriter.writeEvent(event);
+            
             switch(event.getEventType()){
                 case TOPOLOGY:
                     switch(event.getNetworkComponent()){
@@ -504,7 +481,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                                     if(node.isActivated() == (Boolean)event.getValue())
                                         logger.debug("Node status same, not changed by event.");
                                     node.setActivated((Boolean)event.getValue()); 
-                                    logger.info("..changing status of node " + node.getIndex());
+                                    logger.info("..setting node " + node.getIndex() + " to activated = " + event.getValue());
                                     break;
                                 default:
                                     logger.debug("Node state cannot be recognised");
@@ -512,7 +489,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                             break;
                         case LINK:
                             Link link=flowNetwork.getLink(event.getComponentID());
-                            link.replacePropertyElement(event.getParameter(), event.getValue());
+//                            link.replacePropertyElement(event.getParameter(), event.getValue());
                             switch((LinkState)event.getParameter()){
                                 case ID:
                                     link.setIndex((String)event.getValue());
@@ -527,10 +504,32 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                                     if(link.isActivated() == (Boolean)event.getValue())
                                         logger.debug("Link status same, not changed by event.");
                                     link.setActivated((Boolean)event.getValue()); 
-                                    logger.info("..changing status of link " + link.getIndex());
+                                    logger.info("..setting link " + link.getIndex() + " to activated = " + event.getValue());
                                     break;
                                 default:
                                     logger.debug("Link state cannot be recognised");
+                            }
+                            break;
+                        case INTERDEPENDENT_LINK:
+                            InterdependentLink interdependentLink=flowNetwork.getInterdependentLink(event.getComponentID());
+                            switch((LinkState)event.getParameter()){
+                                case ID:
+                                    interdependentLink.setIndex((String)event.getValue());
+                                    break;
+                                case FROM_NODE:
+                                    interdependentLink.setStartNode(flowNetwork.getNode((String)event.getValue()));
+                                    break;
+                                case TO_NODE:
+                                    interdependentLink.setEndNode(flowNetwork.getNode((String)event.getValue()));
+                                    break;
+                                case STATUS:
+                                    if(interdependentLink.isActivated() == (Boolean)event.getValue())
+                                        logger.debug("Interdependent link status same, not changed by event.");
+                                    interdependentLink.setActivated((Boolean)event.getValue()); 
+                                    logger.info("..setting interdependent link " + interdependentLink.getIndex() + " to activated = " + event.getValue());
+                                    break;
+                                default:
+                                    logger.debug("Interdependent link state cannot be recognised");
                             }
                             break;
                         default:
@@ -547,6 +546,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                             Link link=flowNetwork.getLink(event.getComponentID());
                             link.replacePropertyElement(event.getParameter(), event.getValue());
                             break;
+                        case INTERDEPENDENT_LINK:
+                            InterdependentLink interdependentLink=flowNetwork.getInterdependentLink(event.getComponentID());
+                            interdependentLink.replacePropertyElement(event.getParameter(), event.getValue());
+                            break;
                         default:
                             logger.debug("Network component cannot be recognised");
                     }
@@ -554,16 +557,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 case SYSTEM:
                     logger.info("..executing system parameter event: " + (SfinaParameter)event.getParameter());
                     switch((SfinaParameter)event.getParameter()){
-                        case DOMAIN:
-                            getSfinaParameters().put(SfinaParameter.DOMAIN, (Domain)event.getValue());
-                            setDomain((Domain)event.getValue());
-                            break;
-                        case BACKEND:
-                            getSfinaParameters().put(SfinaParameter.BACKEND, (PowerBackend)event.getValue());
-                            setBackend((PowerBackend)event.getValue());
-                            break;
                         case RELOAD:
-                            loadInputData("time_" + (String)event.getValue());
+                            loadInputData(timeTokenName + (String)event.getValue());
                             break;
                         default:
                             logger.debug("System parameter cannot be recognized.");
@@ -583,49 +578,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     @Override
     public void runFlowAnalysis(){
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
-            boolean converged = callBackend(currentIsland);
+            boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
         nextIteration();
-    }
-    
-    /**
-     * Executes domain and backend specific flow analysis. Currently implemented for power domain: Matpower and InterPSS.
-     * @param flowNetwork
-     * @return true if converged, else false.
-     */
-    @Override
-    public boolean callBackend(FlowNetwork flowNetwork){
-        FlowBackendInterface flowBackend;
-        boolean converged = false;
-        logger.info("executing " + backend + " backend");
-        switch(domain){
-            case POWER:
-                switch(backend){
-                    case MATPOWER:
-                        flowBackend=new MATPOWERFlowBackend(getBackendParameters());
-                        converged=flowBackend.flowAnalysis(flowNetwork);
-                        break;
-                    case INTERPSS:
-                        flowBackend=new InterpssFlowBackend(getBackendParameters());
-                        converged=flowBackend.flowAnalysis(flowNetwork);
-                        break;
-                    default:
-                        logger.debug("This flow backend is not supported at this moment.");
-                }
-                break;
-            case GAS:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case WATER:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            case TRANSPORTATION:
-                logger.debug("This domain is not supported at this moment");
-                break;
-            default:
-                logger.debug("This domain is not supported at this moment");
-        }
-        return converged;
     }
     
     /**
@@ -638,30 +593,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     public void setFlowNetwork(FlowNetwork net) {
         this.flowNetwork = net;
-    }
-    
-    /**
-     * 
-     * @return the domain
-     */
-    public Domain getDomain(){
-        return domain;
-    }
-    
-    public void setDomain(Domain domain){
-        this.domain=domain;
-    }
-    
-    /**
-     * 
-     * @return the simulation backend
-     */
-    public PowerBackend getBackend(){
-        return backend;
-    }
-    
-    public void setBackend(PowerBackend backend){
-        this.backend=backend;
     }
     
     /**
@@ -687,6 +618,14 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     @Override
     public int getIteration(){
         return this.iteration;
+    }
+    
+    /**
+     * 
+     * @param iteration
+     */
+    public void setIteration(int iteration){
+        this.iteration=iteration;
     }
     
     /**
@@ -723,22 +662,22 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * @return the backendParameters
      */
     @Override
-    public HashMap<Enum,Object> getBackendParameters() {
-        return backendParameters;
+    public HashMap<Enum,Object> getDomainParameters() {
+        return this.getFlowDomainAgent().getDomainParameters();
     }
 
     /**
      * @param backendParameters the backendParameters to set
      */
     public void setBackendParameters(HashMap<Enum,Object> backendParameters) {
-        this.backendParameters = backendParameters;
+        this.getFlowDomainAgent().setDomainParameters(backendParameters);
     }
     
     /**
      * @return the experimentInputFilesLocation
      */
-    public String getExperimentInputFilesLocation() {
-        return experimentInputFilesLocation;
+    public String getExperimentBaseFolderLocation() {
+        return experimentBaseFolderLocation;
     }
     
     /**
@@ -748,6 +687,92 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         return timeToken;
     }
     
+    /**
+     * @param timeToken
+     */
+    public void setTimeToken(String timeToken) {
+        this.timeToken = timeToken;
+    }
+    
+    /**
+     * @return the time token name, i.e. probably "time_"
+     */
+    public String getTimeTokenName() {
+        return timeTokenName;
+    }
+    
+    /**
+     * @return the peerToken
+     */
+    public static String getPeerToken() {
+        return peerToken;
+    }
+
+    /**
+     * @param aPeerToken the peerToken to set
+     */
+    public static void setPeerToken(String aPeerToken) {
+        peerToken = aPeerToken;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public String getMissingValue(){
+        return this.missingValue;
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public String getColumnSeparator(){
+        return this.columnSeparator;
+    }
+    
+    /**
+     * @return the linksLocation
+     */
+    public String getLinksLocation() {
+        return linksLocation;
+    }
+
+    /**
+     * @return the linksFlowLocation
+     */
+    public String getLinksFlowLocation() {
+        return linksFlowLocation;
+    }
+    
+    /**
+     * @return the eventWriter
+     */
+    public EventWriter getEventWriter() {
+        return eventWriter;
+    }
+    
+    /**
+     * @param topologyLoader the topologyLoader to set
+     */
+    public void setTopologyLoader(TopologyLoader topologyLoader) {
+        this.topologyLoader = topologyLoader;
+    }
+
+    /**
+     * @param topologyWriter the topologyWriter to set
+     */
+    public void setTopologyWriter(TopologyWriter topologyWriter) {
+        this.topologyWriter = topologyWriter;
+    }
+    
+    /**
+     * @return the runTime
+     */
+    public Time getRunTime() {
+        return runTime;
+    }
+    
     //****************** MEASUREMENTS ******************
     
     /**
@@ -755,10 +780,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      */
     @Override
     public void scheduleMeasurements(){
-        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+"/peer-"+getPeer().getIndexNumber()));
+        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+peerTokenName));
         getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
             public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-                
+                logger.debug("---> Measuring peer" + getPeer().getIndexNumber());
                 getMeasurementDumper().measurementEpochEnded(log, epochNumber);
                 log.shrink(epochNumber, epochNumber+1);
             }

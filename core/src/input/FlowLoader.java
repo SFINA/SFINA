@@ -23,16 +23,16 @@ import org.apache.log4j.Logger;
  *
  * @author evangelospournaras
  */
-public class FlowLoaderNew {
+public class FlowLoader {
     
-    private static final Logger logger = Logger.getLogger(FlowLoaderNew.class);
+    private static final Logger logger = Logger.getLogger(FlowLoader.class);
     
     private final FlowNetwork net;
     private final String parameterValueSeparator;
     private final String missingValue;
     private FlowNetworkDataTypesInterface flowNetworkDataTypes;
     
-    public FlowLoaderNew(FlowNetwork net, String parameterValueSeparator, String missingValue, FlowNetworkDataTypesInterface flowNetworkDataTypes){
+    public FlowLoader(FlowNetwork net, String parameterValueSeparator, String missingValue, FlowNetworkDataTypesInterface flowNetworkDataTypes){
         this.net=net;
         this.parameterValueSeparator=parameterValueSeparator;
         this.missingValue=missingValue;
