@@ -5,7 +5,6 @@
  */
 package network;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -23,7 +22,7 @@ import org.apache.log4j.Logger;
  * 
  * @author evangelospournaras
  */
-public class Node extends RemoteNode{
+public class Node extends RemoteNode implements NodeInterface{
     
     private Enum flowType;
     private Enum capacityType;

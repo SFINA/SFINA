@@ -39,6 +39,7 @@ import network.NodeState;
 import org.apache.log4j.Logger;
 import output.TopologyWriter;
 import input.FlowLoaderNew;
+import network.InterdependentLink;
 import output.EventWriter;
 import output.FlowWriterNew;
 import protopeer.BasePeerlet;
@@ -167,7 +168,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                 
                 topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, networkIndex);
                 flowLoader=new FlowLoaderNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
+                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, networkIndex);
                 flowWriter = new FlowWriterNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                 eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                                 
@@ -387,6 +388,8 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
             logger.info("loading data at " + timeToken);
             topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
             topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
+            
+            // Load flow data if provided
             if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
                 flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
             else
@@ -396,11 +399,11 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
             else
                 logger.debug("No link flow data provided at " + timeToken + ".");
             
-            //Loading interdependent link data if provided. 
+            // Load interdependent link data if provided. 
             if (new File(experimentInputFilesLocation+timeToken+interdependentLinksLocation).exists()){
                 topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+interdependentLinksLocation);
                 if(new File(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation).exists())
-                    flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation);
+                    flowLoader.loadInterdependentLinkFlowData(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation);
             }
             else
                 logger.debug("No interdependent link input files provided at " + timeToken + ".");
@@ -419,8 +422,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
         logger.info("doing output at iteration " + iteration);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
         topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
+        topologyWriter.writeInterdependentLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksLocation);
         flowWriter.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
         flowWriter.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
+        flowWriter.writeInterdependentLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksFlowLocation);
     }
     
     @Override
@@ -484,7 +489,7 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                             break;
                         case LINK:
                             Link link=flowNetwork.getLink(event.getComponentID());
-                            link.replacePropertyElement(event.getParameter(), event.getValue());
+//                            link.replacePropertyElement(event.getParameter(), event.getValue());
                             switch((LinkState)event.getParameter()){
                                 case ID:
                                     link.setIndex((String)event.getValue());
@@ -505,6 +510,28 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                                     logger.debug("Link state cannot be recognised");
                             }
                             break;
+                        case INTERDEPENDENT_LINK:
+                            InterdependentLink interdependentLink=flowNetwork.getInterdependentLink(event.getComponentID());
+                            switch((LinkState)event.getParameter()){
+                                case ID:
+                                    interdependentLink.setIndex((String)event.getValue());
+                                    break;
+                                case FROM_NODE:
+                                    interdependentLink.setStartNode(flowNetwork.getNode((String)event.getValue()));
+                                    break;
+                                case TO_NODE:
+                                    interdependentLink.setEndNode(flowNetwork.getNode((String)event.getValue()));
+                                    break;
+                                case STATUS:
+                                    if(interdependentLink.isActivated() == (Boolean)event.getValue())
+                                        logger.debug("Interdependent link status same, not changed by event.");
+                                    interdependentLink.setActivated((Boolean)event.getValue()); 
+                                    logger.info("..setting interdependent link " + interdependentLink.getIndex() + " to activated = " + event.getValue());
+                                    break;
+                                default:
+                                    logger.debug("Interdependent link state cannot be recognised");
+                            }
+                            break;
                         default:
                             logger.debug("Network component cannot be recognised");
                     }
@@ -518,6 +545,10 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                         case LINK:
                             Link link=flowNetwork.getLink(event.getComponentID());
                             link.replacePropertyElement(event.getParameter(), event.getValue());
+                            break;
+                        case INTERDEPENDENT_LINK:
+                            InterdependentLink interdependentLink=flowNetwork.getInterdependentLink(event.getComponentID());
+                            interdependentLink.replacePropertyElement(event.getParameter(), event.getValue());
                             break;
                         default:
                             logger.debug("Network component cannot be recognised");

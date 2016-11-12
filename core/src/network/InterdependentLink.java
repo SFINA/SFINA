@@ -23,13 +23,13 @@ import org.apache.log4j.Logger;
  *
  * @author Ben
  */
-public class InterdependentLink extends Link{
+public class InterdependentLink extends Link implements LinkInterface{
     
     private int startNodeNetworkIndex;
     private int endNodeNetworkIndex;
     private static final Logger logger = Logger.getLogger(InterdependentLink.class);
     
-    public InterdependentLink(String index, boolean activated, Node startNode, Node endNode, int startNodeNetworkIndex, int endNodeNetworkIndex) {
+    public InterdependentLink(String index, boolean activated, NodeInterface startNode, NodeInterface endNode, int startNodeNetworkIndex, int endNodeNetworkIndex) {
         super(index, activated, startNode, endNode);
         this.startNodeNetworkIndex = startNodeNetworkIndex;
         this.endNodeNetworkIndex = endNodeNetworkIndex;
@@ -63,4 +63,26 @@ public class InterdependentLink extends Link{
         this.startNodeNetworkIndex = startNodeNetworkIndex;
     }
 
+    /**
+     *
+     * @return if the node points to or away from this network
+     */
+    public Boolean isOutgoing(){
+        boolean startIsRemote = this.getStartNode() instanceof RemoteNode;
+        boolean endIsRemote = this.getEndNode() instanceof RemoteNode;
+        if(startIsRemote || endIsRemote)
+            return endIsRemote;
+        else {
+            logger.debug("InterdependentLink doesn't have a RemoteNode at one of its ends. Shouldn't happen. Index = " + this.getIndex());
+            return null;
+        }
+    }
+    
+    /**
+     *
+     * @return
+     */
+    public Boolean isIncoming(){
+        return !isOutgoing();
+    }
 }

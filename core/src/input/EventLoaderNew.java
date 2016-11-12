@@ -105,6 +105,9 @@ public class EventLoaderNew {
                     case "link":
                         networkComponent=NetworkComponent.LINK;
                         break;
+                    case "interLink":
+                        networkComponent=NetworkComponent.INTERDEPENDENT_LINK;
+                        break;
                     case "-": // Might want to change this, so it corresponds to the variable missingValue
                         break;
                     default:
@@ -123,6 +126,9 @@ public class EventLoaderNew {
                             case LINK:
                                 parameter=this.lookupLinkState(values.get(4));
                                 break;
+                            case INTERDEPENDENT_LINK:
+                                parameter=this.lookupLinkState(values.get(4));
+                                break;
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
@@ -133,6 +139,9 @@ public class EventLoaderNew {
                                 parameter=this.getFlowNetworkDataTypes().parseNodeStateTypeFromString(values.get(4));
                                 break;
                             case LINK:
+                                parameter=this.getFlowNetworkDataTypes().parseLinkStateTypeFromString(values.get(4));
+                                break;
+                            case INTERDEPENDENT_LINK:
                                 parameter=this.getFlowNetworkDataTypes().parseLinkStateTypeFromString(values.get(4));
                                 break;
                             default:
@@ -156,6 +165,9 @@ public class EventLoaderNew {
                             case LINK:
                                 value=this.getActualLinkValue((LinkState)parameter,values.get(5));
                                 break;
+                            case INTERDEPENDENT_LINK:
+                                value=this.getActualLinkValue((LinkState)parameter,values.get(5));
+                                break;
                             default:
                                 logger.debug("Network component cannot be recognized.");
                         }
@@ -166,6 +178,9 @@ public class EventLoaderNew {
                                 value=this.getFlowNetworkDataTypes().parseNodeValuefromString(parameter,values.get(5));
                                 break;
                             case LINK:
+                                value=this.getFlowNetworkDataTypes().parseLinkValueFromString(parameter,values.get(5));
+                                break;
+                            case INTERDEPENDENT_LINK:
                                 value=this.getFlowNetworkDataTypes().parseLinkValueFromString(parameter,values.get(5));
                                 break;
                             default:

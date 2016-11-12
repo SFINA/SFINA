@@ -436,7 +436,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     @Override
     public void saveOutputData(){
         logger.info("doing output at iteration " + iteration);
-        TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
+        TopologyWriter topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, 0);
         topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
         topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
         switch(domain){

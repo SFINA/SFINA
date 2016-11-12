@@ -53,6 +53,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private LinkedHashMap<String,Node> nodes;
     private LinkedHashMap<String,Link> links;
+    private LinkedHashMap<String,InterdependentLink> interdependentLinks;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**
@@ -62,6 +63,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         super();
         this.nodes=new LinkedHashMap<>();
         this.links=new LinkedHashMap<>();
+        this.interdependentLinks=new LinkedHashMap<>();
     }
     
     @Override
@@ -84,6 +86,16 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return links.values();
     }
     
+    /**
+     * Returns a collection of the links
+     * 
+     * @return a collection of the links
+     */
+    @Override
+    public Collection<InterdependentLink> getInterdependentLinks(){
+        return interdependentLinks.values();
+    }
+    
     @Override
     /**
      * Simply adds a node (without links)
@@ -100,8 +112,11 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * 
      * @param link the added link
      */
-    public void addLink(Link link){
-        this.links.put(link.getIndex(), link);
+    public void addLink(LinkInterface link){
+        if(link.isInterdependent())
+            this.interdependentLinks.put(link.getIndex(), (InterdependentLink)link);
+        else
+            this.links.put(link.getIndex(), (Link)link);
         if(link.isActivated()){
             link.getStartNode().addLink(link);
             link.getEndNode().addLink(link);
@@ -130,11 +145,15 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * 
      * @param link the removed link
      */
-    public void removeLink(Link link){
+    public void removeLink(LinkInterface link){
         for(Node node:nodes.values()){
             node.removeLink(link);
         }
-        this.links.remove(link.getIndex());
+        if(link.isInterdependent())
+            this.interdependentLinks.remove(link.getIndex());
+        else
+            this.links.remove(link.getIndex());
+        
     }
     
     @Override
@@ -157,6 +176,17 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public Link getLink(String index){
         return links.get(index);
+    }
+    
+    /**
+     * Returns the interdependent link given the link index
+     * 
+     * @param index the link index
+     * @return the link
+     */
+    @Override
+    public InterdependentLink getInterdependentLink(String index){
+        return interdependentLinks.get(index);
     }
     
     @Override
@@ -325,12 +355,12 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
                     currentIslandLinks.add(link);
                 // Restart Iteration with EndNode of current Link if it is connected (i.e. has node on other end.
                 if (link.isConnected()){
-                    currentNode = link.getEndNode();
+                    currentNode = (Node)link.getEndNode();
                     if (!currentIslandNodes.contains(currentNode)){
                         iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
                     }
                     // Restart Iteration with StartNode of current Link
-                    currentNode = link.getStartNode();
+                    currentNode = (Node)link.getStartNode();
                     if (!currentIslandNodes.contains(currentNode)){
                         iterateIsland(currentNode, currentIslandNodes, currentIslandLinks, leftNodes);
                     }
@@ -399,9 +429,9 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
             ArrayList<Node> neighborNodes = new ArrayList();
             for(Link link : node.getLinks()){
                 if(!link.getStartNode().getIndex().equals(node.getIndex()))
-                    neighborNodes.add(link.getStartNode());
+                    neighborNodes.add((Node)link.getStartNode());
                 else if(!link.getEndNode().getIndex().equals(node.getIndex()))
-                    neighborNodes.add(link.getEndNode());
+                    neighborNodes.add((Node)link.getEndNode());
             }
             
             // Get number of neighbors of current node that are connected

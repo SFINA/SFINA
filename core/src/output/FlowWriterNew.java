@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import network.FlowNetwork;
 import network.Link;
+import network.LinkInterface;
 import network.Node;
 import org.apache.log4j.Logger;
 
@@ -85,6 +86,14 @@ public class FlowWriterNew {
     }
     
     public void writeLinkFlowData(String location){
+        writeLinkFlowData(location, false);
+    }
+    
+    public void writeInterdependentLinkFlowData(String location) {
+        writeLinkFlowData(location, true);
+    }
+    
+    private void writeLinkFlowData(String location, boolean interdependent){
         try{
             File file = new File(location);
             File parent = file.getParentFile();
@@ -107,7 +116,13 @@ public class FlowWriterNew {
                 writer.print(columnSeparator + stateStrings.get(i));
             writer.print("\n");
             
-            for (Link link : net.getLinks()){
+            ArrayList<LinkInterface> links;
+            if(interdependent)
+                links = new ArrayList(net.getInterdependentLinks());
+            else
+                links = new ArrayList(net.getLinks());
+            
+            for (LinkInterface link : links){
                 writer.print(link.getIndex());
                 for (int i=0; i<necessaryStates.size(); i++)
                     writer.print(columnSeparator + this.getFlowNetworkDataTypes().castLinkStateValueToString(necessaryStates.get(i), link, missingValue));

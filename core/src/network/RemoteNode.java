@@ -24,12 +24,12 @@ import org.apache.log4j.Logger;
  * 
  * @author evangelospournaras
  */
-public class RemoteNode extends State{
+public class RemoteNode extends State implements NodeInterface{
     
     private String index;
     private boolean activated;
     private List<Link> links;
-    private List<Link> interdependentLinks;
+    private List<InterdependentLink> interdependentLinks;
     private boolean connected;
     private Integer networkIndex;
     private static final Logger logger = Logger.getLogger(RemoteNode.class);
@@ -58,6 +58,7 @@ public class RemoteNode extends State{
      * 
      * @return the index of the node
      */
+    @Override
     public String getIndex() {
         return index;
     }
@@ -67,8 +68,25 @@ public class RemoteNode extends State{
      * 
      * @param index the index to set
      */
+    @Override
     public void setIndex(String index) {
         this.index = index;
+    }
+    
+    /**
+     * @return the networkIndex
+     */
+    @Override
+    public Integer getNetworkIndex() {
+        return networkIndex;
+    }
+
+    /**
+     * @param networkIndex the networkIndex to set
+     */
+    @Override
+    public void setNetworkIndex(Integer networkIndex) {
+        this.networkIndex = networkIndex;
     }
     
     /**
@@ -76,10 +94,12 @@ public class RemoteNode extends State{
      * 
      * @return the activated/deactivated status of the node
      */
+    @Override
     public boolean isActivated() {
         return activated;
     }
     
+    @Override
     public boolean isRemoteNode(){
         return this instanceof RemoteNode;
     }
@@ -89,15 +109,14 @@ public class RemoteNode extends State{
      * 
      * @param link the added link
      */
-    public void addLink(Link link) {
-        if (!this.getLinks().contains(link) && !this.getInterdependentLinks().contains(link)) {
-            if (link.isInterdependent()) {
-                this.getInterdependentLinks().add(link);
-            } else {
-                this.getLinks().add(link);
-            }
-            this.evaluateConnectivity();
+    @Override
+    public void addLink(LinkInterface link) {
+        if (link.isInterdependent() && !this.getInterdependentLinks().contains((InterdependentLink)link)) {
+            this.getInterdependentLinks().add((InterdependentLink)link);
+        } else if (!link.isInterdependent() && !this.getLinks().contains((Link)link)){
+            this.getLinks().add((Link)link);
         }
+        this.evaluateConnectivity();
     }
 
     /**
@@ -105,11 +124,12 @@ public class RemoteNode extends State{
      * 
      * @param link the removed link
      */
-    public void removeLink(Link link){
+    @Override
+    public void removeLink(LinkInterface link){
         if(link.isInterdependent())
-            this.getInterdependentLinks().remove(link);
+            this.getInterdependentLinks().remove((InterdependentLink)link);
         else
-            this.getLinks().remove(link);
+            this.getLinks().remove((Link)link);
         this.evaluateConnectivity();
     }
     
@@ -118,6 +138,7 @@ public class RemoteNode extends State{
      * 
      * @return a new array list with the incoming links of the node
      */
+    @Override
     public ArrayList<Link> getIncomingLinks(){
         ArrayList<Link> incomingLinks=new ArrayList<Link>();
         for(Link link:getLinks()){
@@ -133,6 +154,7 @@ public class RemoteNode extends State{
      * 
      * @return a new array list with the outgoing links of the node
      */
+    @Override
     public ArrayList<Link> getOutgoingLinks(){
         ArrayList<Link> outgoingLinks=new ArrayList<Link>();
         for(Link link:getLinks()){
@@ -148,9 +170,10 @@ public class RemoteNode extends State{
      * 
      * @return a new array list with the incoming links of the node
      */
-    public ArrayList<Link> getIncomingInterdependentLinks(){
-        ArrayList<Link> incomingLinks=new ArrayList<Link>();
-        for(Link link:getInterdependentLinks()){
+    @Override
+    public ArrayList<InterdependentLink> getIncomingInterdependentLinks(){
+        ArrayList<InterdependentLink> incomingLinks=new ArrayList<>();
+        for(InterdependentLink link:getInterdependentLinks()){
             if(link.getEndNode().equals(this)){
                 incomingLinks.add(link);
             }
@@ -163,9 +186,10 @@ public class RemoteNode extends State{
      * 
      * @return a new array list with the outgoing links of the node
      */
-    public ArrayList<Link> getOutgoingInterdependentLinks(){
-        ArrayList<Link> outgoingLinks=new ArrayList<Link>();
-        for(Link link:getInterdependentLinks()){
+    @Override
+    public ArrayList<InterdependentLink> getOutgoingInterdependentLinks(){
+        ArrayList<InterdependentLink> outgoingLinks=new ArrayList<>();
+        for(InterdependentLink link:getInterdependentLinks()){
             if(link.getStartNode().equals(this)){
                 outgoingLinks.add(link);
             }
@@ -178,6 +202,7 @@ public class RemoteNode extends State{
      * 
      * @return if the node is connected or disconnected
      */
+    @Override
     public boolean isConnected(){
         return connected;
     }
@@ -188,11 +213,13 @@ public class RemoteNode extends State{
      * 
      * @return the links of the node
      */
+    @Override
     public List<Link> getLinks() {
         return links;
     }
     
-    public List<Link> getInterdependentLinks(){
+    @Override
+    public List<InterdependentLink> getInterdependentLinks(){
         return interdependentLinks;
     }
 
@@ -201,6 +228,7 @@ public class RemoteNode extends State{
      * 
      * @param links the links to set
      */
+    @Override
     public void setLinks(List<Link> links) {
         this.links = links;
         this.evaluateConnectivity();
@@ -223,6 +251,7 @@ public class RemoteNode extends State{
      * 
      * @param activated the activated to set
      */
+    @Override
     public void setActivated(boolean activated) {
         if(activated != this.isActivated()){
             this.activated = activated;

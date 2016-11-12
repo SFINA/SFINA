@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.FlowNetwork;
+import network.InterdependentLink;
 import network.Node;
 import network.Link;
+import network.LinkInterface;
 import org.apache.log4j.Logger;
 
 /**
@@ -70,7 +72,19 @@ public class FlowLoaderNew {
     }
 
     public void loadLinkFlowData(String location){
-        ArrayList<Link> links = new ArrayList(net.getLinks());
+        loadLinkFlowData(location, false);
+    }
+    
+    public void loadInterdependentLinkFlowData(String location){
+        loadLinkFlowData(location, true);
+    }
+    
+    private void loadLinkFlowData(String location, boolean isInterdependent){
+        ArrayList<LinkInterface> links;
+        if(isInterdependent)
+            links = new ArrayList(net.getInterdependentLinks());
+        else
+            links = new ArrayList(net.getLinks());
         ArrayList<Enum> linkStates = new ArrayList<>();
         HashMap<String, ArrayList<String>> linksStateValues = new HashMap<>();
         File file = new File(location);
@@ -113,14 +127,18 @@ public class FlowLoaderNew {
         }
     }
     
-    private void injectLinkStates(ArrayList<Link> links, ArrayList<Enum> linkStates, HashMap<String,ArrayList<String>> linkStatesValues){
-        for(Link link : links){
+    private void injectLinkStates(ArrayList<LinkInterface> links, ArrayList<Enum> linkStates, HashMap<String,ArrayList<String>> linkStatesValues){
+        for(LinkInterface link : links){
             ArrayList<String> rawValues = linkStatesValues.get(link.getIndex());
             for(int i=0;i<rawValues.size();i++){
                 Enum state = linkStates.get(i);
                 String rawValue = rawValues.get(i);
-                if(!rawValue.equals(this.missingValue) &&  state != null)
-                    link.addProperty(state, this.getFlowNetworkDataTypes().parseLinkValueFromString(state, rawValue));
+                if(!rawValue.equals(this.missingValue) &&  state != null){
+                    if(link.isInterdependent())
+                        ((InterdependentLink)link).addProperty(state, this.getFlowNetworkDataTypes().parseLinkValueFromString(state, rawValue));
+                    else
+                        ((Link)link).addProperty(state, this.getFlowNetworkDataTypes().parseLinkValueFromString(state, rawValue));
+                }
             }
         }
     }

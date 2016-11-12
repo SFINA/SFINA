@@ -18,6 +18,7 @@
 package backend;
 
 import network.Link;
+import network.LinkInterface;
 import network.Node;
 
 
@@ -54,6 +55,6 @@ public interface FlowNetworkDataTypesInterface {
     
     public String castNodeStateValueToString(Enum nodeState, Node node, String missingValue);
     
-    public String castLinkStateValueToString(Enum linkState, Link link, String missingValue);
+    public String castLinkStateValueToString(Enum linkState, LinkInterface link, String missingValue);
     
 }

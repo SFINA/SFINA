@@ -27,6 +27,7 @@ import network.InterdependentLink;
 import network.Link;
 import network.LinkState;
 import network.Node;
+import network.NodeInterface;
 import network.NodeState;
 import network.RemoteNode;
 import org.apache.log4j.Logger;
@@ -124,20 +125,20 @@ public class TopologyLoader {
                     String endNodeIndex=(String)this.getActualLinkValue(linkStates.get(3), values.get(3));
                     Integer endNetIndex=(Integer)this.getActualLinkValue(linkStates.get(4), values.get(4));
                     boolean status=(Boolean)this.getActualLinkValue(linkStates.get(5), values.get(5));
-                    Node startNode=null;
-                    Node endNode=null;
+                    NodeInterface startNode=null;
+                    NodeInterface endNode=null;
                     for(Node node:nodes){
                         if(startNodeIndex.equals(node.getIndex()) && startNetIndex == networkIndex){
                             startNode=node;
-                            endNode = (Node) new RemoteNode(endNodeIndex, true, endNetIndex); 
+                            endNode = new RemoteNode(endNodeIndex, true, endNetIndex); 
                         }
                         if(endNodeIndex.equals(node.getIndex()) && endNetIndex == networkIndex){
                             endNode=node;
-                            startNode = (Node) new RemoteNode(startNodeIndex, true, startNetIndex); 
+                            startNode = new RemoteNode(startNodeIndex, true, startNetIndex); 
                         }
                     }
                     if(startNode!=null || endNode!=null){
-                        Link link=new InterdependentLink(linkIndex,status,startNode,endNode,startNetIndex,endNetIndex);
+                        InterdependentLink link = new InterdependentLink(linkIndex,status,startNode,endNode,startNetIndex,endNetIndex);
                         net.addLink(link);
                     }
                     else{

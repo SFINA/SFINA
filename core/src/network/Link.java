@@ -7,7 +7,6 @@ package network;
 
 import dsutil.generic.state.State;
 import org.apache.log4j.Logger;
-import protopeer.network.NetworkAddress;
 
 /**
  * A link has the following features:
@@ -23,11 +22,11 @@ import protopeer.network.NetworkAddress;
  * 
  * @author evangelospournaras
  */
-public class Link extends State{
+public class Link extends State implements LinkInterface{
     
     private String index;
-    private Node startNode;
-    private Node endNode;
+    private NodeInterface startNode;
+    private NodeInterface endNode;
     private boolean connected;
     private boolean activated;
     private Enum flowType;
@@ -56,7 +55,7 @@ public class Link extends State{
      * @param startNode the start node of the link
      * @param endNode the end node of the link
      */
-    public Link(String index, boolean activated, Node startNode, Node endNode){
+    public Link(String index, boolean activated, NodeInterface startNode, NodeInterface endNode){
         super();
         this.index=index;
         this.startNode=startNode;
@@ -71,6 +70,7 @@ public class Link extends State{
      * 
      * @return if link is interdependent
      */
+    @Override
     public boolean isInterdependent(){
         return this instanceof InterdependentLink;
     }
@@ -80,6 +80,7 @@ public class Link extends State{
      * 
      * @return the flow of the link
      */
+    @Override
     public double getFlow(){
         if(this.flowType==null)
             logger.debug("Flow type is not defined.");
@@ -91,6 +92,7 @@ public class Link extends State{
      * 
      * @param flow the flow of the link
      */
+    @Override
     public void setFlow(double flow){
         if(this.flowType==null){
             logger.debug("Flow type is not defined.");
@@ -105,6 +107,7 @@ public class Link extends State{
      * 
      * @return the capacity of the link
      */
+    @Override
     public double getCapacity(){
         if(this.capacityType==null)
             logger.debug("Capacity type is not defined.");
@@ -116,6 +119,7 @@ public class Link extends State{
      * 
      * @param capacity the capacity of the link
      */
+    @Override
     public void setCapacity(double capacity){
         if(this.capacityType==null){
             logger.debug("Capacity type is not defined.");
@@ -130,6 +134,7 @@ public class Link extends State{
      * 
      * @param flowType the flow type of the link
      */
+    @Override
     public void setFlowType(Enum flowType){
         this.flowType=flowType;
     }
@@ -139,6 +144,7 @@ public class Link extends State{
      * 
      * @param capacityType the capacity type of the link
      */
+    @Override
     public void setCapacityType(Enum capacityType){
         this.capacityType=capacityType;
     }
@@ -148,6 +154,7 @@ public class Link extends State{
      * 
      * @return the index of the link
      */
+    @Override
     public String getIndex() {
         return index;
     }
@@ -157,6 +164,7 @@ public class Link extends State{
      * 
      * @param index the index of the link
      */
+    @Override
     public void setIndex(String index) {
         this.index = index;
     }
@@ -166,8 +174,12 @@ public class Link extends State{
      * 
      * @return the startNode of the link
      */
-    public Node getStartNode() {
-        return startNode;
+    @Override
+    public NodeInterface getStartNode() {
+        if(startNode.isRemoteNode())
+            return (RemoteNode)startNode;
+        else
+            return (Node)startNode;
     }
 
     /**
@@ -175,6 +187,7 @@ public class Link extends State{
      * 
      * @param startNode the startNode of the link
      */
+    @Override
     public void setStartNode(Node startNode) {
         this.startNode = startNode;
         this.evaluateConnectivity();
@@ -185,8 +198,12 @@ public class Link extends State{
      * 
      * @return the endNode of the link
      */
-    public Node getEndNode() {
-        return endNode;
+    @Override
+    public NodeInterface getEndNode() {
+        if(endNode.isRemoteNode())
+            return (RemoteNode)endNode;
+        else
+            return (Node)endNode;
     }
 
     /**
@@ -194,6 +211,7 @@ public class Link extends State{
      * 
      * @param endNode the endNode of the link
      */
+    @Override
     public void setEndNode(Node endNode) {
         this.endNode = endNode;
         this.evaluateConnectivity();
@@ -204,6 +222,7 @@ public class Link extends State{
      * 
      * @return if connected or disconnected
      */
+    @Override
     public boolean isConnected() {
         return connected;
     }
@@ -250,6 +269,7 @@ public class Link extends State{
      * 
      * @return if the link is activated or not
      */
+    @Override
     public boolean isActivated() {
         return activated;
     }
@@ -259,6 +279,7 @@ public class Link extends State{
      * 
      * @param activated the status activated/deactivated of the link
      */
+    @Override
     public void setActivated(boolean activated) {
         this.activated = activated;
         if(activated){
