@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author mcb
  */
-public interface CommunicationMediator extends CommunicationBetweenMediator {
+public interface CommunicationAgentInterface extends CommunicationBetweenMediator {
     
     /*
         Receives Messages from the Communication Mediator

@@ -38,7 +38,7 @@ import interdependent.communication.Messages.SfinaMessageInterface;
  *
  * @author root
  */
-public class CommunicationAgent extends BasePeerlet implements CommunicationMediator {
+public class CommunicationAgent extends BasePeerlet implements CommunicationAgentInterface {
 
     protected final static int POST_ADDRESS_CHANGE = 0;
     protected final static int POST_AGENT_IS_READY = 1;
@@ -48,9 +48,6 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationMedi
     idea, communication Agent needs to know to how many other communicationAgents 
     it does need to keep contact to
     */
-    
-    
-    
    
     
    // private Map<Integer, MessageReceiver> localMessageLocations;
@@ -61,7 +58,7 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationMedi
         
     private int totalNumberNetworks;
     
-    private CommunicationMediator.MessageReceiver messageReceiver;
+    private CommunicationAgentInterface.MessageReceiver messageReceiver;
     
     private boolean agentIsReady =false;
     
@@ -155,11 +152,13 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationMedi
         if(oldAddress == null || !oldAddress.equals(getPeer().getNetworkAddress())){
 
             this.networkAddress = getPeer().getNetworkAddress();
-            //todo notify about networkaddress change
-            //decide if broadcast or only to those in externalLocations
-            NetworkAddressMessage message = new NetworkAddressMessage(this.messageReceiver.getIdentifier(), this.networkAddress);
-            peer.broadcastMessage(message);
+            
         }
+        // notify all as during stop also everyon got notified
+        //todo notify about networkaddress change
+        //decide if broadcast or only to those in externalLocations
+        NetworkAddressMessage message = new NetworkAddressMessage(this.messageReceiver.getIdentifier(), this.networkAddress);
+        peer.broadcastMessage(message);
         
     }
     @Override
@@ -205,6 +204,7 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationMedi
  
     @Override
     public void agentIsRead(boolean ready) {
+        
         this.agentIsReady = ready;
         this.postProcessCommunication(POST_AGENT_IS_READY);
     }
