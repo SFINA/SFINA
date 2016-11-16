@@ -19,6 +19,9 @@ package interdependent.communication;
 
 import event.Event;
 import java.util.List;
+import java.util.Map;
+import protopeer.network.NetworkAddress;
+import protopeer.util.quantities.Time;
 
 /**
  *
@@ -26,9 +29,16 @@ import java.util.List;
  */
 public interface CommunicationAgentInterface extends CommunicationBetweenMediator {
     
+     public final static String parameterColumnSeparator="=";
+    
+ 
+     public static String getParameterColumnSeparator() {
+        return parameterColumnSeparator;
+    }
+    
+    
     /*
-        Receives Messages from the Communication Mediator
-        has to register itself through the registerMessageReceiver method
+        Receives Messages from the Communication Agent
     */
     public interface MessageReceiver{
     
@@ -37,11 +47,17 @@ public interface CommunicationAgentInterface extends CommunicationBetweenMediato
         * @param events
         */
         public void injectEvents(List<Event> events);
+        
+        /**
+         * Notifies the Message Receiver, that it has to initialise (bootstrap) itself.
+         * This Method gets called, when CommunicationAgent did its own Bootstrapping
+         */
+        public void initialise();
               
         /**
          * Notifies the Message Receiver, that it can proceed to the next step
-         * This will happen if and only if the mediator got an EventMessage and an FinishedStepMessage 
-         * fromr all the connected Networks of this receiver
+         * This will happen if and only if the Communication Agent got an EventMessage and an FinishedStepMessage 
+         * from all the connected Networks of this receiver
          */
         public void progressToNextStep();
      
@@ -50,12 +66,18 @@ public interface CommunicationAgentInterface extends CommunicationBetweenMediato
          * @return 
          */
         public int getIdentifier();
+        
+        /**
+         * gets a list of Network Identifier to which the Receiver is connected
+         * @return 
+         */
+        public List<Integer> getConnectedNetwork();
     }
-    /*
-    Handling
-    */
-    public void registerMessageReceiver(MessageReceiver listener);
-    public void removeMessageReceiver(MessageReceiver listener);
+//    /*
+//    Handling
+//    */
+//    public void registerMessageReceiver(MessageReceiver listener);
+//    public void removeMessageReceiver(MessageReceiver listener);
     /**
      * 
      * @param event
@@ -63,7 +85,121 @@ public interface CommunicationAgentInterface extends CommunicationBetweenMediato
      */
     public void sendEvent(Event event, int identifier);
     
-    public void agentIsRead(boolean ready);
+    public void agentFinishedStep();
+    
+    /*
+    Former Communication
+    */
+   // public void runBootstraping();
+    
+    
+    
+    
+    
+    
+    /**
+    Getter and Setter
+    * 
+    ***/
+    /**
+     * @return the experimentInputFilesLocation
+     */
+    public String getExperimentBaseFolderLocation();
+    /**
+     * @return the time token, i.e. time_x for current time x
+     */
+    public String getTimeToken();
+    
+    /**
+     * @param timeToken
+     */
+    public void setTimeToken(String timeToken);
+    
+    /**
+     * @return the time token name, i.e. probably "time_"
+     */
+    public String getTimeTokenName();
+    
+    /**
+     * @return the peerToken
+     */
+    public String getPeerToken();
+
+    /**
+     * @param aPeerToken the peerToken to set
+     */
+    public void setPeerToken(String aPeerToken);
+    
+    /**
+     *
+     * @return
+     */
+    public String getMissingValue();
+    
+    /**
+     *
+     * @return
+     */
+    public String getColumnSeparator();
+    
+    /**
+     * @return the linksLocation
+     */
+    public String getLinksLocation();
+
+    /**
+     * @return the linksFlowLocation
+     */
+    public String getLinksFlowLocation();
+    
+    
+     public String getExperimentID();
+
+ 
+    public Time getBootstrapTime();
+       
+    public void setBootstrapTime(Time bootstrapTime);
+    
+    
+    public int getSimulationTime();
+    
+     public String getExperimentInputFilesLocation();
+
+
+
+    public String getExperimentOutputFilesLocation();
+
+
+
+    public String getEventsInputLocation();
+
+
+
+    public String getEventsOutputLocation();
+
+
+
+    public String getPeerTokenName();
+
+
+
+    public Map<Integer, NetworkAddress> getExternalMessageLocations();
+
+    
+    
+    public String getNodesLocation();
+
+   
+
+    public String getNodesFlowLocation();
+    
+    public Time getRunTime();
+    
+    public String getSfinaParamLocation();
+
+    public String getBackendParamLocation();
+    
+   
     
         
        
