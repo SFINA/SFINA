@@ -326,11 +326,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation){
         // Sfina Parameters
         File file = new File(sfinaParamLocation);
-        if (!file.exists())
+        if (file.exists()){
+            sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
+            sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
+            logger.debug("Loaded sfinaParameters: " + sfinaParameters);
+        }
+        else
             logger.debug("sfinaParameters.txt file not found. Should be here: " + sfinaParamLocation);
-        sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
-        sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
-        logger.debug("Loaded sfinaParameters: " + sfinaParameters);
         file = new File(backendParamLocation);
         if (file.exists()) {
             this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
