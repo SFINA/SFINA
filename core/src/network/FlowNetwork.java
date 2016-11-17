@@ -29,7 +29,6 @@ import org.jgrapht.Graph;
 import static org.jgrapht.alg.DijkstraShortestPath.findPathBetween;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import protopeer.network.NetworkAddress;
 
 /**
  * A flow network facilitates and mandates the topology of a flow network. This
@@ -51,9 +50,8 @@ import protopeer.network.NetworkAddress;
  */
 public class FlowNetwork extends State implements FlowNetworkInterface{
     
-    private LinkedHashMap<String,Node> nodes;
-    private LinkedHashMap<String,Link> links;
-    private LinkedHashMap<String,InterdependentLink> interdependentLinks;
+    private List<Node> nodes;
+    private List<LinkInterface> links;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**
@@ -61,9 +59,8 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public FlowNetwork(){
         super();
-        this.nodes=new LinkedHashMap<>();
-        this.links=new LinkedHashMap<>();
-        this.interdependentLinks=new LinkedHashMap<>();
+        this.nodes=new ArrayList<>();
+        this.links=new ArrayList<>();
     }
     
     @Override
@@ -73,7 +70,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @return a colelction of the nodes
      */
     public Collection<Node> getNodes(){
-        return nodes.values();
+        return nodes;
     }
     
     @Override
@@ -83,7 +80,11 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @return a collection of the links
      */
     public Collection<Link> getLinks(){
-        return links.values();
+        ArrayList<Link> localLinks = new ArrayList<>();
+        for(LinkInterface link : links)
+            if(!link.isInterdependent())
+                localLinks.add((Link) link);
+        return localLinks;
     }
     
     /**
@@ -92,8 +93,12 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @return a collection of the links
      */
     @Override
-    public Collection<InterdependentLink> getInterdependentLinks(){
-        return interdependentLinks.values();
+    public Collection<InterdependentLink> getLinksInterdependent(){
+        ArrayList<InterdependentLink> interLinks = new ArrayList<>();
+        for(LinkInterface link : links)
+            if(link.isInterdependent())
+                interLinks.add((InterdependentLink) link);
+        return interLinks;
     }
     
     @Override
@@ -103,7 +108,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param node the node added in the network
      */
     public void addNode(Node node){
-        this.nodes.put(node.getIndex(), node);
+        this.nodes.add(node);
     }
     
     @Override
@@ -113,10 +118,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param link the added link
      */
     public void addLink(LinkInterface link){
-        if(link.isInterdependent())
-            this.interdependentLinks.put(link.getIndex(), (InterdependentLink)link);
-        else
-            this.links.put(link.getIndex(), (Link)link);
+        this.links.add(link);
         if(link.isActivated()){
             link.getStartNode().addLink(link);
             link.getEndNode().addLink(link);
@@ -136,7 +138,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         for(Link link:node.getOutgoingLinks()){
             link.setStartNode(null);
         }
-        this.nodes.remove(node.getIndex());
+        this.nodes.remove(node);
     }
     
     @Override
@@ -146,13 +148,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param link the removed link
      */
     public void removeLink(LinkInterface link){
-        for(Node node:nodes.values()){
+        for(Node node:nodes){
             node.removeLink(link);
         }
-        if(link.isInterdependent())
-            this.interdependentLinks.remove(link.getIndex());
-        else
-            this.links.remove(link.getIndex());
+        this.links.remove(link);
         
     }
     
@@ -164,7 +163,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @return the node
      */
     public Node getNode(String index){
-        return this.nodes.get(index);
+        for(Node node : nodes)
+            if(node.getIndex().equals(index))
+                return node;
+        return null;
     }
     
     @Override
@@ -175,7 +177,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @return the link
      */
     public Link getLink(String index){
-        return links.get(index);
+        for(LinkInterface link : links)
+            if(link.getIndex().equals(index) && !link.isInterdependent())
+                return (Link)link;
+        return null;
     }
     
     /**
@@ -186,7 +191,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     @Override
     public InterdependentLink getInterdependentLink(String index){
-        return interdependentLinks.get(index);
+        for(LinkInterface link : links)
+            if(link.getIndex().equals(index) && link.isInterdependent())
+                return (InterdependentLink)link;
+        return null;
     }
     
     @Override
@@ -198,9 +206,9 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @return the link or null if no link between the nodes exists
      */
     public Link getLink(Node startNode, Node endNode){
-        for (Link link : links.values()){
-            if (link.getStartNode() == startNode && link.getEndNode() == endNode)
-                return link;
+        for (LinkInterface link : links){
+            if (!link.isInterdependent() && link.getStartNode() == startNode && link.getEndNode() == endNode) // User can't know the remote node of the other network for interdependent link.
+                return (Link)link;
         }
         return null;
     }
@@ -215,6 +223,17 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
             link.setFlowType(flowType);
         }
     }
+    
+//    /**
+//     * Sets the flow type of the interdependent links
+//     * 
+//     * @param flowType the flow type of the links
+//     */
+//    public void setInterdependentLinkFlowType(Enum flowType){
+//        for(Link link:this.getLinksInterdependent()){
+//            link.setFlowType(flowType);
+//        }
+//    }
     
     /**
      * Sets the flow type of the nodes
@@ -256,8 +275,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param index the index of the activated node.
      */
     public void activateNode(String index){
-        Node activatedNode=nodes.get(index);
-        activatedNode.setActivated(true);
+        this.getNode(index).setActivated(true);
     }
     
     @Override
@@ -267,8 +285,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param index the index of the activated link
      */
     public void activateLink(String index){
-        Link activatedLink=links.get(index);
-        activatedLink.setActivated(true);
+        this.getLink(index).setActivated(true);
     }
     
     @Override
@@ -278,8 +295,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param index the index of the deactivated node
      */
     public void deactivateNode(String index){
-        Node deactivatedNode=nodes.get(index);
-        deactivatedNode.setActivated(false);
+        this.getNode(index).setActivated(false);
     }
     
     @Override
@@ -289,8 +305,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param index the index of the deactivated link
      */
     public void deactivateLink(String index){
-        Link deactivatedLink=links.get(index);
-        deactivatedLink.setActivated(false);
+        this.getLink(index).setActivated(false);
     }
     
     /**
@@ -377,7 +392,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public double getAvgNodeDegree(){
         double totalNodeDegree=0.0;
-        for(Node node:this.nodes.values()){
+        for(Node node:this.nodes){
             totalNodeDegree+=node.getLinks().size();
         }
         return totalNodeDegree/this.nodes.size();
@@ -391,7 +406,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public double getClosenessCentrality(Node node){
         double distance = 0.0;
-        for (Node otherNode : nodes.values()){
+        for (Node otherNode : nodes){
             if (otherNode != node){
                 ArrayList<Link> asp = getShortestPath(otherNode, node);
                 if (asp == null)
@@ -412,7 +427,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public LinkedHashMap getDegreeDist(){
         LinkedHashMap<Integer,Integer> dist = new LinkedHashMap<>();
         ArrayList<Integer> allDegrees = new ArrayList<>();
-        for (Node node : this.nodes.values()){
+        for (Node node : this.nodes){
             allDegrees.add(node.getLinks().size());
         }
         for (int i=0; i < Collections.max(allDegrees)+1; i++)
@@ -424,7 +439,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public double getClustCoeff(){
         // Compute local clustering coefficient for each node
         ArrayList<Double> localClustCoeff = new ArrayList();
-        for(Node node:this.nodes.values()){
+        for(Node node:this.nodes){
             // Get neighbors of current node
             ArrayList<Node> neighborNodes = new ArrayList();
             for(Link link : node.getLinks()){
@@ -472,8 +487,8 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      */
     public double getAvgShortestPath(){
         double asp = 0.0;
-        for (Node v : nodes.values()){
-            for (Node w : nodes.values()){
+        for (Node v : nodes){
+            for (Node w : nodes){
                 ArrayList<Link> path = getShortestPath(v,w);
                 if (path != null)
                     asp += path.size();
@@ -522,10 +537,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private Graph<String, DefaultEdge> buildJGraphT(){
         Graph<String, DefaultEdge> g = new SimpleGraph<>(DefaultEdge.class);
-        for (Node node : nodes.values())
+        for (Node node : nodes)
             if(node.isActivated())
                 g.addVertex(node.getIndex());
-        for (Link link : links.values())
+        for (LinkInterface link : links)
             if(link.isActivated())
                 g.addEdge(link.getStartNode().getIndex(), link.getEndNode().getIndex());
         return g;

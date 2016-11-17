@@ -28,8 +28,7 @@ public class Node extends State implements NodeInterface{
     
     private String index;
     private boolean activated;
-    private List<Link> links;
-    private List<InterdependentLink> interdependentLinks;
+    private List<LinkInterface> links;
     private boolean connected;
     private Enum flowType;
     private Enum capacityType;
@@ -48,7 +47,6 @@ public class Node extends State implements NodeInterface{
         this.activated=activated;
         this.connected=false;
         this.links=new ArrayList<>();
-        this.interdependentLinks=new ArrayList<>();
         this.evaluateConnectivity();
     }
     
@@ -61,7 +59,7 @@ public class Node extends State implements NodeInterface{
      * @param activated
      * @param links 
      */
-    public Node(String index, boolean activated, List<Link> links){
+    public Node(String index, boolean activated, List<LinkInterface> links){
         super();
         this.index=index;
         this.activated=activated;
@@ -106,11 +104,8 @@ public class Node extends State implements NodeInterface{
      */
     @Override
     public void addLink(LinkInterface link) {
-        if (link.isInterdependent() && !this.getInterdependentLinks().contains((InterdependentLink)link)) {
-            this.getInterdependentLinks().add((InterdependentLink)link);
-        } else if (!link.isInterdependent() && !this.getLinks().contains((Link)link)){
-            this.getLinks().add((Link)link);
-        }
+        if(!this.links.contains(link))
+            this.links.add(link);
         this.evaluateConnectivity();
     }
 
@@ -121,10 +116,7 @@ public class Node extends State implements NodeInterface{
      */
     @Override
     public void removeLink(LinkInterface link){
-        if(link.isInterdependent())
-            this.getInterdependentLinks().remove((InterdependentLink)link);
-        else
-            this.getLinks().remove((Link)link);
+        this.links.remove(link);
         this.evaluateConnectivity();
     }
     
@@ -168,7 +160,7 @@ public class Node extends State implements NodeInterface{
     @Override
     public ArrayList<InterdependentLink> getIncomingInterdependentLinks(){
         ArrayList<InterdependentLink> incomingLinks=new ArrayList<>();
-        for(InterdependentLink link:getInterdependentLinks()){
+        for(InterdependentLink link:getLinksInterdependent()){
             if(link.getEndNode().equals(this)){
                 incomingLinks.add(link);
             }
@@ -184,7 +176,7 @@ public class Node extends State implements NodeInterface{
     @Override
     public ArrayList<InterdependentLink> getOutgoingInterdependentLinks(){
         ArrayList<InterdependentLink> outgoingLinks=new ArrayList<>();
-        for(InterdependentLink link:getInterdependentLinks()){
+        for(InterdependentLink link:getLinksInterdependent()){
             if(link.getStartNode().equals(this)){
                 outgoingLinks.add(link);
             }
@@ -202,7 +194,9 @@ public class Node extends State implements NodeInterface{
         return connected;
     }
 
-
+    public List<LinkInterface> getLinksAll(){
+        return links;
+    }
     /**
      * Returns the links of the node
      * 
@@ -210,12 +204,26 @@ public class Node extends State implements NodeInterface{
      */
     @Override
     public List<Link> getLinks() {
-        return links;
+        List<Link> localLinks = new ArrayList<>();
+        for(LinkInterface link : links){
+            if(!link.isInterdependent())
+                localLinks.add((Link) link);
+        }
+        return localLinks;
     }
     
     @Override
-    public List<InterdependentLink> getInterdependentLinks(){
+    public List<InterdependentLink> getLinksInterdependent(){
+        List<InterdependentLink> interdependentLinks = new ArrayList<>();
+        for(LinkInterface link : links){
+            if(link.isInterdependent())
+                interdependentLinks.add((InterdependentLink) link);
+        }
         return interdependentLinks;
+    }
+    
+    public boolean hasInterdependentLinks(){
+        return !getLinksInterdependent().isEmpty();
     }
 
     /**
@@ -224,7 +232,7 @@ public class Node extends State implements NodeInterface{
      * @param links the links to set
      */
     @Override
-    public void setLinks(List<Link> links) {
+    public void setLinks(List<LinkInterface> links) {
         this.links = links;
         this.evaluateConnectivity();
     }
@@ -254,7 +262,7 @@ public class Node extends State implements NodeInterface{
                 this.setFlow(0.0);
             for(Link link : this.getLinks())
                 link.evaluateConnectivity();
-            for(Link link : this.getInterdependentLinks())
+            for(Link link : this.getLinksInterdependent())
                 link.evaluateConnectivity();
         }
         else
@@ -266,6 +274,7 @@ public class Node extends State implements NodeInterface{
      * 
      * @return the flow
      */
+    @Override
     public double getFlow(){
         if(this.flowType==null)
             logger.debug("Flow type is not defined.");
@@ -277,6 +286,7 @@ public class Node extends State implements NodeInterface{
      * 
      * @param flow the flow set
      */
+    @Override
     public void setFlow(double flow){
         if(this.flowType==null){
             logger.debug("Flow type is not defined.");
@@ -291,6 +301,7 @@ public class Node extends State implements NodeInterface{
      * 
      * @return the capacity of the node
      */
+    @Override
     public double getCapacity(){
         if(this.capacityType==null)
             logger.debug("Capacity type is not defined.");
@@ -302,6 +313,7 @@ public class Node extends State implements NodeInterface{
      * 
      * @param capacity the capacity of the node
      */
+    @Override
     public void setCapacity(double capacity){
         if(this.capacityType==null){
             logger.debug("Capacity type is not defined.");
@@ -316,6 +328,7 @@ public class Node extends State implements NodeInterface{
      * 
      * @param flowType the set flow type
      */
+    @Override
     public void setFlowType(Enum flowType){
         this.flowType=flowType;
     }
@@ -325,6 +338,7 @@ public class Node extends State implements NodeInterface{
      * 
      * @param capacityType the capacity type of the node
      */
+    @Override
     public void setCapacityType(Enum capacityType){
         this.capacityType=capacityType;
     }

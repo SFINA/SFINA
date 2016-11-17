@@ -82,7 +82,7 @@ public class FlowLoader {
     private void loadLinkFlowData(String location, boolean isInterdependent){
         ArrayList<LinkInterface> links;
         if(isInterdependent)
-            links = new ArrayList(net.getInterdependentLinks());
+            links = new ArrayList(net.getLinksInterdependent());
         else
             links = new ArrayList(net.getLinks());
         ArrayList<Enum> linkStates = new ArrayList<>();

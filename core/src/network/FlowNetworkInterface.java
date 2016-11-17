@@ -88,6 +88,6 @@ public interface FlowNetworkInterface {
      *
      * @return a collection of the links
      */
-    Collection<InterdependentLink> getInterdependentLinks();
+    Collection<InterdependentLink> getLinksInterdependent();
     
 }

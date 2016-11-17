@@ -118,7 +118,7 @@ public class FlowWriter {
             
             ArrayList<LinkInterface> links;
             if(interdependent)
-                links = new ArrayList(net.getInterdependentLinks());
+                links = new ArrayList(net.getLinksInterdependent());
             else
                 links = new ArrayList(net.getLinks());
             

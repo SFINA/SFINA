@@ -25,20 +25,61 @@ import java.util.List;
  * @author Ben
  */
 public interface NodeInterface {
-
+    /**
+     * Returns the index of the node
+     *
+     * @return the index of the node
+     */
+    String getIndex();
+    
+    /**
+     * Sets the index of the node
+     *
+     * @param index the index to set
+     */
+    void setIndex(String index);
+    
     /**
      * Adds a link and evaluates the connectivity of the node.
      *
      * @param link the added link
      */
     void addLink(LinkInterface link);
+    
+    /**
+     * Removes the link and evaluates the connectivity of the node
+     *
+     * @param link the removed link
+     */
+    void removeLink(LinkInterface link);
+    
+    /**
+     * Sets the links of the node
+     *
+     * @param links the links to set
+     */
+    void setLinks(List<LinkInterface> links);
 
     /**
-     * Returns a new list with all incoming links of the node
+     * Returns all the links (local and interdependent) of the node
      *
-     * @return a new array list with the incoming links of the node
+     * @return the links of the node
      */
-    ArrayList<InterdependentLink> getIncomingInterdependentLinks();
+    List<LinkInterface> getLinksAll();
+    
+    /**
+     * Returns the local links of the node
+     *
+     * @return the links of the node
+     */
+    List<Link> getLinks();
+    
+    /**
+     * Returns the interdependent links of the node
+     *
+     * @return the links of the node
+     */
+    List<InterdependentLink> getLinksInterdependent();
 
     /**
      * Returns a new list with all incoming links of the node
@@ -46,37 +87,35 @@ public interface NodeInterface {
      * @return a new array list with the incoming links of the node
      */
     ArrayList<Link> getIncomingLinks();
-
+    
     /**
-     * Returns the index of the node
-     *
-     * @return the index of the node
-     */
-    String getIndex();
-
-    List<InterdependentLink> getInterdependentLinks();
-
-    /**
-     * Returns the links of the node
-     *
-     * @return the links of the node
-     */
-    List<Link> getLinks();
-
-    /**
-     * Returns a new list with all outgoing links of the node
-     *
-     * @return a new array list with the outgoing links of the node
-     */
-    ArrayList<InterdependentLink> getOutgoingInterdependentLinks();
-
-    /**
-     * Returns a new list with all outgoing links of the node
+     * Returns a new list with all outgoing local links of the node
      *
      * @return a new array list with the outgoing links of the node
      */
     ArrayList<Link> getOutgoingLinks();
 
+    /**
+     * Returns a new list with all incoming links of the node
+     *
+     * @return a new array list with the incoming links of the node
+     */
+    ArrayList<InterdependentLink> getIncomingInterdependentLinks();
+    
+    /**
+     * Returns a new list with all outgoing interdependent links of the node
+     *
+     * @return a new array list with the outgoing links of the node
+     */
+    ArrayList<InterdependentLink> getOutgoingInterdependentLinks();
+    
+    /**
+     * Checks if interdependent links are connected to this node
+     * 
+     * @return if interdependent links are connected to this node
+     */
+    boolean hasInterdependentLinks();
+    
     /**
      * Returned the activated/deactivated status of the node
      *
@@ -92,13 +131,6 @@ public interface NodeInterface {
     boolean isConnected();
 
     /**
-     * Removes the link and evaluates the connectivity of the node
-     *
-     * @param link the removed link
-     */
-    void removeLink(LinkInterface link);
-
-    /**
      * Sets the activated/deactivated status of the node
      *
      * @param activated the activated to set
@@ -106,17 +138,45 @@ public interface NodeInterface {
     void setActivated(boolean activated);
 
     /**
-     * Sets the index of the node
+     * Returns the capacity of the node if a capacity type is defined
      *
-     * @param index the index to set
+     * @return the capacity of the node
      */
-    void setIndex(String index);
+    double getCapacity();
 
     /**
-     * Sets the links of the node
+     * Returns the flow value if a flow type is defined.
      *
-     * @param links the links to set
+     * @return the flow
      */
-    void setLinks(List<Link> links);
+    double getFlow();
+
+    /**
+     * Sets the capacity of the node if a capacity type is defined
+     *
+     * @param capacity the capacity of the node
+     */
+    void setCapacity(double capacity);
+
+    /**
+     * Sets the capacity type of the node
+     *
+     * @param capacityType the capacity type of the node
+     */
+    void setCapacityType(Enum capacityType);
+
+    /**
+     * Sets the flow if a flow type is defined
+     *
+     * @param flow the flow set
+     */
+    void setFlow(double flow);
+
+    /**
+     * Sets the flow type
+     *
+     * @param flowType the set flow type
+     */
+    void setFlowType(Enum flowType);
     
 }

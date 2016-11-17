@@ -102,7 +102,7 @@ public class TopologyWriter {
             file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileWriter(file,false));
             writer.println("id" + columnSeparator + "from_node_id" + columnSeparator + "from_net_id" + columnSeparator + "to_node_id" + columnSeparator + "to_net_id" + columnSeparator + "status");
-            for (InterdependentLink link : net.getInterdependentLinks()){
+            for (InterdependentLink link : net.getLinksInterdependent()){
                 String status;
                 if (link.isActivated())
                     status = "1";

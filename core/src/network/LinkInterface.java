@@ -23,14 +23,28 @@ package network;
  * @author Ben
  */
 public interface LinkInterface{
-
+    
     /**
-     * Returns the capacity of the link if a capacity type is defined
+     * Returns the index of the link
      *
-     * @return the capacity of the link
+     * @return the index of the link
      */
-    double getCapacity();
-
+    String getIndex();
+    
+    /**
+     * Sets the index of the link
+     *
+     * @param index the index of the link
+     */
+    void setIndex(String index);
+    
+    /**
+     * Returns the start node of the link
+     *
+     * @return the startNode of the link
+     */
+    NodeInterface getStartNode();
+    
     /**
      * Returns the end node of the link
      *
@@ -46,18 +60,11 @@ public interface LinkInterface{
     double getFlow();
 
     /**
-     * Returns the index of the link
+     * Returns the capacity of the link if a capacity type is defined
      *
-     * @return the index of the link
+     * @return the capacity of the link
      */
-    String getIndex();
-
-    /**
-     * Returns the start node of the link
-     *
-     * @return the startNode of the link
-     */
-    NodeInterface getStartNode();
+    double getCapacity();
 
     /**
      * Returns if the link is activated or not
@@ -103,6 +110,13 @@ public interface LinkInterface{
     void setCapacityType(Enum capacityType);
 
     /**
+     * Sets the start node of the link and evaluates connectivity
+     *
+     * @param startNode the startNode of the link
+     */
+    void setStartNode(NodeInterface startNode);
+    
+    /**
      * Sets the end node of the link and evaluates the connectivity
      *
      * @param endNode the endNode of the link
@@ -122,19 +136,5 @@ public interface LinkInterface{
      * @param flowType the flow type of the link
      */
     void setFlowType(Enum flowType);
-
-    /**
-     * Sets the index of the link
-     *
-     * @param index the index of the link
-     */
-    void setIndex(String index);
-
-    /**
-     * Sets the start node of the link and evaluates connectivity
-     *
-     * @param startNode the startNode of the link
-     */
-    void setStartNode(NodeInterface startNode);
     
 }
