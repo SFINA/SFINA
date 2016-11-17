@@ -107,7 +107,7 @@ public interface LinkInterface{
      *
      * @param endNode the endNode of the link
      */
-    void setEndNode(Node endNode);
+    void setEndNode(NodeInterface endNode);
 
     /**
      * Sets the flow of the link if a flow type is defined
@@ -135,6 +135,6 @@ public interface LinkInterface{
      *
      * @param startNode the startNode of the link
      */
-    void setStartNode(Node startNode);
+    void setStartNode(NodeInterface startNode);
     
 }

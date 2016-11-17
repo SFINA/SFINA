@@ -72,81 +72,7 @@ public class Link extends State implements LinkInterface{
      */
     @Override
     public boolean isInterdependent(){
-        return this instanceof InterdependentLink;
-    }
-    
-    /**
-     * Returns the flow of the link if a flow type is defined
-     * 
-     * @return the flow of the link
-     */
-    @Override
-    public double getFlow(){
-        if(this.flowType==null)
-            logger.debug("Flow type is not defined.");
-        return Math.abs((double)this.getProperty(flowType));
-    }
-    
-    /**
-     * Sets the flow of the link if a flow type is defined
-     * 
-     * @param flow the flow of the link
-     */
-    @Override
-    public void setFlow(double flow){
-        if(this.flowType==null){
-            logger.debug("Flow type is not defined.");
-        }
-        else{
-            this.addProperty(flowType, flow);
-        }
-    }
-    
-    /**
-     * Returns the capacity of the link if a capacity type is defined
-     * 
-     * @return the capacity of the link
-     */
-    @Override
-    public double getCapacity(){
-        if(this.capacityType==null)
-            logger.debug("Capacity type is not defined.");
-        return Math.abs((double)this.getProperty(capacityType));
-    }
-    
-    /**
-     * Sets the capacity of the link if a capacity type is defined
-     * 
-     * @param capacity the capacity of the link
-     */
-    @Override
-    public void setCapacity(double capacity){
-        if(this.capacityType==null){
-            logger.debug("Capacity type is not defined.");
-        }
-        else{
-            this.addProperty(capacityType, capacity);
-        }
-    }
-    
-    /**
-     * Sets the flow type of the link
-     * 
-     * @param flowType the flow type of the link
-     */
-    @Override
-    public void setFlowType(Enum flowType){
-        this.flowType=flowType;
-    }
-    
-    /**
-     * Sets the capacity type of the link
-     * 
-     * @param capacityType the capacity type of the link
-     */
-    @Override
-    public void setCapacityType(Enum capacityType){
-        this.capacityType=capacityType;
+        return false;
     }
 
     /**
@@ -176,10 +102,7 @@ public class Link extends State implements LinkInterface{
      */
     @Override
     public NodeInterface getStartNode() {
-        if(startNode.isRemoteNode())
-            return (RemoteNode)startNode;
-        else
-            return (Node)startNode;
+        return this.startNode;
     }
 
     /**
@@ -188,7 +111,7 @@ public class Link extends State implements LinkInterface{
      * @param startNode the startNode of the link
      */
     @Override
-    public void setStartNode(Node startNode) {
+    public void setStartNode(NodeInterface startNode) {
         this.startNode = startNode;
         this.evaluateConnectivity();
     }
@@ -200,10 +123,7 @@ public class Link extends State implements LinkInterface{
      */
     @Override
     public NodeInterface getEndNode() {
-        if(endNode.isRemoteNode())
-            return (RemoteNode)endNode;
-        else
-            return (Node)endNode;
+        return this.endNode;
     }
 
     /**
@@ -212,7 +132,7 @@ public class Link extends State implements LinkInterface{
      * @param endNode the endNode of the link
      */
     @Override
-    public void setEndNode(Node endNode) {
+    public void setEndNode(NodeInterface endNode) {
         this.endNode = endNode;
         this.evaluateConnectivity();
     }
@@ -291,6 +211,80 @@ public class Link extends State implements LinkInterface{
             this.getStartNode().removeLink(this);
             this.getEndNode().removeLink(this);
         }
+    }
+    
+    /**
+     * Returns the flow of the link if a flow type is defined
+     * 
+     * @return the flow of the link
+     */
+    @Override
+    public double getFlow(){
+        if(this.flowType==null)
+            logger.debug("Flow type is not defined.");
+        return Math.abs((double)this.getProperty(flowType));
+    }
+    
+    /**
+     * Sets the flow of the link if a flow type is defined
+     * 
+     * @param flow the flow of the link
+     */
+    @Override
+    public void setFlow(double flow){
+        if(this.flowType==null){
+            logger.debug("Flow type is not defined.");
+        }
+        else{
+            this.addProperty(flowType, flow);
+        }
+    }
+    
+    /**
+     * Returns the capacity of the link if a capacity type is defined
+     * 
+     * @return the capacity of the link
+     */
+    @Override
+    public double getCapacity(){
+        if(this.capacityType==null)
+            logger.debug("Capacity type is not defined.");
+        return Math.abs((double)this.getProperty(capacityType));
+    }
+    
+    /**
+     * Sets the capacity of the link if a capacity type is defined
+     * 
+     * @param capacity the capacity of the link
+     */
+    @Override
+    public void setCapacity(double capacity){
+        if(this.capacityType==null){
+            logger.debug("Capacity type is not defined.");
+        }
+        else{
+            this.addProperty(capacityType, capacity);
+        }
+    }
+    
+    /**
+     * Sets the flow type of the link
+     * 
+     * @param flowType the flow type of the link
+     */
+    @Override
+    public void setFlowType(Enum flowType){
+        this.flowType=flowType;
+    }
+    
+    /**
+     * Sets the capacity type of the link
+     * 
+     * @param capacityType the capacity type of the link
+     */
+    @Override
+    public void setCapacityType(Enum capacityType){
+        this.capacityType=capacityType;
     }
     
 }

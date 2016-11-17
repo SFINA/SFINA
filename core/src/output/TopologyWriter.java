@@ -109,9 +109,9 @@ public class TopologyWriter {
                 else 
                     status = "0";
                 if (link.isOutgoing())
-                    writer.println(link.getIndex() + columnSeparator + link.getStartNode().getIndex() + columnSeparator + networkIndex + columnSeparator + link.getEndNode().getIndex() + columnSeparator + link.getEndNode().getNetworkIndex() + columnSeparator + status);
+                    writer.println(link.getIndex() + columnSeparator + link.getStartNode().getIndex() + columnSeparator + link.getThisNetworkIndex() + columnSeparator + link.getEndNode().getIndex() + columnSeparator + link.getRemoteNetworkIndex() + columnSeparator + status);
                 else
-                    writer.println(link.getIndex() + columnSeparator + link.getStartNode().getIndex() + columnSeparator + link.getStartNode().getNetworkIndex() + columnSeparator + link.getEndNode().getIndex() + columnSeparator + networkIndex + columnSeparator + status);
+                    writer.println(link.getIndex() + columnSeparator + link.getEndNode().getIndex() + columnSeparator + link.getRemoteNetworkIndex() + columnSeparator + link.getStartNode().getIndex() + columnSeparator + link.getThisNetworkIndex() + columnSeparator + status);
             }
             writer.close();
         }

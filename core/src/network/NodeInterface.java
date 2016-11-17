@@ -91,8 +91,6 @@ public interface NodeInterface {
      */
     boolean isConnected();
 
-    boolean isRemoteNode();
-
     /**
      * Removes the link and evaluates the connectivity of the node
      *
@@ -120,15 +118,5 @@ public interface NodeInterface {
      * @param links the links to set
      */
     void setLinks(List<Link> links);
-
-    /**
-     * @return the networkIndex
-     */
-    Integer getNetworkIndex();
-
-    /**
-     * @param networkIndex the networkIndex to set
-     */
-    void setNetworkIndex(Integer networkIndex);
     
 }

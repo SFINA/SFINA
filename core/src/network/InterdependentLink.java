@@ -25,57 +25,44 @@ import org.apache.log4j.Logger;
  */
 public class InterdependentLink extends Link implements LinkInterface{
     
-    private int startNodeNetworkIndex;
-    private int endNodeNetworkIndex;
+    private int thisNetworkIndex;
+    private int remoteNetworkIndex;
+    private boolean isOutgoing;
     private static final Logger logger = Logger.getLogger(InterdependentLink.class);
     
-    public InterdependentLink(String index, boolean activated, NodeInterface startNode, NodeInterface endNode, int startNodeNetworkIndex, int endNodeNetworkIndex) {
+    public InterdependentLink(String index, boolean activated, NodeInterface startNode, NodeInterface endNode, int thisNetworkIndex, int remoteNetworkIndex, String remoteNodeIndex, boolean isRemoteNodeActivated) {
         super(index, activated, startNode, endNode);
-        this.startNodeNetworkIndex = startNodeNetworkIndex;
-        this.endNodeNetworkIndex = endNodeNetworkIndex;
+        this.thisNetworkIndex = thisNetworkIndex;
+        this.remoteNetworkIndex = remoteNetworkIndex;
+        if (endNode == null && startNode != null){
+            this.isOutgoing = true;
+            this.setEndNode(new Node(remoteNodeIndex, isRemoteNodeActivated));
+        }
+        else if (startNode == null && endNode != null){
+            this.isOutgoing = false;
+            this.setStartNode(new Node(remoteNodeIndex, isRemoteNodeActivated));
+        }
+        else
+            logger.debug("The start or end node of interdependent link which is in other network should be null.");
     }
 
     /**
-     * @return the endNodeNetworkIndex
+     * Check if link is interdependent.
+     * Returns true if StartNode and EndNode of link are in same network.
+     * 
+     * @return if link is interdependent
      */
-    public int getEndNodeNetworkIndex() {
-        return endNodeNetworkIndex;
+    @Override
+    public boolean isInterdependent(){
+        return true;
     }
-
-    /**
-     * @param endNodeNetworkIndex the endNodeNetworkIndex to set
-     */
-    public void setEndNodeNetworkIndex(int endNodeNetworkIndex) {
-        this.endNodeNetworkIndex = endNodeNetworkIndex;
-    }
-
-    /**
-     * @return the startNodeNetworkIndex
-     */
-    public int getStartNodeNetworkIndex() {
-        return startNodeNetworkIndex;
-    }
-
-    /**
-     * @param startNodeNetworkIndex the startNodeNetworkIndex to set
-     */
-    public void setStartNodeNetworkIndex(int startNodeNetworkIndex) {
-        this.startNodeNetworkIndex = startNodeNetworkIndex;
-    }
-
+    
     /**
      *
      * @return if the node points to or away from this network
      */
     public Boolean isOutgoing(){
-        boolean startIsRemote = this.getStartNode() instanceof RemoteNode;
-        boolean endIsRemote = this.getEndNode() instanceof RemoteNode;
-        if(startIsRemote || endIsRemote)
-            return endIsRemote;
-        else {
-            logger.debug("InterdependentLink doesn't have a RemoteNode at one of its ends. Shouldn't happen. Index = " + this.getIndex());
-            return null;
-        }
+        return this.isOutgoing;
     }
     
     /**
@@ -84,5 +71,33 @@ public class InterdependentLink extends Link implements LinkInterface{
      */
     public Boolean isIncoming(){
         return !isOutgoing();
+    }
+
+    /**
+     * @return the thisNetworkIndex
+     */
+    public int getThisNetworkIndex() {
+        return thisNetworkIndex;
+    }
+
+    /**
+     * @param thisNetworkIndex the thisNetworkIndex to set
+     */
+    public void setThisNetworkIndex(int thisNetworkIndex) {
+        this.thisNetworkIndex = thisNetworkIndex;
+    }
+
+    /**
+     * @return the remoteNetworkIndex
+     */
+    public int getRemoteNetworkIndex() {
+        return remoteNetworkIndex;
+    }
+
+    /**
+     * @param remoteNetworkIndex the remoteNetworkIndex to set
+     */
+    public void setRemoteNetworkIndex(int remoteNetworkIndex) {
+        this.remoteNetworkIndex = remoteNetworkIndex;
     }
 }
