@@ -18,7 +18,6 @@
 package experiments;
 
 import core.SimulationAgent;
-import java.io.File;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
@@ -36,8 +35,6 @@ public class TestInterpssBackend extends SimulatedExperiment{
     private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
     
     private final static String expSeqNum="01";
-    private final static String peersLogDirectory="peerlets-log/";
-    
     private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters
@@ -51,11 +48,6 @@ public class TestInterpssBackend extends SimulatedExperiment{
         Experiment.initEnvironment();
         TestInterpssBackend test = new TestInterpssBackend();
         test.init();
-        
-        // Can move these three lines to SimulationAgent also? Reason: loading peersLogDirectory name from the config file.
-        File folder = new File(peersLogDirectory+experimentID+"/");
-        clearExperimentFile(folder);
-        folder.mkdir();
         
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
@@ -76,21 +68,9 @@ public class TestInterpssBackend extends SimulatedExperiment{
         };
         test.initPeers(0,N,peerFactory);
         test.startPeers(0,N);
+        
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
     }
     
-    public final static void clearExperimentFile(File experiment){
-        File[] files = experiment.listFiles();
-        if(files!=null) { //some JVMs return null for empty dirs
-            for(File f: files) {
-                if(f.isDirectory()) {
-                    clearExperimentFile(f);
-                } else {
-                    f.delete();
-                }
-            }
-        }
-        experiment.delete();
-    }
 }

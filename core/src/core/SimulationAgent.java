@@ -41,7 +41,6 @@ import output.TopologyWriter;
 import input.FlowLoader;
 import java.util.Collection;
 import network.InterdependentLink;
-import network.LinkInterface;
 import output.EventWriter;
 import output.FlowWriter;
 import protopeer.BasePeerlet;
@@ -713,6 +712,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     /**
      * @return the networkIndex
      */
+    @Override
     public int getNetworkIndex() {
         return this.getFlowNetwork().getNetworkIndex();
     }
@@ -731,6 +731,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * 
      * @return a list of network indices of all connected networks
      */
+    @Override
     public Collection<Integer> getConnectedNetworkIndices(){
         return this.getFlowNetwork().getConnectedNetworkIndices();
     }
