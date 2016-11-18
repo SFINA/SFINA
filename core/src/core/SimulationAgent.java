@@ -67,8 +67,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private int iteration;
     private final static String parameterColumnSeparator="=";
     private final static String fileSystemSchema="conf/fileSystem.conf";
-    private final static String peersLogDirectory="peerlets-log/";
-    private static String peerToken="peer";
+    private String peersLogDirectory;
+    private String peerToken;
     private String peerTokenName;
     private String timeToken;
     private String timeTokenName;
@@ -256,6 +256,12 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                         break;
                     case "timeTokenName":
                         this.timeTokenName=st.nextToken();
+                        break;
+                    case "peerToken":
+                        this.peerToken=st.nextToken();
+                        break;
+                    case "peersLogDirectory":
+                        this.peersLogDirectory=st.nextToken();
                         break;
                     case "inputDirectoryName":
                         inputDirectoryName=st.nextToken();
