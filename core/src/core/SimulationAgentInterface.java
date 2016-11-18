@@ -7,6 +7,7 @@ package core;
 
 import backend.FlowDomainAgent;
 import event.Event;
+import java.util.Collection;
 import java.util.HashMap;
 import network.FlowNetwork;
 import protopeer.network.Message;
@@ -18,39 +19,53 @@ import protopeer.network.Message;
  */
 public interface SimulationAgentInterface {
     
-    public void runBootstraping();
+    void runBootstraping();
     
-    public void runActiveState();
+    void runActiveState();
     
-    public int getSimulationTime();
+    int getSimulationTime();
     
-    public HashMap<Enum,Object> getDomainParameters();
+    HashMap<Enum,Object> getDomainParameters();
     
-    public void saveOutputData();
+    void saveOutputData();
     
-    public int getIteration();
+    int getIteration();
     
-    public void queueEvent(Event event);
+    void queueEvent(Event event);
     
-    public void runPassiveState(Message message);
+    void runPassiveState(Message message);
     
-    public void executeEvent(FlowNetwork flowNetwork, Event event);
+    void executeEvent(FlowNetwork flowNetwork, Event event);
     
-    public void executeAllEvents();
+    void executeAllEvents();
     
-    public void runInitialOperations();
+    void runInitialOperations();
     
-    public void runFinalOperations();
+    void runFinalOperations();
         
-    public void runFlowAnalysis();
+    void runFlowAnalysis();
         
-    public FlowDomainAgent getFlowDomainAgent();
+    FlowDomainAgent getFlowDomainAgent();
 
-    public void scheduleMeasurements();
+    void scheduleMeasurements();
     
-    public void loadFileSystem(String schema);
+    void loadFileSystem(String schema);
     
-    public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation);                
+    void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation);                
+
+    /**
+     * Return all connected networks.
+     * A network is connected, if an interdependent link points to or from that
+     * network and is activated and connected.
+     *
+     * @return a list of network indices of all connected networks
+     */
+    Collection<Integer> getConnectedNetworkIndices();
+
+    /**
+     * @return the networkIndex
+     */
+    int getNetworkIndex();
 
     
 }

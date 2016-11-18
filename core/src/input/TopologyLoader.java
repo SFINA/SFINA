@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
 import network.FlowNetwork;
 import network.InterdependentLink;
 import network.Link;
+import network.LinkInterface;
 import network.LinkState;
 import network.Node;
 import network.NodeInterface;
@@ -52,19 +53,20 @@ public class TopologyLoader {
     }
     
     private void emptyNetwork(){
-        if (net.getLinks().size() != 0){
-            ArrayList<Link> links = new ArrayList<Link>(net.getLinks());
-            for (Link link : links)
+        if (!net.getLinksAll().isEmpty()){
+            ArrayList<LinkInterface> links = new ArrayList<>(net.getLinksAll());
+            for (LinkInterface link : links)
                 net.removeLink(link);
         }
-        if (net.getNodes().size() != 0){
-            ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
+        if (!net.getNodes().isEmpty()){
+            ArrayList<Node> nodes = new ArrayList<>(net.getNodes());
             for (Node node : nodes)
                 net.removeNode(node);
         }
     }
     
     public void loadNodes(String location){
+        emptyNetwork(); // empty network if it has nodes and links
         ArrayList<NodeState> nodeStates=new ArrayList<NodeState>();
         File file = new File(location);
         Scanner scr = null;
@@ -96,8 +98,8 @@ public class TopologyLoader {
     }
     
     public void loadLinks(String location){
-        ArrayList<Node> nodes = new ArrayList<Node>(net.getNodes());
-        ArrayList<LinkState> linkStates=new ArrayList<LinkState>();
+        ArrayList<Node> nodes = new ArrayList<>(net.getNodes());
+        ArrayList<LinkState> linkStates=new ArrayList<>();
         File file = new File(location);
         Scanner scr = null;
         boolean isInterdependent = false;
@@ -136,6 +138,8 @@ public class TopologyLoader {
                     if(link!=null){
                         net.addLink(link);
                     }
+                    else if(startNetIndex != networkIndex && endNetIndex != networkIndex)
+                        logger.debug("Interdependent link given in input file is not connected to this network.");
                     else{
                         logger.debug("Something went wrong with the indices of nodes and links.");
                     }

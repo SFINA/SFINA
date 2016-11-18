@@ -81,13 +81,6 @@ public class InterdependentLink extends Link implements LinkInterface{
     }
 
     /**
-     * @param thisNetworkIndex the thisNetworkIndex to set
-     */
-    public void setThisNetworkIndex(int thisNetworkIndex) {
-        this.thisNetworkIndex = thisNetworkIndex;
-    }
-
-    /**
      * @return the remoteNetworkIndex
      */
     public int getRemoteNetworkIndex() {

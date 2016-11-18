@@ -52,6 +52,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private List<Node> nodes;
     private List<LinkInterface> links;
+    private int networkIndex;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**
@@ -63,22 +64,63 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         this.links=new ArrayList<>();
     }
     
+    /**
+     * @return the networkIndex
+     */
     @Override
+    public int getNetworkIndex() {
+        return networkIndex;
+    }
+
+    /**
+     * @param networkIndex the networkIndex to set
+     */
+    @Override
+    public void setNetworkIndex(int networkIndex) {
+        this.networkIndex = networkIndex;
+    }
+    
+    /**
+     * Return all connected networks. 
+     * A network is connected, if an interdependent link points to or from that 
+     * network and is activated and connected.
+     * 
+     * @return a list of network indices of all connected networks
+     */
+    @Override
+    public Collection<Integer> getConnectedNetworkIndices(){
+        Collection<Integer> networkIndices = new ArrayList<>();
+        for(InterdependentLink link : this.getLinksInterdependent())
+            if(!networkIndices.contains(link.getRemoteNetworkIndex()) && link.isActivated() && link.isConnected())
+                networkIndices.add(link.getRemoteNetworkIndex());
+        return networkIndices;
+    }
+    
     /**
      * Returns a collection of the nodes
      * 
      * @return a colelction of the nodes
      */
+    @Override
     public Collection<Node> getNodes(){
         return nodes;
     }
     
+    /**
+     *
+     * @return
+     */
     @Override
+    public Collection<LinkInterface> getLinksAll(){
+        return links;
+    }
+    
     /**
      * Returns a collection of the links
      * 
      * @return a collection of the links
      */
+    @Override
     public Collection<Link> getLinks(){
         ArrayList<Link> localLinks = new ArrayList<>();
         for(LinkInterface link : links)
@@ -108,29 +150,31 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param node the node added in the network
      */
     public void addNode(Node node){
-        this.nodes.add(node);
+        if(!this.nodes.contains(node))
+            this.nodes.add(node);
     }
     
-    @Override
     /**
      * Adds a link and makes the connection of the involved nodes
      * 
      * @param link the added link
      */
+    @Override
     public void addLink(LinkInterface link){
-        this.links.add(link);
+        if(!this.links.contains(link))
+            this.links.add(link);
         if(link.isActivated()){
             link.getStartNode().addLink(link);
             link.getEndNode().addLink(link);
         }
     }
     
-    @Override
     /**
      * Removes a node and updates the connection with all involved links
      * 
      * @param node the removed node
      */
+    @Override
     public void removeNode(Node node){
         for(Link link:node.getIncomingLinks()){
             link.setEndNode(null);
@@ -141,12 +185,12 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         this.nodes.remove(node);
     }
     
-    @Override
     /**
      * Removes a link and updates the connection with all involved nodes
      * 
      * @param link the removed link
      */
+    @Override
     public void removeLink(LinkInterface link){
         for(Node node:nodes){
             node.removeLink(link);
@@ -155,13 +199,13 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         
     }
     
-    @Override
     /**
      * Returns the node given the node index
      * 
      * @param index the node index
      * @return the node
      */
+    @Override
     public Node getNode(String index){
         for(Node node : nodes)
             if(node.getIndex().equals(index))
@@ -169,13 +213,13 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return null;
     }
     
-    @Override
     /**
      * Returns the link given the link index
      * 
      * @param index the link index
      * @return the link
      */
+    @Override
     public Link getLink(String index){
         for(LinkInterface link : links)
             if(link.getIndex().equals(index) && !link.isInterdependent())
@@ -197,7 +241,6 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return null;
     }
     
-    @Override
     /**
      * Returns the link given the start node and end node
      * 
@@ -205,6 +248,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
      * @param endNode the end node of the link
      * @return the link or null if no link between the nodes exists
      */
+    @Override
     public Link getLink(Node startNode, Node endNode){
         for (LinkInterface link : links){
             if (!link.isInterdependent() && link.getStartNode() == startNode && link.getEndNode() == endNode) // User can't know the remote node of the other network for interdependent link.
@@ -268,42 +312,42 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         }
     }
     
-    @Override
     /**
      * Activates a node and updates the topology.
      * 
      * @param index the index of the activated node.
      */
+    @Override
     public void activateNode(String index){
         this.getNode(index).setActivated(true);
     }
-    
-    @Override
+     
     /**
      * Activates a link and updates the topology
      * 
      * @param index the index of the activated link
      */
+    @Override
     public void activateLink(String index){
         this.getLink(index).setActivated(true);
     }
     
-    @Override
     /**
      * Deactivates a node and updates the topology
      * 
      * @param index the index of the deactivated node
      */
+    @Override
     public void deactivateNode(String index){
         this.getNode(index).setActivated(false);
     }
     
-    @Override
     /**
      * Deactivates a link and updates the topology
      * 
      * @param index the index of the deactivated link
      */
+    @Override
     public void deactivateLink(String index){
         this.getLink(index).setActivated(false);
     }
@@ -316,14 +360,14 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     @Override
     public ArrayList<FlowNetwork> computeIslands(){
         ArrayList<FlowNetwork> islands = new ArrayList<>();
-        ArrayList leftNodes = new ArrayList();
+        ArrayList<Node> leftNodes = new ArrayList();
         for (Node node : this.getNodes())
             if(node.isActivated())
                 leftNodes.add(node);
         while (leftNodes.size() > 0){
             ArrayList<Node> newIslandNodes = new ArrayList();
             ArrayList<Link> newIslandLinks = new ArrayList();
-            Node currentNode = (Node)leftNodes.get(0);
+            Node currentNode = leftNodes.get(0);
             iterateIsland(currentNode, newIslandNodes, newIslandLinks, leftNodes);
             
             Collections.sort(newIslandNodes, new Comparator<Node>(){
@@ -349,7 +393,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return islands;
     }
     
-    private void iterateIsland(Node currentNode, ArrayList<Node> currentIslandNodes, ArrayList<Link> currentIslandLinks, ArrayList leftNodes){
+    private void iterateIsland(Node currentNode, ArrayList<Node> currentIslandNodes, ArrayList<Link> currentIslandLinks, ArrayList<Node> leftNodes){
         if (currentIslandNodes.contains(currentNode)){
             logger.debug("Attention: Island iterator was called even though node is already in island, which should not happen! Check algorithm!");
             return;
@@ -384,12 +428,12 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         }
     }
     
-    @Override
     /**
      * An example of a topological metric: average node degree
      * 
      * @return the average node degree
      */
+    @Override
     public double getAvgNodeDegree(){
         double totalNodeDegree=0.0;
         for(Node node:this.nodes){
@@ -398,12 +442,12 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
         return totalNodeDegree/this.nodes.size();
     }
     
-    @Override
     /**
      * Calculates closeness centrality for given node
      * @param node
      * @return centrality
      */
+    @Override
     public double getClosenessCentrality(Node node){
         double distance = 0.0;
         for (Node otherNode : nodes){
@@ -545,5 +589,5 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
                 g.addEdge(link.getStartNode().getIndex(), link.getEndNode().getIndex());
         return g;
     }
-    
+
 }

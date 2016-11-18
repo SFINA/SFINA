@@ -89,5 +89,26 @@ public interface FlowNetworkInterface {
      * @return a collection of the links
      */
     Collection<InterdependentLink> getLinksInterdependent();
+
+    Collection<LinkInterface> getLinksAll();
+
+    /**
+     * Return all connected networks.
+     * A network is connected, if an interdependent link points to or from that
+     * network and is activated and connected.
+     *
+     * @return a list of network indices of all connected networks
+     */
+    Collection<Integer> getConnectedNetworkIndices();
+
+    /**
+     * @return the networkIndex
+     */
+    int getNetworkIndex();
+
+    /**
+     * @param networkIndex the networkIndex to set
+     */
+    void setNetworkIndex(int networkIndex);
     
 }

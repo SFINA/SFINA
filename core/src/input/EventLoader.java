@@ -253,6 +253,10 @@ public class EventLoader {
                 return LinkState.FROM_NODE;
             case "to_node_id":
                 return LinkState.TO_NODE;
+            case "from_net_id":
+                return LinkState.FROM_NET;
+            case "to_net_id":
+                return LinkState.TO_NET;
             case "status":
                 return LinkState.STATUS;
             default:
@@ -288,6 +292,10 @@ public class EventLoader {
                 return rawValue;
             case TO_NODE:
                 return rawValue;
+            case FROM_NET:
+                return Integer.parseInt(rawValue);
+            case TO_NET:
+                return Integer.parseInt(rawValue);
             case STATUS:
                 switch(rawValue){
                     case "1":
