@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import output.TopologyWriter;
 import input.FlowLoader;
 import java.util.Collection;
+import java.util.List;
 import network.InterdependentLink;
 import output.EventWriter;
 import output.FlowWriter;
@@ -683,7 +684,15 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      */
     @Override
     public void queueEvent(Event event){
-        this.getEvents().add(event);
+        this.events.add(event);
+    }
+    
+    /**
+     *
+     * @param events
+     */
+    public void queueEvents(List<Event> events){
+        this.events.addAll(events);
     }
     
     /**

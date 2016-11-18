@@ -9,6 +9,7 @@ import backend.FlowDomainAgent;
 import event.Event;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import network.FlowNetwork;
 import protopeer.network.Message;
 
@@ -32,6 +33,8 @@ public interface SimulationAgentInterface {
     int getIteration();
     
     void queueEvent(Event event);
+    
+    void queueEvents(List<Event> events);
     
     void runPassiveState(Message message);
     
