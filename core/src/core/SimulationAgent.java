@@ -724,13 +724,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.getFlowDomainAgent().setDomainParameters(backendParameters);
     }
     
-    /**
-     * @return the networkIndex
-     */
-    @Override
-    public int getNetworkIndex() {
-        return this.getFlowNetwork().getNetworkIndex();
-    }
+        /**
+         * @return the networkIndex
+         */
+        @Override
+        public int getNetworkIndex() {
+            return this.getFlowNetwork().getNetworkIndex();
+        }
 
     /**
      * @param networkIndex the networkIndex to set
