@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  */
 public class EventWriter {
     
-    private static final Logger logger = Logger.getLogger(FlowWriterNew.class);
+    private static final Logger logger = Logger.getLogger(FlowWriter.class);
     
     private String columnSeparator;
     private String missingValue;
@@ -112,6 +112,38 @@ public class EventWriter {
                                 logger.debug("Link state cannot be recognised");
                         }
                         break;
+                    case INTERDEPENDENT_LINK:
+                        eventStrings.add("interLink");
+                        eventStrings.add(event.getComponentID());
+                        switch((LinkState)event.getParameter()){
+                            case ID:
+                                eventStrings.add("id");
+                                eventStrings.add(event.getValue().toString());
+                                break;
+                            case FROM_NODE:
+                                eventStrings.add("from_node_id");
+                                eventStrings.add(event.getValue().toString());
+                                break;
+                            case TO_NODE:
+                                eventStrings.add("to_node_id");
+                                eventStrings.add(event.getValue().toString());
+                                break;
+                            case FROM_NET:
+                                eventStrings.add("from_net_id");
+                                eventStrings.add(event.getValue().toString());
+                                break;
+                            case TO_NET:
+                                eventStrings.add("to_net_id");
+                                eventStrings.add(event.getValue().toString());
+                                break;
+                            case STATUS:
+                                eventStrings.add("status");
+                                eventStrings.add((Boolean)event.getValue() ? "1" : "0");
+                                break;
+                            default:
+                                logger.debug("Link state cannot be recognised");
+                        }
+                        break;
                     default:
                         logger.debug("Network component cannot be recognised");
                 }
@@ -127,6 +159,12 @@ public class EventWriter {
                         break;
                     case LINK:
                         eventStrings.add("link");
+                        eventStrings.add(event.getComponentID());
+                        eventStrings.add(this.flowNetworkDataTypes.castLinkStateTypeToString(event.getParameter()));
+                        eventStrings.add(event.getValue().toString());
+                        break;
+                    case INTERDEPENDENT_LINK:
+                        eventStrings.add("interLink");
                         eventStrings.add(event.getComponentID());
                         eventStrings.add(this.flowNetworkDataTypes.castLinkStateTypeToString(event.getParameter()));
                         eventStrings.add(event.getValue().toString());

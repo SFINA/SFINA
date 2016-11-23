@@ -23,5 +23,6 @@ package network;
  */
 public enum NodeState {
     ID,
-    STATUS
+    STATUS,
+    NETWORK_INDEX
 }

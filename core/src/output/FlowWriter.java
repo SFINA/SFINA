@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import network.FlowNetwork;
 import network.Link;
+import network.LinkInterface;
 import network.Node;
 import org.apache.log4j.Logger;
 
@@ -32,16 +33,16 @@ import org.apache.log4j.Logger;
  *
  * @author Ben
  */
-public class FlowWriterNew {
+public class FlowWriter {
 
-    private static final Logger logger = Logger.getLogger(FlowWriterNew.class);
+    private static final Logger logger = Logger.getLogger(FlowWriter.class);
 
     private FlowNetwork net;
     private String columnSeparator;
     private String missingValue;
     private FlowNetworkDataTypesInterface flowNetworkDataTypes;
     
-    public FlowWriterNew(FlowNetwork net, String columnSeparator, String missingValue, FlowNetworkDataTypesInterface flowNetworkDataTypes){
+    public FlowWriter(FlowNetwork net, String columnSeparator, String missingValue, FlowNetworkDataTypesInterface flowNetworkDataTypes){
         this.net=net;
         this.columnSeparator=columnSeparator;        
         this.missingValue = missingValue;
@@ -85,6 +86,14 @@ public class FlowWriterNew {
     }
     
     public void writeLinkFlowData(String location){
+        writeLinkFlowData(location, false);
+    }
+    
+    public void writeInterdependentLinkFlowData(String location) {
+        writeLinkFlowData(location, true);
+    }
+    
+    private void writeLinkFlowData(String location, boolean interdependent){
         try{
             File file = new File(location);
             File parent = file.getParentFile();
@@ -107,7 +116,13 @@ public class FlowWriterNew {
                 writer.print(columnSeparator + stateStrings.get(i));
             writer.print("\n");
             
-            for (Link link : net.getLinks()){
+            ArrayList<LinkInterface> links;
+            if(interdependent)
+                links = new ArrayList(net.getLinksInterdependent());
+            else
+                links = new ArrayList(net.getLinks());
+            
+            for (LinkInterface link : links){
                 writer.print(link.getIndex());
                 for (int i=0; i<necessaryStates.size(); i++)
                     writer.print(columnSeparator + this.getFlowNetworkDataTypes().castLinkStateValueToString(necessaryStates.get(i), link, missingValue));

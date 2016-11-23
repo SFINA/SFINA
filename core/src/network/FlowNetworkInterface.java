@@ -33,11 +33,11 @@ public interface FlowNetworkInterface {
     
     public void addNode(Node node);
     
-    public void addLink(Link link);
+    public void addLink(LinkInterface link);
     
     public void removeNode(Node node);
     
-    public void removeLink(Link link);
+    public void removeLink(LinkInterface link);
     
     public Node getNode(String index);
     
@@ -74,5 +74,41 @@ public interface FlowNetworkInterface {
     public double getBtwnCentrality(Link link);
 
     public double getDegCentrality(Link link);*/
+
+    /**
+     * Returns the interdependent link given the link index
+     *
+     * @param index the link index
+     * @return the link
+     */
+    InterdependentLink getInterdependentLink(String index);
+
+    /**
+     * Returns a collection of the links
+     *
+     * @return a collection of the links
+     */
+    Collection<InterdependentLink> getLinksInterdependent();
+
+    Collection<LinkInterface> getLinksAll();
+
+    /**
+     * Return all connected networks.
+     * A network is connected, if an interdependent link points to or from that
+     * network and is activated and connected.
+     *
+     * @return a list of network indices of all connected networks
+     */
+    Collection<Integer> getConnectedNetworkIndices();
+
+    /**
+     * @return the networkIndex
+     */
+    int getNetworkIndex();
+
+    /**
+     * @param networkIndex the networkIndex to set
+     */
+    void setNetworkIndex(int networkIndex);
     
 }

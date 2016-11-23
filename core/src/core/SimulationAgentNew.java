@@ -160,9 +160,9 @@ public class SimulationAgentNew extends BasePeerlet implements SimulationAgentIn
                 folder.mkdir();
                 clearOutputFiles(new File(experimentOutputFilesLocation));
                 
-                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
+          //      topologyLoader=new TopologyLoader(flowNetwork, columnSeparator);
                 flowLoader=new FlowLoaderNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
+            //    topologyWriter = new TopologyWriter(flowNetwork, columnSeparator);
                 flowWriter = new FlowWriterNew(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                 eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                                 
