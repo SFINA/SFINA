@@ -137,6 +137,8 @@ public class SimulationAgentNewNew extends BasePeerlet implements SimulationAgen
     public void progressToNextStep() {
         this.runActiveState();
     }
+    
+    
 
     @Override
     public int getIdentifier() {
@@ -193,7 +195,7 @@ public class SimulationAgentNewNew extends BasePeerlet implements SimulationAgen
                 executeAllEvents();
                 
                 runFlowAnalysis();
-
+                    
                 runFinalOperations();
                 
                 getCommunicationAgent().agentFinishedStep();
