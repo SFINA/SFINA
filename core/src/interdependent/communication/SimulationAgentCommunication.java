@@ -59,7 +59,7 @@ import protopeer.util.quantities.Time;
  *
  * @author root
  */
-public class SimulationAgentCommunication extends BasePeerlet implements SimulationAgentCommunicationInterface, CommunicationAgentInterface.MessageReceiver{
+public class SimulationAgentCommunication extends BasePeerlet implements SimulationAgentCommunicationInterface, CommunicationAgentInterface.MessageReceiver, TimeSteppingAgentInterface.CommandReceiver{
     
     private static final Logger logger = Logger.getLogger(SimulationAgentCommunication.class);
 
@@ -103,6 +103,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     private ArrayList<Event> events;
     
     private CommunicationAgentInterface communicationAgent;
+    private TimeSteppingAgentInterface timeSteppingAgent;
     
     public SimulationAgentCommunication(
             String experimentID,
@@ -187,7 +188,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
                 scheduleMeasurements();
                 
                 //new line added
-                getCommunicationAgent().agentFinishedStep();
+                getTimeSteppingAgent().agentFinishedStep();
                
             }
         });
@@ -235,7 +236,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
             public void timerExpired(Timer timer){
                 //initiActiveState()
           
-                runInitialOperations();
+             
                 
                 executeAllEvents();
                 
@@ -243,7 +244,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
 
                 runFinalOperations();
                 
-                getCommunicationAgent().agentFinishedStep();
+                getTimeSteppingAgent().agentFinishedStep();
             }
         });
         loadAgentTimer.schedule(this.runTime);
@@ -361,12 +362,22 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
      *          GETTER AND SETTER  
      *****************************************/
     
-      public CommunicationAgentInterface getCommunicationAgent(){
+    public CommunicationAgentInterface getCommunicationAgent(){
         if(this.communicationAgent == null){
             this.communicationAgent = (CommunicationAgentInterface) getPeer().getPeerletOfType(CommunicationAgentInterface.class);
         }
          return this.communicationAgent;
     }
+    
+    public TimeSteppingAgentInterface getTimeSteppingAgent(){
+       
+        if(this.timeSteppingAgent == null){
+            this.timeSteppingAgent = (TimeSteppingAgentInterface) getPeer().getPeerletOfType(CommunicationAgentInterface.class);
+        }
+         return this.timeSteppingAgent;
+        
+    }
+    
     
     @Override
     public int getSimulationTime(){

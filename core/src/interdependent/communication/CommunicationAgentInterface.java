@@ -31,12 +31,12 @@ import java.util.Collections;
  */
 public interface CommunicationAgentInterface {
     
-     public final static String parameterColumnSeparator="=";
-    
- 
-     public static String getParameterColumnSeparator() {
-        return parameterColumnSeparator;
-    }
+//     public final static String parameterColumnSeparator="=";
+//    
+// 
+//     public static String getParameterColumnSeparator() {
+//        return parameterColumnSeparator;
+//    }
     
     
     /*
@@ -50,24 +50,6 @@ public interface CommunicationAgentInterface {
         */
         public void injectEvents(List<Event> events);
         
-//        /**
-//         * Notifies the Message Receiver, that it has to initialise (bootstrap) itself.
-//         * This Method gets called, when CommunicationAgent did its own Bootstrapping
-//         */
-//        public void initialise();
-              
-        /**
-         * Notifies the Message Receiver, that it can proceed to the next time step
-         * This will happen if and only if the Communication Agent got an EventMessage and an FinishedStepMessage 
-         * from all the connected Networks of this receiver
-         */
-        public void progressToNextTimeStep();
-        
-        /**
-         * Notifies the Message Receiver, that something changed and that it has 
-         * to redo its caluclations
-         */
-        public void redoIteration();
                      
         /**
          * gets an Identifier from the Receiver, which is globally representative for the network of the receiver
@@ -81,11 +63,6 @@ public interface CommunicationAgentInterface {
          */
         public Collection<Integer> getConnectedNetwork();
     }
-//    /*
-//    Handling
-//    */
-//    public void registerMessageReceiver(MessageReceiver listener);
-//    public void removeMessageReceiver(MessageReceiver listener);
     /**
      * 
      * @param event
@@ -93,121 +70,10 @@ public interface CommunicationAgentInterface {
      */
     public void sendEvent(Event event, int identifier);
     
-    public void agentFinishedStep();
     
-    /*
-    Former Communication
-    */
-   // public void runBootstraping();
-    
-    
-    
-    
-    
-//    
-//    /**
-//    Getter and Setter
-//    * 
-//    ***/
-//    /**
-//     * @return the experimentInputFilesLocation
-//     */
-//    public String getExperimentBaseFolderLocation();
-//    /**
-//     * @return the time token, i.e. time_x for current time x
-//     */
-//    public String getTimeToken();
-//    
-//    /**
-//     * @param timeToken
-//     */
-//    public void setTimeToken(String timeToken);
-//    
-//    /**
-//     * @return the time token name, i.e. probably "time_"
-//     */
-//    public String getTimeTokenName();
-//    
-//    /**
-//     * @return the peerToken
-//     */
-//    public String getPeerToken();
-//
-//    /**
-//     * @param aPeerToken the peerToken to set
-//     */
-//    public void setPeerToken(String aPeerToken);
-//    
-//    /**
-//     *
-//     * @return
-//     */
-//    public String getMissingValue();
-//    
-//    /**
-//     *
-//     * @return
-//     */
-//    public String getColumnSeparator();
-//    
-//    /**
-//     * @return the linksLocation
-//     */
-//    public String getLinksLocation();
-//
-//    /**
-//     * @return the linksFlowLocation
-//     */
-//    public String getLinksFlowLocation();
-//    
-//    
-//     public String getExperimentID();
-//
-// 
-//    public Time getBootstrapTime();
-//       
-//    public void setBootstrapTime(Time bootstrapTime);
-//    
-//    
-//    public int getSimulationTime();
-//    
-//     public String getExperimentInputFilesLocation();
-//
-//
-//
-//    public String getExperimentOutputFilesLocation();
-//
-//
-//
-//    public String getEventsInputLocation();
-//
-//
-//
-//    public String getEventsOutputLocation();
-//
-//
-//
-//    public String getPeerTokenName();
+  //  public Map<Integer, NetworkAddress> getExternalMessageLocations();
 
 
-
-    public Map<Integer, NetworkAddress> getExternalMessageLocations();
-
-    
-//    
-//    public String getNodesLocation();
-//
-//   
-//
-//    public String getNodesFlowLocation();
-//    
-//    public Time getRunTime();
-//    
-//    public String getSfinaParamLocation();
-//
-//    public String getBackendParamLocation();
-//    
-   
     
         
        

@@ -40,7 +40,7 @@ import protopeer.network.NetworkAddress;
  *
  * @author root
  */
-public class CommunicationAgent extends BasePeerlet implements CommunicationAgentInterface {
+public class CommunicationAgent extends SimpleTimeSteppingAgent implements CommunicationAgentInterface {
 
     protected final static int POST_ADDRESS_CHANGE = 0;
     protected final static int POST_AGENT_IS_READY = 1;
@@ -53,9 +53,11 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationAgen
     private List<Integer> externalNetworksSendEvent;
     private int totalNumberNetworks;
     private CommunicationAgentInterface.MessageReceiver messageReceiver;
+    private boolean bootstrapingFinished = false;
     private boolean agentIsReady =false;
     private NetworkAddress networkAddress;
     private Peer peer; 
+
     
     /**************************************************
      *             CONSTRUCTORS
@@ -113,7 +115,9 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationAgen
      
         //check if its a SFINA Message
         if(message instanceof AbstractSfinaMessage){
+            
             AbstractSfinaMessage sfinaMessage = (AbstractSfinaMessage) message;
+            
             switch(sfinaMessage.getMessageType()){
                 case SfinaMessageInterface.EVENT_MESSAGE:
                     if(this.messageReceiver != null){
@@ -177,7 +181,7 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationAgen
              this.externalNetworksSendEvent.clear();
              this.agentIsReady = false;
              
-             getMessageReceiver().progressToNextTimeStep();
+             getCommandReceiver().progressToNextTimeStep();
         }
          
      }
@@ -189,9 +193,6 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationAgen
                  this.externalNetworksSendEvent.containsAll(identifiers) &&
                          this.agentIsReady;
      }
-    
-    
-    
     
      
     /**************************************************
@@ -215,16 +216,27 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationAgen
     @Override
     public void agentFinishedStep() {
         
-        this.agentIsReady = true;
-         FinishedStepMessage message = new FinishedStepMessage(getMessageReceiver().getNetworkIdentifier());
-         
-         Collection<Integer> identifiers = getMessageReceiver().getConnectedNetwork();
-         for(int i: identifiers){
-             NetworkAddress address = this.externalMessageLocations.get(i);
-             this.peer.sendMessage(address, message); 
+        if(!this.bootstrapingFinished){
+            this.bootstrapingFinished = true;
+            this.agentIsReady = false;
+            getCommandReceiver().progressToNextTimeStep();
+        }else{
+            // mark that agent is ready
+            this.agentIsReady = true;
+            
+            // inform other Communication Agents
+             FinishedStepMessage message = new FinishedStepMessage(getMessageReceiver().getNetworkIdentifier());
+             Collection<Integer> identifiers = getMessageReceiver().getConnectedNetwork();
+             for(int i: identifiers){
+                 NetworkAddress address = this.externalMessageLocations.get(i);
+                 this.peer.sendMessage(address, message); 
+            }
+             
+             // TODO: here new EVENTS should be send
+             
+            // post process the communication
+            this.postProcessCommunication(POST_AGENT_IS_READY);
         }
-        
-        this.postProcessCommunication(POST_AGENT_IS_READY);
     }
     public MessageReceiver getMessageReceiver(){
         if(messageReceiver == null){
@@ -233,176 +245,8 @@ public class CommunicationAgent extends BasePeerlet implements CommunicationAgen
         return messageReceiver;
     }
     
-    /************************************************
-     *              GETTER AND SETTER
-     ************************************************/
-    public Map<Integer, NetworkAddress> getExternalMessageLocations() {
-        return externalMessageLocations;
-    }
     
     
-    
-    
-    
-    
-    
-    
-    /*----------------------------------------------------------*/
-    //          OLD     OLD     OLD     OLD     OLD     OLD
-    
-    /**
-       UTILILTY FUNCTIONS
-    **/
-    
-//     /**
-//     * It clears the directory with the output files.
-//     * 
-//     * @param experiment 
-//     */
-//    private static void clearOutputFiles(File experiment){
-//        File[] files = experiment.listFiles();
-//        if(files!=null) { //some JVMs return null for empty dirs
-//            for(File f: files) {
-//                if(f.isDirectory()) {
-//                    clearOutputFiles(f);
-//                } else {
-//                    f.delete();
-//                }
-//            }
-//        }
-//        experiment.delete();
-//    }
-//    
-//     /**
-//     * Load parameters determining file system structure from conf/fileSystem.conf
-//     * @param location
-//     */
-//    public void loadFileSystem(String location){
-//        String inputDirectoryName=null;
-//        String outputDirectoryName=null;
-//        String topologyDirectoryName=null;
-//        String flowDirectoryName=null;
-//        String configurationFilesLocation=null;
-//        String eventsFileName=null;
-//        String sfinaParamFileName=null;
-//        String backendParamFileName=null;
-//        String nodesFileName=null;
-//        String linksFileName=null;
-//        File file = new File(location);
-//        Scanner scr = null;
-//        try {
-//            scr = new Scanner(file);
-//            while(scr.hasNext()){
-//                StringTokenizer st = new StringTokenizer(scr.next(), parameterColumnSeparator);
-//                switch(st.nextToken()){
-//                    case "columnSeparator":
-//                        this.columnSeparator=st.nextToken();
-//                        break;
-//                    case "missingValue":
-//                        this.missingValue=st.nextToken();
-//                        break;
-//                    case "timeTokenName":
-//                        this.timeTokenName=st.nextToken();
-//                        break;
-//                    case "inputDirectoryName":
-//                        inputDirectoryName=st.nextToken();
-//                        break;
-//                    case "outputDirectoryName":
-//                        outputDirectoryName=st.nextToken();
-//                        break;
-//                    case "topologyDirectoryName":
-//                        topologyDirectoryName=st.nextToken();
-//                        break;
-//                    case "flowDirectoryName":
-//                        flowDirectoryName=st.nextToken();
-//                        break;
-//                    case "configurationFilesLocation":
-//                        configurationFilesLocation=st.nextToken();
-//                        break;
-//                    case "eventsFileName":
-//                        eventsFileName=st.nextToken();
-//                        break;
-//                    case "sfinaParamFileName":
-//                        sfinaParamFileName=st.nextToken();
-//                        break;
-//                    case "backendParamFileName":
-//                        backendParamFileName=st.nextToken();
-//                        break;
-//                    case "nodesFileName":
-//                        nodesFileName=st.nextToken();
-//                        break;
-//                    case "linksFileName":
-//                        linksFileName=st.nextToken();
-//                        break;
-//                    default:
-//                        logger.debug("File system parameter couldn't be recognized.");
-//                }
-//            }
-//        }
-//        catch (FileNotFoundException ex){
-//            ex.printStackTrace();
-//        }
-//        this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
-//        this.peerTokenName = "/"+peerToken+"-"+getPeer().getIndexNumber();
-//        this.experimentBaseFolderLocation=configurationFilesLocation+experimentID;
-//        this.experimentInputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+inputDirectoryName;
-//        this.experimentOutputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+outputDirectoryName;
-//        this.eventsInputLocation=experimentInputFilesLocation+eventsFileName;
-//        this.eventsOutputLocation=experimentOutputFilesLocation+eventsFileName;
-//        this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
-//        this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
-//        this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
-//        this.linksLocation="/"+topologyDirectoryName+linksFileName;
-//        this.nodesFlowLocation="/"+flowDirectoryName+nodesFileName;
-//        this.linksFlowLocation="/"+flowDirectoryName+linksFileName;
-//    }
-//    
-//    
-//     //****************** MEASUREMENTS ******************
-//    
-//    /**
-//     * Scheduling the measurements for the simulation agent
-//     */
-//    public void scheduleMeasurements(){
-//        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+experimentID+peerTokenName));
-//        getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
-//            public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-//                logger.debug("---> Measuring peer" + getPeer().getIndexNumber());
-//                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
-//                log.shrink(epochNumber, epochNumber+1);
-//            }
-//        });
-//    }
-//
-//    /**
-//     * GETTER, SETTER AND ONE LINER
-//     */
-//
-//    /**
-//     * @return the peersLogDirectory
-//     */
-//    public String getPeersLogDirectory() {
-//        return peersLogDirectory;
-//    }
-//
-//    /**
-//     * @return the measurementDumper
-//     */
-//    public MeasurementFileDumper getMeasurementDumper() {
-//        return measurementDumper;
-//    }
-//    
-//    /**
-//     * @param measurementDumper the measurementDumper to set
-//     */
-//    public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
-//        this.measurementDumper = measurementDumper;
-//    }
-//   
-//  
-//    
-//
-//  
 
-  
+   
 }
