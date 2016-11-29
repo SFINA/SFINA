@@ -21,13 +21,12 @@ import protopeer.BasePeerlet;
 
 /**
  *
- * @author root
+ * @author mcb
  */
 public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface {
 
     private CommandReceiver commandReceiver;
-   
-      
+       
     @Override
     public void agentFinishedStep() {
         getCommandReceiver().progressToNextTimeStep();

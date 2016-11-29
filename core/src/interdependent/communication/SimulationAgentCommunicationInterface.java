@@ -26,7 +26,7 @@ import protopeer.network.Message;
 
 /**
  *
- * @author root
+ * @author mcb
  */
 public interface SimulationAgentCommunicationInterface {
     void runBootstraping();

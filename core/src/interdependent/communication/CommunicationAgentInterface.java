@@ -30,15 +30,6 @@ import java.util.Collections;
  * @author mcb
  */
 public interface CommunicationAgentInterface {
-    
-//     public final static String parameterColumnSeparator="=";
-//    
-// 
-//     public static String getParameterColumnSeparator() {
-//        return parameterColumnSeparator;
-//    }
-    
-    
     /*
         Receives Messages from the Communication Agent
     */
@@ -69,12 +60,5 @@ public interface CommunicationAgentInterface {
      * @param identifier 
      */
     public void sendEvent(Event event, int identifier);
-    
-    
-  //  public Map<Integer, NetworkAddress> getExternalMessageLocations();
-
-
-    
-        
-       
+          
 }

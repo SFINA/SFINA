@@ -57,7 +57,7 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author root
+ * @author mcb
  */
 public class SimulationAgentCommunication extends BasePeerlet implements SimulationAgentCommunicationInterface, CommunicationAgentInterface.MessageReceiver, TimeSteppingAgentInterface.CommandReceiver{
     

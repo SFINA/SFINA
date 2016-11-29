@@ -38,7 +38,7 @@ import protopeer.network.NetworkAddress;
 
 /**
  *
- * @author root
+ * @author McB
  */
 public class CommunicationAgent extends SimpleTimeSteppingAgent implements CommunicationAgentInterface {
 
