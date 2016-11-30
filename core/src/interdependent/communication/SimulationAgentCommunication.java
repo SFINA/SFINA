@@ -372,7 +372,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     public TimeSteppingAgentInterface getTimeSteppingAgent(){
        
         if(this.timeSteppingAgent == null){
-            this.timeSteppingAgent = (TimeSteppingAgentInterface) getPeer().getPeerletOfType(CommunicationAgentInterface.class);
+            this.timeSteppingAgent = (TimeSteppingAgentInterface) getPeer().getPeerletOfType(TimeSteppingAgentInterface.class);
         }
          return this.timeSteppingAgent;
         

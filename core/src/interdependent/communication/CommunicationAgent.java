@@ -38,7 +38,7 @@ import protopeer.network.NetworkAddress;
 
 /**
  *
- * @author McB
+ * @author mcb
  */
 public class CommunicationAgent extends SimpleTimeSteppingAgent implements CommunicationAgentInterface {
 
@@ -47,7 +47,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent implements Commu
     protected final static int POST_FINISHED_STEP = 2;
     protected final static int POST_EVENT_SEND = 3;
     
-    private static final Logger logger = Logger.getLogger(CommunicationAgent_old.class);
+    private static final Logger logger = Logger.getLogger(CommunicationAgent.class);
     private Map<Integer, NetworkAddress> externalMessageLocations; 
     private List<Integer> externalNetworksFinishedStep;    
     private List<Integer> externalNetworksSendEvent;
@@ -83,7 +83,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent implements Commu
     public void stop() {
         super.stop(); //To change body of generated methods, choose Tools | Templates.
         NetworkAddressMessage message = new NetworkAddressMessage(messageReceiver.getNetworkIdentifier(), this.networkAddress, true);
-        peer.broadcastMessage(message);
+       // peer.broadcastMessage(message);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent implements Commu
         //todo notify about networkaddress change
         //decide if broadcast or only to those in externalLocations
         NetworkAddressMessage message = new NetworkAddressMessage(this.messageReceiver.getNetworkIdentifier(), this.networkAddress);
-        peer.broadcastMessage(message);
+      //  peer.broadcastMessage(message);
                 
     }
     @Override
@@ -187,10 +187,10 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent implements Commu
      }
      
      public boolean readyToProgress(){
-          Collection<Integer> identifiers = getMessageReceiver().getConnectedNetwork();
+         // Collection<Integer> identifiers = getMessageReceiver().getConnectedNetwork();
           //TBD: progress when all Finished step or when connected?
         return this.externalNetworksFinishedStep.size()==(this.totalNumberNetworks-1) && 
-                 this.externalNetworksSendEvent.containsAll(identifiers) &&
+                this.externalNetworksSendEvent.size() == (this.totalNumberNetworks-1) &&
                          this.agentIsReady;
      }
     
@@ -215,7 +215,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent implements Commu
  
     @Override
     public void agentFinishedStep() {
-        
+        // only executed once, so that bootstrapping can immediately 
         if(!this.bootstrapingFinished){
             this.bootstrapingFinished = true;
             this.agentIsReady = false;
