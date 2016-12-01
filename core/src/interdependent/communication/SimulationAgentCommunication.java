@@ -17,6 +17,7 @@
  */
 package interdependent.communication;
 
+import interdependent.communication.Archive.CommunicationAgentInterface;
 import backend.FlowDomainAgent;
 import core.SimulationAgentInterface;
 import dsutil.protopeer.FingerDescriptor;
@@ -59,7 +60,7 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class SimulationAgentCommunication extends BasePeerlet implements SimulationAgentCommunicationInterface, CommunicationAgentInterface.MessageReceiver, TimeSteppingAgentInterface.CommandReceiver{
+public class SimulationAgentCommunication extends BasePeerlet implements SimulationAgentCommunicationInterface,  TimeSteppingAgentInterface.CommandReceiver{
     
     private static final Logger logger = Logger.getLogger(SimulationAgentCommunication.class);
 
@@ -179,16 +180,16 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
                 folder.mkdir();
                 clearOutputFiles(new File(experimentOutputFilesLocation));
                 
-                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, getNetworkIdentifier());
+                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, getNetworkIndex());
                 flowLoader=new FlowLoader(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, getNetworkIdentifier());
+                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, getNetworkIndex());
                 flowWriter = new FlowWriter(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                 eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                                 
                 scheduleMeasurements();
                 
                 //new line added
-                getTimeSteppingAgent().agentFinishedStep();
+                getTimeSteppingAgent().agentFinishedStep(getEvents());
                
             }
         });
@@ -236,15 +237,19 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
             public void timerExpired(Timer timer){
                 //initiActiveState()
           
-             
+             //TBD where to inject events??
                 
                 executeAllEvents();
                 
                 runFlowAnalysis();
 
                 runFinalOperations();
+                // Discuss with Ben if correct order, seems to be, first output gets saved,
+                // then iteration is increased, assumes that resetIteration() sets counter to 1
+                // Ben should look at the current logic flow
+                nextIteration();
                 
-                getTimeSteppingAgent().agentFinishedStep();
+                getTimeSteppingAgent().agentFinishedStep(getEvents());
             }
         });
         loadAgentTimer.schedule(this.runTime);
@@ -254,7 +259,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
      */
     public void initActiveState(){
         this.timeToken = this.timeTokenName + this.getSimulationTime();
-        logger.info("\n--------------> " + this.timeToken + " at network " + this.getNetworkIdentifier()+ " <--------------");
+        logger.info("\n--------------> " + this.timeToken + " at network " + this.getNetworkIndex()+ " <--------------");
         resetIteration();        
         loadInputData(timeToken);   
     }
@@ -286,9 +291,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
-        //here?
-        nextIteration();
-        
+             
     }
      
     @Override
@@ -328,11 +331,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     /*****************************************************
      *          MESSAGE RECEIVER METHODS 
      * ****************************************************/
-    
-     @Override
-    public void injectEvents(List<Event> events) {
-       this.queueEvents(events);
-    }
+   
     
       @Override
     public void progressToNextTimeStep() {
@@ -343,16 +342,17 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     @Override
     public void redoIteration() {
         this.runActiveState();
+     
     }
     
     
     @Override
-    public int getNetworkIdentifier() {
+    public int getNetworkIndex() {
         return this.getFlowNetwork().getNetworkIndex(); 
     }
 
     @Override
-    public Collection<Integer> getConnectedNetwork() {
+    public Collection<Integer> getConnectedNetworkIndices() {
         return this.getFlowNetwork().getConnectedNetworkIndices();
     }
     

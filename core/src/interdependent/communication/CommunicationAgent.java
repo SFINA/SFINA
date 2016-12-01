@@ -1,5 +1,9 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 201    @Override
+    public long toLongValue() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+6 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +21,7 @@
  */
 package interdependent.communication;
 
+import interdependent.communication.Archive.CommunicationAgentInterface;
 import event.Event;
 
 import interdependent.communication.Messages.AbstractSfinaMessage;
@@ -31,222 +36,331 @@ import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import protopeer.BasePeerlet;
+import protopeer.Finger;
+import protopeer.NeighborManager;
 import protopeer.Peer;
+import protopeer.network.IntegerNetworkAddress;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
-
+import protopeer.time.Timer;
+import protopeer.time.TimerListener;
 
 /**
  *
  * @author mcb
  */
-public class CommunicationAgent extends SimpleTimeSteppingAgent implements CommunicationAgentInterface {
+public class CommunicationAgent extends SimpleTimeSteppingAgent {
 
     protected final static int POST_ADDRESS_CHANGE = 0;
     protected final static int POST_AGENT_IS_READY = 1;
     protected final static int POST_FINISHED_STEP = 2;
     protected final static int POST_EVENT_SEND = 3;
-    
+
     private static final Logger logger = Logger.getLogger(CommunicationAgent.class);
-    private Map<Integer, NetworkAddress> externalMessageLocations; 
-    private List<Integer> externalNetworksFinishedStep;    
+    private Map<Integer, NetworkAddress> externalMessageLocations;
+    private List<Integer> externalNetworksFinishedStep;
     private List<Integer> externalNetworksSendEvent;
     private int totalNumberNetworks;
-    private CommunicationAgentInterface.MessageReceiver messageReceiver;
+    private SimulationAgentCommunicationInterface simulationAgent;
     private boolean bootstrapingFinished = false;
-    private boolean agentIsReady =false;
+    private boolean agentIsReady = false;
     private NetworkAddress networkAddress;
-    private Peer peer; 
+    private Peer peer;
 
-    
-    /**************************************************
-     *             CONSTRUCTORS
-     **************************************************/
-    public CommunicationAgent(int totalNumberNetworks){
+    private Timer initialDelayTimer;
+
+    /**
+     * ************************************************
+     * CONSTRUCTORS
+     *************************************************
+     */
+    public CommunicationAgent(int totalNumberNetworks) {
         //previously SimulationAgent
 //        this.experimentID=experimentID;
 //        this.bootstrapTime=bootstrapTime;
 //        this.runTime=runTime;
-       
+
         // this();
-        this.externalMessageLocations = new HashMap();      
+        this.externalMessageLocations = new HashMap();
         this.totalNumberNetworks = totalNumberNetworks;
         this.externalNetworksFinishedStep = new ArrayList<>();
         this.externalNetworksSendEvent = new ArrayList<>();
     }
-    
-    /*****************************************
-            Base Peerlet Functions
-    *******************************************/    
-  
+
+    /**
+     * ***************************************
+     * Base Peerlet Functions
+    ******************************************
+     */
     @Override
     public void stop() {
         super.stop(); //To change body of generated methods, choose Tools | Templates.
-        NetworkAddressMessage message = new NetworkAddressMessage(messageReceiver.getNetworkIdentifier(), this.networkAddress, true);
-       // peer.broadcastMessage(message);
+//        NetworkAddressMessage message = new NetworkAddressMessage(simulationAgent.getNetworkIndex(), this.networkAddress, true);
+//        peer.broadcastMessage(message);
     }
 
     @Override
     public void start() {
         super.start(); //To change body of generated methods, choose Tools | Templates.
-        NetworkAddress oldAddress = this.networkAddress;
-        /*
-        test if networkaddress can be used in this way, does it implement necessary interfaces?
-        */
-        if(oldAddress == null || !oldAddress.equals(getPeer().getNetworkAddress())){
-            this.networkAddress = getPeer().getNetworkAddress();
-        }
-        // notify all as during stop also everyon got notified
-        //todo notify about networkaddress change
-        //decide if broadcast or only to those in externalLocations
-        NetworkAddressMessage message = new NetworkAddressMessage(this.messageReceiver.getNetworkIdentifier(), this.networkAddress);
-      //  peer.broadcastMessage(message);
-                
+        
+       
+        //first not needed as addresses are hard coded
+//        NetworkAddress oldAddress = this.networkAddress;
+//        /*
+//        test if networkaddress can be used in this way, does it implement necessary interfaces?
+//         */
+//        if (oldAddress == null || !oldAddress.equals(getPeer().getNetworkAddress())) {
+//            this.networkAddress = getPeer().getNetworkAddress();
+//        }
+//        // notify all as during stop also everyon got notified
+//        //todo notify about networkaddress change
+//        //decide if broadcast or only to those in externalLocations
+//        NetworkAddressMessage message = new NetworkAddressMessage(this.simulationAgent.getNetworkIndex(), this.networkAddress);
+//
+//        sendMessageToNeighbors(message);
+        //this.peer.broadcastMessage(message); does not work, as it is not implemented by protopeer
+
     }
+
     @Override
     public void init(Peer peer) {
         super.init(peer); //To change body of generated methods, choose Tools | Templates.
         this.peer = peer;
-        this.messageReceiver =(MessageReceiver) peer.getPeerletOfType(MessageReceiver.class); 
+        this.simulationAgent = (SimulationAgentCommunicationInterface) peer.getPeerletOfType(SimulationAgentCommunicationInterface.class);
+
+     
     }
-        
+
     @Override
     public void handleIncomingMessage(Message message) {
-     
+
         //check if its a SFINA Message
-        if(message instanceof AbstractSfinaMessage){
-            
+        if (message instanceof AbstractSfinaMessage) {
+
             AbstractSfinaMessage sfinaMessage = (AbstractSfinaMessage) message;
-            
-            switch(sfinaMessage.getMessageType()){
+
+            switch (sfinaMessage.getMessageType()) {
                 case SfinaMessageInterface.EVENT_MESSAGE:
-                    if(this.messageReceiver != null){
+                    if (this.simulationAgent != null) {
                         //TBD: Maybe Collect, or runtime etc.? has to be discussed
-                        messageReceiver.injectEvents(((EventMessageNew) sfinaMessage).getEvents());
+                        simulationAgent.queueEvents(((EventMessageNew) sfinaMessage).getEvents());
                     }
                     this.externalNetworksSendEvent.add(sfinaMessage.getNetworkIdentifier());
                     postProcessCommunication(POST_EVENT_SEND);
-                    break;    
+                    break;
                 case SfinaMessageInterface.NETWORK_ADDRES_CHANGE:
                     NetworkAddressMessage netMessage = (NetworkAddressMessage) sfinaMessage;
-                    
-                     int id = netMessage.getNetworkIdentifier();
+
+                    int id = netMessage.getNetworkIdentifier();
                     NetworkAddress address = netMessage.getAddress();
-                    if(netMessage.isStopped())
-                        this.externalMessageLocations.remove(netMessage.getNetworkIdentifier());
-                    else
+
+                    // Network Messages have to be propergated, as no broadcasting function exists
+                    if (netMessage.isStopped()) {
+                        this.externalMessageLocations.remove(netMessage.getNetworkIdentifier());    
+                    }else {
                         externalMessageLocations.put(id, address);
+                    }
                     postProcessCommunication(POST_ADDRESS_CHANGE);
+
                     break;
                 case SfinaMessageInterface.FINISHED_STEP:
                     this.externalNetworksFinishedStep.add(sfinaMessage.getNetworkIdentifier());
                     postProcessCommunication(POST_FINISHED_STEP);
                     break;
                 default:
-                    
+
             }
         }
 
     }
-    
-    /******** COMMUNICATION HELPER **********************************/
-    
-     protected void postProcessCommunication(int typeOfPost){
-         // each time something changes this function should be called 
-         // handles necessary further steps
-         
-         //1. after networkAddress change message, do case evaluation and start agent etc.
-         switch(typeOfPost){
-             case POST_ADDRESS_CHANGE:
-                 break;
-             case POST_AGENT_IS_READY:
-                 checkAndNextStep();
-                 break;
-             case POST_EVENT_SEND:
-                 checkAndNextStep();
-                 break;
-             case POST_FINISHED_STEP:
-                 checkAndNextStep();
-                 break;
-             default:
-      
-         }
-        
-    }
-    
-     public void checkAndNextStep(){
-         if(readyToProgress()){
-             
-             this.externalNetworksFinishedStep.clear();
-             this.externalNetworksSendEvent.clear();
-             this.agentIsReady = false;
-             
-             getCommandReceiver().progressToNextTimeStep();
+
+    /**
+     * ****** COMMUNICATION HELPER *********************************
+     */
+    protected void postProcessCommunication(int typeOfPost) {
+        // each time something changes this function should be called 
+        // handles necessary further steps
+
+        //1. after networkAddress change message, do case evaluation and start agent etc.
+        switch (typeOfPost) {
+            case POST_ADDRESS_CHANGE:
+                break;
+            case POST_AGENT_IS_READY:
+                checkAndNextStep();
+                break;
+            case POST_EVENT_SEND:
+                checkAndNextStep();
+                break;
+            case POST_FINISHED_STEP:
+                checkAndNextStep();
+                break;
+            default:
+
         }
-         
-     }
-     
-     public boolean readyToProgress(){
-         // Collection<Integer> identifiers = getMessageReceiver().getConnectedNetwork();
-          //TBD: progress when all Finished step or when connected?
-        return this.externalNetworksFinishedStep.size()==(this.totalNumberNetworks-1) && 
-                this.externalNetworksSendEvent.size() == (this.totalNumberNetworks-1) &&
-                         this.agentIsReady;
-     }
-    
-     
-    /**************************************************
-     *          Communication Agent Functions
-     *************************************************/
-    
+
+    }
+
+    public void checkAndNextStep() {
+        if (readyToProgress()) {
+
+            this.externalNetworksFinishedStep.clear();
+            this.externalNetworksSendEvent.clear();
+            this.agentIsReady = false;
+
+            getCommandReceiver().progressToNextTimeStep();
+        }
+
+    }
+
+    public boolean readyToProgress() {
+        // Collection<Integer> identifiers = getSimulationAgent().getConnectedNetwork();
+        //TBD: is this condition enough: it does not check for which keys exactly are inside
+        return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
+                && (this.externalNetworksSendEvent.size() == getSimulationAgent().getConnectedNetworkIndices().size())
+                && this.agentIsReady;
+    }
+
+    /**
+     * ************************************************
+     * Communication Agent Functions
+     ************************************************
+     */
+//    @Override
+//    public void sendEvent(Event event, int identifier) {
+//
+//        /*
+//        Should be collected? Or what should happen?
+//         */
+//        NetworkAddress address = this.externalMessageLocations.get(identifier);
+//        EventMessageNew message = new EventMessageNew(getSimulationAgent().getNetworkIndex(), event);
+//
+//        if (address != null) {
+//            this.peer.sendMessage(address, message);
+//        }
+//
+//    }
+
     @Override
-    public void sendEvent(Event event, int identifier) {
-        
-       /*
-        Should be collected? Or what should happen?
-        */ 
-       NetworkAddress address = this.externalMessageLocations.get(identifier); 
-       EventMessageNew message = new EventMessageNew(getMessageReceiver().getNetworkIdentifier(),event);
-      
-       if(address != null)
-            this.peer.sendMessage(address, message);
-      
-    }  
- 
-    @Override
-    public void agentFinishedStep() {
+    public void agentFinishedStep(List<Event> events) {
         // only executed once, so that bootstrapping can immediately 
-        if(!this.bootstrapingFinished){
+       
+        this.externalMessageLocations = getConnectedExternalNetworkAddresses();
+        if (!this.bootstrapingFinished) {
             this.bootstrapingFinished = true;
             this.agentIsReady = false;
+            
             getCommandReceiver().progressToNextTimeStep();
-        }else{
+        } else {
             // mark that agent is ready
             this.agentIsReady = true;
-            
+
             // inform other Communication Agents
-             FinishedStepMessage message = new FinishedStepMessage(getMessageReceiver().getNetworkIdentifier());
-             Collection<Integer> identifiers = getMessageReceiver().getConnectedNetwork();
-             for(int i: identifiers){
-                 NetworkAddress address = this.externalMessageLocations.get(i);
-                 this.peer.sendMessage(address, message); 
+            FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex());
+            sendToAll(message);
+            
+            EventMessageNew eventMessage = new EventMessageNew(getSimulationAgent().getNetworkIndex(), events);
+            Collection<Integer> identifiers = getSimulationAgent().getConnectedNetworkIndices();
+            for (int i : identifiers) {
+                NetworkAddress address = this.externalMessageLocations.get(i);
+                this.peer.sendMessage(address, eventMessage);
             }
-             
-             // TODO: here new EVENTS should be send
-             
+
+            
+            // TODO: here new EVENTS should be send
             // post process the communication
             this.postProcessCommunication(POST_AGENT_IS_READY);
         }
     }
-    public MessageReceiver getMessageReceiver(){
-        if(messageReceiver == null){
-            messageReceiver=(MessageReceiver) getPeer().getPeerletOfType(MessageReceiver.class);
+
+    public SimulationAgentCommunicationInterface getSimulationAgent() {
+        if (simulationAgent == null) {
+            simulationAgent = (SimulationAgentCommunicationInterface) getPeer().getPeerletOfType(SimulationAgentCommunicationInterface.class);
         }
-        return messageReceiver;
+        return simulationAgent;
+    }
+//
+//    private NeighborManager getNeighborManager() {
+////        if(this.neighborManager == null){
+////            this.neighborManager = (NeighborManager) getPeer().getPeerletOfType(NeighborManager.class);
+////        }
+////        return this.neighborManager;
+//
+//        return (NeighborManager) getPeer().getPeerletOfType(NeighborManager.class);
+//    }
+
+//    private void sendMessageToNeighbors(AbstractSfinaMessage message) {
+//
+//        for (Finger neighbor : getNeighborManager().getNeighbors()) {
+//            getPeer().sendMessage(neighbor.getNetworkAddress(), message);
+//        }
+//
+//    }
+
+    private boolean netAddressIsInMap(NetworkAddressMessage netmessage) {
+
+        int id = netmessage.getNetworkIdentifier();
+        NetworkAddress address = netmessage.getAddress();
+
+        if (this.externalMessageLocations.containsKey(id) && (this.externalMessageLocations.get(id).equals(address))) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    private void sendNetworkLocation() {
+        NetworkAddress oldAddress = this.networkAddress;
+        /*
+        test if networkaddress can be used in this way, does it implement necessary interfaces?
+         */
+        if (oldAddress == null || !oldAddress.equals(getPeer().getNetworkAddress())) {
+            this.networkAddress = getPeer().getNetworkAddress();
+        }
+        // notify all as during stop also everyon got notified
+        //todo notify about networkaddress change
+        //decide if broadcast or only to those in externalLocations
+        NetworkAddressMessage message = new NetworkAddressMessage(this.simulationAgent.getNetworkIndex(), this.networkAddress);
+
+    //    sendMessageToNeighbors(message);
     }
     
+    private void sendToAll(AbstractSfinaMessage message){
+        
+    Collection<NetworkAddress> addresses = getAllExternalNetworkAddresses().values();
     
+    for(NetworkAddress address: addresses){
+        getPeer().sendMessage(address, message);
+    }
     
+    }
+    
+    private Map<Integer, NetworkAddress> getAllExternalNetworkAddresses(){
+       HashMap<Integer,NetworkAddress> retMap = new HashMap<>();
+       
+       for(int i=0; i<this.totalNumberNetworks;i++){
+           if(getPeer().getIndexNumber() == i){
+               
+           }else{
+               retMap.put(i, new IntegerNetworkAddress(i));
+           }
+       }
+       return retMap;
+    }
+    
+    private Map<Integer,NetworkAddress> getConnectedExternalNetworkAddresses(){
+        
+        Collection<Integer> indices = getSimulationAgent().getConnectedNetworkIndices();
+        Map<Integer, NetworkAddress> addressMap = getAllExternalNetworkAddresses();
+        
+        Map<Integer, NetworkAddress> returnMap = new HashMap<>();
+        
+        for(int i: indices){
+            NetworkAddress currAddress = addressMap.get(i);
+            returnMap.put(i, currAddress);
+        }
+        return returnMap;
+        
+    }
 
-   
 }

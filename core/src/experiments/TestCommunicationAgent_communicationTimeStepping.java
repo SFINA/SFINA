@@ -23,9 +23,14 @@ import interdependent.communication.SimulationAgentCommunication;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
+import protopeer.NeighborManager;
 import protopeer.Peer;
 import protopeer.PeerFactory;
 import protopeer.SimulatedExperiment;
+import protopeer.servers.bootstrap.BootstrapClient;
+import protopeer.servers.bootstrap.BootstrapServer;
+import protopeer.servers.bootstrap.SimpleConnector;
+import protopeer.servers.bootstrap.SimplePeerIdentifierGenerator;
 import protopeer.util.quantities.Time;
 
 /**
@@ -36,6 +41,7 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
     
     private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
     
+   
     private final static String expSeqNum="01";
     private static String experimentID="experiment-"+expSeqNum;
     
@@ -43,8 +49,7 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
     private final static int runDuration=6;
-    private final static int N=1;
-    
+    private final static int N=2;
     
     public static void main(String[] args) {
         Experiment.initEnvironment();
@@ -57,7 +62,17 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
 //                if (peerIndex == 0) {
 //                   newPeer.addPeerlet(null);
 //                }
-                newPeer.addPeerlet(new CommunicationAgent(1));
+//                if (peerIndex == 0) {
+//                    newPeer.addPeerlet(new BootstrapServer());
+//                }
+//                //Connection AGENTS
+//                 newPeer.addPeerlet(new NeighborManager());
+//                  newPeer.addPeerlet(new SimpleConnector());
+//                   newPeer.addPeerlet(new BootstrapClient(Experiment.getSingleton().getAddressToBindTo(0), new
+//                SimplePeerIdentifierGenerator()));
+
+                //SFINA AGENTS
+                newPeer.addPeerlet(new CommunicationAgent(N));
                 newPeer.addPeerlet(new SimulationAgentCommunication(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
@@ -66,6 +81,9 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
+               
+               
+               
                 return newPeer;
             }
         };
@@ -74,6 +92,7 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
         
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
+       
     }
     
 }

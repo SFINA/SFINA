@@ -19,6 +19,7 @@ package interdependent.communication;
 
 import backend.FlowDomainAgent;
 import event.Event;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import network.FlowNetwork;
@@ -65,19 +66,20 @@ public interface SimulationAgentCommunicationInterface {
     
     void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation);                
 
-    //should be in Message Receiver Interface
-    
-    /**
-     * Return all connected networks.
-     * A network is connected, if an interdependent link points to or from that
-     * network and is activated and connected.
-     *
-     * @return a list of network indices of all connected networks
-     */
-   // Collection<Integer> getConnectedNetworkIndices();
-
-    /**
-     * @return the networkIndex
-     */
-    //int getNetworkIndex();
+      
+                     
+       /**
+        * @return the networkIndex
+        */
+        public int getNetworkIndex();
+        
+        /**
+        * Return all connected networks.
+        * A network is connected, if an interdependent link points to or from that
+        * network and is activated and connected.
+        *
+        * @return a list of network indices of all connected networks
+        */
+        public Collection<Integer> getConnectedNetworkIndices();
+     
 }

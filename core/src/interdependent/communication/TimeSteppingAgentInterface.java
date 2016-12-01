@@ -17,6 +17,9 @@
  */
 package interdependent.communication;
 
+import event.Event;
+import java.util.List;
+
 /**
  *
  * @author McB
@@ -43,8 +46,9 @@ public interface TimeSteppingAgentInterface {
     }
     /**
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
+     * @param events
      */
-    public void agentFinishedStep();
+    public void agentFinishedStep(List<Event> events);
     
    
 }

@@ -56,6 +56,8 @@ public class NetworkAddressMessage extends AbstractSfinaMessage{
     public boolean isStopped(){
         return this.stopped;
     }
+   
+    
     
     
 }
