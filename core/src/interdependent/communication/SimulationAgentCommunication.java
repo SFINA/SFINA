@@ -103,6 +103,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     private MeasurementFileDumper measurementDumper;
     private ArrayList<Event> events;
     
+    // We don't need these two variables
     private CommunicationAgentInterface communicationAgent;
     private TimeSteppingAgentInterface timeSteppingAgent;
     
@@ -117,7 +118,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     }
     
     /***************************************************
-     * ************ BASE PEERLET FUNCTIONS
+     *               BASE PEERLET FUNCTIONS
      * *************************************************/
     
     /**
@@ -238,6 +239,8 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
                 //initiActiveState()
           
              //TBD where to inject events??
+                //Ben: They are injected when the method queueEvent or queueEvents is used.
+                // So what do you mean by "where"?
                 
                 executeAllEvents();
                 
@@ -247,6 +250,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
                 // Discuss with Ben if correct order, seems to be, first output gets saved,
                 // then iteration is increased, assumes that resetIteration() sets counter to 1
                 // Ben should look at the current logic flow
+                // Ben: Yes that's how it is implemented currently. Maybe move to redoIteration()
                 nextIteration();
                 
                 getTimeSteppingAgent().agentFinishedStep(getEvents());
@@ -269,21 +273,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
         
     }
     
-     @Override
-    public void executeAllEvents(){
-        int time = getSimulationTime();
-        logger.info("executing all events at time_" + time);
-        Iterator<Event> i = getEvents().iterator();
-        while (i.hasNext()){
-            Event event = i.next();
-            if(event.getTime() == time){
-                this.executeEvent(flowNetwork, event);
-                i.remove(); // removes event from the events list, to avoid being executed several times. this is favorable for efficiency (especially for checking islanding, however probably not necessary
-            }
-        }
-    }
-    
-     /**
+    /**
      * Performs the simulation between measurements. Handles iterations and calls the backend.
      */
     @Override
@@ -299,7 +289,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
         
     }
     
-      /**
+    /**
      * Sets iteration to 1.
      */
     public void resetIteration(){
@@ -317,11 +307,11 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     
     
     // WHAT ist this?
-     /**
-     * Load parameters determining file system structure from conf/fileSystem.conf
-     * @param location
-     */
-       @Override
+    /**
+    * Load parameters determining file system structure from conf/fileSystem.conf
+    * @param location
+    */
+    @Override
     public void runPassiveState(Message message){
         
     }
@@ -333,18 +323,18 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
      * ****************************************************/
    
     
-      @Override
+    @Override
     public void progressToNextTimeStep() {
         this.initActiveState();
         this.runActiveState();
     }
 
+    // TBD: Refactor to progressToNextIteration() or similar
+    // We could also put the nextIteration() method here, would be logically more consistent
     @Override
-    public void redoIteration() {
-        this.runActiveState();
-     
+    public void redoIteration() { 
+        this.runActiveState(); 
     }
-    
     
     @Override
     public int getNetworkIndex() {
@@ -362,6 +352,10 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
      *          GETTER AND SETTER  
      *****************************************/
     
+    // Don't need these Agent variabels, can directly use these getter methods using getPeerletOfType
+    // Then also the == null check becomes obsolete
+    // Make it as simple as possible :)
+    
     public CommunicationAgentInterface getCommunicationAgent(){
         if(this.communicationAgent == null){
             this.communicationAgent = (CommunicationAgentInterface) getPeer().getPeerletOfType(CommunicationAgentInterface.class);
@@ -378,7 +372,6 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
         
     }
     
-    
     @Override
     public int getSimulationTime(){
         return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
@@ -389,7 +382,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
         return (FlowDomainAgent)getPeer().getPeerletOfType(FlowDomainAgent.class);
     }
     
-     /**
+    /**
      * 
      * @return the network
      */
@@ -407,7 +400,8 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     public ArrayList<Event> getEvents() {
         return events;
     }
-     /**
+     
+    /**
      * 
      * @return the current iteration
      */
@@ -415,7 +409,8 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     public int getIteration(){
         return this.iteration;
     }
-     /**
+     
+    /**
      * 
      * @param iteration
      */
@@ -423,7 +418,7 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
         this.iteration=iteration;
     }
     
-     /**
+    /**
      * @return the sfinaParameters
      */
     public HashMap<SfinaParameter,Object> getSfinaParameters() {
@@ -489,8 +484,23 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
     
     
     
+    /***************************************
+     *          EVENT HANDLING
+     *****************************************/
     
-   
+    @Override
+    public void executeAllEvents(){
+        int time = getSimulationTime();
+        logger.info("executing all events at time_" + time);
+        Iterator<Event> i = getEvents().iterator();
+        while (i.hasNext()){
+            Event event = i.next();
+            if(event.getTime() == time){
+                this.executeEvent(flowNetwork, event);
+                i.remove(); // removes event from the events list, to avoid being executed several times. this is favorable for efficiency (especially for checking islanding, however probably not necessary
+            }
+        }
+    }
     
     /**
      * Executes the event if its time corresponds to the current simulation time.
@@ -642,15 +652,6 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
             logger.debug("Event not executed because defined for different time step.");
     }
      
-    
-    
-   
-  
-    
-    
-   
-  
-    
     /**
      * 
      * @param event 
@@ -707,10 +708,11 @@ public class SimulationAgentCommunication extends BasePeerlet implements Simulat
 
    
     
+    /***************************************
+     *          FILE SYSTEM AND LOADING  
+     *****************************************/
     
-    
-    /***** FILE SYSTEM, LOADING etc *******/
-     @Override
+    @Override
     public void loadFileSystem(String location){
         String inputDirectoryName=null;
         String outputDirectoryName=null;
