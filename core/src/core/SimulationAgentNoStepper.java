@@ -58,9 +58,9 @@ import protopeer.util.quantities.Time;
  *
  * @author evangelospournaras
  */
-public class SimulationAgentOld extends BasePeerlet implements SimulationAgentInterface{
+public class SimulationAgentNoStepper extends BasePeerlet implements SimulationAgentInterface{
     
-    private static final Logger logger = Logger.getLogger(SimulationAgentOld.class);
+    private static final Logger logger = Logger.getLogger(SimulationAgentNoStepper.class);
 
     private String experimentID;
     private Time bootstrapTime;
@@ -101,7 +101,7 @@ public class SimulationAgentOld extends BasePeerlet implements SimulationAgentIn
     private MeasurementFileDumper measurementDumper;
     private ArrayList<Event> events;
     
-    public SimulationAgentOld(
+    public SimulationAgentNoStepper(
             String experimentID,
             Time bootstrapTime, 
             Time runTime){

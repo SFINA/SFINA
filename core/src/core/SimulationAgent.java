@@ -17,10 +17,11 @@
  */
 package core;
 
-import interdependent.communication.Archive.CommunicationAgentInterface;
 import backend.FlowDomainAgent;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
+import event.EventType;
+import event.NetworkComponent;
 import input.EventLoader;
 import input.FlowLoader;
 import input.SfinaParameter;
@@ -185,8 +186,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                                 
                 scheduleMeasurements();
                 
-                //new line added
-                getTimeSteppingAgent().agentFinishedStep(getEvents());
+                //new line added#
+                logger.debug("##### End of bootstraping, calling agentFinishedActiveState ");
+                getTimeSteppingAgent().agentFinishedActiveState(getEvents());
                
             }
         });
@@ -227,41 +229,55 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         - runFlowAnalysis()
         - finalOperations()
      */
+    
     @Override
-    public void runActiveState(){
+    public void progressToNextTimeStep() {
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                //initiActiveState()
-          
-             //TBD where to inject events??
-                //Ben: They are injected when the method queueEvent or queueEvents is used.
-                // So what do you mean by "where"?
-                
-                executeAllEvents();
-                
-                runFlowAnalysis();
-
-                runFinalOperations();
-                // Discuss with Ben if correct order, seems to be, first output gets saved,
-                // then iteration is increased, assumes that resetIteration() sets counter to 1
-                // Ben should look at the current logic flow
-                // Ben: Yes that's how it is implemented currently. Maybe move to redoIteration()
-                nextIteration();
-                
-                getTimeSteppingAgent().agentFinishedStep(getEvents());
+                initTimeStep();
+                initIteration();
+                runActiveState(); 
             }
         });
         loadAgentTimer.schedule(this.runTime);
     }
+
+    @Override
+    public void progressToNextIteration() { 
+        this.initIteration();
+        this.runActiveState(); 
+    }
+    
+    @Override
+    public void runActiveState(){
+        executeAllEvents();
+
+        runInitialOperations();
+
+        runFlowAnalysis();
+
+        runFinalOperations();
+
+        saveOutputData();
+
+        getTimeSteppingAgent().agentFinishedActiveState(getEvents());
+            
+    }
+    
      /**
      * Initializes the active state by setting iteration = 1 and loading data.
      */
-    public void initActiveState(){
+    private void initTimeStep(){
         this.timeToken = this.timeTokenName + this.getSimulationTime();
-        logger.info("\n--------------> " + this.timeToken + " at network " + this.getNetworkIndex()+ " <--------------");
+        logger.info("\n---------------------------------------------------\n--------------> " + this.timeToken + " at network " + this.getNetworkIndex()+ " <--------------");
         resetIteration();        
         loadInputData(timeToken);   
+    }
+    
+    private void initIteration(){
+        this.iteration++;
+        logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex()+ " <-------");
     }
       
     @Override
@@ -277,7 +293,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
-             
+        // For testing if iteration advances as expected
+//        if(this.getIteration()==1)
+//            this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
     }
      
     @Override
@@ -289,48 +307,17 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * Sets iteration to 1.
      */
     public void resetIteration(){
-        this.iteration=1;
+        this.iteration=0;
     }
-    
-    /**
-     * Goes to next iteration and initiates output. First outputs network data at current iteration, then increases iteration by one.
-     * Has to be called at the end of the iteration.
-     */
-    public void nextIteration(){
-        this.saveOutputData();
-        this.iteration++;
-    }
-    
-    
-    // WHAT ist this?
-    /**
-    * Load parameters determining file system structure from conf/fileSystem.conf
-    * @param location
-    */
+
     @Override
     public void runPassiveState(Message message){
         
     }
-  
-   
-    
-    /*****************************************************
-     *          MESSAGE RECEIVER METHODS 
-     * ****************************************************/
-   
-    
-    @Override
-    public void progressToNextTimeStep() {
-        this.initActiveState();
-        this.runActiveState();
-    }
 
-    // TBD: Refactor to progressToNextIteration() or similar
-    // We could also put the nextIteration() method here, would be logically more consistent
-    @Override
-    public void redoIteration() { 
-        this.runActiveState(); 
-    }
+    /***************************************
+     *          GETTER AND SETTER  
+     *****************************************/
     
     @Override
     public int getNetworkIndex() {
@@ -341,17 +328,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     public Collection<Integer> getConnectedNetworkIndices() {
         return this.getFlowNetwork().getConnectedNetworkIndices();
     }
-    
-   
-    
-    /***************************************
-     *          GETTER AND SETTER  
-     *****************************************/
-    
-    public CommunicationAgentInterface getCommunicationAgent(){
-        return (CommunicationAgentInterface) getPeer().getPeerletOfType(CommunicationAgentInterface.class);
-    }
-    
+  
     public TimeSteppingAgentInterface getTimeSteppingAgent(){
         return (TimeSteppingAgentInterface) getPeer().getPeerletOfType(TimeSteppingAgentInterface.class);
     }

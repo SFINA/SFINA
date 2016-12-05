@@ -25,7 +25,7 @@ import java.util.List;
  * @author McB
  */
 public interface TimeSteppingAgentInterface {
-    
+
     /**
     *   SimulationAgent has to implement this to be able to communicate with the 
     *   TimeSteppingAgentInterface
@@ -42,13 +42,20 @@ public interface TimeSteppingAgentInterface {
          * Notifies the Message Receiver, that something changed and that it has 
          * to redo its caluclations
          */
-        public void redoIteration();
+        public void progressToNextIteration();
     }
+    
     /**
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
      * @param events
      */
-    public void agentFinishedStep(List<Event> events);
+    public void agentFinishedActiveState(List<Event> events);
     
+    /**
+     * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
+     * @param events
+     * @return 
+     */
+    boolean pendingEventsInQueue(List<Event> events);
    
 }

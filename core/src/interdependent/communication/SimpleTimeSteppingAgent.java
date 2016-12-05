@@ -17,8 +17,8 @@
  */
 package interdependent.communication;
 
+import core.SimulationAgentInterface;
 import event.Event;
-import interdependent.communication.Archive.CommunicationAgentInterface;
 import java.util.List;
 import protopeer.BasePeerlet;
 
@@ -27,22 +27,29 @@ import protopeer.BasePeerlet;
  * @author mcb
  */
 public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface {
-
-    private CommandReceiver commandReceiver;
-       
+   
     @Override
-    public void agentFinishedStep(List<Event> events) {
-        getCommandReceiver().progressToNextTimeStep();
+    public void agentFinishedActiveState(List<Event> events) {
+        if(pendingEventsInQueue(events))
+            getCommandReceiver().progressToNextIteration();
+        else
+            getCommandReceiver().progressToNextTimeStep();
+    }
+    
+    public SimulationAgentInterface getSimulationAgent() {
+        return (SimulationAgentInterface) getPeer().getPeerletOfType(SimulationAgentInterface.class);
     }
         
     public CommandReceiver getCommandReceiver(){
-        if(commandReceiver == null){
-            commandReceiver=(CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
-        }
-        return commandReceiver;
+        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
     }
     
-    
-    
+    @Override
+    public boolean pendingEventsInQueue(List<Event> events){
+        for(Event event: events)
+            if(event.getTime() == getSimulationAgent().getSimulationTime())
+                return true;
+        return false;
+    }
     
 }
