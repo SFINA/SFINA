@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package core;
 
 import core.SimulationAgentInterface;
 import event.Event;
-import java.util.List;
 import protopeer.BasePeerlet;
 
 /**
@@ -29,8 +28,8 @@ import protopeer.BasePeerlet;
 public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface {
    
     @Override
-    public void agentFinishedActiveState(List<Event> events) {
-        if(pendingEventsInQueue(events))
+    public void agentFinishedActiveState() {
+        if(pendingEventsInQueue())
             getCommandReceiver().progressToNextIteration();
         else
             getCommandReceiver().progressToNextTimeStep();
@@ -45,8 +44,8 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
     }
     
     @Override
-    public boolean pendingEventsInQueue(List<Event> events){
-        for(Event event: events)
+    public boolean pendingEventsInQueue(){
+        for(Event event : getSimulationAgent().getEvents())
             if(event.getTime() == getSimulationAgent().getSimulationTime())
                 return true;
         return false;

@@ -15,30 +15,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent;
-
-import org.apache.log4j.Logger;
-import protopeer.network.Message;
+package interdependent.Messages;
 
 /**
- *
- * @author Ben
+ * A Message notifiying the the Network defined by networkIdentifier finished current time step or iteration
+ * @author mcb
  */
-public class StatusMessage extends Message{
-    private static final Logger logger = Logger.getLogger(StatusMessage.class);
-    private boolean networkChanged;
-    private int iteration;
-    
-    public StatusMessage(boolean isNetworkChanged, int iteration){
-        this.networkChanged = isNetworkChanged;
+public class FinishedStepMessage extends AbstractSfinaMessage{
+    private final int time;
+    private final int iteration;
+    private final boolean converged;
+
+    public FinishedStepMessage(int networkIdentifier, int time, int iteration, boolean converged) {
+        super(networkIdentifier);
+        this.time = time;
         this.iteration = iteration;
+        this.converged = converged;
+    }
+
+    @Override
+    public SfinaMessageType getMessageType() {
+        return SfinaMessageType.FINISHED_STEP;
     }
 
     /**
-     * @return the networkChanged
+     * @return the time
      */
-    public boolean isNetworkChanged() {
-        return networkChanged;
+    public int getTime() {
+        return time;
     }
 
     /**
@@ -46,5 +50,14 @@ public class StatusMessage extends Message{
      */
     public int getIteration() {
         return iteration;
-    }    
+    }
+
+    /**
+     * @return the converged
+     */
+    public boolean isConverged() {
+        return converged;
+    }
+     
+   
 }

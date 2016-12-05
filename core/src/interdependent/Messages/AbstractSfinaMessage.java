@@ -15,24 +15,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication.Messages;
+package interdependent.Messages;
+
+import protopeer.network.Message;
 
 /**
- * A Message notifiying the the Networkd defined by networkIdentifier converged
- * @author mcb
+ *
+ * @author root
  */
-public class FinishedStepMessage extends AbstractSfinaMessage{
+public abstract class AbstractSfinaMessage extends Message implements SfinaMessageInterface{
+    
+    private int networkIdentifier;
 
-    public FinishedStepMessage(int networkIdentifier) {
-        super(networkIdentifier);
+    
+    public AbstractSfinaMessage(int networkIdentifier){
+        this.networkIdentifier = networkIdentifier;
     }
 
+    public int getNetworkIdentifier() {
+        return networkIdentifier;
+    }
+    
     @Override
-    public String getMessageType() {
-        return SfinaMessageInterface.FINISHED_STEP;
-    }
+    public abstract SfinaMessageType getMessageType();
     
     
-      
-   
 }

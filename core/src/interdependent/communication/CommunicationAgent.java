@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 201    @Override
-    public long toLongValue() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-6 SFINA Team
+ * Copyright (C) 2016
+ * SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,14 +18,13 @@
  */
 package interdependent.communication;
 
-import core.SimulationAgentInterface;
+import core.SimpleTimeSteppingAgent;
 import event.Event;
-
-import interdependent.communication.Messages.AbstractSfinaMessage;
-import interdependent.communication.Messages.EventMessageNew;
-import interdependent.communication.Messages.FinishedStepMessage;
-import interdependent.communication.Messages.NetworkAddressMessage;
-import interdependent.communication.Messages.SfinaMessageInterface;
+import event.NetworkComponent;
+import interdependent.Messages.AbstractSfinaMessage;
+import interdependent.Messages.EventMessage;
+import interdependent.Messages.FinishedStepMessage;
+import interdependent.Messages.NetworkAddressMessage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,47 +43,43 @@ import protopeer.time.Timer;
  */
 public class CommunicationAgent extends SimpleTimeSteppingAgent {
 
-    protected final static int POST_ADDRESS_CHANGE = 0;
+    protected final static int POST_ADDRESS_CHANGE_RECEIVED = 0;
     protected final static int POST_AGENT_IS_READY = 1;
-    protected final static int POST_FINISHED_STEP = 2;
-    protected final static int POST_EVENT_SEND = 3;
+    protected final static int POST_FINISHED_STEP_RECEIVED = 2;
+    protected final static int POST_EVENT_RECEIVED = 3;
 
     private static final Logger logger = Logger.getLogger(CommunicationAgent.class);
-    private Map<Integer, NetworkAddress> externalMessageLocations;
+    private Map<Integer, NetworkAddress> externalNetworkAddresses;
     private List<Integer> externalNetworksFinishedStep;
+    private boolean externalNetworksConverged;
     private List<Integer> externalNetworksSendEvent;
+    private List<Event> eventsToQueue;
     private int totalNumberNetworks;
-    private SimulationAgentInterface simulationAgent;
-    private boolean bootstrapingFinished = false;
-    private boolean agentIsReady = false;
-    private NetworkAddress networkAddress;
-    private Peer peer;
+    private boolean agentIsReady; 
 
     private Timer initialDelayTimer;
 
     /**
-     * ************************************************
-     * CONSTRUCTORS
-     *************************************************
+     * 
+     * @param totalNumberNetworks 
      */
     public CommunicationAgent(int totalNumberNetworks) {
-        //previously SimulationAgent
-//        this.experimentID=experimentID;
-//        this.bootstrapTime=bootstrapTime;
-//        this.runTime=runTime;
-
-        // this();
-        this.externalMessageLocations = new HashMap();
+        super();
+        this.externalNetworkAddresses = new HashMap();
         this.totalNumberNetworks = totalNumberNetworks;
         this.externalNetworksFinishedStep = new ArrayList<>();
         this.externalNetworksSendEvent = new ArrayList<>();
+        this.eventsToQueue = new ArrayList<>();
+        this.agentIsReady = false;
+        this.externalNetworksConverged = true;
     }
 
     /**
      * ***************************************
-     * Base Peerlet Functions
-    ******************************************
+     *         Base Peerlet Functions
+     * ***************************************
      */
+    
     @Override
     public void stop() {
         super.stop(); //To change body of generated methods, choose Tools | Templates.
@@ -121,8 +113,6 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     @Override
     public void init(Peer peer) {
         super.init(peer); //To change body of generated methods, choose Tools | Templates.
-        this.peer = peer;
-        this.simulationAgent = getSimulationAgent();
 
      
     }
@@ -136,15 +126,18 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
             AbstractSfinaMessage sfinaMessage = (AbstractSfinaMessage) message;
 
             switch (sfinaMessage.getMessageType()) {
-                case SfinaMessageInterface.EVENT_MESSAGE:
-                    if (this.simulationAgent != null) {
-                        //TBD: Maybe Collect, or runtime etc.? has to be discussed
-                        simulationAgent.queueEvents(((EventMessageNew) sfinaMessage).getEvents());
-                    }
-                    this.externalNetworksSendEvent.add(sfinaMessage.getNetworkIdentifier());
-                    postProcessCommunication(POST_EVENT_SEND);
+                case EVENT_MESSAGE:
+                    //TBD: Maybe Collect, or runtime etc.? has to be discussed
+                    //Ben: Maybe better, in case some events arrive in the middle of executing events. Probably not a problem, but better be safe.
+                    this.eventsToQueue.addAll(((EventMessage) sfinaMessage).getEvents());
+                    
+                    if(!externalNetworksSendEvent.contains(sfinaMessage.getNetworkIdentifier()))
+                        this.externalNetworksSendEvent.add(sfinaMessage.getNetworkIdentifier());
+                    else
+                        logger.debug("Attention: Event message already received from this network, shoudn't happen.");
+                    postProcessCommunication(POST_EVENT_RECEIVED);
                     break;
-                case SfinaMessageInterface.NETWORK_ADDRES_CHANGE:
+                case NETWORK_ADDRESS_CHANGE:
                     NetworkAddressMessage netMessage = (NetworkAddressMessage) sfinaMessage;
 
                     int id = netMessage.getNetworkIdentifier();
@@ -152,42 +145,51 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
 
                     // Network Messages have to be propergated, as no broadcasting function exists
                     if (netMessage.isStopped()) {
-                        this.externalMessageLocations.remove(netMessage.getNetworkIdentifier());    
+                        this.externalNetworkAddresses.remove(netMessage.getNetworkIdentifier());    
                     }else {
-                        externalMessageLocations.put(id, address);
+                        externalNetworkAddresses.put(id, address);
                     }
-                    postProcessCommunication(POST_ADDRESS_CHANGE);
+                    postProcessCommunication(POST_ADDRESS_CHANGE_RECEIVED);
 
                     break;
-                case SfinaMessageInterface.FINISHED_STEP:
-                    this.externalNetworksFinishedStep.add(sfinaMessage.getNetworkIdentifier());
-                    postProcessCommunication(POST_FINISHED_STEP);
+                case FINISHED_STEP:
+                    if(!externalNetworksFinishedStep.contains(sfinaMessage.getNetworkIdentifier())){
+                        this.externalNetworksFinishedStep.add(sfinaMessage.getNetworkIdentifier());
+                        if(!((FinishedStepMessage)sfinaMessage).isConverged())
+                            this.externalNetworksConverged = false;
+                    }
+                    else
+                        logger.debug("Attention: Finished Step message already received from this network, shoudn't happen.");
+                    postProcessCommunication(POST_FINISHED_STEP_RECEIVED);
                     break;
                 default:
+                    logger.debug("Message Type not recognized");
 
             }
         }
 
     }
-
+    
     /**
-     * ****** COMMUNICATION HELPER *********************************
+     * ***************************************
+     *         COMMUNICATION HELPER 
+     * ***************************************
      */
+
     protected void postProcessCommunication(int typeOfPost) {
         // each time something changes this function should be called 
         // handles necessary further steps
 
-        //1. after networkAddress change message, do case evaluation and start agent etc.
         switch (typeOfPost) {
-            case POST_ADDRESS_CHANGE:
+            case POST_ADDRESS_CHANGE_RECEIVED:
                 break;
             case POST_AGENT_IS_READY:
                 checkAndNextStep();
                 break;
-            case POST_EVENT_SEND:
+            case POST_EVENT_RECEIVED:
                 checkAndNextStep();
                 break;
-            case POST_FINISHED_STEP:
+            case POST_FINISHED_STEP_RECEIVED:
                 checkAndNextStep();
                 break;
             default:
@@ -198,82 +200,114 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
 
     public void checkAndNextStep() {
         if (readyToProgress()) {
-
+            
             this.externalNetworksFinishedStep.clear();
             this.externalNetworksSendEvent.clear();
             this.agentIsReady = false;
-
-            getCommandReceiver().progressToNextTimeStep();
+            this.getSimulationAgent().queueEvents(eventsToQueue);
+            this.eventsToQueue.clear();
+            this.checkEventsForConflicts();
+            
+            // TBD: This part should be double checked. logic a bit tricky.
+            if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
+               getCommandReceiver().progressToNextTimeStep();
+            else if(this.pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
+                getCommandReceiver().progressToNextIteration();
+            else if(this.externalNetworksConverged) // if this network doesn't have more events waiting and the other networks have also finished, continue to next time step
+                getCommandReceiver().progressToNextTimeStep();
+            else{ // if the above two don't hold, wait
+                this.externalNetworksConverged = true;
+                logger.debug("No pending events, but other networks still iterating -> Waiting");
+            }
         }
 
     }
 
     public boolean readyToProgress() {
-        // Collection<Integer> identifiers = getSimulationAgent().getConnectedNetwork();
-        //TBD: is this condition enough: it does not check for which keys exactly are inside
+        //TBD: is this condition enough: it does not check for which keys exactly are inside 
+        // -> Ben: now yes, added check when receiving messages
+        // PROBLEM when interdependent link in input files to another network is defined, which is not loaded. The case, if 3 networks are prepared, but N = 2;
+        // Should ideally be checked somewhere
         return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
-                && (this.externalNetworksSendEvent.size() == getSimulationAgent().getConnectedNetworkIndices().size())
+                && (this.externalNetworksSendEvent.size() == getSimulationAgent().getConnectedNetworkIndices().size()) 
                 && this.agentIsReady;
     }
 
     /**
      * ************************************************
-     * Communication Agent Functions
-     ************************************************
+     *          Communication Agent Functions
+     * ************************************************
      */
-//    @Override
-//    public void sendEvent(Event event, int identifier) {
-//
-//        /*
-//        Should be collected? Or what should happen?
-//         */
-//        NetworkAddress address = this.externalMessageLocations.get(identifier);
-//        EventMessageNew message = new EventMessageNew(getSimulationAgent().getNetworkIndex(), event);
-//
-//        if (address != null) {
-//            this.peer.sendMessage(address, message);
-//        }
-//
-//    }
 
     @Override
-    public void agentFinishedStep(List<Event> events) {
-        // only executed once, so that bootstrapping can immediately 
+    public void agentFinishedActiveState() {        
+        this.agentIsReady = true;
+        
+        // inform other Communication Agents
+        FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), this.pendingEventsInQueue());
+        sendToAll(message);
+
+        EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
+        sendToConnected(eventMessage);
+
+        // post process the communication
+        this.postProcessCommunication(POST_AGENT_IS_READY);
+    }
+
+    private void sendToAll(AbstractSfinaMessage message){
+        for(NetworkAddress address: getAllExternalNetworkAddresses().values())
+            getPeer().sendMessage(address, message);
+    }
+    
+    private void sendToConnected(AbstractSfinaMessage message){
+        for(NetworkAddress address: getConnectedExternalNetworkAddresses().values())
+            getPeer().sendMessage(address, message);
+    }
+    
+    private Map<Integer, NetworkAddress> getAllExternalNetworkAddresses(){
+       HashMap<Integer,NetworkAddress> allAddresses = new HashMap<>();
        
-        this.externalMessageLocations = getConnectedExternalNetworkAddresses();
-        if (!this.bootstrapingFinished) {
-            this.bootstrapingFinished = true;
-            this.agentIsReady = false;
-            
-            getCommandReceiver().progressToNextTimeStep();
-        } else {
-            // mark that agent is ready
-            this.agentIsReady = true;
-
-            // inform other Communication Agents
-            FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex());
-            sendToAll(message);
-            
-            EventMessageNew eventMessage = new EventMessageNew(getSimulationAgent().getNetworkIndex(), events);
-            Collection<Integer> identifiers = getSimulationAgent().getConnectedNetworkIndices();
-            for (int i : identifiers) {
-                NetworkAddress address = this.externalMessageLocations.get(i);
-                this.peer.sendMessage(address, eventMessage);
-            }
-
-            
-            // TODO: here new EVENTS should be send
-            // post process the communication
-            this.postProcessCommunication(POST_AGENT_IS_READY);
-        }
+       for(int i=0; i<this.totalNumberNetworks; i++){
+           if(getPeer().getIndexNumber() != i)
+               allAddresses.put(i, new IntegerNetworkAddress(i));
+       }
+       return allAddresses;
+    }
+    
+    private Map<Integer, NetworkAddress> getConnectedExternalNetworkAddresses(){
+        
+        Collection<Integer> indices = getSimulationAgent().getConnectedNetworkIndices();
+        Map<Integer, NetworkAddress> allAddresses = getAllExternalNetworkAddresses();
+        
+        Map<Integer, NetworkAddress> connectedAddresses = new HashMap<>();
+        
+        for(int i : indices)
+            connectedAddresses.put(i, allAddresses.get(i));
+        
+        return connectedAddresses;
+    }
+    
+    /**
+     * ************************************************
+     *          EVENT METHODS
+     * ************************************************
+     */
+    
+    private List<Event> extractPendingInterdependentEvents(){
+        List<Event> interdependentEvents = new ArrayList<>();
+        for(Event event : this.getSimulationAgent().getEvents())
+            if(event.getTime() == this.getSimulationAgent().getSimulationTime() && event.getNetworkComponent().equals(NetworkComponent.INTERDEPENDENT_LINK))
+                interdependentEvents.add(event);
+        return interdependentEvents;
+    }
+    
+    // TBD: Can be here or in SimulationAgent, what makes more sense?
+    // Ben: I think better here, to be easily changeable without touching SimulationAgent
+    private void checkEventsForConflicts() {
+        logger.debug("Conflict check of events not implemented yet.");
     }
 
-    public SimulationAgentInterface getSimulationAgent() {
-        if (simulationAgent == null) {
-            simulationAgent = (SimulationAgentInterface) getPeer().getPeerletOfType(SimulationAgentInterface.class);
-        }
-        return simulationAgent;
-    }
+    
 //
 //    private NeighborManager getNeighborManager() {
 ////        if(this.neighborManager == null){
@@ -292,71 +326,34 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
 //
 //    }
 
-    private boolean netAddressIsInMap(NetworkAddressMessage netmessage) {
+//    private boolean netAddressIsInMap(NetworkAddressMessage netmessage) {
+//
+//        int id = netmessage.getNetworkIdentifier();
+//        NetworkAddress address = netmessage.getAddress();
+//
+//        if (this.externalNetworkAddresses.containsKey(id) && (this.externalNetworkAddresses.get(id).equals(address))) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//
+//    }
 
-        int id = netmessage.getNetworkIdentifier();
-        NetworkAddress address = netmessage.getAddress();
-
-        if (this.externalMessageLocations.containsKey(id) && (this.externalMessageLocations.get(id).equals(address))) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    private void sendNetworkLocation() {
-        NetworkAddress oldAddress = this.networkAddress;
-        /*
-        test if networkaddress can be used in this way, does it implement necessary interfaces?
-         */
-        if (oldAddress == null || !oldAddress.equals(getPeer().getNetworkAddress())) {
-            this.networkAddress = getPeer().getNetworkAddress();
-        }
-        // notify all as during stop also everyon got notified
-        //todo notify about networkaddress change
-        //decide if broadcast or only to those in externalLocations
-        NetworkAddressMessage message = new NetworkAddressMessage(this.simulationAgent.getNetworkIndex(), this.networkAddress);
-
-    //    sendMessageToNeighbors(message);
-    }
+//    private void sendNetworkLocation() {
+//        NetworkAddress oldAddress = this.networkAddress;
+//        /*
+//        test if networkaddress can be used in this way, does it implement necessary interfaces?
+//         */
+//        if (oldAddress == null || !oldAddress.equals(getPeer().getNetworkAddress())) {
+//            this.networkAddress = getPeer().getNetworkAddress();
+//        }
+//        // notify all as during stop also everyon got notified
+//        //todo notify about networkaddress change
+//        //decide if broadcast or only to those in externalLocations
+//        NetworkAddressMessage message = new NetworkAddressMessage(this.simulationAgent.getNetworkIndex(), this.networkAddress);
+//
+//    //    sendMessageToNeighbors(message);
+//    }
     
-    private void sendToAll(AbstractSfinaMessage message){
-        
-    Collection<NetworkAddress> addresses = getAllExternalNetworkAddresses().values();
     
-    for(NetworkAddress address: addresses){
-        getPeer().sendMessage(address, message);
-    }
-    
-    }
-    
-    private Map<Integer, NetworkAddress> getAllExternalNetworkAddresses(){
-       HashMap<Integer,NetworkAddress> retMap = new HashMap<>();
-       
-       for(int i=0; i<this.totalNumberNetworks;i++){
-           if(getPeer().getIndexNumber() == i){
-               
-           }else{
-               retMap.put(i, new IntegerNetworkAddress(i));
-           }
-       }
-       return retMap;
-    }
-    
-    private Map<Integer,NetworkAddress> getConnectedExternalNetworkAddresses(){
-        
-        Collection<Integer> indices = getSimulationAgent().getConnectedNetworkIndices();
-        Map<Integer, NetworkAddress> addressMap = getAllExternalNetworkAddresses();
-        
-        Map<Integer, NetworkAddress> returnMap = new HashMap<>();
-        
-        for(int i: indices){
-            NetworkAddress currAddress = addressMap.get(i);
-            returnMap.put(i, currAddress);
-        }
-        return returnMap;
-        
-    }
-
 }

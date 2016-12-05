@@ -27,7 +27,6 @@ import input.FlowLoader;
 import input.SfinaParameter;
 import input.SfinaParameterLoader;
 import input.TopologyLoader;
-import interdependent.communication.TimeSteppingAgentInterface;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface,  TimeSteppingAgentInterface.CommandReceiver{
+public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface, TimeSteppingAgentInterface.CommandReceiver{
     
     private static final Logger logger = Logger.getLogger(SimulationAgent.class);
 
@@ -188,7 +187,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 
                 //new line added#
                 logger.debug("##### End of bootstraping, calling agentFinishedActiveState ");
-                getTimeSteppingAgent().agentFinishedActiveState(getEvents());
+                getTimeSteppingAgent().agentFinishedActiveState();
                
             }
         });
@@ -261,7 +260,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
 
         saveOutputData();
 
-        getTimeSteppingAgent().agentFinishedActiveState(getEvents());
+        getTimeSteppingAgent().agentFinishedActiveState();
             
     }
     
@@ -294,8 +293,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
         // For testing if iteration advances as expected
-//        if(this.getIteration()==1)
-//            this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
+        if(this.getIteration()==1)
+            this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
     }
      
     @Override

@@ -18,7 +18,7 @@
 package experiments;
 
 import core.SimulationAgent;
-import interdependent.communication.SimpleTimeSteppingAgent;
+import core.SimpleTimeSteppingAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;

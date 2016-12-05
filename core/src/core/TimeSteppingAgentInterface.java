@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package core;
 
 import event.Event;
 import java.util.List;
@@ -49,13 +49,13 @@ public interface TimeSteppingAgentInterface {
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
      * @param events
      */
-    public void agentFinishedActiveState(List<Event> events);
+    public void agentFinishedActiveState();
     
     /**
      * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
      * @param events
      * @return 
      */
-    boolean pendingEventsInQueue(List<Event> events);
+    boolean pendingEventsInQueue();
    
 }

@@ -15,18 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication.Messages;
+package interdependent.Messages;
 
 /**
  *
- * @author root
+ * @author Ben
  */
-public interface SfinaMessageInterface {
-    
-    public static final String EVENT_MESSAGE = "Event_Message";
-    public static final String NETWORK_ADDRES_CHANGE ="Network_Address_Change_Message";
-    public static final String FINISHED_STEP = "Finished_Step_Message";
-    
-    public int getNetworkIdentifier();
-    public String getMessageType();
+public enum SfinaMessageType {
+    EVENT_MESSAGE,
+    NETWORK_ADDRESS_CHANGE,
+    FINISHED_STEP
 }

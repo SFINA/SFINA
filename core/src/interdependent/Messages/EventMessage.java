@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication.Messages;
+package interdependent.Messages;
 
 import event.Event;
 import java.util.ArrayList;
@@ -25,16 +25,16 @@ import java.util.List;
  *
  * @author root
  */
-public class EventMessageNew extends AbstractSfinaMessage{
+public class EventMessage extends AbstractSfinaMessage{
     
     private List<Event> eventList;
 
-    public EventMessageNew(int networkIdentifier, List<Event> events) {
+    public EventMessage(int networkIdentifier, List<Event> events) {
         super(networkIdentifier);
         this.eventList = events;
     }
     
-    public EventMessageNew(int networkIdentifier, Event event){
+    public EventMessage(int networkIdentifier, Event event){
         super(networkIdentifier);
         this.eventList = new ArrayList();
         this.eventList.add(event);
@@ -46,8 +46,8 @@ public class EventMessageNew extends AbstractSfinaMessage{
     }
 
     @Override
-    public String getMessageType() {
-        return SfinaMessageInterface.EVENT_MESSAGE;
+    public SfinaMessageType getMessageType() {
+        return SfinaMessageType.EVENT_MESSAGE;
     }
     
     

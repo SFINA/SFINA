@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication.Messages;
+package interdependent.Messages;
 
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
@@ -49,8 +49,8 @@ public class NetworkAddressMessage extends AbstractSfinaMessage{
     }
    
     @Override
-    public String getMessageType() {
-        return SfinaMessageInterface.NETWORK_ADDRES_CHANGE;
+    public SfinaMessageType getMessageType() {
+        return SfinaMessageType.NETWORK_ADDRESS_CHANGE;
     }
     
     public boolean isStopped(){

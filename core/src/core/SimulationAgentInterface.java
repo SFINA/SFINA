@@ -7,6 +7,7 @@ package core;
 
 import backend.FlowDomainAgent;
 import event.Event;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +74,11 @@ public interface SimulationAgentInterface {
      * @return the columnSeparator
      */
     String getParameterColumnSeparator();
+
+    /**
+     * @return the events
+     */
+    ArrayList<Event> getEvents();
 
     
 }
