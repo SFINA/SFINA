@@ -29,6 +29,8 @@ import com.interpss.core.aclf.AclfNetwork;
 import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
+import core.SimulationAgent;
+import core.SimulationAgentInterface;
 import static java.lang.Math.PI;
 import network.FlowNetwork;
 import network.Link;
@@ -58,10 +60,8 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
     private AclfNetwork IpssNet;
     private boolean converged;
     
-    public InterpssFlowDomainAgent(String experimentID,
-            Time bootstrapTime, 
-            Time runTime){
-        super(experimentID, bootstrapTime, runTime);
+    public InterpssFlowDomainAgent(){
+        super();
         // Is there a better way to force initializing the FlowNetworkDataTypes class?
         this.setFlowNetworkDataTypes(new PowerFlowNetworkDataTypes()); 
         this.converged = false;
@@ -133,7 +133,7 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
      */
     @Override
     public void loadDomainParameters(String backendParamLocation){
-        PowerBackendParameterLoader backendParameterLoader = new PowerBackendParameterLoader(parameterColumnSeparator);
+        PowerBackendParameterLoader backendParameterLoader = new PowerBackendParameterLoader(this.getParameterColumnSeparator());
         this.setDomainParameters(backendParameterLoader.loadBackendParameters(backendParamLocation));
     }   
     

@@ -17,13 +17,14 @@
  */
 package backend;
 
+import core.SimulationAgent;
+import core.SimulationAgentInterface;
 import java.util.HashMap;
 import network.FlowNetwork;
 import org.apache.log4j.Logger;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
-import protopeer.util.quantities.Time;
 
 /**
  *
@@ -33,26 +34,13 @@ public abstract class FlowDomainAgent extends BasePeerlet{
 
     private static final Logger logger = Logger.getLogger(FlowDomainAgent.class);
     
-    private String experimentID;
-    private Time bootstrapTime;
-    private Time runTime;
-    
-    public final String parameterColumnSeparator="=";
-    public final String fileSystemSchema="conf/fileSystem.conf";
-    public final String peersLogDirectory="peerlets-log/";
-    
     private FlowNetworkDataTypesInterface flowNetworkDataTypes;
     
     private MeasurementFileDumper measurementDumper;
     
     private HashMap<Enum,Object> domainParameters;
     
-    public FlowDomainAgent(String experimentID,
-            Time bootstrapTime, 
-            Time runTime){
-        this.experimentID=experimentID;
-        this.bootstrapTime=bootstrapTime;
-        this.runTime=runTime;
+    public FlowDomainAgent(){
     }
     
     /**
@@ -100,13 +88,6 @@ public abstract class FlowDomainAgent extends BasePeerlet{
      * Cast parameters from backend parameter HashMap to domain specific variables.
      */
     public abstract void extractDomainParameters();
-    
-    /**
-     * @return the experimentID
-     */
-    public String getExperimentID() {
-        return experimentID;
-    }
 
     /**
      * @return the domainParameters
@@ -138,6 +119,10 @@ public abstract class FlowDomainAgent extends BasePeerlet{
      */
     public void setFlowNetworkDataTypes(FlowNetworkDataTypesInterface flowNetworkDataTypes) {
         this.flowNetworkDataTypes = flowNetworkDataTypes;
+    }
+    
+    public String getParameterColumnSeparator(){
+        return ((SimulationAgentInterface)this.getPeer().getPeerletOfType(SimulationAgentInterface.class)).getParameterColumnSeparator();
     }
     
 }

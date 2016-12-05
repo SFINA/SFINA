@@ -17,20 +17,14 @@
  */
 package experiments;
 
+import core.SimulationAgent;
 import interdependent.communication.CommunicationAgent;
-import interdependent.communication.SimpleTimeSteppingAgent;
-import interdependent.communication.SimulationAgentCommunication;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
-import protopeer.NeighborManager;
 import protopeer.Peer;
 import protopeer.PeerFactory;
 import protopeer.SimulatedExperiment;
-import protopeer.servers.bootstrap.BootstrapClient;
-import protopeer.servers.bootstrap.BootstrapServer;
-import protopeer.servers.bootstrap.SimpleConnector;
-import protopeer.servers.bootstrap.SimplePeerIdentifierGenerator;
 import protopeer.util.quantities.Time;
 
 /**
@@ -73,17 +67,11 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
 
                 //SFINA AGENTS
                 newPeer.addPeerlet(new CommunicationAgent(N));
-                newPeer.addPeerlet(new SimulationAgentCommunication(
+                newPeer.addPeerlet(new SimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
-                newPeer.addPeerlet(new InterpssFlowDomainAgent(
-                        experimentID, 
-                        Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime)));
-               
-               
-               
+                newPeer.addPeerlet(new InterpssFlowDomainAgent());
                 return newPeer;
             }
         };

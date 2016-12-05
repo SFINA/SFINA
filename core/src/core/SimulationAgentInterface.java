@@ -19,7 +19,6 @@ import protopeer.network.Message;
  * @author evangelospournaras
  */
 public interface SimulationAgentInterface {
-    
     void runBootstraping();
     
     void runActiveState();
@@ -69,6 +68,11 @@ public interface SimulationAgentInterface {
      * @return the networkIndex
      */
     int getNetworkIndex();
+
+    /**
+     * @return the columnSeparator
+     */
+    String getParameterColumnSeparator();
 
     
 }

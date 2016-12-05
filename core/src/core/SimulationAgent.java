@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,33 +17,35 @@
  */
 package core;
 
+import interdependent.communication.Archive.CommunicationAgentInterface;
+import backend.FlowDomainAgent;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import backend.FlowDomainAgent;
 import input.EventLoader;
+import input.FlowLoader;
 import input.SfinaParameter;
 import input.SfinaParameterLoader;
 import input.TopologyLoader;
+import interdependent.communication.TimeSteppingAgentInterface;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import network.FlowNetwork;
+import network.InterdependentLink;
 import network.Link;
 import network.LinkState;
 import network.Node;
 import network.NodeState;
 import org.apache.log4j.Logger;
-import output.TopologyWriter;
-import input.FlowLoader;
-import java.util.Collection;
-import java.util.List;
-import network.InterdependentLink;
 import output.EventWriter;
 import output.FlowWriter;
+import output.TopologyWriter;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
@@ -56,9 +58,9 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author evangelospournaras
+ * @author mcb
  */
-public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface{
+public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface,  TimeSteppingAgentInterface.CommandReceiver{
     
     private static final Logger logger = Logger.getLogger(SimulationAgent.class);
 
@@ -111,6 +113,10 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.flowNetwork=new FlowNetwork();
     }
     
+    /***************************************************
+     *               BASE PEERLET FUNCTIONS
+     * *************************************************/
+    
     /**
     * Inititializes the simulation agent by creating the finger descriptor.
     *
@@ -139,6 +145,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     public void stop(){
         
     }
+    
+    
+    /**************************************************
+     *               BOOTSTRAPPING
+     **************************************************/
     
     /**
      * The scheduling of system bootstrapping. It loads system parameters, 
@@ -173,12 +184,34 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
                                 
                 scheduleMeasurements();
-                runActiveState();
+                
+                //new line added
+                getTimeSteppingAgent().agentFinishedStep(getEvents());
+               
             }
         });
         loadAgentTimer.schedule(this.bootstrapTime);
     }
 
+    /**
+     * Scheduling the measurements for the simulation agent
+     */
+    @Override
+    public void scheduleMeasurements(){
+        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+peerTokenName));
+        getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
+            public void measurementEpochEnded(MeasurementLog log, int epochNumber){
+                logger.debug("---> Measuring network " + getPeer().getIndexNumber());
+                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
+                log.shrink(epochNumber, epochNumber+1);
+            }
+        });
+    }
+   
+    
+    /***************************************************
+    *               RUN ACTIVE STATE
+    **************************************************/
     
     /**
      * The scheduling of the active state.  It is executed periodically. 
@@ -199,20 +232,128 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                initActiveState();
-                
-                runInitialOperations();
+                //initiActiveState()
+          
+             //TBD where to inject events??
+                //Ben: They are injected when the method queueEvent or queueEvents is used.
+                // So what do you mean by "where"?
                 
                 executeAllEvents();
                 
                 runFlowAnalysis();
 
                 runFinalOperations();
+                // Discuss with Ben if correct order, seems to be, first output gets saved,
+                // then iteration is increased, assumes that resetIteration() sets counter to 1
+                // Ben should look at the current logic flow
+                // Ben: Yes that's how it is implemented currently. Maybe move to redoIteration()
+                nextIteration();
                 
-                runActiveState(); 
+                getTimeSteppingAgent().agentFinishedStep(getEvents());
             }
         });
         loadAgentTimer.schedule(this.runTime);
+    }
+     /**
+     * Initializes the active state by setting iteration = 1 and loading data.
+     */
+    public void initActiveState(){
+        this.timeToken = this.timeTokenName + this.getSimulationTime();
+        logger.info("\n--------------> " + this.timeToken + " at network " + this.getNetworkIndex()+ " <--------------");
+        resetIteration();        
+        loadInputData(timeToken);   
+    }
+      
+    @Override
+    public void runInitialOperations(){
+        
+    }
+    
+    /**
+     * Performs the simulation between measurements. Handles iterations and calls the backend.
+     */
+    @Override
+    public void runFlowAnalysis(){
+        for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
+            boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
+        }
+             
+    }
+     
+    @Override
+    public void runFinalOperations(){
+        
+    }
+    
+    /**
+     * Sets iteration to 1.
+     */
+    public void resetIteration(){
+        this.iteration=1;
+    }
+    
+    /**
+     * Goes to next iteration and initiates output. First outputs network data at current iteration, then increases iteration by one.
+     * Has to be called at the end of the iteration.
+     */
+    public void nextIteration(){
+        this.saveOutputData();
+        this.iteration++;
+    }
+    
+    
+    // WHAT ist this?
+    /**
+    * Load parameters determining file system structure from conf/fileSystem.conf
+    * @param location
+    */
+    @Override
+    public void runPassiveState(Message message){
+        
+    }
+  
+   
+    
+    /*****************************************************
+     *          MESSAGE RECEIVER METHODS 
+     * ****************************************************/
+   
+    
+    @Override
+    public void progressToNextTimeStep() {
+        this.initActiveState();
+        this.runActiveState();
+    }
+
+    // TBD: Refactor to progressToNextIteration() or similar
+    // We could also put the nextIteration() method here, would be logically more consistent
+    @Override
+    public void redoIteration() { 
+        this.runActiveState(); 
+    }
+    
+    @Override
+    public int getNetworkIndex() {
+        return this.getFlowNetwork().getNetworkIndex(); 
+    }
+
+    @Override
+    public Collection<Integer> getConnectedNetworkIndices() {
+        return this.getFlowNetwork().getConnectedNetworkIndices();
+    }
+    
+   
+    
+    /***************************************
+     *          GETTER AND SETTER  
+     *****************************************/
+    
+    public CommunicationAgentInterface getCommunicationAgent(){
+        return (CommunicationAgentInterface) getPeer().getPeerletOfType(CommunicationAgentInterface.class);
+    }
+    
+    public TimeSteppingAgentInterface getTimeSteppingAgent(){
+        return (TimeSteppingAgentInterface) getPeer().getPeerletOfType(TimeSteppingAgentInterface.class);
     }
     
     @Override
@@ -226,230 +367,117 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
     
     /**
-     * Load parameters determining file system structure from conf/fileSystem.conf
-     * @param location
-     */
-    @Override
-    public void loadFileSystem(String location){
-        String inputDirectoryName=null;
-        String outputDirectoryName=null;
-        String topologyDirectoryName=null;
-        String flowDirectoryName=null;
-        String configurationFilesLocation=null;
-        String eventsFileName=null;
-        String sfinaParamFileName=null;
-        String backendParamFileName=null;
-        String nodesFileName=null;
-        String linksFileName=null;
-        String interdependentLinksFileName=null;
-        File file = new File(location);
-        Scanner scr = null;
-        try {
-            scr = new Scanner(file);
-            while(scr.hasNext()){
-                StringTokenizer st = new StringTokenizer(scr.next(), parameterColumnSeparator);
-                switch(st.nextToken()){
-                    case "columnSeparator":
-                        this.columnSeparator=st.nextToken();
-                        break;
-                    case "missingValue":
-                        this.missingValue=st.nextToken();
-                        break;
-                    case "timeTokenName":
-                        this.timeTokenName=st.nextToken();
-                        break;
-                    case "peerToken":
-                        this.peerToken=st.nextToken();
-                        break;
-                    case "peersLogDirectory":
-                        this.peersLogDirectory=st.nextToken();
-                        break;
-                    case "inputDirectoryName":
-                        inputDirectoryName=st.nextToken();
-                        break;
-                    case "outputDirectoryName":
-                        outputDirectoryName=st.nextToken();
-                        break;
-                    case "topologyDirectoryName":
-                        topologyDirectoryName=st.nextToken();
-                        break;
-                    case "flowDirectoryName":
-                        flowDirectoryName=st.nextToken();
-                        break;
-                    case "configurationFilesLocation":
-                        configurationFilesLocation=st.nextToken();
-                        break;
-                    case "eventsFileName":
-                        eventsFileName=st.nextToken();
-                        break;
-                    case "sfinaParamFileName":
-                        sfinaParamFileName=st.nextToken();
-                        break;
-                    case "backendParamFileName":
-                        backendParamFileName=st.nextToken();
-                        break;
-                    case "nodesFileName":
-                        nodesFileName=st.nextToken();
-                        break;
-                    case "linksFileName":
-                        linksFileName=st.nextToken();
-                        break;
-                    case "interdependentLinksFileName":
-                        interdependentLinksFileName=st.nextToken();
-                        break;
-                    default:
-                        logger.debug("File system parameter couldn't be recognized.");
-                }
-            }
-        }
-        catch (FileNotFoundException ex){
-            ex.printStackTrace();
-        }
-        this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
-        this.peerTokenName = "/"+peerToken+"-"+getPeer().getIndexNumber();
-        this.experimentBaseFolderLocation=configurationFilesLocation+experimentID;
-        this.experimentInputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+inputDirectoryName;
-        this.experimentOutputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+outputDirectoryName;
-        this.eventsInputLocation=experimentInputFilesLocation+eventsFileName;
-        this.eventsOutputLocation=experimentOutputFilesLocation+eventsFileName;
-        this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
-        this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
-        this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
-        this.linksLocation="/"+topologyDirectoryName+linksFileName;
-        this.interdependentLinksLocation="/"+topologyDirectoryName+interdependentLinksFileName;
-        this.nodesFlowLocation="/"+flowDirectoryName+nodesFileName;
-        this.linksFlowLocation="/"+flowDirectoryName+linksFileName;
-        this.interdependentLinksFlowLocation="/"+flowDirectoryName+interdependentLinksFileName;
-    }
-    
-    /**
-     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise.
-     * @param sfinaParamLocation path to sfinaParameters.txt
-     * @param backendParamLocation path to backendParameters.txt
-     * @param eventsLocation path to events.txt
-     */
-    @Override
-    public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation){
-        // Sfina Parameters
-        File file = new File(sfinaParamLocation);
-        if (file.exists()){
-            sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
-            sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
-            logger.debug("Loaded sfinaParameters: " + sfinaParameters);
-        }
-        else
-            logger.debug("sfinaParameters.txt file not found. Should be here: " + sfinaParamLocation);
-        file = new File(backendParamLocation);
-        if (file.exists()) {
-            this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
-            logger.debug("Loaded backendParameters: " + this.getDomainParameters());
-        }
-        else
-            logger.debug("No backendParameters.txt file provided.");
-        
-        // Events
-        file = new File(eventsLocation);
-        if (file.exists()) {
-            eventLoader=new EventLoader(columnSeparator,missingValue,this.getFlowDomainAgent().getFlowNetworkDataTypes());
-            events=eventLoader.loadEvents(eventsLocation);
-        }
-        else
-            logger.debug("No events.txt file provided.");
-    }
-    
-    /**
-     * It clears the directory with the output files.
      * 
-     * @param experiment 
+     * @return the network
      */
-    private static void clearOutputFiles(File experiment){
-        File[] files = experiment.listFiles();
-        if(files!=null) { //some JVMs return null for empty dirs
-            for(File f: files) {
-                if(f.isDirectory()) {
-                    clearOutputFiles(f);
-                } else {
-                    f.delete();
-                }
-            }
-        }
-        experiment.delete();
+    public FlowNetwork getFlowNetwork() {
+        return flowNetwork;
+    }
+    
+    public void setFlowNetwork(FlowNetwork net) {
+        this.flowNetwork = net;
     }
     
     /**
-     * Initializes the active state by setting iteration = 1 and loading data.
+     * @return the events
      */
-    public void initActiveState(){
-        this.timeToken = this.timeTokenName + this.getSimulationTime();
-        logger.info("\n--------------> " + this.timeToken + " at network " + this.getNetworkIndex() + " <--------------");
-        resetIteration();        
-        loadInputData(timeToken);   
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
+     
+    /**
+     * 
+     * @return the current iteration
+     */
+    @Override
+    public int getIteration(){
+        return this.iteration;
+    }
+     
+    /**
+     * 
+     * @param iteration
+     */
+    public void setIteration(int iteration){
+        this.iteration=iteration;
     }
     
     /**
-     * Loads network data from input files at given time if folder is provided.
-     * @param timeToken String "time_x" for time x
+     * @return the sfinaParameters
      */
-    public void loadInputData(String timeToken){
-        File file = new File(experimentInputFilesLocation+timeToken);
-        if (file.exists() && file.isDirectory()) {
-            logger.info("loading data at " + timeToken);
-            topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
-            topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
-            
-            // Load flow data if provided
-            if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
-                flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
-            else
-                logger.debug("No node flow data provided at " + timeToken + ".");
-            if(new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
-                flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
-            else
-                logger.debug("No link flow data provided at " + timeToken + ".");
-            
-            // Load interdependent link data if provided. 
-            if (new File(experimentInputFilesLocation+timeToken+interdependentLinksLocation).exists()){
-                topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+interdependentLinksLocation);
-                if(new File(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation).exists())
-                    flowLoader.loadInterdependentLinkFlowData(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation);
-            }
-            else
-                logger.debug("No interdependent link input files provided at " + timeToken + ".");
-            
-            this.getFlowDomainAgent().setFlowParameters(flowNetwork);
-        }
-        else
-            logger.debug("No input data provided at " + timeToken + ". Continue to use data from before.");
+    public HashMap<SfinaParameter,Object> getSfinaParameters() {
+        return sfinaParameters;
+    }
+
+    /**
+     * @param sfinaParameters the sfinaParameters to set
+     */
+    public void setSfinaParameters(HashMap<SfinaParameter,Object> sfinaParameters) {
+        this.sfinaParameters = sfinaParameters;
+    }
+
+    /**
+     * @return the backendParameters
+     */
+    @Override
+    public HashMap<Enum,Object> getDomainParameters() {
+        return this.getFlowDomainAgent().getDomainParameters();
+    }
+
+    /**
+     * @param backendParameters the backendParameters to set
+     */
+    public void setBackendParameters(HashMap<Enum,Object> backendParameters) {
+        this.getFlowDomainAgent().setDomainParameters(backendParameters);
     }
     
     /**
-     * Outputs txt files in same format as input. Creates new folder for every iteration.
+     * @param networkIndex the networkIndex to set
      */
-    @Override
-    public void saveOutputData(){
-        logger.info("doing output at iteration " + iteration);
-        topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
-        topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
-        topologyWriter.writeInterdependentLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksLocation);
-        flowWriter.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
-        flowWriter.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
-        flowWriter.writeInterdependentLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksFlowLocation);
+    private void setNetworkIndex(int networkIndex) {
+        this.getFlowNetwork().setNetworkIndex(networkIndex);
     }
     
-    @Override
-    public void runPassiveState(Message message){
-        
+     /**
+     * @return the experimentID
+     */
+    public String getExperimentID() {
+        return experimentID;
+    }
+
+    /**
+     * @return the peersLogDirectory
+     */
+    public String getPeersLogDirectory() {
+        return peersLogDirectory;
+    }
+
+    /**
+     * @return the columnSeparator
+     */
+    public String getParameterColumnSeparator() {
+        return parameterColumnSeparator;
     }
     
-    @Override
-    public void runInitialOperations(){
-        
+    /**
+     * @return the measurementDumper
+     */
+    public MeasurementFileDumper getMeasurementDumper() {
+        return measurementDumper;
     }
     
-    @Override
-    public void runFinalOperations(){
-        
+    /**
+     * @param measurementDumper the measurementDumper to set
+     */
+    public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
+        this.measurementDumper = measurementDumper;
     }
+    
+    
+    
+    /***************************************
+     *          EVENT HANDLING
+     *****************************************/
     
     @Override
     public void executeAllEvents(){
@@ -616,69 +644,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
      
     /**
-     * Performs the simulation between measurements. Handles iterations and calls the backend.
-     */
-    @Override
-    public void runFlowAnalysis(){
-        for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
-            boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
-        }
-        nextIteration();
-    }
-    
-    /**
-     * 
-     * @return the network
-     */
-    public FlowNetwork getFlowNetwork() {
-        return flowNetwork;
-    }
-    
-    public void setFlowNetwork(FlowNetwork net) {
-        this.flowNetwork = net;
-    }
-    
-    /**
-     * Sets iteration to 1.
-     */
-    public void resetIteration(){
-        this.iteration=1;
-    }
-    
-    /**
-     * Goes to next iteration and initiates output. First outputs network data at current iteration, then increases iteration by one.
-     * Has to be called at the end of the iteration.
-     */
-    public void nextIteration(){
-        this.saveOutputData();
-        this.iteration++;
-    }
-    
-    /**
-     * 
-     * @return the current iteration
-     */
-    @Override
-    public int getIteration(){
-        return this.iteration;
-    }
-    
-    /**
-     * 
-     * @param iteration
-     */
-    public void setIteration(int iteration){
-        this.iteration=iteration;
-    }
-    
-    /**
-     * @return the events
-     */
-    public ArrayList<Event> getEvents() {
-        return events;
-    }
-    
-    /**
      * 
      * @param event 
      */
@@ -695,104 +660,208 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.events.addAll(events);
     }
     
-    /**
-     * @return the sfinaParameters
-     */
-    public HashMap<SfinaParameter,Object> getSfinaParameters() {
-        return sfinaParameters;
-    }
-
-    /**
-     * @param sfinaParameters the sfinaParameters to set
-     */
-    public void setSfinaParameters(HashMap<SfinaParameter,Object> sfinaParameters) {
-        this.sfinaParameters = sfinaParameters;
-    }
-
-    /**
-     * @return the backendParameters
-     */
+    
+    /***************************************
+     *          FILE SYSTEM AND LOADING  
+     *****************************************/
+    
     @Override
-    public HashMap<Enum,Object> getDomainParameters() {
-        return this.getFlowDomainAgent().getDomainParameters();
-    }
-
-    /**
-     * @param backendParameters the backendParameters to set
-     */
-    public void setBackendParameters(HashMap<Enum,Object> backendParameters) {
-        this.getFlowDomainAgent().setDomainParameters(backendParameters);
-    }
-    
-        /**
-         * @return the networkIndex
-         */
-        @Override
-        public int getNetworkIndex() {
-            return this.getFlowNetwork().getNetworkIndex();
-        }
-
-    /**
-     * @param networkIndex the networkIndex to set
-     */
-    private void setNetworkIndex(int networkIndex) {
-        this.getFlowNetwork().setNetworkIndex(networkIndex);
-    }
-    
-    /**
-     * Return all connected networks. 
-     * A network is connected, if an interdependent link points to or from that 
-     * network and is activated and connected.
-     * 
-     * @return a list of network indices of all connected networks
-     */
-    @Override
-    public Collection<Integer> getConnectedNetworkIndices(){
-        return this.getFlowNetwork().getConnectedNetworkIndices();
-    }
-    
-    //****************** MEASUREMENTS ******************
-    
-    /**
-     * Scheduling the measurements for the simulation agent
-     */
-    @Override
-    public void scheduleMeasurements(){
-        this.setMeasurementDumper(new MeasurementFileDumper(getPeersLogDirectory()+this.getExperimentID()+peerTokenName));
-        getPeer().getMeasurementLogger().addMeasurementLoggerListener(new MeasurementLoggerListener(){
-            public void measurementEpochEnded(MeasurementLog log, int epochNumber){
-                logger.debug("---> Measuring network " + getPeer().getIndexNumber());
-                getMeasurementDumper().measurementEpochEnded(log, epochNumber);
-                log.shrink(epochNumber, epochNumber+1);
+    public void loadFileSystem(String location){
+        String inputDirectoryName=null;
+        String outputDirectoryName=null;
+        String topologyDirectoryName=null;
+        String flowDirectoryName=null;
+        String configurationFilesLocation=null;
+        String eventsFileName=null;
+        String sfinaParamFileName=null;
+        String backendParamFileName=null;
+        String nodesFileName=null;
+        String linksFileName=null;
+        String interdependentLinksFileName=null;
+        File file = new File(location);
+        Scanner scr = null;
+        try {
+            scr = new Scanner(file);
+            while(scr.hasNext()){
+                StringTokenizer st = new StringTokenizer(scr.next(), parameterColumnSeparator);
+                switch(st.nextToken()){
+                    case "columnSeparator":
+                        this.columnSeparator=st.nextToken();
+                        break;
+                    case "missingValue":
+                        this.missingValue=st.nextToken();
+                        break;
+                    case "timeTokenName":
+                        this.timeTokenName=st.nextToken();
+                        break;
+                    case "peerToken":
+                        this.peerToken=st.nextToken();
+                        break;
+                    case "peersLogDirectory":
+                        this.peersLogDirectory=st.nextToken();
+                        break;
+                    case "inputDirectoryName":
+                        inputDirectoryName=st.nextToken();
+                        break;
+                    case "outputDirectoryName":
+                        outputDirectoryName=st.nextToken();
+                        break;
+                    case "topologyDirectoryName":
+                        topologyDirectoryName=st.nextToken();
+                        break;
+                    case "flowDirectoryName":
+                        flowDirectoryName=st.nextToken();
+                        break;
+                    case "configurationFilesLocation":
+                        configurationFilesLocation=st.nextToken();
+                        break;
+                    case "eventsFileName":
+                        eventsFileName=st.nextToken();
+                        break;
+                    case "sfinaParamFileName":
+                        sfinaParamFileName=st.nextToken();
+                        break;
+                    case "backendParamFileName":
+                        backendParamFileName=st.nextToken();
+                        break;
+                    case "nodesFileName":
+                        nodesFileName=st.nextToken();
+                        break;
+                    case "linksFileName":
+                        linksFileName=st.nextToken();
+                        break;
+                    case "interdependentLinksFileName":
+                        interdependentLinksFileName=st.nextToken();
+                        break;
+                    default:
+                        logger.debug("File system parameter couldn't be recognized.");
+                }
             }
-        });
-    }
-
-    /**
-     * @return the experimentID
-     */
-    public String getExperimentID() {
-        return experimentID;
-    }
-
-    /**
-     * @return the peersLogDirectory
-     */
-    public String getPeersLogDirectory() {
-        return peersLogDirectory;
-    }
-
-    /**
-     * @return the measurementDumper
-     */
-    public MeasurementFileDumper getMeasurementDumper() {
-        return measurementDumper;
+        }
+        catch (FileNotFoundException ex){
+            ex.printStackTrace();
+        }
+        this.timeToken=this.timeTokenName+Time.inSeconds(0).toString();
+        this.peerTokenName = "/"+peerToken+"-"+getPeer().getIndexNumber();
+        this.experimentBaseFolderLocation=configurationFilesLocation+experimentID;
+        this.experimentInputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+inputDirectoryName;
+        this.experimentOutputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+outputDirectoryName;
+        this.eventsInputLocation=experimentInputFilesLocation+eventsFileName;
+        this.eventsOutputLocation=experimentOutputFilesLocation+eventsFileName;
+        this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
+        this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
+        this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
+        this.linksLocation="/"+topologyDirectoryName+linksFileName;
+        this.interdependentLinksLocation="/"+topologyDirectoryName+interdependentLinksFileName;
+        this.nodesFlowLocation="/"+flowDirectoryName+nodesFileName;
+        this.linksFlowLocation="/"+flowDirectoryName+linksFileName;
+        this.interdependentLinksFlowLocation="/"+flowDirectoryName+interdependentLinksFileName;
     }
     
     /**
-     * @param measurementDumper the measurementDumper to set
+     * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise.
+     * @param sfinaParamLocation path to sfinaParameters.txt
+     * @param backendParamLocation path to backendParameters.txt
+     * @param eventsLocation path to events.txt
      */
-    public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
-        this.measurementDumper = measurementDumper;
+    @Override
+    public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation){
+        // Sfina Parameters
+        File file = new File(sfinaParamLocation);
+        if (file.exists()){
+            sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
+            sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
+            logger.debug("Loaded sfinaParameters: " + sfinaParameters);
+        }
+        else
+            logger.debug("sfinaParameters.txt file not found. Should be here: " + sfinaParamLocation);
+        file = new File(backendParamLocation);
+        if (file.exists()) {
+            this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
+            logger.debug("Loaded backendParameters: " + this.getDomainParameters());
+        }
+        else
+            logger.debug("No backendParameters.txt file provided.");
+        
+        // Events
+        file = new File(eventsLocation);
+        if (file.exists()) {
+            eventLoader=new EventLoader(columnSeparator,missingValue,this.getFlowDomainAgent().getFlowNetworkDataTypes());
+            events=eventLoader.loadEvents(eventsLocation);
+        }
+        else
+            logger.debug("No events.txt file provided.");
     }
+    
+    /**
+     * It clears the directory with the output files.
+     * 
+     * @param experiment 
+     */
+    private static void clearOutputFiles(File experiment){
+        File[] files = experiment.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    clearOutputFiles(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        experiment.delete();
+    }
+    
+   
+    
+    /**
+     * Loads network data from input files at given time if folder is provided.
+     * @param timeToken String "time_x" for time x
+     */
+    public void loadInputData(String timeToken){
+        File file = new File(experimentInputFilesLocation+timeToken);
+        if (file.exists() && file.isDirectory()) {
+            logger.info("loading data at " + timeToken);
+            topologyLoader.loadNodes(experimentInputFilesLocation+timeToken+nodesLocation);
+            topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+linksLocation);
+            
+            // Load flow data if provided
+            if (new File(experimentInputFilesLocation+timeToken+nodesFlowLocation).exists())
+                flowLoader.loadNodeFlowData(experimentInputFilesLocation+timeToken+nodesFlowLocation);
+            else
+                logger.debug("No node flow data provided at " + timeToken + ".");
+            if(new File(experimentInputFilesLocation+timeToken+linksFlowLocation).exists())
+                flowLoader.loadLinkFlowData(experimentInputFilesLocation+timeToken+linksFlowLocation);
+            else
+                logger.debug("No link flow data provided at " + timeToken + ".");
+            
+            // Load interdependent link data if provided. 
+            if (new File(experimentInputFilesLocation+timeToken+interdependentLinksLocation).exists()){
+                topologyLoader.loadLinks(experimentInputFilesLocation+timeToken+interdependentLinksLocation);
+                if(new File(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation).exists())
+                    flowLoader.loadInterdependentLinkFlowData(experimentInputFilesLocation+timeToken+interdependentLinksFlowLocation);
+            }
+            else
+                logger.debug("No interdependent link input files provided at " + timeToken + ".");
+            
+            this.getFlowDomainAgent().setFlowParameters(flowNetwork);
+        }
+        else
+            logger.debug("No input data provided at " + timeToken + ". Continue to use data from before.");
+    }
+    
+    /**
+     * Outputs txt files in same format as input. Creates new folder for every iteration.
+     */
+    @Override
+    public void saveOutputData(){
+        logger.info("doing output at iteration " + iteration);
+        topologyWriter.writeNodes(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesLocation);
+        topologyWriter.writeLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksLocation);
+        topologyWriter.writeInterdependentLinks(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksLocation);
+        flowWriter.writeNodeFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+nodesFlowLocation);
+        flowWriter.writeLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+linksFlowLocation);
+        flowWriter.writeInterdependentLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksFlowLocation);
+    }
+    
 }

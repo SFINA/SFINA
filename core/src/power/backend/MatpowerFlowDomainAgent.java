@@ -58,10 +58,8 @@ public class MatpowerFlowDomainAgent extends FlowDomainAgent{
     private boolean converged;
     private final String caseFile="DumpCase";
     
-    public MatpowerFlowDomainAgent(String experimentID,
-            Time bootstrapTime, 
-            Time runTime){
-        super(experimentID, bootstrapTime, runTime);
+    public MatpowerFlowDomainAgent(){
+        super();
         // Is there a better way to force initializing the FlowNetworkDataTypes class?
         this.setFlowNetworkDataTypes(new PowerFlowNetworkDataTypes()); 
         logger.debug("initializing Matpower backend");
@@ -158,7 +156,7 @@ public class MatpowerFlowDomainAgent extends FlowDomainAgent{
      */
     @Override
     public void loadDomainParameters(String backendParamLocation){
-        PowerBackendParameterLoader backendParameterLoader = new PowerBackendParameterLoader(parameterColumnSeparator);
+        PowerBackendParameterLoader backendParameterLoader = new PowerBackendParameterLoader(this.getParameterColumnSeparator());
         this.setDomainParameters(backendParameterLoader.loadBackendParameters(backendParamLocation));
     }   
             

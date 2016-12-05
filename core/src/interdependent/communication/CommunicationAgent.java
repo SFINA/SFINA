@@ -21,7 +21,7 @@
  */
 package interdependent.communication;
 
-import interdependent.communication.Archive.CommunicationAgentInterface;
+import core.SimulationAgentInterface;
 import event.Event;
 
 import interdependent.communication.Messages.AbstractSfinaMessage;
@@ -35,15 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import protopeer.BasePeerlet;
-import protopeer.Finger;
-import protopeer.NeighborManager;
 import protopeer.Peer;
 import protopeer.network.IntegerNetworkAddress;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
 import protopeer.time.Timer;
-import protopeer.time.TimerListener;
 
 /**
  *
@@ -61,7 +57,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     private List<Integer> externalNetworksFinishedStep;
     private List<Integer> externalNetworksSendEvent;
     private int totalNumberNetworks;
-    private SimulationAgentCommunicationInterface simulationAgent;
+    private SimulationAgentInterface simulationAgent;
     private boolean bootstrapingFinished = false;
     private boolean agentIsReady = false;
     private NetworkAddress networkAddress;
@@ -126,7 +122,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     public void init(Peer peer) {
         super.init(peer); //To change body of generated methods, choose Tools | Templates.
         this.peer = peer;
-        this.simulationAgent = (SimulationAgentCommunicationInterface) peer.getPeerletOfType(SimulationAgentCommunicationInterface.class);
+        this.simulationAgent = getSimulationAgent();
 
      
     }
@@ -272,9 +268,9 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
         }
     }
 
-    public SimulationAgentCommunicationInterface getSimulationAgent() {
+    public SimulationAgentInterface getSimulationAgent() {
         if (simulationAgent == null) {
-            simulationAgent = (SimulationAgentCommunicationInterface) getPeer().getPeerletOfType(SimulationAgentCommunicationInterface.class);
+            simulationAgent = (SimulationAgentInterface) getPeer().getPeerletOfType(SimulationAgentInterface.class);
         }
         return simulationAgent;
     }

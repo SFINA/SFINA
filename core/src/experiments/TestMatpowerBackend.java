@@ -17,7 +17,7 @@
  */
 package experiments;
 
-import core.SimulationAgent;
+import core.SimulationAgentOld;
 import org.apache.log4j.Logger;
 import power.backend.MatpowerFlowDomainAgent;
 import protopeer.Experiment;
@@ -52,17 +52,11 @@ public class TestMatpowerBackend extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-//                if (peerIndex == 0) {
-//                   newPeer.addPeerlet(null);
-//                }
-                newPeer.addPeerlet(new SimulationAgent(
+                newPeer.addPeerlet(new SimulationAgentOld(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
-                newPeer.addPeerlet(new MatpowerFlowDomainAgent(
-                        experimentID, 
-                        Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime)));
+                newPeer.addPeerlet(new MatpowerFlowDomainAgent());
                 return newPeer;
             }
         };
