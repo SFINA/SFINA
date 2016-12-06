@@ -45,12 +45,15 @@ public interface TimeSteppingAgentInterface {
         public void progressToNextIteration();
     }
     
+   
     /**
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
      * @param events
      */
     public void agentFinishedActiveState();
     
+    
+    // TODO Mark: discuss, Should be defined in CommandReceiver
     /**
      * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
      * @param events

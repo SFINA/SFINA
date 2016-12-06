@@ -89,7 +89,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
 
     @Override
     public void start() {
-        super.start(); //To change body of generated methods, choose Tools | Templates.
+        super.start(); 
         
        
         //first not needed as addresses are hard coded
@@ -209,6 +209,14 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
             this.checkEventsForConflicts();
             
             // TBD: This part should be double checked. logic a bit tricky.
+            // Mark: still not 100 percent secure as a no events could be waiting + 
+            // other networks send finished step, but they have events and still need to progress
+            // then we are not allowed to go to next time step
+            // Mark: solution: finished step message contains all events, which have to be send, when i got from
+            // all networks a finished message, with no events! AND I did not send events, then progress. 
+            // IN this way we know, that everyone finished. 
+            // This approach assumes, that a Simulationagent only finshes, when it converged. (Hence convergence logic is
+            // handled in the SimulationAgent)
             if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
                getCommandReceiver().progressToNextTimeStep();
             else if(this.pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
@@ -274,6 +282,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
        return allAddresses;
     }
     
+    // DANGEROUS
     private Map<Integer, NetworkAddress> getConnectedExternalNetworkAddresses(){
         
         Collection<Integer> indices = getSimulationAgent().getConnectedNetworkIndices();
@@ -292,7 +301,11 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
      *          EVENT METHODS
      * ************************************************
      */
-    
+ 
+    // todo mark: what is with events, which will be triggered in next time steps, i have 
+    // the feeling, that when the agent is readyToProgress, one has to send maybe another
+    // Events, which will be for the next time steps? What do you think? or are Event
+    // Messages only there for communication changes in the current iteration? has to be discussed
     private List<Event> extractPendingInterdependentEvents(){
         List<Event> interdependentEvents = new ArrayList<>();
         for(Event event : this.getSimulationAgent().getEvents())
@@ -303,6 +316,9 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     
     // TBD: Can be here or in SimulationAgent, what makes more sense?
     // Ben: I think better here, to be easily changeable without touching SimulationAgent
+    // Mark: yes its true only point is maybe, that Simulationagent should so 
+    // or so make sure when events are inserted, that these events are valid, or 
+    // am i wrong?
     private void checkEventsForConflicts() {
         logger.debug("Conflict check of events not implemented yet.");
     }

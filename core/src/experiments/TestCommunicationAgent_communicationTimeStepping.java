@@ -29,7 +29,7 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author root
+ * @author mcb
  */
 public class TestCommunicationAgent_communicationTimeStepping extends SimulatedExperiment{
     
