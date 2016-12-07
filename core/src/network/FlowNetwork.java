@@ -52,7 +52,7 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     
     private List<Node> nodes;
     private List<LinkInterface> links;
-    private int networkIndex;
+    private int networkIndex =-1;
     private static final Logger logger = Logger.getLogger(FlowNetwork.class);
     
     /**

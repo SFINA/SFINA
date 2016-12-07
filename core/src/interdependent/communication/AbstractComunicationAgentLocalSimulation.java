@@ -57,6 +57,12 @@ public abstract class AbstractComunicationAgentLocalSimulation extends AbstractC
         
         return connectedAddresses;
     }
+
+    @Override
+    protected NetworkAddress getNetworkAddress(int networkIndex) {
+        return getAllExternalNetworkAddresses().get(networkIndex);
+    }
+    
     
     
 }

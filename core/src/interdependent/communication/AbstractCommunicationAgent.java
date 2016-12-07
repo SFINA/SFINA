@@ -27,6 +27,7 @@ import interdependent.Messages.NetworkAddressMessage;
 import interdependent.Messages.SfinaMessageType;
 import static interdependent.communication.CommunicationAgent.POST_ADDRESS_CHANGE_RECEIVED;
 import static interdependent.communication.CommunicationAgent.POST_AGENT_IS_READY;
+import static java.lang.Integer.min;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     protected int totalNumberNetworks;
     protected boolean agentIsReady; 
 
+    private boolean bootStrapFinished = false;
     protected Timer initialDelayTimer;
     
     
@@ -88,6 +90,14 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      */
     @Override
     public void agentFinishedActiveState() {        
+        
+        //MArk : does this work -> shifted bootstrapping logic here
+        if(!bootStrapFinished){
+            bootStrapFinished = true;
+            postProcessAbstractCommunication(SfinaMessageType.BOOT_FINISHED_MESSAGE);
+            return;
+        }
+        
         this.agentIsReady = true;
         
         // inform other Communication Agents
@@ -96,12 +106,13 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
 
-        
+        // where is it guaranteed that only those messages are send, which 
         EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
         sendToConnected(eventMessage);
 
+        this.handleCommandReceiverFinished();
         // post process the communication
-        this.postProcessAbstractCommunication(SfinaMessageType.AGENT_IS_READY);
+        this.postProcessAbstractCommunication(SfinaMessageType.FINISHED_STEP);
     }
  
     
@@ -128,7 +139,6 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
                         this.externalNetworksSendEvent.add(sfinaMessage.getNetworkIdentifier());
                     else
                         logger.debug("Attention: Event message already received from this network, shoudn't happen.");
-                    postProcessAbstractCommunication(SfinaMessageType.EVENT_MESSAGE);
                     break;
                 case FINISHED_STEP:
                     if(!externalNetworksFinishedStep.contains(sfinaMessage.getNetworkIdentifier())){
@@ -138,18 +148,24 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
                     }
                     else
                         logger.debug("Attention: Finished Step message already received from this network, shoudn't happen.");
-                    postProcessAbstractCommunication(SfinaMessageType.FINISHED_STEP);
                     break;
                 default:
                     if(!handleMessage(sfinaMessage))
                         logger.debug("Message Type not recognized");
-                    else
-                        postProcessAbstractCommunication(sfinaMessage.getMessageType());
+                 
+                        
 
             }
+            postProcessAbstractCommunication(sfinaMessage.getMessageType());
         }
 
     }
+       /**
+     * ***************************************
+     *         MESSAGE SENDING
+     * ***************************************
+     */
+
     protected void sendToAll(AbstractSfinaMessage message){
         for(NetworkAddress address: getAllExternalNetworkAddresses().values())
             getPeer().sendMessage(address, message);
@@ -160,6 +176,9 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
             getPeer().sendMessage(address, message);
     }
     
+    protected void sendToSpecific(AbstractSfinaMessage message, int networkIndex){
+        getPeer().sendMessage(getNetworkAddress(networkIndex), message);
+    }
     
      /**
      * ***************************************
@@ -169,20 +188,61 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     private void postProcessAbstractCommunication(SfinaMessageType typeOfPost) {
         // each time something changes this function should be called 
         // handles necessary further steps
-        if(!handlePostProcess(typeOfPost));
-            checkAndNextStep();
+        
+        switch(typeOfPost){
+            case EVENT_MESSAGE:
+                getSimulationAgent().queueEvents(this.eventsToQueue);
+                this.eventsToQueue.clear();
+                break;
+            default: 
+                if(!handlePostProcess(typeOfPost))
+                checkAndNextStep();
+                
+        }
+        
+        
+        
+        
+//         switch (typeOfPost) {
+//            case EVENT_MESSAGE:
+//                checkAndNextStep();
+//                break;
+//            case FINISHED_STEP:
+//                checkAndNextStep();
+//                break;
+//            default:
+//                handlePostProcess(typeOfPost);
+//                checkAndNextStep();
+//                break;
+//
+//        }
+//        
+        
+//        if(!handlePostProcess(typeOfPost));
+//            checkAndNextStep();
        
     }
     
     public void checkAndNextStep() {
+        
+         if(getCommandReceiver().pendingEventsInQueue()){ // if this network has more events waiting for this time step, continue iterations
+                 getCommandReceiver().progressToNextIteration();
+                 return;
+         }
+        
+         // this.checkEventsForConflicts();
+        
         if (readyToProgress()) {
             
             this.externalNetworksFinishedStep.clear();
             this.externalNetworksSendEvent.clear();
             this.agentIsReady = false;
-            this.getSimulationAgent().queueEvents(eventsToQueue);
+            // MArk This should not be here!
             this.eventsToQueue.clear();
-            this.checkEventsForConflicts();
+           
+            
+            
+            
             
             // TBD: This part should be double checked. logic a bit tricky.
             // Mark: still not 100 percent secure as a no events could be waiting + 
@@ -201,11 +261,13 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 //            else
 //                getCommandReceiver().progressToNextTimeStep();
             
-             if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
-               getCommandReceiver().progressToNextTimeStep();
-            else if(getCommandReceiver().pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
-                getCommandReceiver().progressToNextIteration();
-            else if(this.externalNetworksConverged) // if this network doesn't have more events waiting and the other networks have also finished, continue to next time step
+            //dont make it here, as readyToProgess is not aware of Bootstraping. 
+//            if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
+//               getCommandReceiver().progressToNextTimeStep();
+            
+            //should not be done here, here only next step
+//           
+            if(this.externalNetworksConverged) // if this network doesn't have more events waiting and the other networks have also finished, continue to next time step
                 getCommandReceiver().progressToNextTimeStep();
             else{ // if the above two don't hold, wait ?? it is not really connected?
                 this.externalNetworksConverged = true;
@@ -244,6 +306,11 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         logger.debug("Conflict check of events not implemented yet.");
     }   
     
+    private boolean abstractReadyToProgress(){
+        return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
+                && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
+                && this.agentIsReady;
+    }
     
     
      /**
@@ -257,6 +324,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     
     // DANGEROUS
     protected abstract Map<Integer, NetworkAddress> getConnectedExternalNetworkAddresses();
+    
+    protected abstract NetworkAddress getNetworkAddress(int networkIndex);
     
     protected abstract boolean handleMessage(AbstractSfinaMessage message);
     

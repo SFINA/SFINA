@@ -78,7 +78,13 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
 
     @Override
     protected boolean handlePostProcess(SfinaMessageType messageType) {
-       return false;
+       switch(messageType){
+           case BOOT_FINISHED_MESSAGE:
+               getCommandReceiver().progressToNextTimeStep();
+               return true;
+           default:
+               return false;
+       }
     }
 
     @Override

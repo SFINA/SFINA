@@ -19,12 +19,20 @@ package interdependent.Messages;
 
 /**
  *
- * @author Ben
+ * @author mcb
  */
-public enum SfinaMessageType {
-    EVENT_MESSAGE,
-    NETWORK_ADDRESS_CHANGE,
-    FINISHED_STEP,
-    TOKEN_MESSAGE,
-    BOOT_FINISHED_MESSAGE
+public class TokenMessage extends AbstractSfinaMessage{
+
+    public TokenMessage(int networkIdentifier) {
+        super(networkIdentifier);
+    }
+
+   
+    @Override
+    public SfinaMessageType getMessageType() {
+        return SfinaMessageType.TOKEN_MESSAGE;
+    }
+    
+    
+    
 }
