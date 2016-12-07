@@ -190,15 +190,25 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
             // IN this way we know, that everyone finished. 
             // This approach assumes, that a Simulationagent only finshes, when it converged. (Hence convergence logic is
             // handled in the SimulationAgent)
-            if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
+            
+            // this really has to be rechecked, i think one should remove pendingEventsInQueue, SimulationAGent should handle the 
+            // case when it still has 
+//            if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
+//                getCommandReceiver().progressToNextTimeStep();
+//            else
+//                getCommandReceiver().progressToNextTimeStep();
+            
+             if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
                getCommandReceiver().progressToNextTimeStep();
             else if(getCommandReceiver().pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
                 getCommandReceiver().progressToNextIteration();
             else if(this.externalNetworksConverged) // if this network doesn't have more events waiting and the other networks have also finished, continue to next time step
                 getCommandReceiver().progressToNextTimeStep();
-            else{ // if the above two don't hold, wait
+            else{ // if the above two don't hold, wait ?? it is not really connected?
                 this.externalNetworksConverged = true;
+                //Todo this is not working
                 logger.debug("No pending events, but other networks still iterating -> Waiting");
+                getCommandReceiver().progressToNextTimeStep();
             }
         }
 

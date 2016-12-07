@@ -67,7 +67,7 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
 //                SimplePeerIdentifierGenerator()));
 
                 //SFINA AGENTS
-                newPeer.addPeerlet(new CommunicationAgent(N));
+                newPeer.addPeerlet(new CommunicationAgentNew(N));
                 newPeer.addPeerlet(new SimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),

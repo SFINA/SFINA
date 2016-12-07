@@ -91,8 +91,10 @@ public class FlowNetwork extends State implements FlowNetworkInterface{
     public Collection<Integer> getConnectedNetworkIndices(){
         Collection<Integer> networkIndices = new ArrayList<>();
         for(InterdependentLink link : this.getLinksInterdependent())
-            if(!networkIndices.contains(link.getRemoteNetworkIndex()) && link.isActivated() && link.isConnected())
-                networkIndices.add(link.getRemoteNetworkIndex());
+            if(!networkIndices.contains(link.getRemoteNetworkIndex()) && link.isActivated() && link.isConnected()){
+                if(link.getRemoteNetworkIndex() != this.getNetworkIndex())
+                    networkIndices.add(link.getRemoteNetworkIndex());
+            }
         return networkIndices;
     }
     

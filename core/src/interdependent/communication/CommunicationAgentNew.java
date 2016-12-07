@@ -24,6 +24,7 @@ import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedStepMessage;
 import interdependent.Messages.NetworkAddressMessage;
 import interdependent.Messages.SfinaMessageType;
+import static java.lang.Integer.min;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,8 +64,10 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
         // -> Ben: now yes, added check when receiving messages
         // PROBLEM when interdependent link in input files to another network is defined, which is not loaded. The case, if 3 networks are prepared, but N = 2;
         // Should ideally be checked somewhere
+        // Mark: can be checked here, maybe log it? currently I just take the min
+        
         return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
-                && (this.externalNetworksSendEvent.size() == getSimulationAgent().getConnectedNetworkIndices().size()) 
+                && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady;
     }
 
