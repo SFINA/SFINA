@@ -91,9 +91,12 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         this.agentIsReady = true;
         
         // inform other Communication Agents
+        // Mark: maybe we merge event and Finished Step message?
+        // moreover: if i did not send Events and the others are converged (have no Events left - is this synonymous?)
         FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
 
+        
         EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
         sendToConnected(eventMessage);
 
