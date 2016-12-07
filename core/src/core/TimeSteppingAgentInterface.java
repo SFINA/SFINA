@@ -54,6 +54,7 @@ public interface TimeSteppingAgentInterface {
     
     
     // TODO Mark: discuss, Should be defined in CommandReceiver
+    // Yes, let's move it to CommandReceiver and maybe the method from SimpleTimeSteppingAgent to SimulationAgent
     /**
      * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
      * @param events

@@ -217,6 +217,16 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
             // IN this way we know, that everyone finished. 
             // This approach assumes, that a Simulationagent only finshes, when it converged. (Hence convergence logic is
             // handled in the SimulationAgent)
+            //
+            // Ben: The case you addressed is done by the externalNetworksConverged variable, which is updated through a new 
+            // field in the finished step message. It's so to say the notification if the other networks still have events in queue
+            // Your idea also works, but the other networks don't need to know which exact events are scheduled in a network,
+            // but only that there are some in the queue (boolean). Only the events on interdependent links have to be shared.
+            //
+            // Just noticed: Like this the iteration integers can get out of sync. When one network is waiting while another is 
+            // iterating, and then the first one gets triggered to iterate again, it will just increment. 
+            // So we should decide, if the iterations for one network should always increment, or if they should skip iterations 
+            // in order to be in sync with the iterations of all other networks. I think the second option would be more user friendly.
             if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
                getCommandReceiver().progressToNextTimeStep();
             else if(this.pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
@@ -236,6 +246,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
         // -> Ben: now yes, added check when receiving messages
         // PROBLEM when interdependent link in input files to another network is defined, which is not loaded. The case, if 3 networks are prepared, but N = 2;
         // Should ideally be checked somewhere
+        // Ben: What to do about this?
         return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksSendEvent.size() == getSimulationAgent().getConnectedNetworkIndices().size()) 
                 && this.agentIsReady;
@@ -283,6 +294,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     }
     
     // DANGEROUS
+    // BEN: Why?
     private Map<Integer, NetworkAddress> getConnectedExternalNetworkAddresses(){
         
         Collection<Integer> indices = getSimulationAgent().getConnectedNetworkIndices();
@@ -306,6 +318,8 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     // the feeling, that when the agent is readyToProgress, one has to send maybe another
     // Events, which will be for the next time steps? What do you think? or are Event
     // Messages only there for communication changes in the current iteration? has to be discussed
+    // Ben: you're right. What about extracting all interdependent events where time >= getSimulationTime?
+    // But then the problem is, that the same events can get send several times, maybe prevent this?
     private List<Event> extractPendingInterdependentEvents(){
         List<Event> interdependentEvents = new ArrayList<>();
         for(Event event : this.getSimulationAgent().getEvents())
@@ -319,6 +333,8 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
     // Mark: yes its true only point is maybe, that Simulationagent should so 
     // or so make sure when events are inserted, that these events are valid, or 
     // am i wrong?
+    // Ben: Yes good point, but would you do it for all events, also the local ones? Or we run the check only on interdependent
+    // events automatically.
     private void checkEventsForConflicts() {
         logger.debug("Conflict check of events not implemented yet.");
     }
