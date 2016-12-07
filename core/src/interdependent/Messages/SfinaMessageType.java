@@ -24,5 +24,6 @@ package interdependent.Messages;
 public enum SfinaMessageType {
     EVENT_MESSAGE,
     NETWORK_ADDRESS_CHANGE,
-    FINISHED_STEP
+    FINISHED_STEP,
+    AGENT_IS_READY
 }

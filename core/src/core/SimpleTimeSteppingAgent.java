@@ -29,7 +29,7 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
    
     @Override
     public void agentFinishedActiveState() {
-        if(pendingEventsInQueue())
+        if(getCommandReceiver().pendingEventsInQueue())
             getCommandReceiver().progressToNextIteration();
         else
             getCommandReceiver().progressToNextTimeStep();
@@ -43,12 +43,14 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
         return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
     }
     
-    @Override
-    public boolean pendingEventsInQueue(){
-        for(Event event : getSimulationAgent().getEvents())
-            if(event.getTime() == getSimulationAgent().getSimulationTime())
-                return true;
-        return false;
-    }
+   //Mark: defined in CommandReceiver
+//    
+//    @Override
+//    public boolean pendingEventsInQueue(){
+//        for(Event event : getSimulationAgent().getEvents())
+//            if(event.getTime() == getSimulationAgent().getSimulationTime())
+//                return true;
+//        return false;
+//    }
     
 }

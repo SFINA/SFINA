@@ -219,7 +219,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
             // handled in the SimulationAgent)
             if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
                getCommandReceiver().progressToNextTimeStep();
-            else if(this.pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
+            else if(getCommandReceiver().pendingEventsInQueue()) // if this network has more events waiting for this time step, continue iterations
                 getCommandReceiver().progressToNextIteration();
             else if(this.externalNetworksConverged) // if this network doesn't have more events waiting and the other networks have also finished, continue to next time step
                 getCommandReceiver().progressToNextTimeStep();
@@ -252,7 +252,7 @@ public class CommunicationAgent extends SimpleTimeSteppingAgent {
         this.agentIsReady = true;
         
         // inform other Communication Agents
-        FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), this.pendingEventsInQueue());
+        FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
 
         EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());

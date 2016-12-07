@@ -43,9 +43,20 @@ public interface TimeSteppingAgentInterface {
          * to redo its caluclations
          */
         public void progressToNextIteration();
+        
+        // TODO Mark: discuss, Should be defined in CommandReceiver
+        /**
+         * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
+         * @param events
+         * @return 
+         */
+        boolean pendingEventsInQueue();
     }
     
    
+    // Mark: Todo does it make sense to pass the Events? I would say yes,
+    // a TimeStepper could decide based on the remaining events if to proceed etc.
+    // then also the pendingEventsInQueue method would not be necessary
     /**
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
      * @param events
@@ -53,12 +64,6 @@ public interface TimeSteppingAgentInterface {
     public void agentFinishedActiveState();
     
     
-    // TODO Mark: discuss, Should be defined in CommandReceiver
-    /**
-     * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
-     * @param events
-     * @return 
-     */
-    boolean pendingEventsInQueue();
+    
    
 }

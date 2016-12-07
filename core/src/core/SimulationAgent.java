@@ -247,6 +247,17 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.initIteration();
         this.runActiveState(); 
     }
+
+    @Override
+    public boolean pendingEventsInQueue() {
+        for(Event event : getEvents()){
+            if(event.getTime() == getSimulationTime())
+                return true;
+        }
+        return false;
+    }
+    
+    
     
     @Override
     public void runActiveState(){
