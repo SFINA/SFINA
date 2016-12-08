@@ -187,7 +187,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 
                 //new line added#
                 logger.debug("##### End of bootstraping, calling agentFinishedActiveState ");
-                getTimeSteppingAgent().agentFinishedActiveState();
+                getTimeSteppingAgent().agentFinishedBootStrap();
                
             }
         });

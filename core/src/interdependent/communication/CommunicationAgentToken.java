@@ -57,9 +57,16 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         
     }
 
+    //Just dummy!
     @Override
-    protected boolean readyToProgress() {
-        return this.hasToken;
+    protected ProgressType readyToProgress() {
+        if(this.hasToken ){
+            if(getCommandReceiver().pendingEventsInQueue())
+                return ProgressType.DO_ITERATION;
+            else
+                return ProgressType.DO_NEXT_STEP;
+        }else
+            return ProgressType.DO_NOTHING;
     }
 
     @Override
@@ -76,20 +83,21 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
     protected boolean handlePostProcess(SfinaMessageType messageType) {
         switch(messageType){
             case TOKEN_MESSAGE:
+                getSimulationAgent().queueEvents(eventsToQueue);
                 return false;
+            case AGENT_IS_READY:
+                if(this.agentIsReady && this.hasToken && !getCommandReceiver().pendingEventsInQueue()){
+                    this.hasToken = false;
+                    TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
+                    sendToSpecific(message, nextNetwork);
+                }
             default:
                 return false;
                 
         }
     }
 
-    @Override
-    protected void handleCommandReceiverFinished() {
-        this.hasToken = false;
-        TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
-        sendToSpecific(message, this.nextNetwork);
-    }
-    
+ 
     
     
     

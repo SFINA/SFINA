@@ -59,16 +59,22 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
      * ************************************************
      */
      @Override
-    protected boolean readyToProgress() {
-        //TBD: is this condition enough: it does not check for which keys exactly are inside 
-        // -> Ben: now yes, added check when receiving messages
-        // PROBLEM when interdependent link in input files to another network is defined, which is not loaded. The case, if 3 networks are prepared, but N = 2;
-        // Should ideally be checked somewhere
-        // Mark: can be checked here, maybe log it? currently I just take the min
-        
-        return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
+    protected ProgressType readyToProgress() {
+       
+        if(this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
-                && this.agentIsReady;
+                && this.agentIsReady){
+            if(getCommandReceiver().pendingEventsInQueue()){
+                // what happens if events where send after we send our finishedStep message, that we converged!
+                // This has to be handled, when events are Received!
+                return ProgressType.DO_ITERATION;
+            }else{
+                return ProgressType.DO_NEXT_STEP;
+            }
+        }else{
+            return ProgressType.DO_NOTHING;
+        }
+           
     }
 
     @Override
@@ -76,26 +82,5 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
         return false;
     }
 
-    @Override
-    protected boolean handlePostProcess(SfinaMessageType messageType) {
-       switch(messageType){
-           case BOOT_FINISHED_MESSAGE:
-               getCommandReceiver().progressToNextTimeStep();
-               return true;
-           default:
-               return false;
-       }
-    }
-
-    @Override
-    protected void handleCommandReceiverFinished() {
-        
-    }
-    
-    
-    
-    
-    
- 
     
 }

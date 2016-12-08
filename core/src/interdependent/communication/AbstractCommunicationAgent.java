@@ -51,16 +51,12 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     protected final static int POST_EVENT_RECEIVED = 3;
 
     protected static final Logger logger = Logger.getLogger(CommunicationAgent.class);
-    protected Map<Integer, NetworkAddress> externalNetworkAddresses;
     protected List<Integer> externalNetworksFinishedStep;
-    protected boolean externalNetworksConverged;
     protected List<Integer> externalNetworksSendEvent;
     protected List<Event> eventsToQueue;
     protected int totalNumberNetworks;
     protected boolean agentIsReady; 
 
-    private boolean bootStrapFinished = false;
-    protected Timer initialDelayTimer;
     
     
     
@@ -70,13 +66,12 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      */
     public AbstractCommunicationAgent(int totalNumberNetworks) {
         super();
-        this.externalNetworkAddresses = new HashMap();
         this.totalNumberNetworks = totalNumberNetworks;
         this.externalNetworksFinishedStep = new ArrayList<>();
         this.externalNetworksSendEvent = new ArrayList<>();
         this.eventsToQueue = new ArrayList<>();
         this.agentIsReady = false;
-        this.externalNetworksConverged = true;
+  
     }
     
     
@@ -88,31 +83,29 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      *        TIME STEPPING FUNCTIONS
      * ************************************************
      */
+    
     @Override
-    public void agentFinishedActiveState() {        
-        
-        //MArk : does this work -> shifted bootstrapping logic here
-        if(!bootStrapFinished){
-            bootStrapFinished = true;
-            postProcessAbstractCommunication(SfinaMessageType.BOOT_FINISHED_MESSAGE);
-            return;
-        }
-        
+    public void agentFinishedBootStrap() {
+              
+        this.postProcessAbstractCommunication(SfinaMessageType.BOOT_FINISHED_MESSAGE);
+    }
+
+    @Override
+    public void agentFinishedActiveState() {
         this.agentIsReady = true;
         
-        // inform other Communication Agents
-        // Mark: maybe we merge event and Finished Step message?
-        // moreover: if i did not send Events and the others are converged (have no Events left - is this synonymous?)
+        
+        // Mark: maybe we merge event and Finished Step message? - TBD 
         FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
-
-        // where is it guaranteed that only those messages are send, which 
+        
+        //TBD Mark: where is it guaranteed that only those messages are send, which belong to that network? Should
+        // we do it here or on receive?
         EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
         sendToConnected(eventMessage);
 
-        this.handleCommandReceiverFinished();
         // post process the communication
-        this.postProcessAbstractCommunication(SfinaMessageType.FINISHED_STEP);
+        this.postProcessAbstractCommunication(SfinaMessageType.AGENT_IS_READY);
     }
  
     
@@ -131,36 +124,114 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 
             switch (sfinaMessage.getMessageType()) {
                 case EVENT_MESSAGE:
-                    //TBD: Maybe Collect, or runtime etc.? has to be discussed
-                    //Ben: Maybe better, in case some events arrive in the middle of executing events. Probably not a problem, but better be safe.
+                 
                     this.eventsToQueue.addAll(((EventMessage) sfinaMessage).getEvents());
-                    
                     if(!externalNetworksSendEvent.contains(sfinaMessage.getNetworkIdentifier()))
                         this.externalNetworksSendEvent.add(sfinaMessage.getNetworkIdentifier());
-                    else
+                    else{
+                        // Mark: needs to be discussed, I think it could happen, if another network was first finished and then triggered by an event
                         logger.debug("Attention: Event message already received from this network, shoudn't happen.");
+                    }
                     break;
                 case FINISHED_STEP:
-                    if(!externalNetworksFinishedStep.contains(sfinaMessage.getNetworkIdentifier())){
-                        this.externalNetworksFinishedStep.add(sfinaMessage.getNetworkIdentifier());
-                        if(!((FinishedStepMessage)sfinaMessage).isConverged())
-                            this.externalNetworksConverged = false;
+                    FinishedStepMessage finishedMessage = ((FinishedStepMessage)sfinaMessage);
+                    // Logic: only if converged is network added to the finished Networks - externalNetworksFinishedStep hence only contain networks which are converged
+                    if(finishedMessage.isConverged()){
+                        if(!externalNetworksFinishedStep.contains(finishedMessage.getNetworkIdentifier())){
+                            this.externalNetworksFinishedStep.add(finishedMessage.getNetworkIdentifier()); 
+                        }
+                    }else{
+                        // Logic: if through send events another network is no longer converged, it will be removed
+                        // from the finished Networks
+                        if(externalNetworksFinishedStep.contains(finishedMessage.getNetworkIdentifier())){
+                            int index = this.externalNetworksFinishedStep.indexOf(finishedMessage.getNetworkIdentifier());
+                            this.externalNetworksFinishedStep.remove(index);
+                        }
                     }
-                    else
-                        logger.debug("Attention: Finished Step message already received from this network, shoudn't happen.");
                     break;
                 default:
                     if(!handleMessage(sfinaMessage))
                         logger.debug("Message Type not recognized");
-                 
-                        
-
             }
             postProcessAbstractCommunication(sfinaMessage.getMessageType());
         }
 
     }
-       /**
+     
+     /**
+     * ***************************************
+     *         COMMUNICATION POSTPROCESS
+     * ***************************************
+     */
+    /**
+     * Each time Communication happens/ something chagnes this function should be called 
+     * Handles necessary further steps
+     * @param typeOfPost 
+     */
+    private void postProcessAbstractCommunication(SfinaMessageType typeOfPost) {
+   
+        
+        // Check if Child handles postProcess, else do default Behavior
+        if(!handlePostProcess(typeOfPost)){
+            switch(typeOfPost){
+                case EVENT_MESSAGE:
+                    // Mark message should always be queued or not, as default behavior?
+                    if(this.eventsToQueue.size()>0){
+                        getSimulationAgent().queueEvents(this.eventsToQueue);
+                        if(this.agentIsReady && getCommandReceiver().pendingEventsInQueue()){
+                            // this has to be done, as we already signaled to all agents, that we are converged
+                            FinishedStepMessage finishedStepMessage = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), 
+                                    getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), false);
+                            sendToAll(finishedStepMessage);
+                        }
+                        this.eventsToQueue.clear();
+                    }
+                    break;
+                case BOOT_FINISHED_MESSAGE:
+                    doNextStep();
+                    break;
+                default: 
+            }      
+                
+        }
+        
+        // Decide what to do 
+        switch(readyToProgress()){
+            case DO_ITERATION:
+                doNextIteration();
+                break;
+            case DO_NEXT_STEP:
+                doNextStep();
+                break;
+            case DO_NOTHING:
+                
+                break;
+            default:
+                if(this.agentIsReady){
+                    doNextIteration();
+                }else{
+                    doNextStep();
+                }   
+        }
+        
+        
+
+    }
+    
+    private void doNextStep(){
+        this.externalNetworksFinishedStep.clear();
+        this.externalNetworksSendEvent.clear();
+        this.agentIsReady = false;
+        getCommandReceiver().progressToNextTimeStep();
+    }
+    
+    private void doNextIteration(){
+        this.agentIsReady = false;
+        // Mark: should here also be finished step cleaned etc.?
+        getCommandReceiver().progressToNextIteration();
+    }
+        
+  /**
      * ***************************************
      *         MESSAGE SENDING
      * ***************************************
@@ -179,105 +250,10 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     protected void sendToSpecific(AbstractSfinaMessage message, int networkIndex){
         getPeer().sendMessage(getNetworkAddress(networkIndex), message);
     }
-    
-     /**
-     * ***************************************
-     *         COMMUNICATION POSTPROCESS
-     * ***************************************
-     */
-    private void postProcessAbstractCommunication(SfinaMessageType typeOfPost) {
-        // each time something changes this function should be called 
-        // handles necessary further steps
         
-        switch(typeOfPost){
-            case EVENT_MESSAGE:
-                getSimulationAgent().queueEvents(this.eventsToQueue);
-                this.eventsToQueue.clear();
-                break;
-            default: 
-                if(!handlePostProcess(typeOfPost))
-                checkAndNextStep();
-                
-        }
-        
-        
-        
-        
-//         switch (typeOfPost) {
-//            case EVENT_MESSAGE:
-//                checkAndNextStep();
-//                break;
-//            case FINISHED_STEP:
-//                checkAndNextStep();
-//                break;
-//            default:
-//                handlePostProcess(typeOfPost);
-//                checkAndNextStep();
-//                break;
-//
-//        }
-//        
-        
-//        if(!handlePostProcess(typeOfPost));
-//            checkAndNextStep();
-       
-    }
-    
-    public void checkAndNextStep() {
-        
-         if(getCommandReceiver().pendingEventsInQueue()){ // if this network has more events waiting for this time step, continue iterations
-                 getCommandReceiver().progressToNextIteration();
-                 return;
-         }
-        
-         // this.checkEventsForConflicts();
-        
-        if (readyToProgress()) {
             
-            this.externalNetworksFinishedStep.clear();
-            this.externalNetworksSendEvent.clear();
-            this.agentIsReady = false;
-            // MArk This should not be here!
-            this.eventsToQueue.clear();
-           
-            
-            
-            
-            
-            // TBD: This part should be double checked. logic a bit tricky.
-            // Mark: still not 100 percent secure as a no events could be waiting + 
-            // other networks send finished step, but they have events and still need to progress
-            // then we are not allowed to go to next time step
-            // Mark: solution: finished step message contains all events, which have to be send, when i got from
-            // all networks a finished message, with no events! AND I did not send events, then progress. 
-            // IN this way we know, that everyone finished. 
-            // This approach assumes, that a Simulationagent only finshes, when it converged. (Hence convergence logic is
-            // handled in the SimulationAgent)
-            
-            // this really has to be rechecked, i think one should remove pendingEventsInQueue, SimulationAGent should handle the 
-            // case when it still has 
-//            if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
-//                getCommandReceiver().progressToNextTimeStep();
-//            else
-//                getCommandReceiver().progressToNextTimeStep();
-            
-            //dont make it here, as readyToProgess is not aware of Bootstraping. 
-//            if(this.getSimulationAgent().getIteration() == 0 ) // The case after bootstraping, maybe there's a better way to always ensure that after bootsraping it doesn't stop? E.g. make a different method agentFinishedBootstraping()
-//               getCommandReceiver().progressToNextTimeStep();
-            
-            //should not be done here, here only next step
-//           
-            if(this.externalNetworksConverged) // if this network doesn't have more events waiting and the other networks have also finished, continue to next time step
-                getCommandReceiver().progressToNextTimeStep();
-            else{ // if the above two don't hold, wait ?? it is not really connected?
-                this.externalNetworksConverged = true;
-                //Todo this is not working
-                logger.debug("No pending events, but other networks still iterating -> Waiting");
-                getCommandReceiver().progressToNextTimeStep();
-            }
-        }
-
-    }
+  
+   
   
      /**
      * ************************************************
@@ -306,31 +282,48 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         logger.debug("Conflict check of events not implemented yet.");
     }   
     
-    private boolean abstractReadyToProgress(){
-        return this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
-                && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
-                && this.agentIsReady;
-    }
+    
+    
     
     
      /**
+     * ************************************************************
+     *          METHODS WITH DEFAULT BEHAVIOR - TO BE OVERWRITTEN
+     * ************************************************************
+     */ 
+  
+    
+    public enum ProgressType {
+    DO_NOTHING,
+    DO_ITERATION,
+    DO_NEXT_STEP,
+    DO_DEFAULT
+    }
+    protected ProgressType readyToProgress(){
+        return ProgressType.DO_DEFAULT;
+    }
+    
+    protected boolean handleMessage(AbstractSfinaMessage message){
+        return false;
+    }
+    
+    protected boolean handlePostProcess(SfinaMessageType messageType){
+        return false;
+    }
+    
+   
+    
+    
+    /**
      * ************************************************
      *          ABSTRACT METHODS
      * ************************************************
      */
-    protected abstract boolean readyToProgress();
-    
     protected abstract Map<Integer, NetworkAddress> getAllExternalNetworkAddresses();
     
     // DANGEROUS
     protected abstract Map<Integer, NetworkAddress> getConnectedExternalNetworkAddresses();
     
     protected abstract NetworkAddress getNetworkAddress(int networkIndex);
-    
-    protected abstract boolean handleMessage(AbstractSfinaMessage message);
-    
-    protected abstract boolean handlePostProcess(SfinaMessageType messageType);
-    
-    protected abstract void handleCommandReceiverFinished();
-      
+       
 }

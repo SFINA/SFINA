@@ -53,17 +53,16 @@ public interface TimeSteppingAgentInterface {
         boolean pendingEventsInQueue();
     }
     
-   
-    // Mark: Todo does it make sense to pass the Events? I would say yes,
-    // a TimeStepper could decide based on the remaining events if to proceed etc.
-    // then also the pendingEventsInQueue method would not be necessary
     /**
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
-     * @param events
+     * 
      */
     public void agentFinishedActiveState();
     
-    
-    
+ 
+    /**
+     * CommandReceiver can notify the TimeSteppingAgent that it finished its Bootstrap
+     */
+    public void agentFinishedBootStrap();
    
 }
