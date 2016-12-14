@@ -36,10 +36,7 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
     private int startingNetwork;
     public CommunicationAgentToken(int totalNumberNetworks, int startingNetwork){
         super(totalNumberNetworks);
-        this.startingNetwork = startingNetwork;
-                
-        
-        
+        this.startingNetwork = startingNetwork;    
     }
 
     @Override
@@ -52,9 +49,7 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
     
     
     public CommunicationAgentToken(int totalNumberNetworks) {
-        this(totalNumberNetworks, 0);
-       
-        
+        this(totalNumberNetworks, 0);     
     }
 
     //Just dummy!
@@ -74,9 +69,17 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         if(message.getMessageType().equals(SfinaMessageType.TOKEN_MESSAGE)){
             this.hasToken = true;
             return true;
-        }else{
-            return false;
         }
+        if(message.getMessageType().equals(SfinaMessageType.EVENT_MESSAGE)){
+            if(this.eventsToQueue.size()>0){
+                getSimulationAgent().queueEvents(this.eventsToQueue);
+            }
+            return true;
+        }
+        
+        
+        return false;
+        
     }
 
     @Override
@@ -87,10 +90,14 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
                 return false;
             case AGENT_IS_READY:
                 if(this.agentIsReady && this.hasToken && !getCommandReceiver().pendingEventsInQueue()){
-                    this.hasToken = false;
-                    TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
-                    sendToSpecific(message, nextNetwork);
+                    if(this.eventsToQueue.size()==0 && !getCommandReceiver().pendingEventsInQueue()){
+                        this.hasToken = false;
+                        TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
+                        sendToSpecific(message, nextNetwork);
+                        return true;
+                    }
                 }
+                return false;
             default:
                 return false;
                 

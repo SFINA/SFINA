@@ -287,7 +287,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     private void initIteration(){
         this.iteration++;
-        logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex()+ " <-------");
+        logger.info("\n----->"+this.timeToken+ "-- Iteration " + this.getIteration() + " at network " + this.getNetworkIndex()+ " <-------");
     }
       
     @Override

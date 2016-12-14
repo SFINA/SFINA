@@ -86,7 +86,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     
     @Override
     public void agentFinishedBootStrap() {
-              
+        //Do all necessary Work in the postProcess
         this.postProcessAbstractCommunication(SfinaMessageType.BOOT_FINISHED_MESSAGE);
     }
 
@@ -124,8 +124,9 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 
             switch (sfinaMessage.getMessageType()) {
                 case EVENT_MESSAGE:
-                 
+                    // Queue the received Messages
                     this.eventsToQueue.addAll(((EventMessage) sfinaMessage).getEvents());
+                    // add the Networkid of the sender to ourl ist
                     if(!externalNetworksSendEvent.contains(sfinaMessage.getNetworkIdentifier()))
                         this.externalNetworksSendEvent.add(sfinaMessage.getNetworkIdentifier());
                     else{
@@ -136,6 +137,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
                 case FINISHED_STEP:
                     FinishedStepMessage finishedMessage = ((FinishedStepMessage)sfinaMessage);
                     // Logic: only if converged is network added to the finished Networks - externalNetworksFinishedStep hence only contain networks which are converged
+                    // this simplifies convergence logic. TBD: Is it too much simplified, do we miss some complexity?
                     if(finishedMessage.isConverged()){
                         if(!externalNetworksFinishedStep.contains(finishedMessage.getNetworkIdentifier())){
                             this.externalNetworksFinishedStep.add(finishedMessage.getNetworkIdentifier()); 
@@ -143,6 +145,9 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
                     }else{
                         // Logic: if through send events another network is no longer converged, it will be removed
                         // from the finished Networks
+                        // TBD: on EventMessage Receive, if Simulation Agent gets new Events for the current finished iteration, then it is no longer converged
+                        // Hence a finishedStepMessage with non convergence has to be send, resp. a new message type?
+                        // We need to elaborate how this whole logic works. Which logic has to be delegated to to concrete CommunicationAgent Instantiation?
                         if(externalNetworksFinishedStep.contains(finishedMessage.getNetworkIdentifier())){
                             int index = this.externalNetworksFinishedStep.indexOf(finishedMessage.getNetworkIdentifier());
                             this.externalNetworksFinishedStep.remove(index);
@@ -180,6 +185,9 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
                         getSimulationAgent().queueEvents(this.eventsToQueue);
                         if(this.agentIsReady && getCommandReceiver().pendingEventsInQueue()){
                             // this has to be done, as we already signaled to all agents, that we are converged
+                            // does this have to happen here or in the concrete instantiation? 
+                            // Concrete instantiation could just return true in handlePostProcess, but does this make sense?
+                            // What should be the default behavior?
                             FinishedStepMessage finishedStepMessage = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), 
                                     getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), false);
                             sendToAll(finishedStepMessage);
