@@ -186,7 +186,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 //        }
         
         handleCommunicationEvent(communicationEventType);
-        
+
         // Decide what to do 
         switch(readyToProgress()){
             case DO_NEXT_ITERATION:
@@ -326,9 +326,14 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 //                        this.eventsToQueue.clear();
 //                    }
 //                    break;
-                case BOOT_FINISHED:
-                    doNextStep();
-                    break;
+                // currently not used, as in SimulationAgent the bootstrap method also calls finishedActiveState
+//                case BOOT_FINISHED: 
+//                    doNextStep();
+//                case BOOT_FINISHED_MESSAGE:
+//                  // should this really be the default behavior? I think it would be better to 
+//                  // do nothing here and lete child decide, as this is specific? or
+//                  doNextStep();
+//                    break;
                 default: 
             }    
         return false;

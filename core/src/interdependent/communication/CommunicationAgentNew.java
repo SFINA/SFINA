@@ -17,7 +17,6 @@
  */
 package interdependent.communication;
 
-import interdependent.Messages.AbstractSfinaMessage;
 import static java.lang.Integer.min;
 
 /**
@@ -26,6 +25,7 @@ import static java.lang.Integer.min;
  */
 public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulation{
     
+    private boolean afterBootstrap = false;
   
     /**
      * 
@@ -58,6 +58,13 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
 //        }else{
 //            return ProgressType.DO_NOTHING;
 //        }
+        
+        // What we do after bootstraping is actually the same as after any other step, so maybe
+        // go back to treating them the same after all. What do you think?
+//        if(afterBootstrap){
+//            this.afterBootstrap = false;
+//            return ProgressType.DO_NEXT_STEP;
+//        }
         if(this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady){
@@ -77,10 +84,17 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
            
     }
     
-    @Override
-    protected boolean handleMessage(AbstractSfinaMessage message) {
-        return false;
-    }
-
+    // What we do after bootstraping is actually the same as after any other step, so maybe
+    // go back to treating them the same after all. What do you think?
     
+//    @Override
+//    protected boolean handleCommunicationEvent(CommunicationEventType eventType) {
+//       if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
+//           this.afterBootstrap = true;
+//           return true;
+//        }
+//       return false;
+//    }
+
+   
 }

@@ -71,12 +71,6 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
             case TOKEN_MESSAGE:
                 this.hasToken = true;
                 return true;
-            case EVENT_MESSAGE:
-                // I think we don't need this here. Inject automatically each time before running new iteration/time step.
-//                if(this.eventsToQueue.size()>0){
-//                    getSimulationAgent().queueEvents(this.eventsToQueue);
-//                }
-                return true;
             default:
                 return false;
         }
@@ -91,14 +85,19 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
 //                return false;
             case BOOT_FINISHED:
             case AGENT_IS_READY:
-//                if(this.agentIsReady && this.hasToken && !getCommandReceiver().pendingEventsInQueue()){
+//                if(this.agentIsReady && this.hasToken ){
 //                    if(this.eventsToQueue.size()==0 && !getCommandReceiver().pendingEventsInQueue()){
 //                        this.hasToken = false;
 //                        TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
 //                        sendToSpecific(message, nextNetwork);
 //                        return true;
+//                    }else{
+//                        getSimulationAgent().queueEvents(eventsToQueue);
+//                        return true;
 //                    }
 //                }
+                // Ben: Why check if agent is ready and has token? both should be always true.
+                // Events injected automatically before executing next iteration/step
                 this.hasToken = false;
                 TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
                 sendToSpecific(message, nextNetwork);
