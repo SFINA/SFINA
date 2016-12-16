@@ -17,6 +17,8 @@
  */
 package interdependent.Messages;
 
+import interdependent.communication.CommunicationEventType;
+
 /**
  * A Message notifiying the the Network defined by networkIdentifier finished current time step or iteration
  * @author mcb
@@ -34,8 +36,8 @@ public class FinishedStepMessage extends AbstractSfinaMessage{
     }
 
     @Override
-    public SfinaMessageType getMessageType() {
-        return SfinaMessageType.FINISHED_STEP;
+    public CommunicationEventType getMessageType() {
+        return CommunicationEventType.FINISHED_STEP;
     }
 
     /**

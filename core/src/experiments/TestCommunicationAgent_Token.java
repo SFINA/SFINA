@@ -43,7 +43,7 @@ public class TestCommunicationAgent_Token extends SimulatedExperiment{
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
     private final static int runDuration=6;
-    private final static int N=2;
+    private final static int N=3;
     
     public static void main(String[] args) {
         Experiment.initEnvironment();

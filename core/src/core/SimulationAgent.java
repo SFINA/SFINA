@@ -167,7 +167,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                logger.info("### "+experimentID+" ###");
+                logger.info("### Bootstraping "+experimentID+" ###");
                 loadFileSystem(fileSystemSchema);
                 loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
                 
@@ -186,8 +186,9 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 scheduleMeasurements();
                 
                 //new line added#
-                logger.debug("##### End of bootstraping, calling agentFinishedActiveState ");
-                getTimeSteppingAgent().agentFinishedBootStrap();
+                logger.debug("### End of bootstraping, calling agentFinishedBootstrap. ###");
+                //getTimeSteppingAgent().agentFinishedBootStrap();
+                getTimeSteppingAgent().agentFinishedActiveState();
                
             }
         });
@@ -257,8 +258,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         return false;
     }
     
-    
-    
     @Override
     public void runActiveState(){
         executeAllEvents();
@@ -287,7 +286,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     private void initIteration(){
         this.iteration++;
-        logger.info("\n----->"+this.timeToken+ "-- Iteration " + this.getIteration() + " at network " + this.getNetworkIndex()+ " <-------");
+        logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex() + " (" + this.timeToken + ") <-------");
     }
       
     @Override

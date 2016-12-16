@@ -17,9 +17,6 @@
  */
 package core;
 
-import event.Event;
-import java.util.List;
-
 /**
  *
  * @author McB
@@ -44,7 +41,6 @@ public interface TimeSteppingAgentInterface {
          */
         public void progressToNextIteration();
         
-        // TODO Mark: discuss, Should be defined in CommandReceiver
         /**
          * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
          * @param events

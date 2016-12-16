@@ -15,30 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
-
-import interdependent.communication.CommunicationEventType;
-import protopeer.network.Message;
+package interdependent.communication;
 
 /**
  *
- * @author root
+ * @author Ben
  */
-public abstract class AbstractSfinaMessage extends Message implements SfinaMessageInterface{
-    
-    private int networkIdentifier;
-
-    
-    public AbstractSfinaMessage(int networkIdentifier){
-        this.networkIdentifier = networkIdentifier;
-    }
-
-    public int getNetworkIdentifier() {
-        return networkIdentifier;
-    }
-    
-    @Override
-    public abstract CommunicationEventType getMessageType();
-    
-    
+public enum ProgressType {
+    DO_NOTHING,
+    DO_NEXT_ITERATION,
+    DO_NEXT_STEP,
+    DO_DEFAULT
 }

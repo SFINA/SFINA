@@ -17,6 +17,8 @@
  */
 package interdependent.Messages;
 
+import interdependent.communication.CommunicationEventType;
+
 /**
  *
  * @author root
@@ -28,5 +30,5 @@ public interface SfinaMessageInterface {
 //    public static final String FINISHED_STEP = "Finished_Step_Message";
 //    
     public int getNetworkIdentifier();
-    public SfinaMessageType getMessageType();
+    public CommunicationEventType getMessageType();
 }

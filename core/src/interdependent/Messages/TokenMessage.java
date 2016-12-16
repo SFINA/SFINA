@@ -17,6 +17,8 @@
  */
 package interdependent.Messages;
 
+import interdependent.communication.CommunicationEventType;
+
 /**
  *
  * @author mcb
@@ -29,8 +31,8 @@ public class TokenMessage extends AbstractSfinaMessage{
 
    
     @Override
-    public SfinaMessageType getMessageType() {
-        return SfinaMessageType.TOKEN_MESSAGE;
+    public CommunicationEventType getMessageType() {
+        return CommunicationEventType.TOKEN_MESSAGE;
     }
     
     

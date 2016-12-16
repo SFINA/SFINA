@@ -17,25 +17,8 @@
  */
 package interdependent.communication;
 
-import event.Event;
-import event.NetworkComponent;
 import interdependent.Messages.AbstractSfinaMessage;
-import interdependent.Messages.EventMessage;
-import interdependent.Messages.FinishedStepMessage;
-import interdependent.Messages.NetworkAddressMessage;
-import interdependent.Messages.SfinaMessageType;
 import static java.lang.Integer.min;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.log4j.Logger;
-import protopeer.Peer;
-import protopeer.network.IntegerNetworkAddress;
-import protopeer.network.Message;
-import protopeer.network.NetworkAddress;
-import protopeer.time.Timer;
 
 /**
  *
@@ -61,22 +44,39 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
      @Override
     protected ProgressType readyToProgress() {
        
-        if(this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
-                && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
+//        if(this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
+//                && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
+//                && this.agentIsReady){
+//            if(getCommandReceiver().pendingEventsInQueue()){
+//                // what happens if events where send after we send our finishedStep message, that we converged!
+//                // This has to be handled, when events are Received!
+//                // Ben: Don't understand...
+//                return ProgressType.DO_NEXT_ITERATION;
+//            }else{
+//                return ProgressType.DO_NEXT_STEP;
+//            }
+//        }else{
+//            return ProgressType.DO_NOTHING;
+//        }
+        if(this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
+                && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady){
             if(getCommandReceiver().pendingEventsInQueue()){
                 // what happens if events where send after we send our finishedStep message, that we converged!
                 // This has to be handled, when events are Received!
-                return ProgressType.DO_ITERATION;
-            }else{
-                return ProgressType.DO_NEXT_STEP;
+                // Ben: Don't understand...
+                return ProgressType.DO_NEXT_ITERATION;
             }
-        }else{
+            else if(externalNetworksConverged())
+                return ProgressType.DO_NEXT_STEP;
+            else
+                return ProgressType.DO_NOTHING;
+                // here we should increment the iteration number, s.t. they're always in sync between networks
+        }else
             return ProgressType.DO_NOTHING;
-        }
            
     }
-
+    
     @Override
     protected boolean handleMessage(AbstractSfinaMessage message) {
         return false;

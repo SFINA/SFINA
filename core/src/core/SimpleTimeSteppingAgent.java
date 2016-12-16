@@ -40,8 +40,6 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
         getCommandReceiver().progressToNextTimeStep();
     }
     
-    
-    
     public SimulationAgentInterface getSimulationAgent() {
         return (SimulationAgentInterface) getPeer().getPeerletOfType(SimulationAgentInterface.class);
     }
@@ -49,17 +47,5 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
     public CommandReceiver getCommandReceiver(){
         return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
     }
-    
-    
-    
-   //Mark: defined in CommandReceiver
-//    
-//    @Override
-//    public boolean pendingEventsInQueue(){
-//        for(Event event : getSimulationAgent().getEvents())
-//            if(event.getTime() == getSimulationAgent().getSimulationTime())
-//                return true;
-//        return false;
-//    }
     
 }

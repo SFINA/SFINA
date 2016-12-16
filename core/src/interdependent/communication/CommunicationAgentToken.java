@@ -18,7 +18,6 @@
 package interdependent.communication;
 
 import interdependent.Messages.AbstractSfinaMessage;
-import interdependent.Messages.SfinaMessageType;
 import interdependent.Messages.TokenMessage;
 import protopeer.Peer;
 
@@ -31,12 +30,15 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
     
     private boolean hasToken;
     private int nextNetwork;
-    private int previousNetwork;
-    
     private int startingNetwork;
+    
     public CommunicationAgentToken(int totalNumberNetworks, int startingNetwork){
         super(totalNumberNetworks);
         this.startingNetwork = startingNetwork;    
+    }
+    
+    public CommunicationAgentToken(int totalNumberNetworks) {
+        this(totalNumberNetworks, 0);     
     }
 
     @Override
@@ -46,66 +48,65 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         this.nextNetwork = ((getSimulationAgent().getNetworkIndex()+1) % totalNumberNetworks);
     }
     
-    
-    
-    public CommunicationAgentToken(int totalNumberNetworks) {
-        this(totalNumberNetworks, 0);     
-    }
-
     //Just dummy!
+    // Ben: ?
     @Override
     protected ProgressType readyToProgress() {
-        if(this.hasToken ){
+        if(this.hasToken){
             if(getCommandReceiver().pendingEventsInQueue())
-                return ProgressType.DO_ITERATION;
-            else
+                return ProgressType.DO_NEXT_ITERATION;
+            else if(externalNetworksConverged())
                 return ProgressType.DO_NEXT_STEP;
+            else{
+                // here we should increment the iteration number, s.t. they're always in sync between networks
+                return ProgressType.DO_NOTHING;
+            }
         }else
             return ProgressType.DO_NOTHING;
     }
 
     @Override
     protected boolean handleMessage(AbstractSfinaMessage message) {
-        if(message.getMessageType().equals(SfinaMessageType.TOKEN_MESSAGE)){
-            this.hasToken = true;
-            return true;
+        switch(message.getMessageType()){
+            case TOKEN_MESSAGE:
+                this.hasToken = true;
+                return true;
+            case EVENT_MESSAGE:
+                // I think we don't need this here. Inject automatically each time before running new iteration/time step.
+//                if(this.eventsToQueue.size()>0){
+//                    getSimulationAgent().queueEvents(this.eventsToQueue);
+//                }
+                return true;
+            default:
+                return false;
         }
-        if(message.getMessageType().equals(SfinaMessageType.EVENT_MESSAGE)){
-            if(this.eventsToQueue.size()>0){
-                getSimulationAgent().queueEvents(this.eventsToQueue);
-            }
-            return true;
-        }
-        
-        
-        return false;
-        
     }
 
     @Override
-    protected boolean handlePostProcess(SfinaMessageType messageType) {
+    protected boolean handleCommunicationEvent(CommunicationEventType messageType) {
         switch(messageType){
-            case TOKEN_MESSAGE:
-                getSimulationAgent().queueEvents(eventsToQueue);
-                return false;
+            // See above
+//            case TOKEN_MESSAGE:
+//                getSimulationAgent().queueEvents(eventsToQueue);
+//                return false;
+            case BOOT_FINISHED:
             case AGENT_IS_READY:
-                if(this.agentIsReady && this.hasToken && !getCommandReceiver().pendingEventsInQueue()){
-                    if(this.eventsToQueue.size()==0 && !getCommandReceiver().pendingEventsInQueue()){
-                        this.hasToken = false;
-                        TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
-                        sendToSpecific(message, nextNetwork);
-                        return true;
-                    }
-                }
+//                if(this.agentIsReady && this.hasToken && !getCommandReceiver().pendingEventsInQueue()){
+//                    if(this.eventsToQueue.size()==0 && !getCommandReceiver().pendingEventsInQueue()){
+//                        this.hasToken = false;
+//                        TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
+//                        sendToSpecific(message, nextNetwork);
+//                        return true;
+//                    }
+//                }
+                this.hasToken = false;
+                TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
+                sendToSpecific(message, nextNetwork);
                 return false;
             default:
-                return false;
-                
+                return false;    
         }
     }
 
- 
-    
-    
     
 }

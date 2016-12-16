@@ -17,6 +17,7 @@
  */
 package interdependent.Messages;
 
+import interdependent.communication.CommunicationEventType;
 import event.Event;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +47,8 @@ public class EventMessage extends AbstractSfinaMessage{
     }
 
     @Override
-    public SfinaMessageType getMessageType() {
-        return SfinaMessageType.EVENT_MESSAGE;
+    public CommunicationEventType getMessageType() {
+        return CommunicationEventType.EVENT_MESSAGE;
     }
     
     

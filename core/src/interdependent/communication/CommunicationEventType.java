@@ -15,17 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
+package interdependent.communication;
 
 /**
  *
  * @author Ben
  */
-public enum SfinaMessageType {
+public enum CommunicationEventType {
     EVENT_MESSAGE,
     NETWORK_ADDRESS_CHANGE,
     FINISHED_STEP,
     TOKEN_MESSAGE,
-    BOOT_FINISHED_MESSAGE,
+    BOOT_FINISHED,
     AGENT_IS_READY
 }
