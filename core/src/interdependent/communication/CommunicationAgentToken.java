@@ -69,15 +69,7 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         if(message.getMessageType().equals(SfinaMessageType.TOKEN_MESSAGE)){
             this.hasToken = true;
             return true;
-        }
-        if(message.getMessageType().equals(SfinaMessageType.EVENT_MESSAGE)){
-            if(this.eventsToQueue.size()>0){
-                getSimulationAgent().queueEvents(this.eventsToQueue);
-            }
-            return true;
-        }
-        
-        
+        }    
         return false;
         
     }
@@ -87,13 +79,16 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         switch(messageType){
             case TOKEN_MESSAGE:
                 getSimulationAgent().queueEvents(eventsToQueue);
-                return false;
+                return true;
             case AGENT_IS_READY:
-                if(this.agentIsReady && this.hasToken && !getCommandReceiver().pendingEventsInQueue()){
+                if(this.agentIsReady && this.hasToken ){
                     if(this.eventsToQueue.size()==0 && !getCommandReceiver().pendingEventsInQueue()){
                         this.hasToken = false;
                         TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
                         sendToSpecific(message, nextNetwork);
+                        return true;
+                    }else{
+                        getSimulationAgent().queueEvents(eventsToQueue);
                         return true;
                     }
                 }

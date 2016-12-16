@@ -96,7 +96,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         
         
         // Mark: maybe we merge event and Finished Step message? - TBD 
-        FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().pendingEventsInQueue());
+        // Mark: getCommandReceiver().pendingEventsInQueue() if this is true it is not converged or? so we should say !getCommandReceiver().pendingEventsInQueue()??
+        FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), !getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
         
         //TBD Mark: where is it guaranteed that only those messages are send, which belong to that network? Should
@@ -196,7 +197,9 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
                     }
                     break;
                 case BOOT_FINISHED_MESSAGE:
-                    doNextStep();
+                    // should this really be the default behavior? I think it would be better to 
+                    // do nothing here and lete child decide, as this is specific? or
+                  //  doNextStep();
                     break;
                 default: 
             }      

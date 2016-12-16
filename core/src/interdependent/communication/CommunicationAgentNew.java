@@ -43,6 +43,7 @@ import protopeer.time.Timer;
  */
 public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulation{
     
+    private boolean afterBootstrap = false;
   
     /**
      * 
@@ -61,6 +62,10 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
      @Override
     protected ProgressType readyToProgress() {
        
+        if(afterBootstrap){
+            this.afterBootstrap = false;
+            return ProgressType.DO_NEXT_STEP;
+        }
         if(this.externalNetworksFinishedStep.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksSendEvent.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady){
@@ -78,9 +83,15 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
     }
 
     @Override
-    protected boolean handleMessage(AbstractSfinaMessage message) {
-        return false;
+    protected boolean handlePostProcess(SfinaMessageType messageType) {
+       if(messageType.equals(SfinaMessageType.BOOT_FINISHED_MESSAGE)){
+           this.afterBootstrap = true;
+           return true;
+        }
+       return false;
     }
+
+   
 
     
 }
