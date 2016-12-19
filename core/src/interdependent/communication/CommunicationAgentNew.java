@@ -61,10 +61,11 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
         
         // What we do after bootstraping is actually the same as after any other step, so maybe
         // go back to treating them the same after all. What do you think?
-//        if(afterBootstrap){
-//            this.afterBootstrap = false;
-//            return ProgressType.DO_NEXT_STEP;
-//        }
+        // Is CommunicationAgent dependent, see below
+        if(afterBootstrap){
+            this.afterBootstrap = false;
+            return ProgressType.DO_NEXT_STEP;
+        }
         if(this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady){
@@ -72,11 +73,16 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
                 // what happens if events where send after we send our finishedStep message, that we converged!
                 // This has to be handled, when events are Received!
                 // Ben: Don't understand...
+                // Mark: What happens, if we send a Finished Step Message that we converged. But then receive an event and
+                // now have pendingEventsInQueue, and hence do another iteration instead of a next step, we should inform
+                // all the we have not finished ye, or?
                 return ProgressType.DO_NEXT_ITERATION;
             }
-            else if(externalNetworksConverged())
+            else if(externalNetworksConverged()){
+                //Mark: can this lead to a deadlock? As converged is not a "hard criterion", it could be that two 
+                // networks did not converge, but also dont run 
                 return ProgressType.DO_NEXT_STEP;
-            else
+            }else
                 return ProgressType.DO_NOTHING;
                 // here we should increment the iteration number, s.t. they're always in sync between networks
         }else
@@ -86,15 +92,16 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
     
     // What we do after bootstraping is actually the same as after any other step, so maybe
     // go back to treating them the same after all. What do you think?
-    
-//    @Override
-//    protected boolean handleCommunicationEvent(CommunicationEventType eventType) {
-//       if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
-//           this.afterBootstrap = true;
-//           return true;
-//        }
-//       return false;
-//    }
+    // Is dependent from Communication Agent: if this one -> progress to Next Step, if Token do nothing etc.
+    // Nevertheless: still TBD  
+    @Override
+    protected boolean handleCommunicationEvent(CommunicationEventType eventType) {
+       if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
+           this.afterBootstrap = true;
+           return true;
+        }
+       return false;
+    }
 
    
 }

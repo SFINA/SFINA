@@ -90,12 +90,17 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         
         // Mark: maybe we merge event and Finished Step message? - TBD 
         // Ben: Argument against: One has to be send to all, the other only to connected networks
+        // Mark: what is with the case in the interdependent case, that one finished its step, sends finished, but also sends an event
+        // to another note? The note which only gets the finished step message could/ would start progressing in some cases
+        // but maybe an event is triggered through the events obtained, which also has to be send to the note which already started progressing?
         FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), !getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
         
         //TBD Mark: where is it guaranteed that only those messages are send, which belong to that network? Should
         // we do it here or on receive?
         // Ben: What do you mean by that?
+        // Mark: A network could have three Interdependent Events: Event A goes to network 2, Event B to network 6, and Event C to network seven
+        // currently we are sending all three events to all three networks. But network 2 only needs event A and only need to inject this one
         EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
         sendToConnected(eventMessage);
 
@@ -129,6 +134,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 //                    else{
 //                        // Mark: needs to be discussed, I think it could happen, if another network was first finished and then triggered by an event
 //                        // That's why I put the logging, so we know when it happens :)
+                    // Mark: jep, but this can happen regularly, or am I wrong?
 //                        logger.debug("Attention: Event message already received from this network, shoudn't happen.");
 //                    }
                     break;
@@ -226,9 +232,10 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     }
     
     protected boolean externalNetworksConverged(){
-        for(Boolean converged : this.externalNetworksFinished.values())
+        for(Boolean converged : this.externalNetworksFinished.values()){
             if(!converged)
                 return false;
+        }
         return true;
     }
         
@@ -295,14 +302,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      * ************************************************************
      */ 
     
-    protected ProgressType readyToProgress(){
-        if(bootFinished)
-            return ProgressType.DO_DEFAULT;
-        else if(agentIsReady)
-            return ProgressType.DO_DEFAULT;
-        else
-            return ProgressType.DO_NOTHING;
-    }
+    protected abstract ProgressType readyToProgress();
     
     protected boolean handleMessage(AbstractSfinaMessage message){
         return false;
