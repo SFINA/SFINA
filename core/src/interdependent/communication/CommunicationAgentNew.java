@@ -76,14 +76,19 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
                 // Mark: What happens, if we send a Finished Step Message that we converged. But then receive an event and
                 // now have pendingEventsInQueue, and hence do another iteration instead of a next step, we should inform
                 // all the we have not finished ye, or?
+                // Ben: I think this isn't a problem, because in that case the other agent has not converged, 
+                // therefore nobody will go to the next step. So we also don't need to tell them that they shouldn't. Right?
                 return ProgressType.DO_NEXT_ITERATION;
             }
             else if(externalNetworksConverged()){
                 //Mark: can this lead to a deadlock? As converged is not a "hard criterion", it could be that two 
                 // networks did not converge, but also dont run 
+                // Ben: I'd define convergence in that context the following way: Continue with iterations as long
+                // as there are events scheduled for this time step. Then I don't see why there could be a deadlock.
                 return ProgressType.DO_NEXT_STEP;
             }else
-                return ProgressType.DO_NOTHING;
+//                return ProgressType.DO_NOTHING;
+                return ProgressType.SKIP_NEXT_ITERATION;
                 // here we should increment the iteration number, s.t. they're always in sync between networks
         }else
             return ProgressType.DO_NOTHING;
@@ -95,12 +100,10 @@ public class CommunicationAgentNew extends AbstractComunicationAgentLocalSimulat
     // Is dependent from Communication Agent: if this one -> progress to Next Step, if Token do nothing etc.
     // Nevertheless: still TBD  
     @Override
-    protected boolean handleCommunicationEvent(CommunicationEventType eventType) {
+    protected void handleCommunicationEvent(CommunicationEventType eventType) {
        if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
            this.afterBootstrap = true;
-           return true;
         }
-       return false;
     }
 
    

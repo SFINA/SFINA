@@ -19,6 +19,7 @@ package interdependent.communication;
 
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.TokenMessage;
+import static java.lang.Integer.min;
 import protopeer.Peer;
 
 /**
@@ -58,25 +59,39 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         if(afterbootStrap){
                 this.afterbootStrap = false;
                 return ProgressType.DO_NEXT_STEP;
-            }
+        }
         
-        if(this.hasToken){
-            
-            
-            
+        // Ben: some more checks than just hasToken is necessary, 
+        // because otherwise a next step will be triggered once for every incoming message
+        if(this.hasToken
+                && this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
+                && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
+                && this.agentIsReady){
             // here is a problem, readyToProgress assumes, that algorithm was already running once. But after bootstrap
             // currently we do nothing. Hence we arrive at that point not having executed the code once. 
             // as a quick and dirty fix -> all networks after bootup will run one iteration
             // throuh this iteration 2 will happen first at the network after the starting network
             if(getCommandReceiver().pendingEventsInQueue())
                 return ProgressType.DO_NEXT_ITERATION;
-            else if(externalNetworksConverged())
+//            else if(isFirst()){
+//                return ProgressType.DO_NEXT_STEP;
+//            }
+            else if(externalNetworksConverged()){
+                // Ben: To me it seems not to be executed in the right order, is that possible?
                 return ProgressType.DO_NEXT_STEP;
+//                if(isFirst())
+//                    return ProgressType.DO_NEXT_STEP;
+//                else{
+//                    sendTokenToFirst();
+//                    return ProgressType.DO_NOTHING;
+//                }                
+            }
             else{
                 // here we should increment the iteration number, s.t. they're always in sync between networks
                 // or here should the Token be send to the next, as we are having the token
-                sendTokenToNext();
-                return ProgressType.DO_NOTHING;
+                // Handled by skipNextIteration() which calls again agentIsReady, which sends the token message
+                //sendTokenToNext();
+                return ProgressType.SKIP_NEXT_ITERATION;
             }
         }else
             return ProgressType.DO_NOTHING;
@@ -94,15 +109,15 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
     }
 
     @Override
-    protected boolean handleCommunicationEvent(CommunicationEventType messageType) {
+    protected void handleCommunicationEvent(CommunicationEventType messageType) {
         switch(messageType){
             case BOOT_FINISHED:
                 this.afterbootStrap = true;
-                return true;
             // See above
 //            case TOKEN_MESSAGE:
 //                getSimulationAgent().queueEvents(eventsToQueue);
 //                return false;
+                break;
             case AGENT_IS_READY:
 //                if(this.agentIsReady && this.hasToken ){
 //                    if(!getCommandReceiver().pendingEventsInQueue()){
@@ -122,10 +137,10 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
 //                TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
 //                sendToSpecific(message, nextNetwork);
 //                return false;
-                    sendTokenToNext();
-                    return true;
+                sendTokenToNext();
+                break;
             default:
-                return false;    
+                break;
         }
     }
     
@@ -134,6 +149,14 @@ public class CommunicationAgentToken extends AbstractComunicationAgentLocalSimul
         TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
         sendToSpecific(message, nextNetwork);
     }
-
     
+    private void sendTokenToFirst(){
+        this.hasToken = false;
+        TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
+        sendToSpecific(message, startingNetwork);
+    }    
+    
+    private boolean isFirst(){
+        return this.getSimulationAgent().getNetworkIndex() == startingNetwork;
+    }
 }

@@ -23,6 +23,7 @@ package interdependent.communication;
  */
 public enum ProgressType {
     DO_NOTHING,
+    SKIP_NEXT_ITERATION,
     DO_NEXT_ITERATION,
     DO_NEXT_STEP,
     DO_DEFAULT

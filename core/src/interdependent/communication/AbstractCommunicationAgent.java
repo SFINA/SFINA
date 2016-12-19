@@ -93,6 +93,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         // Mark: what is with the case in the interdependent case, that one finished its step, sends finished, but also sends an event
         // to another note? The note which only gets the finished step message could/ would start progressing in some cases
         // but maybe an event is triggered through the events obtained, which also has to be send to the note which already started progressing?
+        // Ben: But if there are also events sent, then the isConverged field of the finished step message is false and therefore takes care of
+        // preventing the progression.
         FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), !getCommandReceiver().pendingEventsInQueue());
         sendToAll(message);
         
@@ -101,6 +103,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         // Ben: What do you mean by that?
         // Mark: A network could have three Interdependent Events: Event A goes to network 2, Event B to network 6, and Event C to network seven
         // currently we are sending all three events to all three networks. But network 2 only needs event A and only need to inject this one
+        // Ben: Oh damn, you're right, this could cause trouble. Also, this means that the indices of the interdependent events have to be unique
+        // accross all the networks. Didn't think of that yet...
         EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
         sendToConnected(eventMessage);
 
@@ -201,6 +205,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
             case DO_NEXT_STEP:
                 doNextStep();
                 break;
+            case SKIP_NEXT_ITERATION:
+                skipNextIteration();
             case DO_NOTHING:
                 break;
             default:
@@ -223,6 +229,11 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         clearCommunicationAgent();
         injectEvents();
         getCommandReceiver().progressToNextIteration();
+    }
+    
+    private void skipNextIteration(){
+        clearCommunicationAgent();
+        getCommandReceiver().skipNextIteration();
     }
     
     private void clearCommunicationAgent(){
@@ -308,7 +319,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         return false;
     }
     
-    protected boolean handleCommunicationEvent(CommunicationEventType eventType){
+    protected void handleCommunicationEvent(CommunicationEventType eventType){
         switch(eventType){
 //                case EVENT_MESSAGE:
 //                    // Mark message should always be queued or not, as default behavior?
@@ -335,8 +346,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
 //                  doNextStep();
 //                    break;
                 default: 
-            }    
-        return false;
+                    break;
+            }
     }
     
    

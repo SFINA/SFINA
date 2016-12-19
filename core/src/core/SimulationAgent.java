@@ -248,6 +248,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.initIteration();
         this.runActiveState(); 
     }
+    
+    @Override
+    public void skipNextIteration() {
+        this.initIteration();
+        logger.info("Skipping this iteration");
+        getTimeSteppingAgent().agentFinishedActiveState();
+    }
 
     @Override
     public boolean pendingEventsInQueue() {
@@ -284,6 +291,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         loadInputData(timeToken);   
     }
     
+    /**
+     * Sets iteration to 0.
+     */
+    private void resetIteration(){
+        this.iteration=0;
+    }
+    
     private void initIteration(){
         this.iteration++;
         logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex() + " (" + this.timeToken + ") <-------");
@@ -303,8 +317,12 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
         // For testing if iteration advances as expected
-        if(this.getIteration()==1)
-            this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
+        if(this.getNetworkIndex() == 0 && this.getSimulationTime() == 1)
+            if(this.getIteration()==1 || this.getIteration()==2 )
+                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
+        if(this.getSimulationTime() == 2)
+            if(this.getIteration()==1 || this.getIteration()==2 )
+                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
     }
      
     @Override
@@ -312,13 +330,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         
     }
     
-    /**
-     * Sets iteration to 1.
-     */
-    public void resetIteration(){
-        this.iteration=0;
-    }
-
     @Override
     public void runPassiveState(Message message){
         
