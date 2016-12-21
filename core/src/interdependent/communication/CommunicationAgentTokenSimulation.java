@@ -28,7 +28,6 @@ import protopeer.Peer;
  */
 public class CommunicationAgentTokenSimulation extends AbstractComunicationAgentLocalSimulation{
 
-    
     private boolean hasToken;
     private int nextNetwork;
     private int startingNetwork;

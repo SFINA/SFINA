@@ -81,5 +81,11 @@ public interface SimulationAgentInterface {
     ArrayList<Event> getEvents();
     
     void removeEvent(Event event);
+
+    /**
+     *
+     * @return the network
+     */
+    FlowNetwork getFlowNetwork();
     
 }

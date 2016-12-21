@@ -364,6 +364,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      * 
      * @return the network
      */
+    @Override
     public FlowNetwork getFlowNetwork() {
         return flowNetwork;
     }

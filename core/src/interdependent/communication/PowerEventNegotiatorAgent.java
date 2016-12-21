@@ -37,7 +37,7 @@ public class PowerEventNegotiatorAgent extends BasePeerlet implements EventNegot
     
     @Override
     public Event negotiateEvents(List<Event> events){
-        logger.debug("Event negotiation not yet implemented.");
+        
         return null;
     }
 }

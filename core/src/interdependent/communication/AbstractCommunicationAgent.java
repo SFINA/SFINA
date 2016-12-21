@@ -81,11 +81,12 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     @Override
     public void agentFinishedActiveState() {
         this.agentIsReady = true;
-        
-        // TODO: Send events only to networks that they apply to
-        EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), this.extractPendingInterdependentEvents());
-        sendToConnected(eventMessage);
-        
+
+        for(Map.Entry<Integer,List<Event>> entry : this.extractPendingInterdependentEvents().entrySet()){
+            EventMessage eventMessage = new EventMessage(getSimulationAgent().getNetworkIndex(), entry.getValue());
+            sendToSpecific(eventMessage, entry.getKey());
+        }
+            
         FinishedStepMessage message = new FinishedStepMessage(getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().isConverged());
         sendToAll(message);
         
@@ -217,11 +218,16 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      * ************************************************
      */
  
-    protected List<Event> extractPendingInterdependentEvents(){
-        List<Event> interdependentEvents = new ArrayList<>();
-        for(Event event : this.getSimulationAgent().getEvents())
-            if(event.getTime() >= this.getSimulationAgent().getSimulationTime() && event.getNetworkComponent().equals(NetworkComponent.INTERDEPENDENT_LINK))
-                interdependentEvents.add(event);
+    protected Map<Integer, List<Event>> extractPendingInterdependentEvents(){
+        Map<Integer, List<Event>> interdependentEvents = new HashMap<>();
+        for(Integer netID : getSimulationAgent().getConnectedNetworkIndices())
+            interdependentEvents.put(netID, new ArrayList<>());
+        for(Event event : this.getSimulationAgent().getEvents()){
+            if(event.getTime() >= this.getSimulationAgent().getSimulationTime() && event.getNetworkComponent() != null && event.getNetworkComponent().equals(NetworkComponent.INTERDEPENDENT_LINK)){
+                int targetNetwork = this.getSimulationAgent().getFlowNetwork().getInterdependentLink(event.getComponentID()).getRemoteNetworkIndex();
+                interdependentEvents.get(targetNetwork).add(event);
+            }
+        }
         return interdependentEvents;
     }
     
