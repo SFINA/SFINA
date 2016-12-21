@@ -695,6 +695,11 @@ public class SimulationAgentNoStepper extends BasePeerlet implements SimulationA
         this.events.addAll(events);
     }
     
+    @Override
+    public void removeEvent(Event event) {
+        this.events.remove(event);
+    }
+    
     /**
      * @return the sfinaParameters
      */

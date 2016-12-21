@@ -18,7 +18,8 @@
 package experiments;
 
 import core.SimulationAgent;
-import interdependent.communication.CommunicationAgentNew;
+import interdependent.communication.CommunicationAgentInterdependentSimulation;
+import interdependent.communication.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
@@ -53,25 +54,14 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-//                if (peerIndex == 0) {
-//                   newPeer.addPeerlet(null);
-//                }
-//                if (peerIndex == 0) {
-//                    newPeer.addPeerlet(new BootstrapServer());
-//                }
-//                //Connection AGENTS
-//                 newPeer.addPeerlet(new NeighborManager());
-//                  newPeer.addPeerlet(new SimpleConnector());
-//                   newPeer.addPeerlet(new BootstrapClient(Experiment.getSingleton().getAddressToBindTo(0), new
-//                SimplePeerIdentifierGenerator()));
-
-                //SFINA AGENTS
-                newPeer.addPeerlet(new CommunicationAgentNew(N));
                 newPeer.addPeerlet(new SimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
+                //NECESSARY HELPER AGENTS
+                newPeer.addPeerlet(new CommunicationAgentInterdependentSimulation(N));
                 newPeer.addPeerlet(new InterpssFlowDomainAgent());
+                newPeer.addPeerlet(new PowerEventNegotiatorAgent());
                 return newPeer;
             }
         };

@@ -29,7 +29,7 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
    
     @Override
     public void agentFinishedActiveState() {
-        if(getCommandReceiver().pendingEventsInQueue())
+        if(getCommandReceiver().isConverged())
             getCommandReceiver().progressToNextIteration();
         else
             getCommandReceiver().progressToNextTimeStep();

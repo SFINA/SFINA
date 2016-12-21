@@ -171,7 +171,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 loadFileSystem(fileSystemSchema);
                 loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
                 
-                // Clearing output and peers log files
+                // Clearing output and peers log files from earlier experiments
                 File folder = new File(peersLogDirectory+experimentID+"/");
                 clearOutputFiles(folder);
                 folder.mkdir();
@@ -185,11 +185,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                                 
                 scheduleMeasurements();
                 
-                //new line added#
                 logger.debug("### End of bootstraping, calling agentFinishedBootstrap. ###");
-                 getTimeSteppingAgent().agentFinishedBootStrap();
-                //getTimeSteppingAgent().agentFinishedActiveState();
-               
+                getTimeSteppingAgent().agentFinishedBootStrap();               
             }
         });
         loadAgentTimer.schedule(this.bootstrapTime);
@@ -257,12 +254,12 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     }
 
     @Override
-    public boolean pendingEventsInQueue() {
+    public boolean isConverged() {
         for(Event event : getEvents()){
             if(event.getTime() == getSimulationTime())
-                return true;
+                return false;
         }
-        return false;
+        return true;
     }
     
     @Override
@@ -503,7 +500,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                 case TOPOLOGY:
                     switch(event.getNetworkComponent()){
                         case NODE:
-                            Node node=flowNetwork.getNode(event.getComponentID());
+                            Node node = flowNetwork.getNode(event.getComponentID());
                             switch((NodeState)event.getParameter()){
                                 case ID:
                                     node.setIndex((String)event.getValue());
@@ -525,7 +522,6 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                             break;
                         case LINK:
                             Link link=flowNetwork.getLink(event.getComponentID());
-//                            link.replacePropertyElement(event.getParameter(), event.getValue());
                             switch((LinkState)event.getParameter()){
                                 case ID:
                                     link.setIndex((String)event.getValue());
@@ -635,6 +631,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             }
             if(successful)
                 this.eventWriter.writeEvent(event);
+            else
+                logger.debug("Attention: Event must be ill defined, could not be executed!");
         }
         else
             logger.debug("Event not executed because defined for different time step.");
@@ -655,6 +653,11 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      */
     public void queueEvents(List<Event> events){
         this.events.addAll(events);
+    }
+    
+    @Override
+    public void removeEvent(Event event){
+        this.events.remove(event);
     }
     
     

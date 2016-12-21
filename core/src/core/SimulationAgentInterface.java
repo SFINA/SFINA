@@ -79,6 +79,7 @@ public interface SimulationAgentInterface {
      * @return the events
      */
     ArrayList<Event> getEvents();
-
+    
+    void removeEvent(Event event);
     
 }

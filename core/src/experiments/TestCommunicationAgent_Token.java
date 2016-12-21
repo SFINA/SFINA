@@ -18,7 +18,8 @@
 package experiments;
 
 import core.SimulationAgent;
-import interdependent.communication.CommunicationAgentToken;
+import interdependent.communication.CommunicationAgentTokenSimulation;
+import interdependent.communication.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
@@ -53,26 +54,14 @@ public class TestCommunicationAgent_Token extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-//                if (peerIndex == 0) {
-//                   newPeer.addPeerlet(null);
-//                }
-//                if (peerIndex == 0) {
-//                    newPeer.addPeerlet(new BootstrapServer());
-//                }
-//                //Connection AGENTS
-//                 newPeer.addPeerlet(new NeighborManager());
-//                  newPeer.addPeerlet(new SimpleConnector());
-//                   newPeer.addPeerlet(new BootstrapClient(Experiment.getSingleton().getAddressToBindTo(0), new
-//                SimplePeerIdentifierGenerator()));
-
-     
                 newPeer.addPeerlet(new SimulationAgent(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
-                 //SFINA AGENTS
-                newPeer.addPeerlet(new CommunicationAgentToken(N,0));
+                 //NECESSARY HELPER  AGENTS
+                newPeer.addPeerlet(new CommunicationAgentTokenSimulation(N,0));
                 newPeer.addPeerlet(new InterpssFlowDomainAgent());
+                newPeer.addPeerlet(new PowerEventNegotiatorAgent());
                 return newPeer;
             }
         };

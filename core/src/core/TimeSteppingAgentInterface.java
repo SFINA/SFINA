@@ -17,6 +17,8 @@
  */
 package core;
 
+import event.Event;
+
 /**
  *
  * @author McB
@@ -50,11 +52,10 @@ public interface TimeSteppingAgentInterface {
         public void skipNextIteration();
         
         /**
-         * Allows TimeSteppingAgent to check if the SimulationAgent needs more iterations.
-         * @param events
+         * Allows TimeSteppingAgent to check if the SimulationAgent doesn't need more iterations.
          * @return 
          */
-        boolean pendingEventsInQueue();
+        boolean isConverged();
     }
     
     /**
