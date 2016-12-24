@@ -21,13 +21,25 @@ import event.Event;
 import java.util.List;
 
 /**
- * Negotiates in case of event conflicts. 
- * Event conflicts are cases of two events scheduled for the same time, 
- * that want to change the same parameter with different values.
+ * Handles ambiguities of events between interdependent networks.
+ * In particular important for dependencies between networks of different domains (power, gas, communication, ...).
  * @author Ben
  */
 public interface EventNegotiatorAgentInterface {
-
+    
+    /**
+     * Negotiate event conflicts. The case if two events scheduled for the same time, 
+     * want to change the same parameter of the same object with different values.
+     * @param events in conflict
+     * @return the event which replaces the list of input events
+     */
     Event negotiateEvents(List<Event> events);
+    
+    /**
+     * Translate change on interdependent link to change(s) in node in local network.
+     * @param event on an interdependent link
+     * @return list of events triggered by input event
+     */
+    List<Event> translateEvent(Event event);
     
 }

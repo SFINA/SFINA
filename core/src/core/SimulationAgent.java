@@ -586,6 +586,13 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
                                         logger.info("..setting interdependent link " + interdependentLink.getIndex() + " to activated = " + event.getValue());
                                     }
                                     break;
+                                case REMOTE_NODE_STATUS:
+                                    if(interdependentLink.isRemoteNodeActivated() != (Boolean)event.getValue())
+                                        interdependentLink.setRemoteNodeActivated((Boolean)event.getValue());
+                                    else{
+                                        successful = false;
+                                        logger.info("Interdependent link remote node status same, not changed by event.");
+                                    }
                                 default:
                                     successful = false;
                                     logger.debug("Interdependent link state cannot be recognised");
@@ -633,7 +640,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
             if(successful)
                 this.eventWriter.writeEvent(event);
             else
-                logger.debug("Attention: Event must be ill defined, could not be executed!");
+                logger.debug("Attention: Event must be badly defined, could not be executed!");
         }
         else
             logger.debug("Event not executed because defined for different time step.");

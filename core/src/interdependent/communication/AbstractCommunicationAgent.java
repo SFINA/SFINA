@@ -19,6 +19,7 @@ package interdependent.communication;
 
 import core.SimpleTimeSteppingAgent;
 import event.Event;
+import event.EventType;
 import event.NetworkComponent;
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.EventMessage;
@@ -27,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import network.InterdependentLink;
+import network.LinkState;
+import network.NodeState;
 import org.apache.log4j.Logger;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
@@ -218,14 +222,34 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      * ************************************************
      */
  
+    /**
+     * Retrieves all events relevant for the interdependent link.
+     * Separates them per network.
+     * @return Map with List of events mapped to the network index they have to
+     * be send to.
+     */
     protected Map<Integer, List<Event>> extractPendingInterdependentEvents(){
         Map<Integer, List<Event>> interdependentEvents = new HashMap<>();
         for(Integer netID : getSimulationAgent().getConnectedNetworkIndices())
             interdependentEvents.put(netID, new ArrayList<>());
         for(Event event : this.getSimulationAgent().getEvents()){
-            if(event.getTime() >= this.getSimulationAgent().getSimulationTime() && event.getNetworkComponent() != null && event.getNetworkComponent().equals(NetworkComponent.INTERDEPENDENT_LINK)){
-                int targetNetwork = this.getSimulationAgent().getFlowNetwork().getInterdependentLink(event.getComponentID()).getRemoteNetworkIndex();
-                interdependentEvents.get(targetNetwork).add(event);
+            if(event.getTime() >= this.getSimulationAgent().getSimulationTime() && event.getNetworkComponent() != null){
+                if(event.getNetworkComponent().equals(NetworkComponent.INTERDEPENDENT_LINK)){
+                    int targetNetwork = this.getSimulationAgent().getFlowNetwork().getInterdependentLink(event.getComponentID()).getRemoteNetworkIndex();
+                    interdependentEvents.get(targetNetwork).add(event);
+                }
+                if(event.getNetworkComponent().equals(NetworkComponent.NODE) 
+                    && event.getParameter().equals(NodeState.STATUS)
+                    && !getSimulationAgent().getFlowNetwork().getNode(event.getComponentID()).getLinksInterdependent().isEmpty()){
+                    // We have to notify the other network also, when the status of a node with attached interdependent link is changed
+                    // That should be the only property, which is not encoded in the interdependent link events.
+                    // This solution is kinda ugly, maybe there's a better one??
+                    for(InterdependentLink link : getSimulationAgent().getFlowNetwork().getNode(event.getComponentID()).getLinksInterdependent()){
+                        int targetNetwork = link.getRemoteNetworkIndex();
+                        Event remoteNodeStatusChange = new Event(event.getTime(), EventType.TOPOLOGY, NetworkComponent.INTERDEPENDENT_LINK, link.getIndex(), LinkState.REMOTE_NODE_STATUS, event.getValue());
+                        interdependentEvents.get(targetNetwork).add(remoteNodeStatusChange);
+                    }
+                }
             }
         }
         return interdependentEvents;
@@ -234,7 +258,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     private void injectEvents(){
         for(List<Event> events : this.externalNetworksEvents.values()){
             for(Event event : events){
-                getSimulationAgent().queueEvent(checkEventForConflict(event));
+                getSimulationAgent().queueEvents(translateEvent(checkEventForConflict(event)));
             }
         }
     }
@@ -285,6 +309,11 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
     private Event negotiateEvents(List<Event> events) {
         return ((EventNegotiatorAgentInterface) this.getPeer().getPeerletOfType(EventNegotiatorAgentInterface.class)).negotiateEvents(events);
     }
+    
+    private List<Event> translateEvent(Event event) {
+        return ((EventNegotiatorAgentInterface) this.getPeer().getPeerletOfType(EventNegotiatorAgentInterface.class)).translateEvent(event);
+    }
+
   
     /**
      * ************************************************

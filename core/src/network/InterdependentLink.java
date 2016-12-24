@@ -93,4 +93,26 @@ public class InterdependentLink extends Link implements LinkInterface{
     public void setRemoteNetworkIndex(int remoteNetworkIndex) {
         this.remoteNetworkIndex = remoteNetworkIndex;
     }
+    
+    /**
+     * Allow change of remote node activation.
+     * Helpful because the remote node is not saved in the flow network,
+     * thus cannot be accessed from there.
+     * @param activated 
+     */
+    public void setRemoteNodeActivated(boolean activated){
+        if(isOutgoing())
+            this.getEndNode().setActivated(activated);
+        else if(isIncoming())
+            this.getStartNode().setActivated(activated);
+        else
+            logger.debug("Couldn't change activation status of remote node in interdependnet link.");
+    }
+    
+    public Boolean isRemoteNodeActivated(){
+        if(isOutgoing())
+            return this.getEndNode().isActivated();
+        else
+            return this.getStartNode().isActivated();
+    }
 }
