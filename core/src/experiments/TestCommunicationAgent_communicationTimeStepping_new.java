@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  */
 package experiments;
 
-import core.SimulationAgent;
-import interdependent.communication.CommunicationAgentInterdependentSimulation;
+import core.SimulationAgent_new;
+import interdependent.communication.CommunicationAgentInterdependentSimulation_new;
 import interdependent.communication.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
@@ -32,7 +32,7 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class TestCommunicationAgent_communicationTimeStepping extends SimulatedExperiment{
+public class TestCommunicationAgent_communicationTimeStepping_new extends SimulatedExperiment{
     
     private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
     
@@ -54,12 +54,11 @@ public class TestCommunicationAgent_communicationTimeStepping extends SimulatedE
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                newPeer.addPeerlet(new SimulationAgent(
-                        experimentID, 
-                        Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime)));
+                newPeer.addPeerlet(new SimulationAgent_new(
+                        experimentID));
                 //NECESSARY HELPER AGENTS
-                newPeer.addPeerlet(new CommunicationAgentInterdependentSimulation(N));
+                newPeer.addPeerlet(new CommunicationAgentInterdependentSimulation_new(Time.inMilliseconds(bootstrapTime),
+                        Time.inMilliseconds(runTime),N));
                 newPeer.addPeerlet(new InterpssFlowDomainAgent());
                 newPeer.addPeerlet(new PowerEventNegotiatorAgent());
                 return newPeer;

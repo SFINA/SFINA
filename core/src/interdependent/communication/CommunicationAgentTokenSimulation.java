@@ -53,16 +53,24 @@ public class CommunicationAgentTokenSimulation extends AbstractComunicationAgent
     
     @Override
     protected ProgressType readyToProgress() {
+        
+        
+        
+        
         if(this.hasToken){
-            if(afterbootStrap){
+            
+              if(afterbootStrap){
                 this.afterbootStrap = false;
                 return ProgressType.DO_NEXT_STEP;
             }
+          
+            
+            
             if(!getCommandReceiver().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
             } 
             else{
-                if(isFirst() && externalNetworksConverged()){
+                if(externalNetworksConverged()){
                     return ProgressType.DO_NEXT_STEP;
                 } 
                 else
@@ -73,6 +81,13 @@ public class CommunicationAgentTokenSimulation extends AbstractComunicationAgent
             return ProgressType.DO_NOTHING;
     }
 
+    /**
+     * Always called when Message Type was not recognized by AbstractCommunication Agent
+     * Subclasses which like to introduce additional Communication Messages have
+     * to overwrite this Function
+     * @param message 
+     * @return TRUE if @message was handled by sublcasses, else FALSE
+     */
     @Override
     protected boolean handleMessage(AbstractSfinaMessage message) {
         switch(message.getMessageType()){
@@ -85,7 +100,7 @@ public class CommunicationAgentTokenSimulation extends AbstractComunicationAgent
     }
 
     @Override
-    protected void handleCommunicationEvent(CommunicationEventType messageType) {
+    protected void postProcessCommunicationEvent(CommunicationEventType messageType) {
         switch(messageType){
             case BOOT_FINISHED:
                 this.afterbootStrap = true;

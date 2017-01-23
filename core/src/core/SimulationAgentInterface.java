@@ -88,4 +88,10 @@ public interface SimulationAgentInterface {
      */
     FlowNetwork getFlowNetwork();
     
+     /**
+         * Allows TimeSteppingAgent to check if the SimulationAgent doesn't need more iterations.
+         * @return 
+         */
+        boolean isConverged();
+    
 }

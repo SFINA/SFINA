@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,14 +17,13 @@
  */
 package interdependent.communication;
 
-import core.SimpleTimeSteppingAgent;
+import core.SimpleTimeSteppingAgent_new;
 import event.Event;
 import event.EventType;
 import event.NetworkComponent;
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedStepMessage;
-import interdependent.Messages.ProgressedToNextStepMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,19 +34,20 @@ import network.NodeState;
 import org.apache.log4j.Logger;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
+import protopeer.util.quantities.Time;
 
 /**
- * BaseClass for interdependent Communication
+ *
  * @author mcb
  */
-public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent{
+public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingAgent_new{
    
     protected final static int POST_ADDRESS_CHANGE_RECEIVED = 0;
     protected final static int POST_AGENT_IS_READY = 1;
     protected final static int POST_FINISHED_STEP_RECEIVED = 2;
     protected final static int POST_EVENT_RECEIVED = 3;
 
-    protected static final Logger logger = Logger.getLogger(AbstractCommunicationAgent.class);
+    protected static final Logger logger = Logger.getLogger(AbstractCommunicationAgent_new.class);
     
     protected Map<Integer, Boolean> externalNetworksFinished;
     protected Map<Integer, List<Event>> externalNetworksEvents;
@@ -65,8 +65,8 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      * 
      * @param totalNumberNetworks 
      */
-    public AbstractCommunicationAgent(int totalNumberNetworks) {
-        super();
+    public AbstractCommunicationAgent_new(Time bootstrapTime, Time runTime,int totalNumberNetworks) {
+        super(bootstrapTime, runTime);
         this.totalNumberNetworks = totalNumberNetworks;
         this.externalNetworksFinished = new HashMap<>();
         this.externalNetworksEvents = new HashMap<>();
@@ -102,7 +102,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         }
             
         FinishedStepMessage message = new FinishedStepMessage(
-                getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().isConverged());
+                getSimulationAgent().getNetworkIndex(), getSimulationTime(), getSimulationAgent().getIteration(), getSimulationAgent().isConverged());
         sendToAll(message);
         
         this.postProcessAbstractCommunication(CommunicationEventType.AGENT_IS_READY);
@@ -170,7 +170,9 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      */
     private void postProcessAbstractCommunication(CommunicationEventType communicationEventType) {
 
-        postProcessCommunicationEvent(communicationEventType);
+        if((communicationEventType== communicationEventType.BOOT_FINISHED) && !postProcessCommunicationEvent(communicationEventType)){
+            
+        }
 
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Before Ready To Progress");
@@ -211,18 +213,18 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
         clearCommunicationAgent();
         injectEvents();
        // sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
-        getCommandReceiver().progressToNextTimeStep();
+       progressCommandReceiverToNextTimeStep();
     }
     
     private void doNextIteration(){
         clearCommunicationAgent();
         injectEvents();
-        getCommandReceiver().progressToNextIteration();
+       progressCommandReceiverToNextIteration();
     }
     
     private void skipNextIteration(){
         clearCommunicationAgent();
-        getCommandReceiver().skipNextIteration();
+        progressCommandReceiverToSkipNextIteration();
     }
     
     private void clearCommunicationAgent(){
@@ -385,7 +387,7 @@ public abstract class AbstractCommunicationAgent extends SimpleTimeSteppingAgent
      * introduce logic and change it state after each communication.
      * @param eventType 
      */
-    protected abstract void postProcessCommunicationEvent(CommunicationEventType eventType);
+    protected abstract boolean postProcessCommunicationEvent(CommunicationEventType eventType);
 
     /**
      * 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,18 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.Messages;
+
+import interdependent.communication.CommunicationEventType;
 
 /**
  *
- * @author Ben
+ * @author mcb
  */
-public enum CommunicationEventType {
-    EVENT_MESSAGE,
-    NETWORK_ADDRESS_CHANGE,
-    FINISHED_STEP,
-    TOKEN_MESSAGE,
-    BOOT_FINISHED,
-    AGENT_IS_READY,
-    PROGRESSED_TO_NEXT_STEP
+public class ProgressedToNextStepMessage extends AbstractSfinaMessage{
+
+    public ProgressedToNextStepMessage(int networkIdentifier) {
+        super(networkIdentifier);
+    }
+
+    @Override
+    public CommunicationEventType getMessageType() {
+       return CommunicationEventType.PROGRESSED_TO_NEXT_STEP;
+    }
+    
+    
+    
 }

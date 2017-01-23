@@ -807,4 +807,12 @@ public class SimulationAgentNoStepper extends BasePeerlet implements SimulationA
     public void setMeasurementDumper(MeasurementFileDumper measurementDumper) {
         this.measurementDumper = measurementDumper;
     }
+
+    //added by mark at 23.01.2017, just to keep the nostepper.
+    @Override
+    public boolean isConverged() {
+        return true;
+    }
+    
+    
 }

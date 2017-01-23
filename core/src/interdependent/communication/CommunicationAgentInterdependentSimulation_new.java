@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,12 +18,13 @@
 package interdependent.communication;
 
 import static java.lang.Integer.min;
+import protopeer.util.quantities.Time;
 
 /**
  *
- * @author mcb
+ * @author root
  */
-public class CommunicationAgentInterdependentSimulation extends AbstractComunicationAgentLocalSimulation{
+public class CommunicationAgentInterdependentSimulation_new extends AbstractComunicationAgentLocalSimulation_new{
     
     private boolean afterBootstrap = false;
   
@@ -31,8 +32,8 @@ public class CommunicationAgentInterdependentSimulation extends AbstractComunica
      * 
      * @param totalNumberNetworks 
      */
-    public CommunicationAgentInterdependentSimulation(int totalNumberNetworks) {
-        super(totalNumberNetworks);
+    public CommunicationAgentInterdependentSimulation_new(Time bootstrapTime, Time runTime,int totalNumberNetworks) {
+        super(bootstrapTime, runTime, totalNumberNetworks);
      
     }
 
@@ -51,7 +52,7 @@ public class CommunicationAgentInterdependentSimulation extends AbstractComunica
         if(this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady){
-            if(!getCommandReceiver().isConverged()){
+            if(!getSimulationAgent().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
             }
             else if(externalNetworksConverged()){
@@ -65,10 +66,12 @@ public class CommunicationAgentInterdependentSimulation extends AbstractComunica
     }
 
     @Override
-    protected void postProcessCommunicationEvent(CommunicationEventType eventType) {
+    protected boolean postProcessCommunicationEvent(CommunicationEventType eventType) {
        if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
            this.afterBootstrap = true;
+           return true;
         }
+       return false;
     }
 
    
