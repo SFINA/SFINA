@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,23 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.communication.Archive;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import protopeer.network.IntegerNetworkAddress;
 import protopeer.network.NetworkAddress;
-import protopeer.util.quantities.Time;
 
 /**
- *
+ * Abstrace Communication Class which contains Address Logic etc.
  * @author mcb
  */
-public abstract class AbstractComunicationAgentLocalSimulation_new extends AbstractCommunicationAgent_new{
+public abstract class AbstractComunicationAgentLocalSimulation_old extends AbstractCommunicationAgent_old{
     
-    public AbstractComunicationAgentLocalSimulation_new(Time bootstrapTime, Time runTime, int totalNumberNetworks){
-        super(bootstrapTime, runTime, totalNumberNetworks);
+    public AbstractComunicationAgentLocalSimulation_old(int totalNumberNetworks){
+        super(totalNumberNetworks);
     }
     
     

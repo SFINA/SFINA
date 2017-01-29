@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package experiments;
+package core.Archive;
 
-import core.SimulationAgent;
-import interdependent.communication.CommunicationAgentTokenSimulation;
-import interdependent.communication.PowerEventNegotiatorAgent;
+import core.Archive.SimulationAgent_old;
+import core.Archive.SimpleTimeSteppingAgent;
+import experiments.TestInterpssBackend;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
@@ -30,21 +30,21 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author root
+ * @author mcb
  */
-public class TestCommunicationAgent_Token extends SimulatedExperiment{
+public class TestCommunicationAgent_simpleTimeStepping_old extends SimulatedExperiment{
     
     private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
     
-   
     private final static String expSeqNum="01";
     private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=6;
-    private final static int N=3;
+    private final static int runDuration=20;
+    private final static int N=1;
+    
     
     public static void main(String[] args) {
         Experiment.initEnvironment();
@@ -54,14 +54,12 @@ public class TestCommunicationAgent_Token extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                newPeer.addPeerlet(new SimulationAgent(
+                newPeer.addPeerlet(new SimpleTimeSteppingAgent());
+                newPeer.addPeerlet(new SimulationAgent_old(
                         experimentID, 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
-                 //NECESSARY HELPER  AGENTS
-                newPeer.addPeerlet(new CommunicationAgentTokenSimulation(N,0));
                 newPeer.addPeerlet(new InterpssFlowDomainAgent());
-                newPeer.addPeerlet(new PowerEventNegotiatorAgent());
                 return newPeer;
             }
         };
@@ -70,7 +68,6 @@ public class TestCommunicationAgent_Token extends SimulatedExperiment{
         
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
-       
     }
     
 }

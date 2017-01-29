@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  */
 package experiments;
 
+import core.TimeSteppingAgent;
 import core.SimulationAgent;
-import core.SimpleTimeSteppingAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
@@ -29,7 +29,7 @@ import protopeer.util.quantities.Time;
 
 /**
  *
- * @author mcb
+ * @author root
  */
 public class TestCommunicationAgent_simpleTimeStepping extends SimulatedExperiment{
     
@@ -53,11 +53,11 @@ public class TestCommunicationAgent_simpleTimeStepping extends SimulatedExperime
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                newPeer.addPeerlet(new SimpleTimeSteppingAgent());
-                newPeer.addPeerlet(new SimulationAgent(
-                        experimentID, 
+                newPeer.addPeerlet(new TimeSteppingAgent( 
                         Time.inMilliseconds(bootstrapTime),
                         Time.inMilliseconds(runTime)));
+                newPeer.addPeerlet(new SimulationAgent(
+                        experimentID));
                 newPeer.addPeerlet(new InterpssFlowDomainAgent());
                 return newPeer;
             }

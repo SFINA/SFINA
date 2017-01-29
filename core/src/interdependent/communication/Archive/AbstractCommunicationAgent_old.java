@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,15 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.communication.Archive;
 
-import core.SimpleTimeSteppingAgent_new;
+import core.Archive.SimpleTimeSteppingAgent;
 import event.Event;
 import event.EventType;
 import event.NetworkComponent;
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.EventMessage;
-import interdependent.Messages.FinishedStepMessage;
+import interdependent.Messages.FinishedActiveStateMessage;
+import interdependent.Messages.ProgressedToNextStepMessage;
+import interdependent.communication.CommunicationEventType;
+import interdependent.communication.EventNegotiatorAgentInterface;
+import interdependent.communication.ProgressType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,20 +38,19 @@ import network.NodeState;
 import org.apache.log4j.Logger;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
-import protopeer.util.quantities.Time;
 
 /**
- *
+ * BaseClass for interdependent Communication
  * @author mcb
  */
-public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingAgent_new{
+public abstract class AbstractCommunicationAgent_old extends SimpleTimeSteppingAgent{
    
     protected final static int POST_ADDRESS_CHANGE_RECEIVED = 0;
     protected final static int POST_AGENT_IS_READY = 1;
     protected final static int POST_FINISHED_STEP_RECEIVED = 2;
     protected final static int POST_EVENT_RECEIVED = 3;
 
-    protected static final Logger logger = Logger.getLogger(AbstractCommunicationAgent_new.class);
+    protected static final Logger logger = Logger.getLogger(AbstractCommunicationAgent_old.class);
     
     protected Map<Integer, Boolean> externalNetworksFinished;
     protected Map<Integer, List<Event>> externalNetworksEvents;
@@ -65,8 +68,8 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
      * 
      * @param totalNumberNetworks 
      */
-    public AbstractCommunicationAgent_new(Time bootstrapTime, Time runTime,int totalNumberNetworks) {
-        super(bootstrapTime, runTime);
+    public AbstractCommunicationAgent_old(int totalNumberNetworks) {
+        super();
         this.totalNumberNetworks = totalNumberNetworks;
         this.externalNetworksFinished = new HashMap<>();
         this.externalNetworksEvents = new HashMap<>();
@@ -101,8 +104,8 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
             sendToSpecific(eventMessage, entry.getKey());
         }
             
-        FinishedStepMessage message = new FinishedStepMessage(
-                getSimulationAgent().getNetworkIndex(), getSimulationTime(), getSimulationAgent().getIteration(), getSimulationAgent().isConverged());
+        FinishedActiveStateMessage message = new FinishedActiveStateMessage(
+                getSimulationAgent().getNetworkIndex(), getSimulationAgent().getSimulationTime(), getSimulationAgent().getIteration(), getCommandReceiver().isConverged());
         sendToAll(message);
         
         this.postProcessAbstractCommunication(CommunicationEventType.AGENT_IS_READY);
@@ -133,8 +136,8 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
                     EventMessage eventMessage = (EventMessage) sfinaMessage;
                     this.externalNetworksEvents.put(sfinaMessage.getNetworkIdentifier(), eventMessage.getEvents());
                     break;
-                case FINISHED_STEP:
-                    FinishedStepMessage finishedMessage = ((FinishedStepMessage)sfinaMessage);
+                case FINISHED_ACTIVE_STATE:
+                    FinishedActiveStateMessage finishedMessage = ((FinishedActiveStateMessage)sfinaMessage);
                     this.externalNetworksFinished.put(finishedMessage.getNetworkIdentifier(), finishedMessage.isConverged());
                     break;
                 case PROGRESSED_TO_NEXT_STEP:
@@ -170,9 +173,7 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
      */
     private void postProcessAbstractCommunication(CommunicationEventType communicationEventType) {
 
-        if((communicationEventType== communicationEventType.BOOT_FINISHED) && !postProcessCommunicationEvent(communicationEventType)){
-            
-        }
+        postProcessCommunicationEvent(communicationEventType);
 
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Before Ready To Progress");
@@ -213,18 +214,18 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
         clearCommunicationAgent();
         injectEvents();
        // sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
-       progressCommandReceiverToNextTimeStep();
+        getCommandReceiver().progressToNextTimeStep();
     }
     
     private void doNextIteration(){
         clearCommunicationAgent();
         injectEvents();
-       progressCommandReceiverToNextIteration();
+        getCommandReceiver().progressToNextIteration();
     }
     
     private void skipNextIteration(){
         clearCommunicationAgent();
-        progressCommandReceiverToSkipNextIteration();
+        getCommandReceiver().skipNextIteration();
     }
     
     private void clearCommunicationAgent(){
@@ -375,8 +376,8 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
      */
     
     /**
-     * Always called by the AbstractCommunicationAgent at the very end of a 
-     * communication Cycle to detect how it has to progress
+     * Always called by the AbstractCommunicationAgent_old at the very end of a 
+ communication Cycle to detect how it has to progress
      * @return 
      */
     protected abstract ProgressType readyToProgress();
@@ -387,7 +388,7 @@ public abstract class AbstractCommunicationAgent_new extends SimpleTimeSteppingA
      * introduce logic and change it state after each communication.
      * @param eventType 
      */
-    protected abstract boolean postProcessCommunicationEvent(CommunicationEventType eventType);
+    protected abstract void postProcessCommunicationEvent(CommunicationEventType eventType);
 
     /**
      * 

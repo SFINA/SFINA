@@ -24,7 +24,7 @@ package interdependent.communication;
 public enum CommunicationEventType {
     EVENT_MESSAGE,
     NETWORK_ADDRESS_CHANGE,
-    FINISHED_STEP,
+    FINISHED_ACTIVE_STATE,
     TOKEN_MESSAGE,
     BOOT_FINISHED,
     AGENT_IS_READY,

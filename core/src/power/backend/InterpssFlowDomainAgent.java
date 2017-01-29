@@ -29,7 +29,7 @@ import com.interpss.core.aclf.AclfNetwork;
 import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
-import core.SimulationAgent;
+import core.Archive.SimulationAgent_old;
 import core.SimulationAgentInterface;
 import static java.lang.Math.PI;
 import network.FlowNetwork;

@@ -26,13 +26,13 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class SimpleTimeSteppingAgent_new extends BasePeerlet implements TimeSteppingAgentInterface_new {
+public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface {
     
     private Time bootstrapTime;
     private Time runTime;
 
     
-    public SimpleTimeSteppingAgent_new(Time bootstrapTime, Time runTime) {
+    public TimeSteppingAgent(Time bootstrapTime, Time runTime) {
         this.bootstrapTime = bootstrapTime;
         this.runTime = runTime;
     }
@@ -62,7 +62,7 @@ public class SimpleTimeSteppingAgent_new extends BasePeerlet implements TimeStep
     }
         
     private CommandReceiver getCommandReceiver(){
-        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface_new.CommandReceiver.class);
+        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
     }
 
     @Override

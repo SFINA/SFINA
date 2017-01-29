@@ -17,6 +17,7 @@
  */
 package interdependent.communication;
 
+import interdependent.communication.Archive.AbstractComunicationAgentLocalSimulation_old;
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.TokenMessage;
 import static java.lang.Integer.min;
@@ -26,7 +27,7 @@ import protopeer.Peer;
  * Circular execution of iterations: first network 1, then network 2, ..., network n, network 1 etc.
  * @author mcb
  */
-public class CommunicationAgentTokenSimulation extends AbstractComunicationAgentLocalSimulation{
+public class TokenCommunicationAgent_old extends AbstractComunicationAgentLocalSimulation_old{
 
     private boolean hasToken;
     private int nextNetwork;
@@ -34,12 +35,12 @@ public class CommunicationAgentTokenSimulation extends AbstractComunicationAgent
     
     private boolean afterbootStrap =false;
     
-    public CommunicationAgentTokenSimulation(int totalNumberNetworks, int startingNetwork){
+    public TokenCommunicationAgent_old(int totalNumberNetworks, int startingNetwork){
         super(totalNumberNetworks);
         this.startingNetwork = startingNetwork;    
     }
     
-    public CommunicationAgentTokenSimulation(int totalNumberNetworks) {
+    public TokenCommunicationAgent_old(int totalNumberNetworks) {
         this(totalNumberNetworks, 0);     
     }
 

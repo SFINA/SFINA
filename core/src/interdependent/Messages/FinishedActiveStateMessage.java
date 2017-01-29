@@ -23,12 +23,12 @@ import interdependent.communication.CommunicationEventType;
  * A Message notifiying the the Network defined by networkIdentifier finished current time step or iteration
  * @author mcb
  */
-public class FinishedStepMessage extends AbstractSfinaMessage{
+public class FinishedActiveStateMessage extends AbstractSfinaMessage{
     private final int time;
     private final int iteration;
     private final boolean converged;
 
-    public FinishedStepMessage(int networkIdentifier, int time, int iteration, boolean converged) {
+    public FinishedActiveStateMessage(int networkIdentifier, int time, int iteration, boolean converged) {
         super(networkIdentifier);
         this.time = time;
         this.iteration = iteration;
@@ -37,7 +37,7 @@ public class FinishedStepMessage extends AbstractSfinaMessage{
 
     @Override
     public CommunicationEventType getMessageType() {
-        return CommunicationEventType.FINISHED_STEP;
+        return CommunicationEventType.FINISHED_ACTIVE_STATE;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +17,7 @@
  */
 package core;
 
+import core.Archive.SimulationAgent_old;
 import backend.FlowDomainAgent;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
@@ -60,13 +61,13 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class SimulationAgent extends BasePeerlet implements SimulationAgentInterface, TimeSteppingAgentInterface.CommandReceiver{
+public class SimulationAgent  extends BasePeerlet implements SimulationAgentInterface, TimeSteppingAgentInterface.CommandReceiver{
     
-    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
+    private static final Logger logger = Logger.getLogger(SimulationAgent_old.class);
 
     private String experimentID;
-    private Time bootstrapTime;
-    private Time runTime;
+ //   private Time bootstrapTime;
+   // private Time runTime;
     private int iteration;
     private final static String parameterColumnSeparator="=";
     private final static String fileSystemSchema="conf/fileSystem.conf";
@@ -104,12 +105,8 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     private ArrayList<Event> events;
     
     public SimulationAgent(
-            String experimentID,
-            Time bootstrapTime, 
-            Time runTime){
+            String experimentID){
         this.experimentID=experimentID;
-        this.bootstrapTime=bootstrapTime;
-        this.runTime=runTime;
         this.flowNetwork=new FlowNetwork();
     }
     
@@ -135,7 +132,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     */
     @Override
     public void start(){
-        this.runBootstraping();
+  //      this.runBootstraping();
     }
 
     /**
@@ -164,32 +161,28 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
      */
     @Override
     public void runBootstraping(){
-        Timer loadAgentTimer= getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
-                logger.info("### Bootstraping "+experimentID+" ###");
-                loadFileSystem(fileSystemSchema);
-                loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
-                
-                // Clearing output and peers log files from earlier experiments
-                File folder = new File(peersLogDirectory+experimentID+"/");
-                clearOutputFiles(folder);
-                folder.mkdir();
-                clearOutputFiles(new File(experimentOutputFilesLocation));
-                
-                topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, getNetworkIndex());
-                flowLoader=new FlowLoader(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, getNetworkIndex());
-                flowWriter = new FlowWriter(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
-                                
-                scheduleMeasurements();
-                
-                logger.debug("### End of bootstraping, calling agentFinishedBootstrap. ###");
-                getTimeSteppingAgent().agentFinishedBootStrap();               
-            }
-        });
-        loadAgentTimer.schedule(this.bootstrapTime);
+       
+        logger.info("### Bootstraping "+experimentID+" ###");
+        loadFileSystem(fileSystemSchema);
+        loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
+
+        // Clearing output and peers log files from earlier experiments
+        File folder = new File(peersLogDirectory+experimentID+"/");
+        clearOutputFiles(folder);
+        folder.mkdir();
+        clearOutputFiles(new File(experimentOutputFilesLocation));
+
+        topologyLoader=new TopologyLoader(flowNetwork, columnSeparator, getNetworkIndex());
+        flowLoader=new FlowLoader(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+        topologyWriter = new TopologyWriter(flowNetwork, columnSeparator, getNetworkIndex());
+        flowWriter = new FlowWriter(flowNetwork, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+        eventWriter = new EventWriter(eventsOutputLocation, columnSeparator, missingValue, getFlowDomainAgent().getFlowNetworkDataTypes());
+
+        scheduleMeasurements();
+
+        logger.debug("### End of bootstraping, calling agentFinishedBootstrap. ###");
+        getTimeSteppingAgent().agentFinishedBootStrap();               
+        
     }
 
     /**
@@ -229,26 +222,20 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     @Override
     public void progressToNextTimeStep() {
-        Timer loadAgentTimer=getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
                 initTimeStep();
-                initIteration();
+                logIteration();
                 runActiveState(); 
-            }
-        });
-        loadAgentTimer.schedule(this.runTime);
     }
 
     @Override
     public void progressToNextIteration() { 
-        this.initIteration();
+        this.logIteration();
         this.runActiveState(); 
     }
     
     @Override
     public void skipNextIteration() {
-        this.initIteration();
+        this.logIteration();
         logger.info("Skipping this iteration");
         getTimeSteppingAgent().agentFinishedActiveState();
     }
@@ -295,7 +282,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
         this.iteration=0;
     }
     
-    private void initIteration(){
+    private void logIteration(){
         this.iteration++;
         logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex() + " (" + this.timeToken + ") <-------");
     }
@@ -352,7 +339,7 @@ public class SimulationAgent extends BasePeerlet implements SimulationAgentInter
     
     @Override
     public int getSimulationTime(){
-        return (int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime));
+        return getTimeSteppingAgent().getSimulationTime();
     }
     
     @Override

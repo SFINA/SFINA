@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,16 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.communication.Archive;
 
+import interdependent.communication.CommunicationEventType;
+import interdependent.communication.ProgressType;
 import static java.lang.Integer.min;
-import protopeer.util.quantities.Time;
 
 /**
  *
- * @author root
+ * @author mcb
  */
-public class CommunicationAgentInterdependentSimulation_new extends AbstractComunicationAgentLocalSimulation_new{
+public class CommunicationAgentInterdependentSimulation_old extends AbstractComunicationAgentLocalSimulation_old{
     
     private boolean afterBootstrap = false;
   
@@ -32,8 +33,8 @@ public class CommunicationAgentInterdependentSimulation_new extends AbstractComu
      * 
      * @param totalNumberNetworks 
      */
-    public CommunicationAgentInterdependentSimulation_new(Time bootstrapTime, Time runTime,int totalNumberNetworks) {
-        super(bootstrapTime, runTime, totalNumberNetworks);
+    public CommunicationAgentInterdependentSimulation_old(int totalNumberNetworks) {
+        super(totalNumberNetworks);
      
     }
 
@@ -52,7 +53,7 @@ public class CommunicationAgentInterdependentSimulation_new extends AbstractComu
         if(this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
                 && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),this.totalNumberNetworks-1)) 
                 && this.agentIsReady){
-            if(!getSimulationAgent().isConverged()){
+            if(!getCommandReceiver().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
             }
             else if(externalNetworksConverged()){
@@ -66,12 +67,10 @@ public class CommunicationAgentInterdependentSimulation_new extends AbstractComu
     }
 
     @Override
-    protected boolean postProcessCommunicationEvent(CommunicationEventType eventType) {
+    protected void postProcessCommunicationEvent(CommunicationEventType eventType) {
        if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
            this.afterBootstrap = true;
-           return true;
         }
-       return false;
     }
 
    

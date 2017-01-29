@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,11 +17,9 @@
  */
 package core;
 
-import event.Event;
-
 /**
  *
- * @author McB
+ * @author mcb
  */
 public interface TimeSteppingAgentInterface {
 
@@ -51,11 +49,6 @@ public interface TimeSteppingAgentInterface {
          */
         public void skipNextIteration();
         
-        /**
-         * Allows TimeSteppingAgent to check if the SimulationAgent doesn't need more iterations.
-         * @return 
-         */
-        boolean isConverged();
     }
     
     /**
@@ -69,5 +62,9 @@ public interface TimeSteppingAgentInterface {
      * CommandReceiver can notify the TimeSteppingAgent that it finished its Bootstrap
      */
     public void agentFinishedBootStrap();
+    
+    public int getSimulationTime();
+    
+    
    
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package experiments;
+package core.Archive;
 
-import core.SimulationAgent_new;
-import interdependent.communication.CommunicationAgentInterdependentSimulation_new;
+import core.Archive.SimulationAgent_old;
+import experiments.TestInterpssBackend;
+import interdependent.communication.Archive.CommunicationAgentInterdependentSimulation_old;
 import interdependent.communication.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
@@ -32,7 +33,7 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class TestCommunicationAgent_communicationTimeStepping_new extends SimulatedExperiment{
+public class TestCommunicationAgent_communicationTimeStepping_old extends SimulatedExperiment{
     
     private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
     
@@ -54,11 +55,12 @@ public class TestCommunicationAgent_communicationTimeStepping_new extends Simula
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                newPeer.addPeerlet(new SimulationAgent_new(
-                        experimentID));
+                newPeer.addPeerlet(new SimulationAgent_old(
+                        experimentID, 
+                        Time.inMilliseconds(bootstrapTime),
+                        Time.inMilliseconds(runTime)));
                 //NECESSARY HELPER AGENTS
-                newPeer.addPeerlet(new CommunicationAgentInterdependentSimulation_new(Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime),N));
+                newPeer.addPeerlet(new CommunicationAgentInterdependentSimulation_old(N));
                 newPeer.addPeerlet(new InterpssFlowDomainAgent());
                 newPeer.addPeerlet(new PowerEventNegotiatorAgent());
                 return newPeer;

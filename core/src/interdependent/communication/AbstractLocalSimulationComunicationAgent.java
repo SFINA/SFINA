@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,15 +22,16 @@ import java.util.HashMap;
 import java.util.Map;
 import protopeer.network.IntegerNetworkAddress;
 import protopeer.network.NetworkAddress;
+import protopeer.util.quantities.Time;
 
 /**
- * Abstrace Communication Class which contains Address Logic etc.
+ *
  * @author mcb
  */
-public abstract class AbstractComunicationAgentLocalSimulation extends AbstractCommunicationAgent{
+public abstract class AbstractLocalSimulationComunicationAgent extends AbstractCommunicationAgent{
     
-    public AbstractComunicationAgentLocalSimulation(int totalNumberNetworks){
-        super(totalNumberNetworks);
+    public AbstractLocalSimulationComunicationAgent(Time bootstrapTime, Time runTime, int totalNumberNetworks){
+        super(bootstrapTime, runTime, totalNumberNetworks);
     }
     
     

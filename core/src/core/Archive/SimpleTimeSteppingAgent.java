@@ -15,8 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package core;
+package core.Archive;
 
+import core.SimulationAgentInterface;
 import core.SimulationAgentInterface;
 import event.Event;
 import protopeer.BasePeerlet;
@@ -25,7 +26,7 @@ import protopeer.BasePeerlet;
  *
  * @author mcb
  */
-public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface {
+public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface_old {
    
     @Override
     public void agentFinishedActiveState() {
@@ -45,7 +46,7 @@ public class SimpleTimeSteppingAgent extends BasePeerlet implements TimeStepping
     }
         
     public CommandReceiver getCommandReceiver(){
-        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
+        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface_old.CommandReceiver.class);
     }
 
     @Override
