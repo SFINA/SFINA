@@ -45,14 +45,13 @@ public class InterdependentCommunicationAgent extends AbstractLocalSimulationCom
      @Override
     protected ProgressType readyToProgress() {
        
-        if(afterBootstrap){
-            this.afterBootstrap = false;
-            return ProgressType.DO_NEXT_STEP;
-        }
-        if(this.externalNetworksFinished.size() == (this.totalNumberNetworks - 1)
-                && (this.externalNetworksEvents.size() == min(getSimulationAgent().getConnectedNetworkIndices().size(),
-                        this.totalNumberNetworks-1)) 
-                && this.agentIsReady){
+//        if(afterBootstrap){
+//            this.afterBootstrap = false;
+//            return ProgressType.DO_NEXT_STEP;
+//        }
+        if(this.externalNetworksFinished.size() >= (this.totalNumberNetworks - 1)
+                && (this.externalNetworksEvents.size() >= min(getSimulationAgent().getConnectedNetworkIndices().size(),
+                        this.totalNumberNetworks-1)) ){
             if(!getSimulationAgent().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
             }
@@ -68,10 +67,10 @@ public class InterdependentCommunicationAgent extends AbstractLocalSimulationCom
 
     @Override
     protected boolean postProcessCommunicationEvent(CommunicationEventType eventType) {
-       if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
-           this.afterBootstrap = true;
-           return true;
-        }
+//       if(eventType.equals(CommunicationEventType.BOOT_FINISHED)){
+//           this.afterBootstrap = true;
+//           return true;
+//        }
        return false;
     }
 

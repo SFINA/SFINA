@@ -170,8 +170,9 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      */
     private void postProcessAbstractCommunication(CommunicationEventType communicationEventType) {
 
-        if((communicationEventType== communicationEventType.BOOT_FINISHED) && !postProcessCommunicationEvent(communicationEventType)){
-            
+        if(!postProcessCommunicationEvent(communicationEventType) &&(communicationEventType== communicationEventType.BOOT_FINISHED)){
+            doNextStep();
+            return;
         }
 
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
