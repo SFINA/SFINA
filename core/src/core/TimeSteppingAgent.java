@@ -77,7 +77,7 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         loadAgentTimer.schedule(this.bootstrapTime);
     }
     
-    protected final void progressCommandReceiverToNextTimeStep(){
+    protected void progressCommandReceiverToNextTimeStep(){
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
@@ -85,13 +85,14 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
             }
         });
         loadAgentTimer.schedule(this.runTime);         
+        
     }
     
-    protected final void progressCommandReceiverToNextIteration(){
+    protected void progressCommandReceiverToNextIteration(){
         getCommandReceiver().progressToNextIteration(); 
     }
     
-    protected final void progressCommandReceiverToSkipNextIteration(){
+    protected void progressCommandReceiverToSkipNextIteration(){
         getCommandReceiver().skipNextIteration();         
     }
     

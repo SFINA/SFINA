@@ -339,6 +339,8 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     
     @Override
     public int getSimulationTime(){
+//        // just for testing purposes, does this change something
+//        return ((int) (Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(Time.inMilliseconds(2000))));
         return getTimeSteppingAgent().getSimulationTime();
     }
     

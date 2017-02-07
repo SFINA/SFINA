@@ -24,10 +24,13 @@ import event.NetworkComponent;
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedActiveStateMessage;
+import interdependent.Messages.ProgressedToNextStepMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import network.InterdependentLink;
 import network.LinkState;
 import network.NodeState;
@@ -52,13 +55,20 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     protected Map<Integer, Boolean> externalNetworksFinished;
     protected Map<Integer, List<Event>> externalNetworksEvents;
     
+    protected Set<Integer> progressedToNextStep = new HashSet<>();
+    
     protected int totalNumberNetworks;
-    protected boolean agentIsReady; 
-    private boolean bootFinished;
+    protected boolean agentIsReady;
+    private boolean afterBootFinished =false;
+  
     private boolean eventSendToOthers = false;
     private boolean lastIterationSkipped = false;
     
-    private boolean forceProgressToNextStep = false;
+//    private boolean forceProgressToNextStep = false;
+    // counter which counts if we already have a call to make a new Step/ Iteration Skip etc.
+    // if we already issued an action, but if we get another event which is handled before,
+    // then this event cannot reissue a next step
+    private int stepSkipIterationCounter =0;
 
     
     /**
@@ -71,7 +81,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
         this.externalNetworksFinished = new HashMap<>();
         this.externalNetworksEvents = new HashMap<>();
         this.agentIsReady = false;
-        this.bootFinished = false;
+        
     }
     
     
@@ -85,14 +95,34 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     public void agentFinishedBootStrap() {
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Agent Finished Bootstrap ");
-        this.bootFinished = true;
-        this.postProcessAbstractCommunication(CommunicationEventType.BOOT_FINISHED);
+   
+       // this.postProcessAbstractCommunication(CommunicationEventType.BOOT_FINISHED);
+       // if bootstrap is not handled by childClass - we perform our default behavior
+       if(!bootstrapHandled()){
+           this.afterBootFinished = true;
+           doNextStep();
+       } 
     }
 
     @Override
     public void agentFinishedActiveState() {
+        
+        if(stepSkipIterationCounter!=1){
+            logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": stepSkipIterationCounter Error!!!! stepsSkipIterationCount = " +Integer.toString(stepSkipIterationCounter));
+        }
+        
+        
+        stepSkipIterationCounter--;
+        
+        
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Agent Finished Active State ");
+     
+            logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
+            
+            
         this.agentIsReady = true;
         this.eventSendToOthers = false;
         for(Map.Entry<Integer,List<Event>> entry : this.extractPendingInterdependentEvents().entrySet()){
@@ -126,6 +156,10 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
             logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Handle Incomming " + sfinaMessage.getMessageType().toString()+" Message  from " + 
                     Integer.toString(sfinaMessage.getNetworkIdentifier()));
+            logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": default");
+            logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
             
             
             switch (sfinaMessage.getMessageType()) {
@@ -138,8 +172,8 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
                     this.externalNetworksFinished.put(finishedMessage.getNetworkIdentifier(), finishedMessage.isConverged());
                     break;
                 case PROGRESSED_TO_NEXT_STEP:
-                    this.forceProgressToNextStep = true;
-                    break;
+                    this.progressedToNextStep.add(sfinaMessage.getNetworkIdentifier());
+                    break;                   
                 default:
                     if(!handleMessage(sfinaMessage))
                         logger.debug("Message Type not recognized");
@@ -170,10 +204,12 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      */
     private void postProcessAbstractCommunication(CommunicationEventType communicationEventType) {
 
-        if(!postProcessCommunicationEvent(communicationEventType) &&(communicationEventType== communicationEventType.BOOT_FINISHED)){
-            doNextStep();
-            return;
-        }
+        postProcessCommunicationEvent(communicationEventType);
+        
+//        if(!postProcessCommunicationEvent(communicationEventType) &&(communicationEventType== communicationEventType.BOOT_FINISHED)){
+//            doNextStep();
+//            return;
+//        }
 
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Before Ready To Progress");
@@ -183,49 +219,89 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
                 this.lastIterationSkipped = false;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": do Next Iteration");
+                 
+                 
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
                 doNextIteration();
                 break;
             case DO_NEXT_STEP:
                 this.lastIterationSkipped = false;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": do Next Step");
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
                 doNextStep();
                 break;
             case SKIP_NEXT_ITERATION:
                 this.lastIterationSkipped = true;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": skip Iteration");
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
                 skipNextIteration();
                 break;
             case DO_NOTHING:
                 this.lastIterationSkipped = false;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": do nothing");
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
                 break;
             default:
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": default");
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Time is: "+ Integer.toString(getSimulationTime()));
+                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+                    ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
                 this.lastIterationSkipped = false;
                 doNextStep(); 
         }     
     }
 
-    private void doNextStep(){
-        clearCommunicationAgent();
-        injectEvents();
-       // sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
-       progressCommandReceiverToNextTimeStep();
+    protected void doNextStep(){
+        if(stepSkipIterationCounter ==0){
+            stepSkipIterationCounter++;
+            clearCommunicationAgent();
+            injectEvents();
+            
+            //check if afterBootfsinished (only true if bootstrap is handled by 
+            // AbstractCommunicationAgent 
+            if(afterBootFinished){
+                this.afterBootFinished = false;
+            }else{
+                 this.progressedToNextStep.clear();
+                 sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
+            }
+           progressCommandReceiverToNextTimeStep();
+        }
     }
     
-    private void doNextIteration(){
+    protected void doNextIteration(){
+        if(stepSkipIterationCounter ==0){
+            stepSkipIterationCounter++;
         clearCommunicationAgent();
         injectEvents();
-       progressCommandReceiverToNextIteration();
+        progressCommandReceiverToNextIteration();
+        }
     }
     
-    private void skipNextIteration(){
-        clearCommunicationAgent();
-        progressCommandReceiverToSkipNextIteration();
+    protected void skipNextIteration(){
+        if(stepSkipIterationCounter ==0){
+             stepSkipIterationCounter++;
+            clearCommunicationAgent();
+            progressCommandReceiverToSkipNextIteration();
+           
+        }
     }
     
     private void clearCommunicationAgent(){
@@ -235,7 +311,10 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     }
     
     protected boolean externalNetworksConverged(){
-        if(this.eventSendToOthers && !this.lastIterationSkipped){
+        
+// Todo redo
+        if(false){
+        //if(this.eventSendToOthers){
             this.eventSendToOthers = false;
             return false;
         }else{
@@ -389,6 +468,10 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * @param eventType 
      */
     protected abstract boolean postProcessCommunicationEvent(CommunicationEventType eventType);
+    
+    protected boolean bootstrapHandled(){
+        return false;
+    }
 
     /**
      * 
