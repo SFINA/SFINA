@@ -210,7 +210,7 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
 
     @Override
     public boolean isConverged() {
-        if(getIteration() == this.iterationToProgress.get(this.getNetworkIndex()))
+        if(getIteration() >= this.iterationToProgress.get(this.getNetworkIndex()))
             return true;
         else 
             return false;
@@ -253,8 +253,8 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
     }
 
   
-    public TimeSteppingAgentInterface getTimeSteppingAgent(){
-        return (TimeSteppingAgentInterface) getPeer().getPeerletOfType(TimeSteppingInterface_Debug.class);
+    public TimeSteppingInterface_Debug getTimeSteppingAgent(){
+        return (TimeSteppingInterface_Debug) getPeer().getPeerletOfType(TimeSteppingInterface_Debug.class);
     }
     
     @Override
