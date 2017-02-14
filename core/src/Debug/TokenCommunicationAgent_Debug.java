@@ -19,8 +19,8 @@ package Debug;
 
 /**
  *
- * @author mcb
+ * @author root
  */
-public class SimulAgentInterface {
+public class TokenCommunicationAgent_Debug {
     
 }

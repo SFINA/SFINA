@@ -17,7 +17,7 @@
  */
 package core;
 
-import core.Archive.SimulationAgent_old;
+
 import backend.FlowDomainAgent;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
@@ -63,7 +63,7 @@ import protopeer.util.quantities.Time;
  */
 public class SimulationAgent  extends BasePeerlet implements SimulationAgentInterface, TimeSteppingAgentInterface.CommandReceiver{
     
-    private static final Logger logger = Logger.getLogger(SimulationAgent_old.class);
+    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
 
     private String experimentID;
  //   private Time bootstrapTime;
