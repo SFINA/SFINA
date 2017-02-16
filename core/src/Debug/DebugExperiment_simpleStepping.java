@@ -17,9 +17,9 @@
  */
 package Debug;
 
-
+import core.SimulationAgent;
+import core.TimeSteppingAgent;
 import experiments.TestInterpssBackend;
-
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
@@ -32,19 +32,19 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class DebugExperiment extends SimulatedExperiment{
+public class DebugExperiment_simpleStepping extends SimulatedExperiment{
     
     private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
     
-   
     private final static String expSeqNum="01";
     private static String experimentID="experiment-"+expSeqNum;
     
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=6;
-    private final static int N=3;
+    private final static int runDuration=20;
+    private final static int N=1;
+    
     
     public static void main(String[] args) {
         Experiment.initEnvironment();
@@ -54,15 +54,12 @@ public class DebugExperiment extends SimulatedExperiment{
         PeerFactory peerFactory=new PeerFactory() {
             public Peer createPeer(int peerIndex, Experiment experiment) {
                 Peer newPeer = new Peer(peerIndex);
-                // Integers are specifying in which iteration the Simulation Agent
-                // should converge
+                newPeer.addPeerlet(new TimeSteppingAgent_Debug( 
+                        Time.inMilliseconds(bootstrapTime),
+                        Time.inMilliseconds(runTime)));
+                // second argument (Integer): how many iteration before convergence
                 newPeer.addPeerlet(new SimulationAgent_Debug(
-                        experimentID,5,3,4));
-                 //NECESSARY HELPER  AGENTS
-                newPeer.addPeerlet(new TokenCommunicationAgent_Debug(Time.inMilliseconds(bootstrapTime),
-                        Time.inMilliseconds(runTime),N));
-              
-         
+                        experimentID,2));
                 return newPeer;
             }
         };
@@ -71,7 +68,6 @@ public class DebugExperiment extends SimulatedExperiment{
         
         //run the simulation
         test.runSimulation(Time.inSeconds(runDuration));
-       
     }
     
 }

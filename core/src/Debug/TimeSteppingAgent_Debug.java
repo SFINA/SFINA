@@ -17,11 +17,9 @@
  */
 package Debug;
 
-import Debug.TimeSteppingInterface_Debug;
 import protopeer.time.Timer;
 import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
-import Debug.SimulationAgentInterface_Debug;
 import protopeer.BasePeerlet;
 
 /**

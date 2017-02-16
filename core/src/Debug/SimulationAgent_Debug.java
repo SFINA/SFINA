@@ -17,45 +17,17 @@
  */
 package Debug;
 
-import backend.FlowDomainAgent;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
-import core.Archive.SimulationAgent_old;
-import core.TimeSteppingAgentInterface;
+
 import dsutil.protopeer.FingerDescriptor;
-import event.Event;
-import event.EventType;
-import event.NetworkComponent;
-import input.EventLoader;
-import input.FlowLoader;
-import input.SfinaParameter;
-import input.SfinaParameterLoader;
-import input.TopologyLoader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import network.FlowNetwork;
-import network.InterdependentLink;
-import network.Link;
-import network.LinkState;
-import network.Node;
-import network.NodeState;
+
 import org.apache.log4j.Logger;
-import output.EventWriter;
-import output.FlowWriter;
-import output.TopologyWriter;
 import protopeer.BasePeerlet;
 import protopeer.Peer;
-import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
-import protopeer.network.Message;
-import protopeer.util.quantities.Time;
+import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  *
@@ -63,7 +35,7 @@ import protopeer.util.quantities.Time;
  */
 public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgentInterface_Debug,TimeSteppingInterface_Debug.CommandReceiver{
     
-    private static final Logger logger = Logger.getLogger(SimulationAgent_old.class);
+    private static final Logger logger = Logger.getLogger(SimulationAgent_Debug.class);
     
     private int networkIndex;
     List<Integer> iterationToProgress = new ArrayList<>();
@@ -84,11 +56,18 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
             String experimentID,int... iterationToProgress){
         this.experimentID=experimentID;
        
-       
-        //save at whicht iteration SimulationAgent should be converged
-        for(int i=0;i< iterationToProgress.length;i++){
-            this.iterationToProgress.add(iterationToProgress[i]);
-        }
+        
+       // Dummy functionality: number of iteration the simulation Agent has to perform
+       // per Time step, before it is converged (we are not using events etc. in the 
+       // dummy set up
+       if(iterationToProgress.length == 0){
+           this.iterationToProgress.add(2);
+       }else{
+            //save at whicht iteration SimulationAgent should be converged
+            for(int i=0;i< iterationToProgress.length;i++){
+                this.iterationToProgress.add(iterationToProgress[i]);
+            }
+       }
         
         
         
@@ -113,19 +92,11 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
     
     
     /**************************************************
-     *               BOOTSTRAPPINGgetFlowNetwork().getNetworkIndex()
+     *               BOOTSTRAPPING
      **************************************************/
     
     /**
-     * The scheduling of system bootstrapping. It loads system parameters, 
-     * network and event data. At the end, it triggers the active state. 
-     * 
-     * Simulation is initialized as follows:
-     * 
-     * 1. Loading the file system parameters
-     * 2. Loading SFINA and backend configuration files and static event files
-     * 3. Creating a topology loader
-     * 5. Clearing up the output files 
+     * The scheduling of system bootstrapping. 
      */
     @Override
     public void runBootstraping(){
@@ -160,30 +131,10 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
     
     /**
      * The scheduling of the active state.  It is executed periodically. 
- 
-    This is the fundamental prototype of the simulation runtime. It should
-    stay generic. At this moment, the runtime concerns the following:
-
-    1. Counting simulation time.
-    2. Checking and loading new data from files.
-    3. Triggering event execution at the current time step
-    4. Calling three methods, which can be used to implement the actual simulation:
-        - initialOperations()
-        - runFlowAnalysis()
-        - finalOperations()
      */
      @Override
     public void runActiveState(){
-       // executeAllEvents();
-
-      //  runInitialOperations();
-
-      //  runFlowAnalysis();
-
-    //    runFinalOperations();
-
-     //   saveOutputData();
-
+      // dummy, just return immediately
         getTimeSteppingAgent().agentFinishedActiveState();
             
     }
@@ -217,8 +168,6 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
             
     }
     
-   
-    
      /**
      * Initializes the active state by setting iteration = 1 and loading data.
      */
@@ -228,14 +177,12 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
         resetIteration();        
        
     }
-    
     /**
      * Sets iteration to 0.
      */
     private void resetIteration(){
         this.iteration=0;
     }
-    
     private void logIteration(){
         this.iteration++;
         logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex() + " (" + this.timeToken + ") <-------");
@@ -263,13 +210,7 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
 //        return ((int) (Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(Time.inMilliseconds(2000))));
         return getTimeSteppingAgent().getSimulationTime();
     }
-    
    
-  
-
-    
-    
-     
     /**
      * 
      * @return the current iteration
@@ -293,9 +234,6 @@ public class SimulationAgent_Debug extends BasePeerlet implements SimulationAgen
     private void setNetworkIndex(int networkIndex) {
         this.networkIndex = networkIndex;
     }
-    
-   
-    
      /**
      * @return the experimentID
      */

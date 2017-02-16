@@ -17,17 +17,13 @@
  */
 package Debug;
 
-import event.Event;
-import event.EventType;
-import event.NetworkComponent;
+
 import interdependent.Messages.AbstractSfinaMessage;
-import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedActiveStateMessage;
 import interdependent.Messages.ProgressedToNextStepMessage;
 import interdependent.Messages.TokenMessage;
 import interdependent.communication.AbstractCommunicationAgent;
 import interdependent.communication.CommunicationEventType;
-import interdependent.communication.EventNegotiatorAgentInterface;
 import interdependent.communication.ProgressType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,9 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import network.InterdependentLink;
-import network.LinkState;
-import network.NodeState;
 import org.apache.log4j.Logger;
 import protopeer.Peer;
 import protopeer.network.IntegerNetworkAddress;
@@ -69,8 +62,7 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
     protected boolean agentIsReady;
     private boolean afterBootFinished =false;
   
-    private boolean eventSendToOthers = false;
-    private boolean lastIterationSkipped = false;
+
     
 //    private boolean forceProgressToNextStep = false;
     // counter which counts if we already have a call to make a new Step/ Iteration Skip etc.
@@ -90,15 +82,15 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
     
     /**
      * 
+     * @param bootstrapTime
+     * @param runTime
      * @param totalNumberNetworks 
      */
     public TokenCommunicationAgent_Debug(Time bootstrapTime, Time runTime,int totalNumberNetworks) {
         super(bootstrapTime, runTime);
         this.totalNumberNetworks = totalNumberNetworks;
         this.externalNetworksFinished = new HashMap<>();
-  
-        this.agentIsReady = false;
-        
+        this.agentIsReady = false; 
     }
     
     
@@ -112,10 +104,14 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
     public void agentFinishedBootStrap() {
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Agent Finished Bootstrap ");
-       if(!bootstrapHandled()){
-           this.afterBootFinished = true;
-           doNextStep();
-       } 
+       
+         //usually in bootstrap handled - moved for simplification of problem
+        if(isFirst()){
+            this.startingNetworkAfterBootstrap = true;
+        }
+        this.afterBootFinished = true;
+        doNextStep();
+       
     }
 
     @Override
@@ -136,9 +132,7 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
             
             
         this.agentIsReady = true;
-        this.eventSendToOthers = false;
-       
-            
+      
         FinishedActiveStateMessage message = new FinishedActiveStateMessage(
                 getSimulationAgent().getNetworkIndex(), getSimulationTime(), getSimulationAgent().getIteration(), getSimulationAgent().isConverged());
         sendToAll(message);
@@ -157,10 +151,8 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
         
         //check if its a SFINA Message
         if (message instanceof AbstractSfinaMessage) {
-
             AbstractSfinaMessage sfinaMessage = (AbstractSfinaMessage) message;
-            
-            
+           
             logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Handle Incomming " + sfinaMessage.getMessageType().toString()+" Message  from " + 
                     Integer.toString(sfinaMessage.getNetworkIdentifier()));
@@ -168,8 +160,7 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
                     ": default");
             logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Time is: "+ Integer.toString(getSimulationTime()));
-            
-            
+  
             switch (sfinaMessage.getMessageType()) {
                 case FINISHED_ACTIVE_STATE:
                     FinishedActiveStateMessage finishedMessage = ((FinishedActiveStateMessage)sfinaMessage);
@@ -203,42 +194,43 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
         
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Before Ready To Progress");
-        // Decide what to do 
+         
+        // Determine what to do 
         switch(readyToProgress()){
             case DO_NEXT_ITERATION:
-                this.lastIterationSkipped = false;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": do Next Iteration");
-                 
-                 
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Time is: "+ Integer.toString(getSimulationTime()));
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
-                doNextIteration();
+               
+                  // do next Iteration
+                  doNextIteration();
                 break;
             case DO_NEXT_STEP:
-                this.lastIterationSkipped = false;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": do Next Step");
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Time is: "+ Integer.toString(getSimulationTime()));
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
-                doNextStep();
+                
+                 // Do next Step 
+                 doNextStep();
                 break;
             case SKIP_NEXT_ITERATION:
-                this.lastIterationSkipped = true;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": skip Iteration");
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Time is: "+ Integer.toString(getSimulationTime()));
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
+                  
+                // skip Iteration  
                 skipNextIteration();
                 break;
             case DO_NOTHING:
-                this.lastIterationSkipped = false;
                  logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": do nothing");
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
@@ -253,7 +245,8 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
                     ": Time is: "+ Integer.toString(getSimulationTime()));
                   logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Current Iteration: " + Integer.toString(getSimulationAgent().getIteration()));
-                this.lastIterationSkipped = false;
+              
+                  
                 doNextStep(); 
         }     
     }
@@ -299,18 +292,13 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
     }
     
     protected boolean externalNetworksConverged(){
-        // Todo redo
-        if(false){
-        //if(this.eventSendToOthers){
-            this.eventSendToOthers = false;
-            return false;
-        }else{
-            for(Boolean converged : this.externalNetworksFinished.values()){
-                if(!converged)
-                    return false;
-            }
-             return true;
+    
+        for(Boolean converged : this.externalNetworksFinished.values()){
+            if(!converged)
+                return false;
         }
+        return true;
+
 
     }
         
@@ -459,17 +447,7 @@ public class TokenCommunicationAgent_Debug extends TimeSteppingAgent_Debug{
     }
 
  
-    protected boolean bootstrapHandled() {
-        // in first version use the default implementation of the AbstractCommunicationAgent
-        // if it works and the InterdependentCommunication also works, then we can 
-        // change this implementation and try to handle the bootstrap in away, that
-        // only the first agent performs a first step etc.
-        if(isFirst()){
-            this.startingNetworkAfterBootstrap = true;
-        }
-        return false;
-    }
-
+    
     
     
    /**
