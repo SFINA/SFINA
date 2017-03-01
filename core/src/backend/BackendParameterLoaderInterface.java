@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,22 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package utilities;
+package backend;
+
+import java.util.HashMap;
 
 /**
  *
- * @author evangelospournaras
+ * @author Ben
  */
-public enum Metrics {
-    LINE_FLOW,
-    LINE_UTILIZATION,
-    ACTIVATED_LINES,
-    TOTAL_LINES,
-    NODE_FINAL_LOADING,
-    NODE_INIT_LOADING,
-    FLOW_SIMU_TIME,
-    TOT_SIMU_TIME,
-    NEEDED_ITERATIONS,
-    ISLANDS,
-    ISOLATED_NODES
+public interface BackendParameterLoaderInterface { 
+        
+    public HashMap<Enum,Object> loadBackendParameters(String location);
+
+    
 }
