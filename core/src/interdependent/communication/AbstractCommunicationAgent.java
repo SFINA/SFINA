@@ -59,16 +59,12 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     
     protected int totalNumberNetworks;
     protected boolean agentIsReady;
-    private boolean afterBootFinished =false;
+
   
     private boolean eventSendToOthers = false;
     private boolean lastIterationSkipped = false;
     
-//    private boolean forceProgressToNextStep = false;
-    // counter which counts if we already have a call to make a new Step/ Iteration Skip etc.
-    // if we already issued an action, but if we get another event which is handled before,
-    // then this event cannot reissue a next step
-    private int stepSkipIterationCounter =0;
+
 
     
     /**
@@ -107,13 +103,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     @Override
     public void agentFinishedActiveState() {
         
-        if(stepSkipIterationCounter!=1){
-            logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
-                    ": stepSkipIterationCounter Error!!!! stepsSkipIterationCount = " +Integer.toString(stepSkipIterationCounter));
-        }
-        
-        
-        stepSkipIterationCounter--;
+   
         
         
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
@@ -270,24 +260,16 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
 
     protected void doNextStep(){
 
-            stepSkipIterationCounter++;
             clearCommunicationAgent();
-            injectEvents();
+            injectEvents();         
+            this.progressedToNextStep.clear();
+            sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
             
-            //check if afterBootfsinished (only true if bootstrap is handled by 
-            // AbstractCommunicationAgent 
-            if(afterBootFinished){
-                this.afterBootFinished = false;
-            }else{
-                 this.progressedToNextStep.clear();
-                 sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
-            }
      
     }
     
     protected void doNextIteration(){
- 
-            stepSkipIterationCounter++;
+
         clearCommunicationAgent();
         injectEvents();
         progressCommandReceiverToNextIteration();
@@ -295,12 +277,9 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     }
     
     protected void skipNextIteration(){
-    
-             stepSkipIterationCounter++;
             clearCommunicationAgent();
             progressCommandReceiverToSkipNextIteration();
-           
-    
+
     }
     
     private void clearCommunicationAgent(){
@@ -311,19 +290,11 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     
     protected boolean externalNetworksConverged(){
         
-// Todo redo
-        if(false){
-        //if(this.eventSendToOthers){
-            this.eventSendToOthers = false;
-            return false;
-        }else{
-            for(Boolean converged : this.externalNetworksFinished.values()){
-                if(!converged)
-                    return false;
-            }
-             return true;
+        for(Boolean converged : this.externalNetworksFinished.values()){
+            if(!converged)
+                return false;
         }
-
+             return true;
     }
         
   /**
@@ -332,16 +303,29 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * ***************************************
      */
 
+    /**
+     * Sends message to all existing Peers
+     * @param message 
+     */
     protected void sendToAll(AbstractSfinaMessage message){
         for(NetworkAddress address: getAllExternalNetworkAddresses().values())
             getPeer().sendMessage(address, message);
     }
     
+    /**
+     * Sends message to Peers which have A Network connected to this Peer
+     * @param message 
+     */
     protected void sendToConnected(AbstractSfinaMessage message){
         for(NetworkAddress address: getConnectedExternalNetworkAddresses().values())
             getPeer().sendMessage(address, message);
     }
     
+    /**
+     * Sends message to Peer which has the Network with networkIndex
+     * @param message
+     * @param networkIndex 
+     */
     protected void sendToSpecific(AbstractSfinaMessage message, int networkIndex){
         getPeer().sendMessage(getNetworkAddress(networkIndex), message);
     }
@@ -462,33 +446,33 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     
     /**
      * Always called after every Communication with the AbstractCommunication Event
-     * (agentFinishedStep, incomming EventMessage etc.). Allows subclass to 
+     * (agentFinishedStep, incomming message from other peer). Allows subclass to 
      * introduce logic and change it state after each communication.
      * @param eventType 
+     * @return true if if evenType has been handled by Subclass
      */
     protected abstract boolean postProcessCommunicationEvent(CommunicationEventType eventType);
     
-    protected boolean bootstrapHandled(){
-        return false;
-    }
-
+ 
+    /**************  NETWORKING FUNCTIONS ************************
+    
     /**
-     * 
-     * @return 
+     * Returns all Addresses of Networks of the Simulation
+     * @return Map containing the networkIndex as a key and the corresponding NetworkAddres as Value
      */
     protected abstract Map<Integer, NetworkAddress> getAllExternalNetworkAddresses();
     
     /**
-     * 
-     * @return 
+     * Returns all Addresses of Networks connected to the Network of this Peer
+     * @return Map containing the networkIndex as a kez and the corresponding NetworkAddres as Value
      */
     protected abstract Map<Integer, NetworkAddress> getConnectedExternalNetworkAddresses();
     
     
     /**
-     * 
+     * Returns the Address of the Network identified by the networkIndex
      * @param networkIndex
-     * @return 
+     * @return the NetworkAddress
      */
     protected abstract NetworkAddress getNetworkAddress(int networkIndex);
        
