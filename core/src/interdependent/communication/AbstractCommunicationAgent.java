@@ -91,18 +91,18 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * ************************************************
      */
     
-    @Override
-    public void agentFinishedBootStrap() {
-         logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
-                    ": Agent Finished Bootstrap ");
-   
-       // this.postProcessAbstractCommunication(CommunicationEventType.BOOT_FINISHED);
-       // if bootstrap is not handled by childClass - we perform our default behavior
-       if(!bootstrapHandled()){
-           this.afterBootFinished = true;
-           doNextStep();
-       } 
-    }
+//    @Override
+//    public void agentFinishedBootStrap() {
+//         logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
+//                    ": Agent Finished Bootstrap ");
+//   
+//       // this.postProcessAbstractCommunication(CommunicationEventType.BOOT_FINISHED);
+//       // if bootstrap is not handled by childClass - we perform our default behavior
+//       if(!bootstrapHandled()){
+//           this.afterBootFinished = true;
+//           doNextStep();
+//       } 
+//    }
 
     @Override
     public void agentFinishedActiveState() {
@@ -269,7 +269,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     }
 
     protected void doNextStep(){
-        if(stepSkipIterationCounter ==0){
+
             stepSkipIterationCounter++;
             clearCommunicationAgent();
             injectEvents();
@@ -282,26 +282,25 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
                  this.progressedToNextStep.clear();
                  sendToAll(new ProgressedToNextStepMessage(getSimulationAgent().getNetworkIndex()));
             }
-           progressCommandReceiverToNextTimeStep();
-        }
+     
     }
     
     protected void doNextIteration(){
-        if(stepSkipIterationCounter ==0){
+ 
             stepSkipIterationCounter++;
         clearCommunicationAgent();
         injectEvents();
         progressCommandReceiverToNextIteration();
-        }
+  
     }
     
     protected void skipNextIteration(){
-        if(stepSkipIterationCounter ==0){
+    
              stepSkipIterationCounter++;
             clearCommunicationAgent();
             progressCommandReceiverToSkipNextIteration();
            
-        }
+    
     }
     
     private void clearCommunicationAgent(){
