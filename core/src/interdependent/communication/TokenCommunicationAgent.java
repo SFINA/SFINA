@@ -35,7 +35,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     private int startingNetwork;
     private int previousNetwork;
     
-    private boolean startingNetworkAfterBootstrap =false;
+   // private boolean startingNetworkAfterBootstrap =false;
     
     public TokenCommunicationAgent(Time bootstrapTime, Time runTime,int totalNumberNetworks, int startingNetwork){
         super(bootstrapTime, runTime,totalNumberNetworks);
@@ -61,40 +61,38 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     @Override
     protected ProgressType readyToProgress() {
         
-        if(this.startingNetworkAfterBootstrap){
-            this.startingNetworkAfterBootstrap =false;
-            return ProgressType.DO_NEXT_ITERATION;
-        }
+//        if(this.startingNetworkAfterBootstrap){
+//            this.startingNetworkAfterBootstrap =false;
+//            return ProgressType.DO_NEXT_ITERATION;
+//        }
         
         
         if(this.hasToken){
             // if previous network progressed to Next Step, then we also progress
             // to next step
             if(this.progressedToNextStep.contains(this.previousNetwork)){
-                return progessOrIterate();
+                return ProgressType.DO_NEXT_STEP;
             }
             
             // if our SimulationAgent is not converged, we do another iteration
             if(!getSimulationAgent().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
             } 
-            else{
-                if(externalNetworksConverged()){
-//                    return ProgressType.DO_NEXT_STEP;
-                    if(this.isFirst()){
-                 //       this.startingNetworkAfterBootstrap= true;
-                        return progessOrIterate();
-                    }
-                    else{
-                        sendTokenToNext();
-                        return ProgressType.DO_NOTHING;
-                    }
-                } 
-                else
-                    return ProgressType.SKIP_NEXT_ITERATION;
-            }
+       
+            if(externalNetworksConverged()){
+                if(this.isFirst()){
+                    return ProgressType.DO_NEXT_STEP;
+                }
+                else{
+                    sendTokenToNext();
+                    return ProgressType.DO_NOTHING;
+                }
+            } 
+            else
+                return ProgressType.SKIP_NEXT_ITERATION;
+           
         }
-        else 
+        else // No token
             return ProgressType.DO_NOTHING;
     }
 
@@ -122,11 +120,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     protected boolean postProcessCommunicationEvent(CommunicationEventType messageType) {
         switch(messageType){
             case AGENT_IS_READY:
-//                if(this.afterbootStrap == true){
-//                    this.afterbootStrap = false; // has to be done, so that network is not sending away token if its after bootsrap
-//                    return true;
-//                }
-                if(this.hasToken && !startingNetworkAfterBootstrap) // has to be done, as we are handling after bootstrap differently in readytoProgress
+                if(this.hasToken) 
                     sendTokenToNext();
                 return true;
           
@@ -150,28 +144,28 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
         return (this.getSimulationAgent().getNetworkIndex() == startingNetwork);
     }
 
-    @Override
-    protected boolean bootstrapHandled() {
-        // in first version use the default implementation of the AbstractCommunicationAgent
-        // if it works and the InterdependentCommunication also works, then we can 
-        // change this implementation and try to handle the bootstrap in away, that
-        // only the first agent performs a first step etc.
-        if(isFirst()){
-            this.startingNetworkAfterBootstrap = true;
-        }
-        return false;
-    }
+//    @Override
+//    protected boolean bootstrapHandled() {
+//        // in first version use the default implementation of the AbstractCommunicationAgent
+//        // if it works and the InterdependentCommunication also works, then we can 
+//        // change this implementation and try to handle the bootstrap in away, that
+//        // only the first agent performs a first step etc.
+//        if(isFirst()){
+//            this.startingNetworkAfterBootstrap = true;
+//        }
+//        return false;
+//    }
     
     
-    protected ProgressType progessOrIterate(){
-        
-        if(getSimulationAgent().getIteration()==0)
-            return ProgressType.DO_NEXT_ITERATION;
-        else
-            return ProgressType.DO_NEXT_STEP;
-        
-        
-    }
+//    protected ProgressType progessOrIterate(){
+//        
+//        if(getSimulationAgent().getIteration()==0)
+//            return ProgressType.DO_NEXT_ITERATION;
+//        else
+//            return ProgressType.DO_NEXT_STEP;
+//        
+//        
+//    }
     
     
 }

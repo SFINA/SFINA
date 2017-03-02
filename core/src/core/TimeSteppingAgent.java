@@ -36,8 +36,23 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         this.bootstrapTime = bootstrapTime;
         this.runTime = runTime;
     }
-      
     
+    /***********************************************************************
+     *      BASEPEERLET FUNCTIONS
+     ***********************************************************************/
+    
+    @Override
+    public void start() {
+        super.start(); //To change body of generated methods, choose Tools | Templates.
+        Timer loadAgentTimer= getPeer().getClock().createNewTimer();
+        loadAgentTimer.addTimerListener(new TimerListener(){
+            public void timerExpired(Timer timer){
+                       getSimulationAgent().runBootstraping();
+                           }
+        });
+        loadAgentTimer.schedule(this.bootstrapTime);
+    }
+   
     @Override
     public void agentFinishedActiveState() {
         if(!getSimulationAgent().isConverged())
@@ -46,9 +61,14 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
             progressCommandReceiverToNextTimeStep();
     }
 
+    /************************************************************
+     *      TimeSteppingAgentInterface Functions
+     *************************************************************/
+    
     @Override
-    public void agentFinishedBootStrap() {
-        progressCommandReceiverToNextTimeStep();
+    public final void agentFinishedBootStrap() {
+        afterBootstrapFinished(); // sub clases can do some logic
+        progressCommandReceiverToNextTimeStep(); // progress to Time 1
     }
 
     @Override
@@ -65,18 +85,14 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
     }
 
-    @Override
-    public void start() {
-        super.start(); //To change body of generated methods, choose Tools | Templates.
-        Timer loadAgentTimer= getPeer().getClock().createNewTimer();
-        loadAgentTimer.addTimerListener(new TimerListener(){
-            public void timerExpired(Timer timer){
-                       getSimulationAgent().runBootstraping();
-                           }
-        });
-        loadAgentTimer.schedule(this.bootstrapTime);
-    }
+    /*************************************************************
+     *      TimeSteppingAgent internal functions
+     *************************************************************/
     
+    /**
+     * Recursive Function, which handels the Protopeer Time Stepping and hence
+     * the Simulation Time
+     */
     private void progressCommandReceiverToNextTimeStep(){
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
@@ -89,15 +105,27 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         
     }
     
+    /**
+     * Called by Subclasses to simulate another iteration
+     */
     protected final void progressCommandReceiverToNextIteration(){
         getCommandReceiver().progressToNextIteration(); 
     }
-    
+    /**
+     * Called by Subclasses to simulate a skipped Iteration
+     */
     protected final void progressCommandReceiverToSkipNextIteration(){
         getCommandReceiver().skipNextIteration();         
     }
     
-    
+    /**
+     * Can be overwritten by Subclasses to add some logic AFTER the CommandReceiver/
+     * SimulationAgent finished its bootstrap and BEFORE it progresses to the 
+     * first Time Step 
+     */
+    protected void afterBootstrapFinished(){
+        
+    }
     
     
     
