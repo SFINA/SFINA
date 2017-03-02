@@ -60,12 +60,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     
     @Override
     protected ProgressType readyToProgress() {
-        
-//        if(this.startingNetworkAfterBootstrap){
-//            this.startingNetworkAfterBootstrap =false;
-//            return ProgressType.DO_NEXT_ITERATION;
-//        }
-        
+              
         
         if(this.hasToken){
             // if previous network progressed to Next Step, then we also progress
@@ -78,7 +73,6 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
             if(!getSimulationAgent().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
             } 
-       
             if(externalNetworksConverged()){
                 if(this.isFirst()){
                     return ProgressType.DO_NEXT_STEP;
@@ -144,28 +138,5 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
         return (this.getSimulationAgent().getNetworkIndex() == startingNetwork);
     }
 
-//    @Override
-//    protected boolean bootstrapHandled() {
-//        // in first version use the default implementation of the AbstractCommunicationAgent
-//        // if it works and the InterdependentCommunication also works, then we can 
-//        // change this implementation and try to handle the bootstrap in away, that
-//        // only the first agent performs a first step etc.
-//        if(isFirst()){
-//            this.startingNetworkAfterBootstrap = true;
-//        }
-//        return false;
-//    }
-    
-    
-//    protected ProgressType progessOrIterate(){
-//        
-//        if(getSimulationAgent().getIteration()==0)
-//            return ProgressType.DO_NEXT_ITERATION;
-//        else
-//            return ProgressType.DO_NEXT_STEP;
-//        
-//        
-//    }
-    
-    
+ 
 }

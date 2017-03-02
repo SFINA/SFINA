@@ -64,9 +64,6 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     private boolean eventSendToOthers = false;
     private boolean lastIterationSkipped = false;
     
-
-
-    
     /**
      * 
      * @param totalNumberNetworks 
@@ -86,25 +83,8 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      *        TIME STEPPING FUNCTIONS
      * ************************************************
      */
-    
-//    @Override
-//    public void agentFinishedBootStrap() {
-//         logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
-//                    ": Agent Finished Bootstrap ");
-//   
-//       // this.postProcessAbstractCommunication(CommunicationEventType.BOOT_FINISHED);
-//       // if bootstrap is not handled by childClass - we perform our default behavior
-//       if(!bootstrapHandled()){
-//           this.afterBootFinished = true;
-//           doNextStep();
-//       } 
-//    }
-
     @Override
     public void agentFinishedActiveState() {
-        
-   
-        
         
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Agent Finished Active State ");
