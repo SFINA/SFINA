@@ -57,8 +57,7 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     public void agentFinishedActiveState() {
         if(!getSimulationAgent().isConverged())
             progressCommandReceiverToNextIteration();
-        else
-            progressCommandReceiverToNextTimeStep();
+
     }
 
     /************************************************************

@@ -41,7 +41,7 @@ public class TestCommunicationAgent_simpleTimeStepping extends SimulatedExperime
     //Simulation Parameters
     private final static int bootstrapTime=2000;
     private final static int runTime=1000;
-    private final static int runDuration=20;
+    private final static int runDuration=6;
     private final static int N=1;
     
     

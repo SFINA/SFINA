@@ -126,23 +126,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         this.setNetworkIndex(this.getPeer().getIndexNumber());
     }
 
-    /**
-    * Starts the simulation agent by scheduling the epoch measurements and 
-    * bootstrapping the agent
-    */
-    @Override
-    public void start(){
-  //      this.runBootstraping();
-    }
-
-    /**
-    * Stops the simulation agent
-    */
-    @Override
-    public void stop(){
-        
-    }
-    
+  
     
     /**************************************************
      *               BOOTSTRAPPING

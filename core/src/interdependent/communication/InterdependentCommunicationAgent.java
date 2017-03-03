@@ -42,6 +42,7 @@ public class InterdependentCommunicationAgent extends AbstractLocalSimulationCom
      *          ABSTRACT METHODS
      * ************************************************
      */
+    
      @Override
     protected ProgressType readyToProgress() {
        
