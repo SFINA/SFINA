@@ -207,14 +207,14 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     @Override
     public void progressToNextTimeStep() {
                 initTimeStep();
-                logIteration();
-                runActiveState(); 
+                getTimeSteppingAgent().agentFinishedActiveState();
     }
 
     @Override
     public void progressToNextIteration() { 
         this.logIteration();
         this.runActiveState(); 
+        getTimeSteppingAgent().agentFinishedActiveState();
     }
     
     @Override
@@ -226,11 +226,14 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
 
     @Override
     public boolean isConverged() {
+        if(getIteration() == 0)
+            return false;
         for(Event event : getEvents()){
             if(event.getTime() == getSimulationTime())
                 return false;
         }
         return true;
+        
     }
     
     @Override
@@ -245,7 +248,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
 
         saveOutputData();
 
-        getTimeSteppingAgent().agentFinishedActiveState();
+       
             
     }
     
@@ -286,10 +289,10 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         }
         // For testing if iteration advances as expected
         if(this.getNetworkIndex() == 0 && this.getSimulationTime() == 1)
-            if(this.getIteration()==1 || this.getIteration()==2 )
+            if(this.getIteration()==0 || this.getIteration()==1 )
                 this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
         if(this.getSimulationTime() == 2)
-            if(this.getIteration()==1 || this.getIteration()==2 )
+            if(this.getIteration()==0 || this.getIteration()==1 )
                 this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
     }
      

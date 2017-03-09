@@ -90,13 +90,14 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     
     /**
      * Recursive Function, which handels the Protopeer Time Stepping and hence
-     * the Simulation Time
+     * the Simulation Time.
      */
     private void progressCommandReceiverToNextTimeStep(){
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
                 getCommandReceiver().progressToNextTimeStep();
+                
                 progressCommandReceiverToNextTimeStep();
             }
         });
@@ -105,13 +106,13 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     }
     
     /**
-     * Called by Subclasses to simulate another iteration
+     * Called by Subclasses to simulate another iteration.
      */
     protected final void progressCommandReceiverToNextIteration(){
         getCommandReceiver().progressToNextIteration(); 
     }
     /**
-     * Called by Subclasses to simulate a skipped Iteration
+     * Called by Subclasses to simulate a skipped Iteration.
      */
     protected final void progressCommandReceiverToSkipNextIteration(){
         getCommandReceiver().skipNextIteration();         
@@ -120,7 +121,7 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     /**
      * Can be overwritten by Subclasses to add some logic AFTER the CommandReceiver/
      * SimulationAgent finished its bootstrap and BEFORE it progresses to the 
-     * first Time Step 
+     * first Time Step.
      */
     protected void afterBootstrapFinished(){
         

@@ -34,6 +34,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     private int nextNetwork;
     private int startingNetwork;
     private int previousNetwork;
+    private boolean afterBootstrap =false;
     
    // private boolean startingNetworkAfterBootstrap =false;
     
@@ -65,16 +66,16 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
         if(this.hasToken){
             // if previous network progressed to Next Step, then we also progress
             // to next step
-            if(this.progressedToNextStep.contains(this.previousNetwork)){
-                return ProgressType.DO_NEXT_STEP;
-            }
+//            if(this.progressedToNextStep.contains(this.previousNetwork)){
+//                return ProgressType.DO_NEXT_STEP;
+//            }
             
             // if our SimulationAgent is not converged, we do another iteration
             if(!getSimulationAgent().isConverged()){
                 return ProgressType.DO_NEXT_ITERATION;
-            } 
-            if(externalNetworksConverged()){
+            } else if(externalNetworksConverged()){
                 if(this.isFirst()){
+                   // afterBootstrap = true;
                     return ProgressType.DO_NEXT_STEP;
                 }
                 else{
@@ -115,7 +116,10 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
         switch(messageType){
             case AGENT_IS_READY:
                 if(this.hasToken) 
-                    sendTokenToNext();
+                  
+                        sendTokenToNext();
+                    
+                        
                 return true;
           
             default:
@@ -125,10 +129,20 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     }
     
     private void sendTokenToNext(){
+//        if(this.afterBootstrap){
+//            this.afterBootstrap = false;
+//            return;
+//        }
+        
         if(this.hasToken){
             this.hasToken = false;
+            
             TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
-            sendToSpecific(message, nextNetwork);
+            if(isFirst() && getSimulationAgent().getIteration() ==0){
+                sendToSpecific(message, getSimulationAgent().getNetworkIndex());
+            }else{
+                sendToSpecific(message, nextNetwork);
+            }
             logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                         ": Send Token To Network " + Integer.toString(this.nextNetwork));
             }
@@ -137,6 +151,12 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     private boolean isFirst(){
         return (this.getSimulationAgent().getNetworkIndex() == startingNetwork);
     }
+    
+   
+
+   
+    
+    
 
  
 }
