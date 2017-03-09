@@ -813,6 +813,28 @@ public class SimulationAgentNoStepper extends BasePeerlet implements SimulationA
     public boolean isConverged() {
         return true;
     }
+
+    
+    /****************
+     * DUmmy methods
+     */
+    @Override
+    public void progressToNextTimeStep() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void progressToNextIteration() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void skipNextIteration() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    
     
     
 }

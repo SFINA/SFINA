@@ -64,17 +64,13 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
               
         
         if(this.hasToken){
-            // if previous network progressed to Next Step, then we also progress
-            // to next step
-//            if(this.progressedToNextStep.contains(this.previousNetwork)){
-//                return ProgressType.DO_NEXT_STEP;
-//            }
             
-            // if our SimulationAgent is not converged, we do another iteration
-            if(!getSimulationAgent().isConverged()){
+            
+           
+            if(!getSimulationAgent().isConverged()){  // if our SimulationAgent is not converged, we do another iteration
                 return ProgressType.DO_NEXT_ITERATION;
             } else if(externalNetworksConverged()){
-                if(this.isFirst()){
+                if(this.isFirst()){ // if we are the leading Network/ Peer we can progress to the next time step 
                    // afterBootstrap = true;
                     return ProgressType.DO_NEXT_STEP;
                 }
@@ -133,6 +129,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
 //            this.afterBootstrap = false;
 //            return;
 //        }
+
         
         if(this.hasToken){
             this.hasToken = false;

@@ -93,5 +93,31 @@ public interface SimulationAgentInterface {
          * @return 
          */
         boolean isConverged();
+        
+        
+        /*************************************************
+         * Methods used by TimeSteppingAgent
+         **********************************************/
+        
+         /**
+         * Notifies the Message Receiver, that it can proceed to the next time step.
+         * This will happen if and only if the Communication Agent got an EventMessage and an FinishedStepMessage 
+         * from all the connected Networks of this receiver and the current time step of all networks has converged.
+         */
+        public void progressToNextTimeStep();
+        
+        /**
+         * Notifies the Message Receiver, that something changed and that it has 
+         * to redo its caluclations.
+         * This will happen if and only if the Communication Agent got an EventMessage and an FinishedStepMessage 
+         * from all the connected Networks of this receiver.
+         */
+        public void progressToNextIteration();
+        
+        /**
+         * Notifies the Message Receiver, that nothing has changed, but that it should wait for the other networks, 
+         * which are doing another iteration.
+         */
+        public void skipNextIteration();
     
 }

@@ -80,9 +80,9 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         return (SimulationAgentInterface) getPeer().getPeerletOfType(SimulationAgentInterface.class);
     }
         
-    private CommandReceiver getCommandReceiver(){
-        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
-    }
+//    private CommandReceiver getCommandReceiver(){
+//        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
+//    }
 
     /*************************************************************
      *      TimeSteppingAgent internal functions
@@ -96,7 +96,7 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
-                getCommandReceiver().progressToNextTimeStep();
+                getSimulationAgent().progressToNextTimeStep();
                 
                 progressCommandReceiverToNextTimeStep();
             }
@@ -109,13 +109,13 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
      * Called by Subclasses to simulate another iteration.
      */
     protected final void progressCommandReceiverToNextIteration(){
-        getCommandReceiver().progressToNextIteration(); 
+        getSimulationAgent().progressToNextIteration(); 
     }
     /**
      * Called by Subclasses to simulate a skipped Iteration.
      */
     protected final void progressCommandReceiverToSkipNextIteration(){
-        getCommandReceiver().skipNextIteration();         
+        getSimulationAgent().skipNextIteration();         
     }
     
     /**

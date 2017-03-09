@@ -61,7 +61,7 @@ import protopeer.util.quantities.Time;
  *
  * @author mcb
  */
-public class SimulationAgent  extends BasePeerlet implements SimulationAgentInterface, TimeSteppingAgentInterface.CommandReceiver{
+public class SimulationAgent  extends BasePeerlet implements SimulationAgentInterface{
     
     private static final Logger logger = Logger.getLogger(SimulationAgent_old.class);
 
