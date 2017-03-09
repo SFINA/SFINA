@@ -61,7 +61,9 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     
     @Override
     protected ProgressType readyToProgress() {
-              
+//        In order to execute the first Iteration in parallel
+//        if(getSimulationAgent().getIteration() ==0)
+//            return ProgressType.DO_NEXT_ITERATION;
         
         if(this.hasToken){
             
@@ -71,7 +73,6 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
                 return ProgressType.DO_NEXT_ITERATION;
             } else if(externalNetworksConverged()){
                 if(this.isFirst()){ // if we are the leading Network/ Peer we can progress to the next time step 
-                   // afterBootstrap = true;
                     return ProgressType.DO_NEXT_STEP;
                 }
                 else{
@@ -110,12 +111,10 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     @Override
     protected boolean postProcessCommunicationEvent(CommunicationEventType messageType) {
         switch(messageType){
+            // after agentFinishedActivestate send the Token to the next peer
             case AGENT_IS_READY:
                 if(this.hasToken) 
-                  
                         sendTokenToNext();
-                    
-                        
                 return true;
           
             default:
@@ -135,6 +134,10 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
             this.hasToken = false;
             
             TokenMessage message = new TokenMessage(getSimulationAgent().getNetworkIndex());
+            
+            // As the leading Peer: After the Initialisation of the Time step
+            // send the token to yourself in order to
+            // remain the leading peer AND to have a correct output
             if(isFirst() && getSimulationAgent().getIteration() ==0){
                 sendToSpecific(message, getSimulationAgent().getNetworkIndex());
             }else{
@@ -145,7 +148,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
             }
     }   
     
-    private boolean isFirst(){
+    private boolean isFirst(){// returns true if peer is the leading peer
         return (this.getSimulationAgent().getNetworkIndex() == startingNetwork);
     }
     

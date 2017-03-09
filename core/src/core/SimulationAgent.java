@@ -189,6 +189,9 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     *               RUN ACTIVE STATE
     **************************************************/
     
+    /**Mark: TODO: outdated comment below??/
+    
+    * 
     /**
      * The scheduling of the active state.  It is executed periodically. 
  
@@ -203,6 +206,8 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         - runFlowAnalysis()
         - finalOperations()
      */
+    
+    
     
     @Override
     public void progressToNextTimeStep() {
@@ -224,6 +229,10 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         getTimeSteppingAgent().agentFinishedActiveState();
     }
 
+    //Mark: Todo (Question for Ben): in runFlowAnalysis we have boolean which is called
+    // converged - should we not also check this one if we are converged?
+    // If yes it could have as a default value false and instead of checking
+    // getIteration()==0 we could just check "converged".
     @Override
     public boolean isConverged() {
         if(getIteration() == 0)
@@ -247,9 +256,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         runFinalOperations();
 
         saveOutputData();
-
-       
-            
+         
     }
     
      /**
@@ -287,13 +294,13 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
-        // For testing if iteration advances as expected
-        if(this.getNetworkIndex() == 0 && this.getSimulationTime() == 1)
-            if(this.getIteration()==0 || this.getIteration()==1 )
-                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
-        if(this.getSimulationTime() == 2)
-            if(this.getIteration()==0 || this.getIteration()==1 )
-                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
+//        // For testing if iteration advances as expected
+//        if(this.getNetworkIndex() == 0 && this.getSimulationTime() == 1)
+//            if(this.getIteration()==0 || this.getIteration()==1 )
+//                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
+//        if(this.getSimulationTime() == 2)
+//            if(this.getIteration()==0 || this.getIteration()==1 )
+//                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
     }
      
     @Override

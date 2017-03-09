@@ -116,13 +116,11 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      */
     @Override
     public void handleIncomingMessage(Message message) {
-        
         //check if its a SFINA Message
         if (message instanceof AbstractSfinaMessage) {
 
             AbstractSfinaMessage sfinaMessage = (AbstractSfinaMessage) message;
-            
-            
+         
             logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Handle Incomming " + sfinaMessage.getMessageType().toString()+" Message  from " + 
                     Integer.toString(sfinaMessage.getNetworkIdentifier()));
@@ -176,10 +174,6 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
 
         postProcessCommunicationEvent(communicationEventType);
         
-//        if(!postProcessCommunicationEvent(communicationEventType) &&(communicationEventType== communicationEventType.BOOT_FINISHED)){
-//            doNextStep();
-//            return;
-//        }
 
          logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Before Ready To Progress");

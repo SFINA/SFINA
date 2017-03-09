@@ -21,20 +21,18 @@ import static java.lang.Integer.min;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Parallel execution of iterations: After each iteration Peers/ Networks communicate
+ * with each other.
  * @author mcb
  */
 public class InterdependentCommunicationAgent extends AbstractLocalSimulationComunicationAgent{
     
-    private boolean afterBootstrap = false;
-  
     /**
      * 
      * @param totalNumberNetworks 
      */
     public InterdependentCommunicationAgent(Time bootstrapTime, Time runTime,int totalNumberNetworks) {
         super(bootstrapTime, runTime, totalNumberNetworks);
-     
     }
 
     /**
