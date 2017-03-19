@@ -17,8 +17,6 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationType;
-
 /**
  * Message notifying that message sender progressed to next time step.
  * @author mcb
@@ -30,8 +28,8 @@ public class ProgressedToNextStepMessage extends AbstractSfinaMessage{
     }
 
     @Override
-    public CommunicationType getMessageType() {
-       return CommunicationType.PROGRESSED_TO_NEXT_STEP;
+    public MessageType getMessageType() {
+       return MessageType.PROGRESSED_TO_NEXT_STEP;
     }
     
     

@@ -17,8 +17,6 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationType;
-
 /**
  * Message notifying that message sender finished current time step or iteration
  * @author mcb
@@ -36,8 +34,8 @@ public class FinishedActiveStateMessage extends AbstractSfinaMessage{
     }
 
     @Override
-    public CommunicationType getMessageType() {
-        return CommunicationType.FINISHED_ACTIVE_STATE;
+    public MessageType getMessageType() {
+        return MessageType.FINISHED_ACTIVE_STATE;
     }
 
     /**

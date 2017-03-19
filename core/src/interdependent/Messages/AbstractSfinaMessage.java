@@ -17,7 +17,6 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationType;
 import protopeer.network.Message;
 
 /**
@@ -42,7 +41,7 @@ public abstract class AbstractSfinaMessage extends Message implements SfinaMessa
     }
     
     @Override
-    public abstract CommunicationType getMessageType();
+    public abstract MessageType getMessageType();
     
     
 }

@@ -17,8 +17,6 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationType;
-
 /**
  * A Message has to implement this interfaceto in order to be handled by the 
  * default SFINA message handling framework.
@@ -37,5 +35,5 @@ public interface SfinaMessageInterface {
      * Returns the Type of Message.
      * @return 
      */
-    public CommunicationType getMessageType();
+    public MessageType getMessageType();
 }

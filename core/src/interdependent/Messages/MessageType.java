@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.Messages;
 
 /**
- * Types of Communication existing between SFINA Networks. Add enums, if you want
+ * Types of messages, which can be exchanged between SFINA Networks. Add enums, if you want
  * to create new SFINA messages.
  * @author Ben
  */
-public enum CommunicationType {
+public enum MessageType {
     EVENT_MESSAGE,
     NETWORK_ADDRESS_CHANGE,
     FINISHED_ACTIVE_STATE,

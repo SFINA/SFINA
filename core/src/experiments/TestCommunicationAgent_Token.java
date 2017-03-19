@@ -18,8 +18,8 @@
 package experiments;
 
 import core.SimulationAgent;
-import interdependent.communication.agents.TokenCommunicationAgent;
-import interdependent.communication.PowerEventNegotiatorAgent;
+import interdependent.agents.communication.TokenCommunicationAgent;
+import interdependent.agents.negotiators.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;

@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication.agents;
+package interdependent.agents.communication;
 
 
 import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.SfinaMessageInterface;
 import interdependent.Messages.TokenMessage;
-import interdependent.communication.CommunicationType;
-import interdependent.communication.ProgressType;
+import interdependent.Messages.MessageType;
 import protopeer.Peer;
 import protopeer.util.quantities.Time;
 
@@ -112,7 +111,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     
 
     @Override
-    protected boolean postProcessCommunicationEvent(CommunicationType messageType) {
+    protected boolean postProcessCommunicationEvent(MessageType messageType) {
         switch(messageType){
             // after agentFinishedActivestate send the Token to the next peer
             case AGENT_IS_READY:

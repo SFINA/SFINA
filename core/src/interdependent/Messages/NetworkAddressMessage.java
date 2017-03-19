@@ -17,7 +17,6 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationType;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
 
@@ -50,8 +49,8 @@ public class NetworkAddressMessage extends AbstractSfinaMessage{
     }
    
     @Override
-    public CommunicationType getMessageType() {
-        return CommunicationType.NETWORK_ADDRESS_CHANGE;
+    public MessageType getMessageType() {
+        return MessageType.NETWORK_ADDRESS_CHANGE;
     }
     
     public boolean isStopped(){

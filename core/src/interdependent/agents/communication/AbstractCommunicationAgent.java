@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication.agents;
+package interdependent.agents.communication;
 
 import core.TimeSteppingAgent;
 import event.Event;
@@ -26,9 +26,8 @@ import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedActiveStateMessage;
 import interdependent.Messages.ProgressedToNextStepMessage;
 import interdependent.Messages.SfinaMessageInterface;
-import interdependent.communication.CommunicationType;
-import interdependent.communication.EventNegotiatorAgentInterface;
-import interdependent.communication.ProgressType;
+import interdependent.Messages.MessageType;
+import interdependent.agents.negotiators.EventNegotiatorAgentInterface;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -110,7 +109,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
                 getSimulationAgent().getNetworkIndex(), getSimulationTime(), getSimulationAgent().getIteration(), getSimulationAgent().isConverged());
         sendToAll(message);
         
-        this.postProcessAbstractCommunication(CommunicationType.AGENT_IS_READY);
+        this.postProcessAbstractCommunication(MessageType.AGENT_IS_READY);
     }
  
     
@@ -175,7 +174,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * Handles necessary further steps
      * @param communicationEventType 
      */
-    private void postProcessAbstractCommunication(CommunicationType communicationEventType) {
+    private void postProcessAbstractCommunication(MessageType communicationEventType) {
 
         postProcessCommunicationEvent(communicationEventType);
         
@@ -430,7 +429,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * @param eventType 
      * @return true if if evenType has been handled by Subclass
      */
-    protected abstract boolean postProcessCommunicationEvent(CommunicationType eventType);
+    protected abstract boolean postProcessCommunicationEvent(MessageType eventType);
     
  
     /**************  NETWORKING FUNCTIONS ************************
