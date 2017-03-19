@@ -17,7 +17,6 @@
  */
 package core;
 
-import core.Archive.SimulationAgent_old;
 import backend.FlowDomainAgent;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
@@ -63,7 +62,7 @@ import protopeer.util.quantities.Time;
  */
 public class SimulationAgent  extends BasePeerlet implements SimulationAgentInterface{
     
-    private static final Logger logger = Logger.getLogger(SimulationAgent_old.class);
+    private static final Logger logger = Logger.getLogger(SimulationAgent.class);
 
     private String experimentID;
  //   private Time bootstrapTime;
@@ -294,6 +293,9 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
+        
+        //mcb: TODO remove this comment
+        
 //        // For testing if iteration advances as expected
 //        if(this.getNetworkIndex() == 0 && this.getSimulationTime() == 1)
 //            if(this.getIteration()==0 || this.getIteration()==1 )
@@ -308,10 +310,10 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         
     }
     
-    @Override
-    public void runPassiveState(Message message){
-        
-    }
+//    @Override
+//    public void runPassiveState(Message message){
+//        
+//    }
 
     /***************************************
      *          GETTER AND SETTER  
@@ -333,8 +335,6 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     
     @Override
     public int getSimulationTime(){
-//        // just for testing purposes, does this change something
-//        return ((int) (Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(Time.inMilliseconds(2000))));
         return getTimeSteppingAgent().getSimulationTime();
     }
     

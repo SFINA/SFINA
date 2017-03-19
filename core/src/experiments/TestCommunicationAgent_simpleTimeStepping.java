@@ -33,7 +33,7 @@ import protopeer.util.quantities.Time;
  */
 public class TestCommunicationAgent_simpleTimeStepping extends SimulatedExperiment{
     
-    private static final Logger logger = Logger.getLogger(TestInterpssBackend.class);
+    private static final Logger logger = Logger.getLogger(TestCommunicationAgent_simpleTimeStepping.class);
     
     private final static String expSeqNum="01";
     private static String experimentID="experiment-"+expSeqNum;
@@ -47,7 +47,7 @@ public class TestCommunicationAgent_simpleTimeStepping extends SimulatedExperime
     
     public static void main(String[] args) {
         Experiment.initEnvironment();
-        TestInterpssBackend test = new TestInterpssBackend();
+        TestCommunicationAgent_simpleTimeStepping test = new TestCommunicationAgent_simpleTimeStepping();
         test.init();
         
         PeerFactory peerFactory=new PeerFactory() {

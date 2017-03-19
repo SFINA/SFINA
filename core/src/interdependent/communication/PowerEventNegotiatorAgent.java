@@ -17,7 +17,7 @@
  */
 package interdependent.communication;
 
-import core.Archive.SimulationAgent_old;
+
 import core.SimulationAgentInterface;
 import event.Event;
 import event.EventType;

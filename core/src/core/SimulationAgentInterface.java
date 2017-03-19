@@ -36,7 +36,7 @@ public interface SimulationAgentInterface {
     
     void queueEvents(List<Event> events);
     
-    void runPassiveState(Message message);
+   // void runPassiveState(Message message);
     
     void executeEvent(FlowNetwork flowNetwork, Event event);
     
