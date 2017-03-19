@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 SFINA Team
+ * Copyright (C) 2017 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,16 +15,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.agents.communication;
+package messages;
 
 /**
- * Return Type of function readyToPress() of AbstractCommunicationAgent.
- * @author Ben
+ * Message notifying that message sender progressed to next time step.
+ * @author mcb
  */
-public enum ProgressType {
-    DO_NOTHING,
-    SKIP_NEXT_ITERATION,
-    DO_NEXT_ITERATION,
-    DO_NEXT_STEP,
-    DO_DEFAULT
+public class ProgressedToNextStepMessage extends AbstractSfinaMessage{
+
+    public ProgressedToNextStepMessage(int networkIdentifier) {
+        super(networkIdentifier);
+    }
+
+    @Override
+    public MessageType getMessageType() {
+       return MessageType.PROGRESSED_TO_NEXT_STEP;
+    }
+    
+    
+    
 }

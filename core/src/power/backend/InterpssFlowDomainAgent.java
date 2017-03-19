@@ -17,7 +17,7 @@
  */
 package power.backend;
 
-import backend.FlowDomainAgent;
+import agents.backend.FlowDomainAgent;
 import com.interpss.CoreObjectFactory;
 import com.interpss.common.exp.InterpssException;
 import com.interpss.core.DclfObjectFactory;
@@ -29,7 +29,7 @@ import com.interpss.core.aclf.AclfNetwork;
 import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
-import core.SimulationAgentInterface;
+import agents.simulation.SimulationAgentInterface;
 import static java.lang.Math.PI;
 import network.FlowNetwork;
 import network.Link;

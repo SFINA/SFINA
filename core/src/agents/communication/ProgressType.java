@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,17 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package backend;
-
-import java.util.HashMap;
+package agents.communication;
 
 /**
- *
+ * Return Type of function readyToPress() of AbstractCommunicationAgent.
  * @author Ben
  */
-public interface BackendParameterLoaderInterface { 
-        
-    public HashMap<Enum,Object> loadBackendParameters(String location);
-
-    
+public enum ProgressType {
+    DO_NOTHING,
+    SKIP_NEXT_ITERATION,
+    DO_NEXT_ITERATION,
+    DO_NEXT_STEP,
+    DO_DEFAULT
 }

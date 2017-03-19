@@ -17,9 +17,9 @@
  */
 package experiments;
 
-import core.SimulationAgent;
-import interdependent.agents.communication.InterdependentCommunicationAgent;
-import interdependent.agents.negotiators.PowerEventNegotiatorAgent;
+import agents.simulation.SimulationAgent;
+import agents.communication.InterdependentCommunicationAgent;
+import agents.negotiators.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;

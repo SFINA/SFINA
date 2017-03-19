@@ -17,7 +17,7 @@
  */
 package power.input;
 
-import backend.BackendParameterLoaderInterface;
+import agents.backend.BackendParameterLoaderInterface;
 import input.SfinaParameterLoader;
 import java.io.File;
 import java.io.FileNotFoundException;

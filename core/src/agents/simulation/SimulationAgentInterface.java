@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package core;
+package agents.simulation;
 
-import backend.FlowDomainAgent;
+import agents.backend.FlowDomainAgent;
 import event.Event;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.agents.communication;
+package agents.communication;
 
 
-import interdependent.Messages.AbstractSfinaMessage;
-import interdependent.Messages.SfinaMessageInterface;
-import interdependent.Messages.TokenMessage;
-import interdependent.Messages.MessageType;
+import messages.AbstractSfinaMessage;
+import messages.SfinaMessageInterface;
+import messages.TokenMessage;
+import messages.MessageType;
 import protopeer.Peer;
 import protopeer.util.quantities.Time;
 

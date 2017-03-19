@@ -15,44 +15,49 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
-
-import event.Event;
-import java.util.ArrayList;
-import java.util.List;
+package messages;
 
 /**
- * Message ot exchange interdependent Events.
+ * Message notifying that message sender finished current time step or iteration
  * @author mcb
  */
-public class EventMessage extends AbstractSfinaMessage{
-    
-    private List<Event> eventList;
+public class FinishedActiveStateMessage extends AbstractSfinaMessage{
+    private final int time;
+    private final int iteration;
+    private final boolean converged;
 
-    public EventMessage(int networkIdentifier, List<Event> events) {
+    public FinishedActiveStateMessage(int networkIdentifier, int time, int iteration, boolean converged) {
         super(networkIdentifier);
-        this.eventList = events;
-    }
-    
-    public EventMessage(int networkIdentifier, Event event){
-        super(networkIdentifier);
-        this.eventList = new ArrayList();
-        this.eventList.add(event);
-       
-    }
-    
-    public List<Event> getEvents() {
-        return eventList;
+        this.time = time;
+        this.iteration = iteration;
+        this.converged = converged;
     }
 
     @Override
     public MessageType getMessageType() {
-        return MessageType.EVENT_MESSAGE;
+        return MessageType.FINISHED_ACTIVE_STATE;
     }
-    
-    
- 
-    
-    
-    
+
+    /**
+     * @return the time
+     */
+    public int getTime() {
+        return time;
+    }
+
+    /**
+     * @return the iteration
+     */
+    public int getIteration() {
+        return iteration;
+    }
+
+    /**
+     * @return the converged
+     */
+    public boolean isConverged() {
+        return converged;
+    }
+     
+   
 }

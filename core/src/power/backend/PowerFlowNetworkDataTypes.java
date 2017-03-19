@@ -17,7 +17,7 @@
  */
 package power.backend;
 
-import backend.FlowNetworkDataTypesInterface;
+import agents.backend.FlowNetworkDataTypesInterface;
 import network.InterdependentLink;
 import network.Link;
 import network.LinkInterface;

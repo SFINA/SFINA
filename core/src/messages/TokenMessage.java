@@ -15,49 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
+package messages;
 
 /**
- * Message notifying that message sender finished current time step or iteration
+ * Message to pass Token to next Network.
  * @author mcb
  */
-public class FinishedActiveStateMessage extends AbstractSfinaMessage{
-    private final int time;
-    private final int iteration;
-    private final boolean converged;
+public class TokenMessage extends AbstractSfinaMessage{
 
-    public FinishedActiveStateMessage(int networkIdentifier, int time, int iteration, boolean converged) {
+    public TokenMessage(int networkIdentifier) {
         super(networkIdentifier);
-        this.time = time;
-        this.iteration = iteration;
-        this.converged = converged;
     }
 
+   
     @Override
     public MessageType getMessageType() {
-        return MessageType.FINISHED_ACTIVE_STATE;
+        return MessageType.TOKEN_MESSAGE;
     }
-
-    /**
-     * @return the time
-     */
-    public int getTime() {
-        return time;
-    }
-
-    /**
-     * @return the iteration
-     */
-    public int getIteration() {
-        return iteration;
-    }
-
-    /**
-     * @return the converged
-     */
-    public boolean isConverged() {
-        return converged;
-    }
-     
-   
+    
+    
+    
 }

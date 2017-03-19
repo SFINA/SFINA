@@ -17,7 +17,7 @@
  */
 package power.backend;
 
-import backend.FlowDomainAgent;
+import agents.backend.FlowDomainAgent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

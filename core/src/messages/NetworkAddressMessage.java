@@ -15,33 +15,49 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
+package messages;
 
 import protopeer.network.Message;
+import protopeer.network.NetworkAddress;
 
 /**
- * Base Class for a default SFINA message. 
+ * Message notifying that the network address of message sender changed.
  * @author mcb
  */
-public abstract class AbstractSfinaMessage extends Message implements SfinaMessageInterface{
+public class NetworkAddressMessage extends AbstractSfinaMessage{
     
-    private int networkIdentifier; // network where message originates from
 
-    /**
-     * Constructor
-     * @param networkIdentifier : Network where messgae originates from
-     */
-    public AbstractSfinaMessage(int networkIdentifier){
-        this.networkIdentifier = networkIdentifier;
-    }
-
-    @Override
-    public int getNetworkIdentifier() {
-        return networkIdentifier;
+    private NetworkAddress address;
+    private boolean stopped = false;
+    
+    public NetworkAddressMessage(int id, NetworkAddress address){
+        super(id);
+        this.address = address;
     }
     
+    
+    public NetworkAddressMessage(int id, NetworkAddress address, boolean stopped){
+        this(id, address);
+        this.stopped = stopped;
+    }
+
+  
+
+    //todo make it immutable??
+    public NetworkAddress getAddress() {
+        return address;
+    }
+   
     @Override
-    public abstract MessageType getMessageType();
+    public MessageType getMessageType() {
+        return MessageType.NETWORK_ADDRESS_CHANGE;
+    }
+    
+    public boolean isStopped(){
+        return this.stopped;
+    }
+   
+    
     
     
 }

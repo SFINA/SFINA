@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 SFINA Team
+ * Copyright (C) 2016 SFINA Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,22 +15,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
+package messages;
+
+import event.Event;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Message notifying that message sender progressed to next time step.
+ * Message ot exchange interdependent Events.
  * @author mcb
  */
-public class ProgressedToNextStepMessage extends AbstractSfinaMessage{
+public class EventMessage extends AbstractSfinaMessage{
+    
+    private List<Event> eventList;
 
-    public ProgressedToNextStepMessage(int networkIdentifier) {
+    public EventMessage(int networkIdentifier, List<Event> events) {
         super(networkIdentifier);
+        this.eventList = events;
+    }
+    
+    public EventMessage(int networkIdentifier, Event event){
+        super(networkIdentifier);
+        this.eventList = new ArrayList();
+        this.eventList.add(event);
+       
+    }
+    
+    public List<Event> getEvents() {
+        return eventList;
     }
 
     @Override
     public MessageType getMessageType() {
-       return MessageType.PROGRESSED_TO_NEXT_STEP;
+        return MessageType.EVENT_MESSAGE;
     }
+    
+    
+ 
     
     
     

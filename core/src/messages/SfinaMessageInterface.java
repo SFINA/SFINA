@@ -15,24 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.Messages;
+package messages;
 
 /**
- * Message to pass Token to next Network.
+ * A Message has to implement this interfaceto in order to be handled by the 
+ * default SFINA message handling framework.
  * @author mcb
  */
-public class TokenMessage extends AbstractSfinaMessage{
-
-    public TokenMessage(int networkIdentifier) {
-        super(networkIdentifier);
-    }
-
-   
-    @Override
-    public MessageType getMessageType() {
-        return MessageType.TOKEN_MESSAGE;
-    }
+public interface SfinaMessageInterface {
+     
+    /**
+     * Returns the network identifier of the network where message originates
+     * from.
+     * @return 
+     */
+    public int getNetworkIdentifier();
     
-    
-    
+    /**
+     * Returns the Type of Message.
+     * @return 
+     */
+    public MessageType getMessageType();
 }

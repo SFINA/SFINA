@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package core;
+package agents.simulation;
 
-import backend.FlowDomainAgent;
+import agents.backend.FlowDomainAgent;
+import agents.time.TimeSteppingAgentInterface;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
 import event.EventType;

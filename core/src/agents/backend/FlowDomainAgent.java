@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package backend;
+package agents.backend;
 
-import core.SimulationAgentInterface;
+import agents.simulation.SimulationAgentInterface;
 import java.util.HashMap;
 import network.FlowNetwork;
 import org.apache.log4j.Logger;

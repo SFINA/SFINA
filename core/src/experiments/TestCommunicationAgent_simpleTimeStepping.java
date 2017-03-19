@@ -17,8 +17,8 @@
  */
 package experiments;
 
-import core.TimeSteppingAgent;
-import core.SimulationAgent;
+import agents.time.TimeSteppingAgent;
+import agents.simulation.SimulationAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;
 import protopeer.Experiment;
