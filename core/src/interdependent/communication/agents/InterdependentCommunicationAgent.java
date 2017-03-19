@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.communication.agents;
 
+import interdependent.communication.CommunicationEventType;
+import interdependent.communication.ProgressType;
 import static java.lang.Integer.min;
 import protopeer.util.quantities.Time;
 

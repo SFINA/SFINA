@@ -18,7 +18,7 @@
 package experiments;
 
 import core.SimulationAgent;
-import interdependent.communication.TokenCommunicationAgent;
+import interdependent.communication.agents.TokenCommunicationAgent;
 import interdependent.communication.PowerEventNegotiatorAgent;
 import org.apache.log4j.Logger;
 import power.backend.InterpssFlowDomainAgent;

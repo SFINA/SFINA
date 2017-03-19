@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package interdependent.communication;
+package interdependent.communication.agents;
 
 import core.TimeSteppingAgent;
 import event.Event;
@@ -25,6 +25,9 @@ import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedActiveStateMessage;
 import interdependent.Messages.ProgressedToNextStepMessage;
+import interdependent.communication.CommunicationEventType;
+import interdependent.communication.EventNegotiatorAgentInterface;
+import interdependent.communication.ProgressType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
