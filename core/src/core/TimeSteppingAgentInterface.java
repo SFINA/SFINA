@@ -18,7 +18,7 @@
 package core;
 
 /**
- *
+ * A TimeStepping Agent needs to implement this interface.
  * @author mcb
  */
 public interface TimeSteppingAgentInterface {
@@ -26,17 +26,21 @@ public interface TimeSteppingAgentInterface {
    
     
     /**
-     * CommandReceiver can notify the TimeSteppingAgent that it finished its Step
+     * SimulationAgent can notify the TimeSteppingAgent that it finished its Step
      * 
      */
     public void agentFinishedActiveState();
     
  
     /**
-     * CommandReceiver can notify the TimeSteppingAgent that it finished its Bootstrap
+     * SimulationAgent can notify the TimeSteppingAgent that it finished its Bootstrap
      */
     public void agentFinishedBootStrap();
     
+    /**
+     * Returns the current Simulation Time.
+     * @return 
+     */
     public int getSimulationTime();
     
     

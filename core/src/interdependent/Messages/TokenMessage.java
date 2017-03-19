@@ -17,10 +17,10 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 
 /**
- *
+ * Message to pass Token to next Network.
  * @author mcb
  */
 public class TokenMessage extends AbstractSfinaMessage{
@@ -31,8 +31,8 @@ public class TokenMessage extends AbstractSfinaMessage{
 
    
     @Override
-    public CommunicationEventType getMessageType() {
-        return CommunicationEventType.TOKEN_MESSAGE;
+    public CommunicationType getMessageType() {
+        return CommunicationType.TOKEN_MESSAGE;
     }
     
     

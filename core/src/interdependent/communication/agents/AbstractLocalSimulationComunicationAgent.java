@@ -25,7 +25,8 @@ import protopeer.network.NetworkAddress;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Base Class for Interdependent Communication on a single machine. Extend this 
+ * class to add a own interdependent communication logic. 
  * @author mcb
  */
 public abstract class AbstractLocalSimulationComunicationAgent extends AbstractCommunicationAgent{

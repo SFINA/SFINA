@@ -17,12 +17,12 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 import protopeer.network.Message;
 import protopeer.network.NetworkAddress;
 
 /**
- *
+ * Message notifying that the network address of message sender changed.
  * @author mcb
  */
 public class NetworkAddressMessage extends AbstractSfinaMessage{
@@ -50,8 +50,8 @@ public class NetworkAddressMessage extends AbstractSfinaMessage{
     }
    
     @Override
-    public CommunicationEventType getMessageType() {
-        return CommunicationEventType.NETWORK_ADDRESS_CHANGE;
+    public CommunicationType getMessageType() {
+        return CommunicationType.NETWORK_ADDRESS_CHANGE;
     }
     
     public boolean isStopped(){

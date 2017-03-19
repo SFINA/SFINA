@@ -23,7 +23,7 @@ import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Base Class responsible for SFINA Time and Iteration Management.
  * @author mcb
  */
 public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentInterface {
@@ -31,7 +31,11 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     private Time bootstrapTime;
     private Time runTime;
 
-    
+    /**
+     * Constructor
+     * @param bootstrapTime
+     * @param runTime 
+     */
     public TimeSteppingAgent(Time bootstrapTime, Time runTime) {
         this.bootstrapTime = bootstrapTime;
         this.runTime = runTime;
@@ -53,16 +57,17 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
         loadAgentTimer.schedule(this.bootstrapTime);
     }
    
-    @Override
+    /************************************************************
+     *      TimeSteppingAgentInterface Functions
+     *************************************************************/
+    
+     @Override
     public void agentFinishedActiveState() {
         if(!getSimulationAgent().isConverged())
             progressCommandReceiverToNextIteration();
 
     }
-
-    /************************************************************
-     *      TimeSteppingAgentInterface Functions
-     *************************************************************/
+    
     
     @Override
     public final void agentFinishedBootStrap() {
@@ -75,22 +80,22 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
        return ((int)(Time.inSeconds(this.getPeer().getClock().getTime())-Time.inSeconds(this.bootstrapTime)));
     }
     
-    
+    /**
+     * Get the SimulationAgent.
+     * @return 
+     */
     public SimulationAgentInterface getSimulationAgent() {
         return (SimulationAgentInterface) getPeer().getPeerletOfType(SimulationAgentInterface.class);
     }
         
-//    private CommandReceiver getCommandReceiver(){
-//        return (CommandReceiver) getPeer().getPeerletOfType(TimeSteppingAgentInterface.CommandReceiver.class);
-//    }
-
     /*************************************************************
      *      TimeSteppingAgent internal functions
      *************************************************************/
     
     /**
      * Recursive Function, which handels the Protopeer Time Stepping and hence
-     * the Simulation Time.
+     * the SFINA Simulation Time. This function is a crucial part of SFINA. Only
+     * modify if you are sure, what you are doing.
      */
     private void progressCommandReceiverToNextTimeStep(){
         Timer loadAgentTimer=getPeer().getClock().createNewTimer();
@@ -106,13 +111,13 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     }
     
     /**
-     * Called by Subclasses to simulate another iteration.
+     * Perform another iteration of Simulation.
      */
     protected final void progressCommandReceiverToNextIteration(){
         getSimulationAgent().progressToNextIteration(); 
     }
     /**
-     * Called by Subclasses to simulate a skipped Iteration.
+     * Skip next iteration of Simulation.
      */
     protected final void progressCommandReceiverToSkipNextIteration(){
         getSimulationAgent().skipNextIteration();         

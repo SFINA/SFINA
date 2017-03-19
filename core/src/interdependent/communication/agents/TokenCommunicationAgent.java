@@ -19,15 +19,16 @@ package interdependent.communication.agents;
 
 
 import interdependent.Messages.AbstractSfinaMessage;
+import interdependent.Messages.SfinaMessageInterface;
 import interdependent.Messages.TokenMessage;
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 import interdependent.communication.ProgressType;
-import static java.lang.Integer.min;
 import protopeer.Peer;
 import protopeer.util.quantities.Time;
 
 /**
- * Circular execution of iterations: first network 1, then network 2, ..., network n, network 1 etc.
+ * Interdependent Communication Agent for the circular execution of iterations: 
+ * first network 1, then network 2, ..., network n, network 1 etc.
  * @author mcb
  */
 public class TokenCommunicationAgent extends AbstractLocalSimulationComunicationAgent{
@@ -98,7 +99,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
      * @return TRUE if @message was handled by sublcasses, else FALSE
      */
     @Override
-    protected boolean handleMessage(AbstractSfinaMessage message) {
+    protected boolean handleMessage(SfinaMessageInterface message) {
         switch(message.getMessageType()){
             case TOKEN_MESSAGE:
                 this.hasToken = true;
@@ -111,7 +112,7 @@ public class TokenCommunicationAgent extends AbstractLocalSimulationComunication
     
 
     @Override
-    protected boolean postProcessCommunicationEvent(CommunicationEventType messageType) {
+    protected boolean postProcessCommunicationEvent(CommunicationType messageType) {
         switch(messageType){
             // after agentFinishedActivestate send the Token to the next peer
             case AGENT_IS_READY:

@@ -57,7 +57,7 @@ import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Base Class for performing a Simulation. 
  * @author mcb
  */
 public class SimulationAgent  extends BasePeerlet implements SimulationAgentInterface{
@@ -333,8 +333,8 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         return (TimeSteppingAgentInterface) getPeer().getPeerletOfType(TimeSteppingAgentInterface.class);
     }
     
-    @Override
-    public int getSimulationTime(){
+    // Todo : leave private or make it public?
+    private int getSimulationTime(){
         return getTimeSteppingAgent().getSimulationTime();
     }
     

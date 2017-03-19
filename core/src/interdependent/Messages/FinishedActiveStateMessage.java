@@ -17,10 +17,10 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 
 /**
- * A Message notifiying the the Network defined by networkIdentifier finished current time step or iteration
+ * Message notifying that message sender finished current time step or iteration
  * @author mcb
  */
 public class FinishedActiveStateMessage extends AbstractSfinaMessage{
@@ -36,8 +36,8 @@ public class FinishedActiveStateMessage extends AbstractSfinaMessage{
     }
 
     @Override
-    public CommunicationEventType getMessageType() {
-        return CommunicationEventType.FINISHED_ACTIVE_STATE;
+    public CommunicationType getMessageType() {
+        return CommunicationType.FINISHED_ACTIVE_STATE;
     }
 
     /**

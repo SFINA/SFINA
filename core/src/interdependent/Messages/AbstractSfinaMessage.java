@@ -17,28 +17,32 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 import protopeer.network.Message;
 
 /**
- *
- * @author root
+ * Base Class for a default SFINA message. 
+ * @author mcb
  */
 public abstract class AbstractSfinaMessage extends Message implements SfinaMessageInterface{
     
-    private int networkIdentifier;
+    private int networkIdentifier; // network where message originates from
 
-    
+    /**
+     * Constructor
+     * @param networkIdentifier : Network where messgae originates from
+     */
     public AbstractSfinaMessage(int networkIdentifier){
         this.networkIdentifier = networkIdentifier;
     }
 
+    @Override
     public int getNetworkIdentifier() {
         return networkIdentifier;
     }
     
     @Override
-    public abstract CommunicationEventType getMessageType();
+    public abstract CommunicationType getMessageType();
     
     
 }

@@ -18,7 +18,7 @@
 package interdependent.communication;
 
 /**
- *
+ * Return Type of function readyToPress() of AbstractCommunicationAgent.
  * @author Ben
  */
 public enum ProgressType {

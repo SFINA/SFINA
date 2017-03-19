@@ -17,14 +17,14 @@
  */
 package interdependent.communication.agents;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 import interdependent.communication.ProgressType;
 import static java.lang.Integer.min;
 import protopeer.util.quantities.Time;
 
 /**
- * Parallel execution of iterations: After each iteration Peers/ Networks communicate
- * with each other.
+ * Interdependent Communication Agent for the parallel execution of iterations: 
+ * After each iteration Peers/ Networks communicate with each other.
  * @author mcb
  */
 public class InterdependentCommunicationAgent extends AbstractLocalSimulationComunicationAgent{
@@ -64,7 +64,7 @@ public class InterdependentCommunicationAgent extends AbstractLocalSimulationCom
     }
 
     @Override
-    protected boolean postProcessCommunicationEvent(CommunicationEventType eventType) {
+    protected boolean postProcessCommunicationEvent(CommunicationType eventType) {
        return false;
     }
 

@@ -18,10 +18,11 @@
 package interdependent.communication;
 
 /**
- *
+ * Types of Communication existing between SFINA Networks. Add enums, if you want
+ * to create new SFINA messages.
  * @author Ben
  */
-public enum CommunicationEventType {
+public enum CommunicationType {
     EVENT_MESSAGE,
     NETWORK_ADDRESS_CHANGE,
     FINISHED_ACTIVE_STATE,

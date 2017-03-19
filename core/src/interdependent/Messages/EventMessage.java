@@ -17,14 +17,14 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 import event.Event;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author root
+ * Message ot exchange interdependent Events.
+ * @author mcb
  */
 public class EventMessage extends AbstractSfinaMessage{
     
@@ -47,8 +47,8 @@ public class EventMessage extends AbstractSfinaMessage{
     }
 
     @Override
-    public CommunicationEventType getMessageType() {
-        return CommunicationEventType.EVENT_MESSAGE;
+    public CommunicationType getMessageType() {
+        return CommunicationType.EVENT_MESSAGE;
     }
     
     

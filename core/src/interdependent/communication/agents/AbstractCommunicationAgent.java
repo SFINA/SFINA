@@ -25,7 +25,8 @@ import interdependent.Messages.AbstractSfinaMessage;
 import interdependent.Messages.EventMessage;
 import interdependent.Messages.FinishedActiveStateMessage;
 import interdependent.Messages.ProgressedToNextStepMessage;
-import interdependent.communication.CommunicationEventType;
+import interdependent.Messages.SfinaMessageInterface;
+import interdependent.communication.CommunicationType;
 import interdependent.communication.EventNegotiatorAgentInterface;
 import interdependent.communication.ProgressType;
 import java.util.ArrayList;
@@ -43,7 +44,8 @@ import protopeer.network.NetworkAddress;
 import protopeer.util.quantities.Time;
 
 /**
- *
+ * Base Class for interdependent Communication. Extend this class to add own 
+ * networking functions and own interdependent communication logic.
  * @author mcb
  */
 public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
@@ -108,7 +110,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
                 getSimulationAgent().getNetworkIndex(), getSimulationTime(), getSimulationAgent().getIteration(), getSimulationAgent().isConverged());
         sendToAll(message);
         
-        this.postProcessAbstractCommunication(CommunicationEventType.AGENT_IS_READY);
+        this.postProcessAbstractCommunication(CommunicationType.AGENT_IS_READY);
     }
  
     
@@ -120,9 +122,9 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
     @Override
     public void handleIncomingMessage(Message message) {
         //check if its a SFINA Message
-        if (message instanceof AbstractSfinaMessage) {
+        if (message instanceof SfinaMessageInterface) {
 
-            AbstractSfinaMessage sfinaMessage = (AbstractSfinaMessage) message;
+            SfinaMessageInterface sfinaMessage = (SfinaMessageInterface) message;
          
             logger.info("At Network " + Integer.toString(this.getSimulationAgent().getNetworkIndex()) + 
                     ": Handle Incomming " + sfinaMessage.getMessageType().toString()+" Message  from " + 
@@ -160,7 +162,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * @param message 
      * @return TRUE if @message was handled by sublcasses, else FALSE
      */
-    protected boolean handleMessage(AbstractSfinaMessage message){
+    protected boolean handleMessage(SfinaMessageInterface message){
         return false;
     }     
      /**
@@ -173,7 +175,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * Handles necessary further steps
      * @param communicationEventType 
      */
-    private void postProcessAbstractCommunication(CommunicationEventType communicationEventType) {
+    private void postProcessAbstractCommunication(CommunicationType communicationEventType) {
 
         postProcessCommunicationEvent(communicationEventType);
         
@@ -326,7 +328,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
         for(Integer netID : getSimulationAgent().getConnectedNetworkIndices())
             interdependentEvents.put(netID, new ArrayList<>());
         for(Event event : this.getSimulationAgent().getEvents()){
-            if(event.getTime() >= this.getSimulationAgent().getSimulationTime() && event.getNetworkComponent() != null){
+            if(event.getTime() >= getSimulationTime() && event.getNetworkComponent() != null){
                 if(event.getNetworkComponent().equals(NetworkComponent.INTERDEPENDENT_LINK)){
                     int targetNetwork = this.getSimulationAgent().getFlowNetwork().getInterdependentLink(event.getComponentID()).getRemoteNetworkIndex();
                     interdependentEvents.get(targetNetwork).add(event);
@@ -428,7 +430,7 @@ public abstract class AbstractCommunicationAgent extends TimeSteppingAgent{
      * @param eventType 
      * @return true if if evenType has been handled by Subclass
      */
-    protected abstract boolean postProcessCommunicationEvent(CommunicationEventType eventType);
+    protected abstract boolean postProcessCommunicationEvent(CommunicationType eventType);
     
  
     /**************  NETWORKING FUNCTIONS ************************

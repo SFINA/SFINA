@@ -17,18 +17,25 @@
  */
 package interdependent.Messages;
 
-import interdependent.communication.CommunicationEventType;
+import interdependent.communication.CommunicationType;
 
 /**
- *
- * @author root
+ * A Message has to implement this interfaceto in order to be handled by the 
+ * default SFINA message handling framework.
+ * @author mcb
  */
 public interface SfinaMessageInterface {
-    
-//    public static final String EVENT_MESSAGE = "Event_Message";
-//    public static final String NETWORK_ADDRES_CHANGE ="Network_Address_Change_Message";
-//    public static final String FINISHED_STEP = "Finished_Step_Message";
-//    
+     
+    /**
+     * Returns the network identifier of the network where message originates
+     * from.
+     * @return 
+     */
     public int getNetworkIdentifier();
-    public CommunicationEventType getMessageType();
+    
+    /**
+     * Returns the Type of Message.
+     * @return 
+     */
+    public CommunicationType getMessageType();
 }
