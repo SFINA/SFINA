@@ -856,4 +856,9 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         flowWriter.writeInterdependentLinkFlowData(experimentOutputFilesLocation+timeToken+"/iteration_"+iteration+interdependentLinksFlowLocation);
     }
     
+    
+    protected String getPeerTokenName(){
+        return this.peerTokenName;
+    }
+    
 }
