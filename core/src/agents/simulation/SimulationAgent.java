@@ -335,7 +335,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     }
     
     // Todo : leave private or make it public?
-    private int getSimulationTime(){
+    protected int getSimulationTime(){
         return getTimeSteppingAgent().getSimulationTime();
     }
     
