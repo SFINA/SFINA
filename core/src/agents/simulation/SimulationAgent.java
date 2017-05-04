@@ -21,8 +21,6 @@ import agents.backend.FlowDomainAgent;
 import agents.time.TimeSteppingAgentInterface;
 import dsutil.protopeer.FingerDescriptor;
 import event.Event;
-import event.EventType;
-import event.NetworkComponent;
 import input.EventLoader;
 import input.FlowLoader;
 import input.SfinaParameter;
@@ -52,9 +50,6 @@ import protopeer.Peer;
 import protopeer.measurement.MeasurementFileDumper;
 import protopeer.measurement.MeasurementLog;
 import protopeer.measurement.MeasurementLoggerListener;
-import protopeer.network.Message;
-import protopeer.time.Timer;
-import protopeer.time.TimerListener;
 import protopeer.util.quantities.Time;
 
 /**
@@ -211,28 +206,24 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     
     @Override
     public void progressToNextTimeStep() {
-                initTimeStep();
-                getTimeSteppingAgent().agentFinishedActiveState();
+        initTimeStep();
+        getTimeSteppingAgent().agentFinishedActiveState();
     }
 
     @Override
     public void progressToNextIteration() { 
-        this.logIteration();
+        this.initIteration();
         this.runActiveState(); 
         getTimeSteppingAgent().agentFinishedActiveState();
     }
     
     @Override
     public void skipNextIteration() {
-        this.logIteration();
+        this.initIteration();
         logger.info("Skipping this iteration");
         getTimeSteppingAgent().agentFinishedActiveState();
     }
 
-    //Mark: Todo (Question for Ben): in runFlowAnalysis we have boolean which is called
-    // converged - should we not also check this one if we are converged?
-    // If yes it could have as a default value false and instead of checking
-    // getIteration()==0 we could just check "converged".
     @Override
     public boolean isConverged() {
         if(getIteration() == 0)
@@ -276,7 +267,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         this.iteration=0;
     }
     
-    private void logIteration(){
+    private void initIteration(){
         this.iteration++;
         logger.info("\n-------> Iteration " + this.getIteration() + " at network " + this.getNetworkIndex() + " (" + this.timeToken + ") <-------");
     }
@@ -294,16 +285,6 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         for(FlowNetwork currentIsland : flowNetwork.computeIslands()){
             boolean converged = this.getFlowDomainAgent().flowAnalysis(currentIsland);
         }
-        
-        //mcb: TODO remove this comment
-        
-//        // For testing if iteration advances as expected
-//        if(this.getNetworkIndex() == 0 && this.getSimulationTime() == 1)
-//            if(this.getIteration()==0 || this.getIteration()==1 )
-//                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
-//        if(this.getSimulationTime() == 2)
-//            if(this.getIteration()==0 || this.getIteration()==1 )
-//                this.queueEvent(new Event(getSimulationTime(),EventType.TOPOLOGY,NetworkComponent.LINK,"1",LinkState.STATUS,false));
     }
      
     @Override
@@ -311,11 +292,6 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         
     }
     
-//    @Override
-//    public void runPassiveState(Message message){
-//        
-//    }
-
     /***************************************
      *          GETTER AND SETTER  
      *****************************************/
@@ -643,6 +619,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
      *
      * @param events
      */
+    @Override
     public void queueEvents(List<Event> events){
         this.events.addAll(events);
     }

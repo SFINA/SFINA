@@ -48,7 +48,7 @@ public class TimeSteppingAgent extends BasePeerlet implements TimeSteppingAgentI
     
     @Override
     public void start() {
-        super.start(); //To change body of generated methods, choose Tools | Templates.
+        super.start(); 
         Timer loadAgentTimer= getPeer().getClock().createNewTimer();
         loadAgentTimer.addTimerListener(new TimerListener(){
             public void timerExpired(Timer timer){
