@@ -17,6 +17,7 @@
  */
 package power.input;
 
+import agents.backend.BackendParameterLoaderInterface;
 import input.SfinaParameterLoader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,15 +32,16 @@ import power.backend.PowerBackendParameter;
  *
  * @author Ben
  */
-public class PowerBackendParameterLoader {
+public class PowerBackendParameterLoader implements BackendParameterLoaderInterface{
     
     private String columnSeparator;
-    private static final Logger logger = Logger.getLogger(SfinaParameterLoader.class);
+    private static final Logger logger = Logger.getLogger(PowerBackendParameterLoader.class);
     
     public PowerBackendParameterLoader(String columnSeparator){
         this.columnSeparator=columnSeparator;
     }
     
+    @Override
     public HashMap<Enum,Object> loadBackendParameters(String location){
         HashMap<Enum,Object> backendParameters = new HashMap();
         File file = new File(location);

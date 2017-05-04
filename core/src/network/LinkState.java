@@ -25,5 +25,9 @@ public enum LinkState {
     ID,
     FROM_NODE,
     TO_NODE,
-    STATUS
+    STATUS,
+    // For interdependent links:
+    FROM_NET,
+    TO_NET,
+    REMOTE_NODE_STATUS
 }

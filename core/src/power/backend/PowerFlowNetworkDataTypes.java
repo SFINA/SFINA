@@ -17,8 +17,10 @@
  */
 package power.backend;
 
-import backend.FlowNetworkDataTypesInterface;
+import agents.backend.FlowNetworkDataTypesInterface;
+import network.InterdependentLink;
 import network.Link;
+import network.LinkInterface;
 import network.Node;
 import org.apache.log4j.Logger;
 import power.input.PowerLinkState;
@@ -472,7 +474,13 @@ public class PowerFlowNetworkDataTypes implements FlowNetworkDataTypesInterface{
     }
     
     @Override
-    public String castLinkStateValueToString(Enum linkState, Link link, String missingValue){
-        return String.valueOf(link.getProperty(linkState));
+    public String castLinkStateValueToString(Enum linkState, LinkInterface link, String missingValue){
+        Object value;
+        if(link.isInterdependent())
+            value = ((InterdependentLink)link).getProperty(linkState);
+        else
+            value = ((Link)link).getProperty(linkState);
+        
+        return (value == null ? missingValue : String.valueOf(value));
     }
 }

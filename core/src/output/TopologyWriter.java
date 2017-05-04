@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import network.FlowNetwork;
+import network.InterdependentLink;
 import network.Link;
 import network.Node;
 import org.apache.log4j.Logger;
@@ -35,10 +36,12 @@ public class TopologyWriter {
     private FlowNetwork net;
     private String columnSeparator;
     private static final Logger logger = Logger.getLogger(TopologyWriter.class);
+    private final int networkIndex;
     
-    public TopologyWriter(FlowNetwork net, String columnSeparator){
+    public TopologyWriter(FlowNetwork net, String columnSeparator, int networkIndex){
         this.net=net;
         this.columnSeparator=columnSeparator;        
+        this.networkIndex = networkIndex;
     }
     
     public void writeNodes(String location){
@@ -88,5 +91,32 @@ public class TopologyWriter {
         catch(IOException ex){
             ex.printStackTrace();
         }
-    }    
+    }
+    
+    public void writeInterdependentLinks(String location){
+        try{
+            File file = new File(location);
+            File parent = file.getParentFile();
+            if(!parent.exists() && !parent.mkdirs())
+                logger.debug("Couldn't create output folder");
+            file.createNewFile();
+            PrintWriter writer = new PrintWriter(new FileWriter(file,false));
+            writer.println("id" + columnSeparator + "from_node_id" + columnSeparator + "from_net_id" + columnSeparator + "to_node_id" + columnSeparator + "to_net_id" + columnSeparator + "status");
+            for (InterdependentLink link : net.getLinksInterdependent()){
+                String status;
+                if (link.isActivated())
+                    status = "1";
+                else 
+                    status = "0";
+                if (link.isOutgoing())
+                    writer.println(link.getIndex() + columnSeparator + link.getStartNode().getIndex() + columnSeparator + link.getThisNetworkIndex() + columnSeparator + link.getEndNode().getIndex() + columnSeparator + link.getRemoteNetworkIndex() + columnSeparator + status);
+                else
+                    writer.println(link.getIndex() + columnSeparator + link.getEndNode().getIndex() + columnSeparator + link.getRemoteNetworkIndex() + columnSeparator + link.getStartNode().getIndex() + columnSeparator + link.getThisNetworkIndex() + columnSeparator + status);
+            }
+            writer.close();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
+    }
 }

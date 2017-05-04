@@ -23,5 +23,6 @@ package event;
  */
 public enum NetworkComponent {
     NODE,
-    LINK
+    LINK,
+    INTERDEPENDENT_LINK
 }
