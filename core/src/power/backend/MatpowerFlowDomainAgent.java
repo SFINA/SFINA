@@ -99,7 +99,7 @@ public class MatpowerFlowDomainAgent extends FlowDomainAgent{
             processor.setNumericArray(caseFile + ".branch", new MatlabNumericArray(getBranchesPowerFlowInfo(), null));
             processor.setNumericArray(caseFile + ".gencost", new MatlabNumericArray(getCostsPowerFlowInfo(), null));
             
-            switch(powerFlowType){
+            switch((PowerFlowType)getDomainParameters().get(PowerBackendParameter.FLOW_TYPE)){
                 case AC:
                     proxy.eval("result = runpf(" + caseFile + ");");
                     break;
