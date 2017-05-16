@@ -109,11 +109,10 @@ public interface SimulationAgentInterface {
     
     /**
      *
-     * @param sfinaParamLocation
      * @param backendParamLocation
      * @param eventsLocation
      */
-    void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation);                
+    void loadExperimentConfigFiles(String backendParamLocation, String eventsLocation);                
 
     /**
      * Return all connected networks.

@@ -19,7 +19,7 @@ package output;
 
 import event.Event;
 import agents.backend.FlowNetworkDataTypesInterface;
-import input.SfinaParameter;
+import input.SystemParameter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -177,7 +177,7 @@ public class EventWriter {
                 eventStrings.add("system");
                 eventStrings.add(missingValue);
                 eventStrings.add(missingValue);
-                switch((SfinaParameter)event.getParameter()){
+                switch((SystemParameter)event.getParameter()){
                     case RELOAD:
                         eventStrings.add("reload");
                         eventStrings.add(event.getValue().toString());

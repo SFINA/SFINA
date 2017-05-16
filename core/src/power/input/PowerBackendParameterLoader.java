@@ -18,7 +18,6 @@
 package power.input;
 
 import agents.backend.BackendParameterLoaderInterface;
-import input.SfinaParameterLoader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;

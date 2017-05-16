@@ -23,8 +23,7 @@ import dsutil.protopeer.FingerDescriptor;
 import event.Event;
 import input.EventLoader;
 import input.FlowLoader;
-import input.SfinaParameter;
-import input.SfinaParameterLoader;
+import input.SystemParameter;
 import input.TopologyLoader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,8 +60,6 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     private static final Logger logger = Logger.getLogger(SimulationAgent.class);
 
     private String experimentID;
- //   private Time bootstrapTime;
-   // private Time runTime;
     private int iteration;
     private final static String parameterColumnSeparator="=";
     private final static String fileSystemSchema="conf/fileSystem.conf";
@@ -82,18 +79,16 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     private String interdependentLinksFlowLocation;
     private String eventsInputLocation;
     private String eventsOutputLocation;
-    private String sfinaParamLocation;
     private String backendParamLocation;
     private String columnSeparator;
     private String missingValue;
-    private HashMap<SfinaParameter,Object> sfinaParameters;
+    private HashMap<SystemParameter,Object> sfinaParameters;
     private FlowNetwork flowNetwork;
     private TopologyLoader topologyLoader;
     private FlowLoader flowLoader;
     private TopologyWriter topologyWriter;
     private FlowWriter flowWriter;
     private EventWriter eventWriter;
-    private SfinaParameterLoader sfinaParameterLoader;
     private EventLoader eventLoader;
     private FingerDescriptor myAgentDescriptor;
     private MeasurementFileDumper measurementDumper;
@@ -143,7 +138,7 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
        
         logger.info("### Bootstraping "+experimentID+" ###");
         loadFileSystem(fileSystemSchema);
-        loadExperimentConfigFiles(sfinaParamLocation, backendParamLocation, eventsInputLocation);
+        loadExperimentConfigFiles(backendParamLocation, eventsInputLocation);
 
         // Clearing output and peers log files from earlier experiments
         File folder = new File(peersLogDirectory+experimentID+"/");
@@ -360,14 +355,14 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     /**
      * @return the sfinaParameters
      */
-    public HashMap<SfinaParameter,Object> getSfinaParameters() {
+    public HashMap<SystemParameter,Object> getSfinaParameters() {
         return sfinaParameters;
     }
 
     /**
      * @param sfinaParameters the sfinaParameters to set
      */
-    public void setSfinaParameters(HashMap<SfinaParameter,Object> sfinaParameters) {
+    public void setSfinaParameters(HashMap<SystemParameter,Object> sfinaParameters) {
         this.sfinaParameters = sfinaParameters;
     }
 
@@ -583,8 +578,8 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
                     }
                     break;
                 case SYSTEM:
-                    logger.info("..executing system parameter event: " + (SfinaParameter)event.getParameter());
-                    switch((SfinaParameter)event.getParameter()){
+                    logger.info("..executing system parameter event: " + (SystemParameter)event.getParameter());
+                    switch((SystemParameter)event.getParameter()){
                         case RELOAD:
                             loadInputData(timeTokenName + (String)event.getValue());
                             break;
@@ -717,7 +712,6 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
         this.experimentOutputFilesLocation=experimentBaseFolderLocation+peerTokenName+"/"+outputDirectoryName;
         this.eventsInputLocation=experimentInputFilesLocation+eventsFileName;
         this.eventsOutputLocation=experimentOutputFilesLocation+eventsFileName;
-        this.sfinaParamLocation=experimentInputFilesLocation+sfinaParamFileName;
         this.backendParamLocation=experimentInputFilesLocation+backendParamFileName;
         this.nodesLocation="/"+topologyDirectoryName+nodesFileName;
         this.linksLocation="/"+topologyDirectoryName+linksFileName;
@@ -729,22 +723,12 @@ public class SimulationAgent  extends BasePeerlet implements SimulationAgentInte
     
     /**
      * Loads SFINA and backend parameters and events from file. The first has to be provided, will give error otherwise.
-     * @param sfinaParamLocation path to sfinaParameters.txt
      * @param backendParamLocation path to backendParameters.txt
      * @param eventsLocation path to events.txt
      */
     @Override
-    public void loadExperimentConfigFiles(String sfinaParamLocation, String backendParamLocation, String eventsLocation){
-        // Sfina Parameters
-        File file = new File(sfinaParamLocation);
-        if (file.exists()){
-            sfinaParameterLoader = new SfinaParameterLoader(parameterColumnSeparator);
-            sfinaParameters = sfinaParameterLoader.loadSfinaParameters(sfinaParamLocation);
-            logger.debug("Loaded sfinaParameters: " + sfinaParameters);
-        }
-        else
-            logger.debug("sfinaParameters.txt file not found. Should be here: " + sfinaParamLocation);
-        file = new File(backendParamLocation);
+    public void loadExperimentConfigFiles(String backendParamLocation, String eventsLocation){
+        File file = new File(backendParamLocation);
         if (file.exists()) {
             this.getFlowDomainAgent().loadDomainParameters(backendParamLocation);
             logger.debug("Loaded backendParameters: " + this.getDomainParameters());

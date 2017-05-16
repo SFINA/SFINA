@@ -188,7 +188,7 @@ public class EventLoader {
                         }
                         break;
                     case SYSTEM:
-                        value=this.getActualSystemValue((SfinaParameter)parameter, values.get(5));
+                        value=this.getActualSystemValue((SystemParameter)parameter, values.get(5));
                         break;
                     default:
                         logger.debug("Network feature cannot be recognized.");
@@ -223,10 +223,10 @@ public class EventLoader {
         }
     }
     
-    private SfinaParameter lookupSystemParameterState(String systemParameterState){
+    private SystemParameter lookupSystemParameterState(String systemParameterState){
         switch(systemParameterState){
             case "reload":
-                return SfinaParameter.RELOAD;
+                return SystemParameter.RELOAD;
             default:
                 logger.debug(("System parameter state is not recognized."));
                 return null;
@@ -311,7 +311,7 @@ public class EventLoader {
         }    
     }
     
-    private Object getActualSystemValue(SfinaParameter systemParameter, String rawValue){
+    private Object getActualSystemValue(SystemParameter systemParameter, String rawValue){
         switch(systemParameter){
             case RELOAD:
                 return rawValue;

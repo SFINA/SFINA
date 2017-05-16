@@ -9,8 +9,6 @@ package input;
  *
  * @author evangelospournaras
  */
-public enum SfinaParameter {
-    DOMAIN,
-    BACKEND,
+public enum SystemParameter {
     RELOAD
 }
