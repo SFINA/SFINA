@@ -30,6 +30,7 @@ import com.interpss.core.algo.LoadflowAlgorithm;
 import com.interpss.core.dclf.DclfAlgorithm;
 import com.interpss.core.dclf.common.ReferenceBusException;
 import agents.simulation.SimulationAgentInterface;
+import com.interpss.core.aclf.AclfBranchCode;
 import static java.lang.Math.PI;
 import network.FlowNetwork;
 import network.Link;
@@ -77,7 +78,7 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
             return false;
         
         try{
-            switch(powerFlowType){
+            switch((PowerFlowType)getDomainParameters().get(PowerBackendParameter.FLOW_TYPE)){
                 case AC:
                     buildIpssNet();
                     LoadflowAlgorithm acAlgo = CoreObjectFactory.createLoadflowAlgorithm(IpssNet);
@@ -201,6 +202,7 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
             for (Link link : SfinaNet.getLinks()){
 
                 AclfBranch IpssBranch = CoreObjectFactory.createAclfBranch();
+                IpssBranch.setBranchCode(AclfBranchCode.PS_XFORMER);
                 IpssNet.addBranch(IpssBranch, link.getStartNode().getIndex(), link.getEndNode().getIndex()); // names of buses in InterPSS are index of SFINA nodes
                 IpssBranch.setId(link.getIndex()); // set branch id to SFINA branch id to make better accessible
                 IpssBranch.setStatus(link.isActivated());
@@ -225,7 +227,7 @@ public class InterpssFlowDomainAgent extends FlowDomainAgent{
                 //IpssBranch.setFromTurnRatio((Double)link.getProperty(PowerLinkState.TAP_RATIO));
                 // Set angle difference: in matpower only one value is defined. Assume that it's the angle difference, so we set in InterPSS from = 0 and to = angle_shift
                 IpssBranch.setFromPSXfrAngle(0.0);
-                IpssBranch.setToPSXfrAngle((Double)link.getProperty(PowerLinkState.ANGLE_SHIFT));
+                IpssBranch.setToPSXfrAngle((Double)link.getProperty(PowerLinkState.ANGLE_SHIFT)*PI/180);
                 
                 // Admittance matrix
                 //System.out.println(net.formYMatrix());
